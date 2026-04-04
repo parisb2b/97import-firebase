@@ -1,0 +1,1514 @@
+{
+  "source": "https://97import.com",
+  "exported_at": "2026-04-04T19:53:25.075425",
+  "total_files": 167,
+  "total_size_bytes": 123169770,
+  "total_size": "117.5 Mo",
+  "errors_count": 0,
+  "files": [
+    {
+      "path": "index.html",
+      "url": "https://97import.com/",
+      "size_bytes": 1466,
+      "size": "1.43 Ko",
+      "sha256": "73f02db339cf3889a2117900a5d0b4a8728580ccf0108c7a7c51132c3fcf0f63",
+      "content_type": "text/html; charset=utf-8",
+      "downloaded_at": "2026-04-04T19:52:42.377529"
+    },
+    {
+      "path": "assets/index-B1YsO-WO.js",
+      "url": "https://97import.com/assets/index-B1YsO-WO.js",
+      "size_bytes": 1557275,
+      "size": "1.49 Mo",
+      "sha256": "8089edd719ad1ea14c68fe56df15506919e89f68ac49fb3803afd27d89fadb5b",
+      "content_type": "application/javascript; charset=utf-8",
+      "downloaded_at": "2026-04-04T19:52:42.801209"
+    },
+    {
+      "path": "assets/index-fcmVpsNi.css",
+      "url": "https://97import.com/assets/index-fcmVpsNi.css",
+      "size_bytes": 149291,
+      "size": "145.79 Ko",
+      "sha256": "76a1424d05ea3d3d8327f84b700ce0126cd43f2339e2bf64bb5bff0aa2d9aec9",
+      "content_type": "text/css; charset=utf-8",
+      "downloaded_at": "2026-04-04T19:52:43.197451"
+    },
+    {
+      "path": "docs/fiche_technique_maison_modulaire.pdf",
+      "url": "https://97import.com/docs/fiche_technique_maison_modulaire.pdf",
+      "size_bytes": 5586,
+      "size": "5.46 Ko",
+      "sha256": "3057f6354b0ccf2ea5d08b0c0acd97613ce946b716868e8fb5d7be4b07496a1f",
+      "content_type": "application/pdf",
+      "downloaded_at": "2026-04-04T19:52:43.373635"
+    },
+    {
+      "path": "documents/r18_pro_fiche_technique.pdf",
+      "url": "https://97import.com/documents/r18_pro_fiche_technique.pdf",
+      "size_bytes": 315334,
+      "size": "307.94 Ko",
+      "sha256": "a8f34aac5ec86af64b818247037138b1792035f94beaed80132a34c40d939e2f",
+      "content_type": "application/pdf",
+      "downloaded_at": "2026-04-04T19:52:43.608703"
+    },
+    {
+      "path": "documents/r22_pro_fiche_technique.pdf",
+      "url": "https://97import.com/documents/r22_pro_fiche_technique.pdf",
+      "size_bytes": 318461,
+      "size": "311.00 Ko",
+      "sha256": "ececb19dd6f29afdff3de942c889953558d3ce31766d68e9611ec5addf377569",
+      "content_type": "application/pdf",
+      "downloaded_at": "2026-04-04T19:52:44.179288"
+    },
+    {
+      "path": "documents/r32_pro_fiche_technique.pdf",
+      "url": "https://97import.com/documents/r32_pro_fiche_technique.pdf",
+      "size_bytes": 325745,
+      "size": "318.11 Ko",
+      "sha256": "c4354c7743b4ce441bcdb5fc75391b040a7ca4dd722df3cbed2bd5f56b57d1e0",
+      "content_type": "application/pdf",
+      "downloaded_at": "2026-04-04T19:52:44.446175"
+    },
+    {
+      "path": "documents/r57_pro_fiche_technique.pdf",
+      "url": "https://97import.com/documents/r57_pro_fiche_technique.pdf",
+      "size_bytes": 27922,
+      "size": "27.27 Ko",
+      "sha256": "94b9bafd813e9f2bbb546b14c7d32531ce1140db9fe249186e5bd93c8dacb04d",
+      "content_type": "application/pdf",
+      "downloaded_at": "2026-04-04T19:52:44.595336"
+    },
+    {
+      "path": "images/accessories/auger_r18.jpeg",
+      "url": "https://97import.com/images/accessories/auger_r18.jpeg",
+      "size_bytes": 15210,
+      "size": "14.85 Ko",
+      "sha256": "4a111c4309aa67366eba2e2105a71a87d91a87af9d11daf17c5ab511e0d98f53",
+      "content_type": "image/jpeg",
+      "downloaded_at": "2026-04-04T19:52:44.747978"
+    },
+    {
+      "path": "images/accessories/auger_r18.webp",
+      "url": "https://97import.com/images/accessories/auger_r18.webp",
+      "size_bytes": 39188,
+      "size": "38.27 Ko",
+      "sha256": "c9dc6c1e1c3db90a8945a0d189817e56dbee944e68005031c88896dc17a18ef7",
+      "content_type": "image/webp",
+      "downloaded_at": "2026-04-04T19:52:44.914420"
+    },
+    {
+      "path": "images/accessories/flat_bucket_r18.jpeg",
+      "url": "https://97import.com/images/accessories/flat_bucket_r18.jpeg",
+      "size_bytes": 12636,
+      "size": "12.34 Ko",
+      "sha256": "76eacda31a894cf15314286f0a2a4044fb3ba15fe2e1022cbd87d2ec365d32d0",
+      "content_type": "image/jpeg",
+      "downloaded_at": "2026-04-04T19:52:45.160401"
+    },
+    {
+      "path": "images/accessories/flat_bucket_r18.webp",
+      "url": "https://97import.com/images/accessories/flat_bucket_r18.webp",
+      "size_bytes": 35552,
+      "size": "34.72 Ko",
+      "sha256": "153ec5630ac80e414d56d101833dbc88dcb710f07c6bfa17525e2ee524c76dff",
+      "content_type": "image/webp",
+      "downloaded_at": "2026-04-04T19:52:45.308127"
+    },
+    {
+      "path": "images/accessories/fourche.jpeg",
+      "url": "https://97import.com/images/accessories/fourche.jpeg",
+      "size_bytes": 15210,
+      "size": "14.85 Ko",
+      "sha256": "4a111c4309aa67366eba2e2105a71a87d91a87af9d11daf17c5ab511e0d98f53",
+      "content_type": "image/jpeg",
+      "downloaded_at": "2026-04-04T19:52:45.453874"
+    },
+    {
+      "path": "images/accessories/fourche.webp",
+      "url": "https://97import.com/images/accessories/fourche.webp",
+      "size_bytes": 39188,
+      "size": "38.27 Ko",
+      "sha256": "c9dc6c1e1c3db90a8945a0d189817e56dbee944e68005031c88896dc17a18ef7",
+      "content_type": "image/webp",
+      "downloaded_at": "2026-04-04T19:52:45.678978"
+    },
+    {
+      "path": "images/accessories/godet_cribleur.png",
+      "url": "https://97import.com/images/accessories/godet_cribleur.png",
+      "size_bytes": 19712,
+      "size": "19.25 Ko",
+      "sha256": "945adb5807a9daf78ef5550cf43f833cd030a6b1eea6bc01702c0144048e11f7",
+      "content_type": "image/png",
+      "downloaded_at": "2026-04-04T19:52:45.831782"
+    },
+    {
+      "path": "images/accessories/godet_cribleur.webp",
+      "url": "https://97import.com/images/accessories/godet_cribleur.webp",
+      "size_bytes": 11848,
+      "size": "11.57 Ko",
+      "sha256": "ec02a1d1b276550484f116666f13c495ff9bb1c6e9102351e514c9692b23bf79",
+      "content_type": "image/webp",
+      "downloaded_at": "2026-04-04T19:52:45.977288"
+    },
+    {
+      "path": "images/accessories/godet_dents.png",
+      "url": "https://97import.com/images/accessories/godet_dents.png",
+      "size_bytes": 22602,
+      "size": "22.07 Ko",
+      "sha256": "1d12d66a3e7ff3035095ee8ff42bcca91ba46b3826374daa65e62fc2d9a6fb79",
+      "content_type": "image/png",
+      "downloaded_at": "2026-04-04T19:52:46.265732"
+    },
+    {
+      "path": "images/accessories/godet_dents.webp",
+      "url": "https://97import.com/images/accessories/godet_dents.webp",
+      "size_bytes": 13568,
+      "size": "13.25 Ko",
+      "sha256": "068daf89ba57b58c4beacdbe81176b6043ad578719a0e25d45a928dda0e07940",
+      "content_type": "image/webp",
+      "downloaded_at": "2026-04-04T19:52:46.428848"
+    },
+    {
+      "path": "images/accessories/godet_inclinable.jpeg",
+      "url": "https://97import.com/images/accessories/godet_inclinable.jpeg",
+      "size_bytes": 15210,
+      "size": "14.85 Ko",
+      "sha256": "4a111c4309aa67366eba2e2105a71a87d91a87af9d11daf17c5ab511e0d98f53",
+      "content_type": "image/jpeg",
+      "downloaded_at": "2026-04-04T19:52:46.614508"
+    },
+    {
+      "path": "images/accessories/godet_inclinable.webp",
+      "url": "https://97import.com/images/accessories/godet_inclinable.webp",
+      "size_bytes": 39188,
+      "size": "38.27 Ko",
+      "sha256": "c9dc6c1e1c3db90a8945a0d189817e56dbee944e68005031c88896dc17a18ef7",
+      "content_type": "image/webp",
+      "downloaded_at": "2026-04-04T19:52:46.936999"
+    },
+    {
+      "path": "images/accessories/godet_lisse.jpeg",
+      "url": "https://97import.com/images/accessories/godet_lisse.jpeg",
+      "size_bytes": 15210,
+      "size": "14.85 Ko",
+      "sha256": "4a111c4309aa67366eba2e2105a71a87d91a87af9d11daf17c5ab511e0d98f53",
+      "content_type": "image/jpeg",
+      "downloaded_at": "2026-04-04T19:52:47.189503"
+    },
+    {
+      "path": "images/accessories/godet_lisse.webp",
+      "url": "https://97import.com/images/accessories/godet_lisse.webp",
+      "size_bytes": 39188,
+      "size": "38.27 Ko",
+      "sha256": "c9dc6c1e1c3db90a8945a0d189817e56dbee944e68005031c88896dc17a18ef7",
+      "content_type": "image/webp",
+      "downloaded_at": "2026-04-04T19:52:47.354201"
+    },
+    {
+      "path": "images/accessories/grappin.jpeg",
+      "url": "https://97import.com/images/accessories/grappin.jpeg",
+      "size_bytes": 15210,
+      "size": "14.85 Ko",
+      "sha256": "4a111c4309aa67366eba2e2105a71a87d91a87af9d11daf17c5ab511e0d98f53",
+      "content_type": "image/jpeg",
+      "downloaded_at": "2026-04-04T19:52:47.502698"
+    },
+    {
+      "path": "images/accessories/grappin.webp",
+      "url": "https://97import.com/images/accessories/grappin.webp",
+      "size_bytes": 39188,
+      "size": "38.27 Ko",
+      "sha256": "c9dc6c1e1c3db90a8945a0d189817e56dbee944e68005031c88896dc17a18ef7",
+      "content_type": "image/webp",
+      "downloaded_at": "2026-04-04T19:52:47.680971"
+    },
+    {
+      "path": "images/accessories/grapple_r18.jpeg",
+      "url": "https://97import.com/images/accessories/grapple_r18.jpeg",
+      "size_bytes": 14770,
+      "size": "14.42 Ko",
+      "sha256": "42f8b028faec4e5bcaac8f377dbc60ce7e31ffba71c59b06ed124c1eb2706663",
+      "content_type": "image/jpeg",
+      "downloaded_at": "2026-04-04T19:52:47.869087"
+    },
+    {
+      "path": "images/accessories/grapple_r18.webp",
+      "url": "https://97import.com/images/accessories/grapple_r18.webp",
+      "size_bytes": 44190,
+      "size": "43.15 Ko",
+      "sha256": "04490c5d3fc1e0cc1bb5bc5cc49fe175f06486751bee029824aeba8a5355f773",
+      "content_type": "image/webp",
+      "downloaded_at": "2026-04-04T19:52:48.173168"
+    },
+    {
+      "path": "images/accessories/hydraulic_hammer_r18.jpeg",
+      "url": "https://97import.com/images/accessories/hydraulic_hammer_r18.jpeg",
+      "size_bytes": 15095,
+      "size": "14.74 Ko",
+      "sha256": "cf73b34976dfb3b3dab77cc77afca758036297322392a1a7a4d66a7824036088",
+      "content_type": "image/jpeg",
+      "downloaded_at": "2026-04-04T19:52:48.386386"
+    },
+    {
+      "path": "images/accessories/hydraulic_hammer_r18.webp",
+      "url": "https://97import.com/images/accessories/hydraulic_hammer_r18.webp",
+      "size_bytes": 38840,
+      "size": "37.93 Ko",
+      "sha256": "adb396a6dc27146659b14ab799f7608c1bcd69803ee1d1ae2dc05d9066df1b2a",
+      "content_type": "image/webp",
+      "downloaded_at": "2026-04-04T19:52:48.536749"
+    },
+    {
+      "path": "images/accessories/marteau_hydraulique.png",
+      "url": "https://97import.com/images/accessories/marteau_hydraulique.png",
+      "size_bytes": 19491,
+      "size": "19.03 Ko",
+      "sha256": "bc3449db4922a499afa76318856ce8d6bd932bd096918c3e7ab485f52f839398",
+      "content_type": "image/png",
+      "downloaded_at": "2026-04-04T19:52:48.734856"
+    },
+    {
+      "path": "images/accessories/marteau_hydraulique.webp",
+      "url": "https://97import.com/images/accessories/marteau_hydraulique.webp",
+      "size_bytes": 11700,
+      "size": "11.43 Ko",
+      "sha256": "6ec2923a83f5405e5eefbde7a3b7d55004a0b10f5cacbeedb5a88e3934959c31",
+      "content_type": "image/webp",
+      "downloaded_at": "2026-04-04T19:52:48.917780"
+    },
+    {
+      "path": "images/accessories/rake_r18.jpeg",
+      "url": "https://97import.com/images/accessories/rake_r18.jpeg",
+      "size_bytes": 15593,
+      "size": "15.23 Ko",
+      "sha256": "4c5fd4ddedd4e8a8204a5be07a2a6a156700c035ac5e9f0a1a037a4d908b8242",
+      "content_type": "image/jpeg",
+      "downloaded_at": "2026-04-04T19:52:49.074055"
+    },
+    {
+      "path": "images/accessories/rake_r18.webp",
+      "url": "https://97import.com/images/accessories/rake_r18.webp",
+      "size_bytes": 40346,
+      "size": "39.40 Ko",
+      "sha256": "1d9097c96c86e040cede6bfe966da32d0e0f7db7105beba2901d2b6c5a571ff2",
+      "content_type": "image/webp",
+      "downloaded_at": "2026-04-04T19:52:49.276249"
+    },
+    {
+      "path": "images/accessories/ripper_r18.jpeg",
+      "url": "https://97import.com/images/accessories/ripper_r18.jpeg",
+      "size_bytes": 9464,
+      "size": "9.24 Ko",
+      "sha256": "c4bd5b8a87483c8ddb604391d34a15992241eab7385280a5eb0fa64a735e6c5f",
+      "content_type": "image/jpeg",
+      "downloaded_at": "2026-04-04T19:52:49.433002"
+    },
+    {
+      "path": "images/accessories/ripper_r18.webp",
+      "url": "https://97import.com/images/accessories/ripper_r18.webp",
+      "size_bytes": 23990,
+      "size": "23.43 Ko",
+      "sha256": "1f0f1de08c2f9cecb514844e0de832ea4dc7cad2396bfd7a596a6870788f83d4",
+      "content_type": "image/webp",
+      "downloaded_at": "2026-04-04T19:52:49.600529"
+    },
+    {
+      "path": "images/accessories/tariere.jpeg",
+      "url": "https://97import.com/images/accessories/tariere.jpeg",
+      "size_bytes": 15210,
+      "size": "14.85 Ko",
+      "sha256": "4a111c4309aa67366eba2e2105a71a87d91a87af9d11daf17c5ab511e0d98f53",
+      "content_type": "image/jpeg",
+      "downloaded_at": "2026-04-04T19:52:49.762096"
+    },
+    {
+      "path": "images/accessories/tariere.webp",
+      "url": "https://97import.com/images/accessories/tariere.webp",
+      "size_bytes": 39188,
+      "size": "38.27 Ko",
+      "sha256": "c9dc6c1e1c3db90a8945a0d189817e56dbee944e68005031c88896dc17a18ef7",
+      "content_type": "image/webp",
+      "downloaded_at": "2026-04-04T19:52:49.925348"
+    },
+    {
+      "path": "images/accessories/tilt_bucket_r18.jpeg",
+      "url": "https://97import.com/images/accessories/tilt_bucket_r18.jpeg",
+      "size_bytes": 15268,
+      "size": "14.91 Ko",
+      "sha256": "d0d150bb4977712d7150b416f4f24700e7b020e609868b81c8deff93f00ac6ed",
+      "content_type": "image/jpeg",
+      "downloaded_at": "2026-04-04T19:52:50.106438"
+    },
+    {
+      "path": "images/accessories/tilt_bucket_r18.webp",
+      "url": "https://97import.com/images/accessories/tilt_bucket_r18.webp",
+      "size_bytes": 46726,
+      "size": "45.63 Ko",
+      "sha256": "0f42aee0445ac9d7cfc9029715a2b377bdc32347115692e9c0655692d7c13ce8",
+      "content_type": "image/webp",
+      "downloaded_at": "2026-04-04T19:52:50.413781"
+    },
+    {
+      "path": "images/accessories/tooth_bucket_r18.jpeg",
+      "url": "https://97import.com/images/accessories/tooth_bucket_r18.jpeg",
+      "size_bytes": 13604,
+      "size": "13.29 Ko",
+      "sha256": "db4beeba1648fb62f9c844f3b0ca4da5c4fc553cc52cb891d65f5c1e8db18416",
+      "content_type": "image/jpeg",
+      "downloaded_at": "2026-04-04T19:52:50.560239"
+    },
+    {
+      "path": "images/accessories/tooth_bucket_r18.webp",
+      "url": "https://97import.com/images/accessories/tooth_bucket_r18.webp",
+      "size_bytes": 38234,
+      "size": "37.34 Ko",
+      "sha256": "279fe3271feff284dd74684525b3970fce0a272df557acdf29a46eb13bbdc8be",
+      "content_type": "image/webp",
+      "downloaded_at": "2026-04-04T19:52:50.741179"
+    },
+    {
+      "path": "images/direxport_logo_blue.png",
+      "url": "https://97import.com/images/direxport_logo_blue.png",
+      "size_bytes": 1529,
+      "size": "1.49 Ko",
+      "sha256": "bccc7355ac9c7a5d2dccbf9f6e5db99f42fe9e158f08f330cf622d55041d405c",
+      "content_type": "image/png",
+      "downloaded_at": "2026-04-04T19:52:50.920221"
+    },
+    {
+      "path": "images/logo/logo_import97_footer.png",
+      "url": "https://97import.com/images/logo/logo_import97_footer.png",
+      "size_bytes": 84059,
+      "size": "82.09 Ko",
+      "sha256": "57d7faaf6956f5b88ca853b04e0183d116e95789b2b341b4c1cbb8895498d38c",
+      "content_type": "image/png",
+      "downloaded_at": "2026-04-04T19:52:51.216999"
+    },
+    {
+      "path": "images/logo/rippa_dom_tom.svg",
+      "url": "https://97import.com/images/logo/rippa_dom_tom.svg",
+      "size_bytes": 3267,
+      "size": "3.19 Ko",
+      "sha256": "15593621337b4596bbcf5fd2179cb6ddfa07206fd3ad476999e338e3e0155a70",
+      "content_type": "image/svg+xml",
+      "downloaded_at": "2026-04-04T19:52:51.518428"
+    },
+    {
+      "path": "images/logo/rippa_logo.svg+xml",
+      "url": "https://97import.com/images/logo/rippa_logo.svg+xml",
+      "size_bytes": 5182,
+      "size": "5.06 Ko",
+      "sha256": "ab6d1edd5b267c3955765352d98af94e65fb6c4aad1aa15918723306cc7aceac",
+      "content_type": "application/octet-stream",
+      "downloaded_at": "2026-04-04T19:52:51.777853"
+    },
+    {
+      "path": "images/logo/rippa_logo.webp",
+      "url": "https://97import.com/images/logo/rippa_logo.webp",
+      "size_bytes": 48490,
+      "size": "47.35 Ko",
+      "sha256": "eac385d822b4fee30e14e12584631475ecb7159ccf4b24af5c5cb28f2735e2dc",
+      "content_type": "image/webp",
+      "downloaded_at": "2026-04-04T19:52:52.047256"
+    },
+    {
+      "path": "images/logo_import97.png",
+      "url": "https://97import.com/images/logo_import97.png",
+      "size_bytes": 100101,
+      "size": "97.75 Ko",
+      "sha256": "ec79167df34195386c593d0eb7c4244eae3d5f3188edc1f66e4e056876ad0040",
+      "content_type": "image/png",
+      "downloaded_at": "2026-04-04T19:52:52.250965"
+    },
+    {
+      "path": "images/logo_import97_footer_transparent.png",
+      "url": "https://97import.com/images/logo_import97_footer_transparent.png",
+      "size_bytes": 122769,
+      "size": "119.89 Ko",
+      "sha256": "02b86a360d2e74827d87390619d8a1f1c1c0a54b158d9208537d6e1f9134366f",
+      "content_type": "image/png",
+      "downloaded_at": "2026-04-04T19:52:52.403021"
+    },
+    {
+      "path": "images/logo_import97_large.png",
+      "url": "https://97import.com/images/logo_import97_large.png",
+      "size_bytes": 150200,
+      "size": "146.68 Ko",
+      "sha256": "ee977227b1370a2751abe31d0a7e5f6781d7f3fcd774911091eb2f72c0381fbb",
+      "content_type": "image/png",
+      "downloaded_at": "2026-04-04T19:52:52.623763"
+    },
+    {
+      "path": "images/logo_rippa_domtom_transparent.png",
+      "url": "https://97import.com/images/logo_rippa_domtom_transparent.png",
+      "size_bytes": 18977,
+      "size": "18.53 Ko",
+      "sha256": "d3b7d50e3e504ecd8c6fd78a63cdac4ac23b3c81453b891bbfaae5c803e2e263",
+      "content_type": "image/png",
+      "downloaded_at": "2026-04-04T19:52:52.807454"
+    },
+    {
+      "path": "images/logo_rippa_new.png",
+      "url": "https://97import.com/images/logo_rippa_new.png",
+      "size_bytes": 107332,
+      "size": "104.82 Ko",
+      "sha256": "6747d217d6503d2cc5a6e70fe7ca39e422a4a6251cac142b738b2373f67df495",
+      "content_type": "image/png",
+      "downloaded_at": "2026-04-04T19:52:53.014324"
+    },
+    {
+      "path": "images/portal/agri_tractor.jpeg",
+      "url": "https://97import.com/images/portal/agri_tractor.jpeg",
+      "size_bytes": 193806,
+      "size": "189.26 Ko",
+      "sha256": "692d8d783999e8be81c32997307156c7a00390501878cb70844794321a777661",
+      "content_type": "image/jpeg",
+      "downloaded_at": "2026-04-04T19:52:53.224065"
+    },
+    {
+      "path": "images/portal/agri_tractor.jpg",
+      "url": "https://97import.com/images/portal/agri_tractor.jpg",
+      "size_bytes": 54560,
+      "size": "53.28 Ko",
+      "sha256": "53577e0da9b1128123b2e7929e708baf09122f96720946824e6cfc0f935f2ba4",
+      "content_type": "image/jpeg",
+      "downloaded_at": "2026-04-04T19:52:53.380662"
+    },
+    {
+      "path": "images/portal/camping_car.jpg",
+      "url": "https://97import.com/images/portal/camping_car.jpg",
+      "size_bytes": 311159,
+      "size": "303.87 Ko",
+      "sha256": "bbddf8b05d112d5e74aac0aca6ee5003dcc51da35a706954d0b7a0e9501b2367",
+      "content_type": "image/jpeg",
+      "downloaded_at": "2026-04-04T19:52:53.767612"
+    },
+    {
+      "path": "images/portal/camping_car.png",
+      "url": "https://97import.com/images/portal/camping_car.png",
+      "size_bytes": 655538,
+      "size": "640.17 Ko",
+      "sha256": "1c6a2907dc320c0c2e19a9f4c7f04f0ad201e8e0e9de311a258a61cd43283da1",
+      "content_type": "image/png",
+      "downloaded_at": "2026-04-04T19:52:54.191491"
+    },
+    {
+      "path": "images/portal/hero_ship.png",
+      "url": "https://97import.com/images/portal/hero_ship.png",
+      "size_bytes": 1087282,
+      "size": "1.04 Mo",
+      "sha256": "ea6ebb21c8309f222e7b6f6675295de3bd2eec87aebc4657cfa7e36600a8e2c3",
+      "content_type": "image/png",
+      "downloaded_at": "2026-04-04T19:52:54.600297"
+    },
+    {
+      "path": "images/portal/modular_home.png",
+      "url": "https://97import.com/images/portal/modular_home.png",
+      "size_bytes": 1429445,
+      "size": "1.36 Mo",
+      "sha256": "8db4bf23f0315540f0974c75dd56cb02efc242de253effd80e20ade829883b5b",
+      "content_type": "image/png",
+      "downloaded_at": "2026-04-04T19:52:55.234576"
+    },
+    {
+      "path": "images/portal/modular_home.webp",
+      "url": "https://97import.com/images/portal/modular_home.webp",
+      "size_bytes": 314936,
+      "size": "307.55 Ko",
+      "sha256": "fdd0647b6c03974c80aa1eff9ce36089622d64d321811b77eeaa68b833bb99df",
+      "content_type": "image/webp",
+      "downloaded_at": "2026-04-04T19:52:55.480989"
+    },
+    {
+      "path": "images/portal/solar_panel.jpg",
+      "url": "https://97import.com/images/portal/solar_panel.jpg",
+      "size_bytes": 411370,
+      "size": "401.73 Ko",
+      "sha256": "8410ea191e559eb63b98f6476973e56f2269919b8b11d47ca395e86b54e47797",
+      "content_type": "image/jpeg",
+      "downloaded_at": "2026-04-04T19:52:55.892051"
+    },
+    {
+      "path": "images/portal/solar_panel_jinko.png",
+      "url": "https://97import.com/images/portal/solar_panel_jinko.png",
+      "size_bytes": 336832,
+      "size": "328.94 Ko",
+      "sha256": "b9424637e36c364773add067a631e7e0b6bebb126b8081a1ada0d052dcc6277a",
+      "content_type": "image/png",
+      "downloaded_at": "2026-04-04T19:52:56.245052"
+    },
+    {
+      "path": "images/portal/solar_roof.jpg",
+      "url": "https://97import.com/images/portal/solar_roof.jpg",
+      "size_bytes": 129835,
+      "size": "126.79 Ko",
+      "sha256": "a36faf71e84b036be4ebdd9d60d3b7d75a1c89f59af4194a68ae151f27fa19b7",
+      "content_type": "image/jpeg",
+      "downloaded_at": "2026-04-04T19:52:56.441031"
+    },
+    {
+      "path": "images/products/camping_car/bathroom.jpg",
+      "url": "https://97import.com/images/products/camping_car/bathroom.jpg",
+      "size_bytes": 169068,
+      "size": "165.11 Ko",
+      "sha256": "0bc84c83eac7d9306cd99f4fbc91e84b8202f30c0ac2bba96b69c44494bdb28b",
+      "content_type": "image/jpeg",
+      "downloaded_at": "2026-04-04T19:52:56.676047"
+    },
+    {
+      "path": "images/products/camping_car/bedroom.jpg",
+      "url": "https://97import.com/images/products/camping_car/bedroom.jpg",
+      "size_bytes": 282151,
+      "size": "275.54 Ko",
+      "sha256": "52d3abdcfa4533426fba079cd59e0a4160aead2ce7649cfc7628c9a18241573e",
+      "content_type": "image/jpeg",
+      "downloaded_at": "2026-04-04T19:52:57.041154"
+    },
+    {
+      "path": "images/products/camping_car/dining_area.jpg",
+      "url": "https://97import.com/images/products/camping_car/dining_area.jpg",
+      "size_bytes": 297165,
+      "size": "290.20 Ko",
+      "sha256": "0fb180005aaba3c1fedeabe664bdbc449e7e862bc6912dedcebd24fc2f4a025d",
+      "content_type": "image/jpeg",
+      "downloaded_at": "2026-04-04T19:52:57.297699"
+    },
+    {
+      "path": "images/products/camping_car/exterior_back.jpg",
+      "url": "https://97import.com/images/products/camping_car/exterior_back.jpg",
+      "size_bytes": 266225,
+      "size": "259.99 Ko",
+      "sha256": "dcfa77fa0ae8d0c6c248787bef84259fb1f12f3419b19aadd4147853471ce0d5",
+      "content_type": "image/jpeg",
+      "downloaded_at": "2026-04-04T19:52:57.573301"
+    },
+    {
+      "path": "images/products/camping_car/exterior_front_side.jpg",
+      "url": "https://97import.com/images/products/camping_car/exterior_front_side.jpg",
+      "size_bytes": 270887,
+      "size": "264.54 Ko",
+      "sha256": "c9be1e95a5095693cda5c15ff99ce3a575f97dfd70cd8662cbc3d408e0b8e66e",
+      "content_type": "image/jpeg",
+      "downloaded_at": "2026-04-04T19:52:57.815710"
+    },
+    {
+      "path": "images/products/camping_car/exterior_main.webp",
+      "url": "https://97import.com/images/products/camping_car/exterior_main.webp",
+      "size_bytes": 23808,
+      "size": "23.25 Ko",
+      "sha256": "e88097af0f46f80c29a70bcd18586fca74e5c8507cb7a1a5e4436fe27607dccc",
+      "content_type": "image/webp",
+      "downloaded_at": "2026-04-04T19:52:58.293916"
+    },
+    {
+      "path": "images/products/camping_car/exterior_side.jpg",
+      "url": "https://97import.com/images/products/camping_car/exterior_side.jpg",
+      "size_bytes": 203618,
+      "size": "198.85 Ko",
+      "sha256": "06f0be8a4912e5b683d0f74077339685ee73717d9892b3a0c51725bea970c16e",
+      "content_type": "image/jpeg",
+      "downloaded_at": "2026-04-04T19:52:58.539469"
+    },
+    {
+      "path": "images/products/camping_car/interior_living.jpg",
+      "url": "https://97import.com/images/products/camping_car/interior_living.jpg",
+      "size_bytes": 250186,
+      "size": "244.32 Ko",
+      "sha256": "7f2a96deb1d630dbc09b286c760a04dc38a11b430527cba7ffc4e7a60afcc77b",
+      "content_type": "image/jpeg",
+      "downloaded_at": "2026-04-04T19:52:58.784932"
+    },
+    {
+      "path": "images/products/camping_car/interior_overview.jpg",
+      "url": "https://97import.com/images/products/camping_car/interior_overview.jpg",
+      "size_bytes": 290082,
+      "size": "283.28 Ko",
+      "sha256": "056c8feed7fc038c4d35797b6b0ece6c7d7fc91d286691ab4e3ff17d3ab29e10",
+      "content_type": "image/jpeg",
+      "downloaded_at": "2026-04-04T19:52:59.036871"
+    },
+    {
+      "path": "images/products/camping_car/kitchen.jpg",
+      "url": "https://97import.com/images/products/camping_car/kitchen.jpg",
+      "size_bytes": 252603,
+      "size": "246.68 Ko",
+      "sha256": "6bc3e3631412538b0314d5513d1498c49a3d3f2e0ff6aca87c4c1e876cf3fbd6",
+      "content_type": "image/jpeg",
+      "downloaded_at": "2026-04-04T19:52:59.252997"
+    },
+    {
+      "path": "images/products/camping_car/laundry.jpg",
+      "url": "https://97import.com/images/products/camping_car/laundry.jpg",
+      "size_bytes": 244161,
+      "size": "238.44 Ko",
+      "sha256": "aac04b84de26de03423313126df16d62f0e38c38424abb9a0e93807a16f00ce1",
+      "content_type": "image/jpeg",
+      "downloaded_at": "2026-04-04T19:52:59.572056"
+    },
+    {
+      "path": "images/products/camping_car/video_tour.mp4",
+      "url": "https://97import.com/images/products/camping_car/video_tour.mp4",
+      "size_bytes": 13812784,
+      "size": "13.17 Mo",
+      "sha256": "ac60cb360552096801e5be42c789b2f1fd581049e7d28d139154c65b3e02ee9c",
+      "content_type": "video/mp4",
+      "downloaded_at": "2026-04-04T19:53:00.445824"
+    },
+    {
+      "path": "images/products/modular_premium/exterior_1.jpg",
+      "url": "https://97import.com/images/products/modular_premium/exterior_1.jpg",
+      "size_bytes": 249609,
+      "size": "243.76 Ko",
+      "sha256": "69b5621d981bb7bf32551dc338abedf422941ac2dec42745aaba21a53e6e762a",
+      "content_type": "image/jpeg",
+      "downloaded_at": "2026-04-04T19:53:00.821013"
+    },
+    {
+      "path": "images/products/modular_premium/exterior_2.jpg",
+      "url": "https://97import.com/images/products/modular_premium/exterior_2.jpg",
+      "size_bytes": 196171,
+      "size": "191.57 Ko",
+      "sha256": "449b46013137623060fbf51602ae60a34b9f9d5f089187566aedb8facfc4b07c",
+      "content_type": "image/jpeg",
+      "downloaded_at": "2026-04-04T19:53:01.090477"
+    },
+    {
+      "path": "images/products/modular_premium/exterior_3.jpg",
+      "url": "https://97import.com/images/products/modular_premium/exterior_3.jpg",
+      "size_bytes": 2706041,
+      "size": "2.58 Mo",
+      "sha256": "eb5ba9613008460877c3577c9808e93669144dd0c420a24232a025ab3e613992",
+      "content_type": "image/jpeg",
+      "downloaded_at": "2026-04-04T19:53:01.654930"
+    },
+    {
+      "path": "images/products/modular_premium/exterior_4.jpg",
+      "url": "https://97import.com/images/products/modular_premium/exterior_4.jpg",
+      "size_bytes": 310526,
+      "size": "303.25 Ko",
+      "sha256": "75c464e9eeb3870dddd380ab06f79aff7bf6f3afa8f615224d0eb2076b49443a",
+      "content_type": "image/jpeg",
+      "downloaded_at": "2026-04-04T19:53:01.898365"
+    },
+    {
+      "path": "images/products/modular_premium/video_1.mp4",
+      "url": "https://97import.com/images/products/modular_premium/video_1.mp4",
+      "size_bytes": 10938624,
+      "size": "10.43 Mo",
+      "sha256": "ef24b2febe47db3e06b64a2c0c88af5028b380148acf55588ec0d34e1d6e36b3",
+      "content_type": "video/mp4",
+      "downloaded_at": "2026-04-04T19:53:02.573655"
+    },
+    {
+      "path": "images/products/modular_premium/video_2.mp4",
+      "url": "https://97import.com/images/products/modular_premium/video_2.mp4",
+      "size_bytes": 30366314,
+      "size": "28.96 Mo",
+      "sha256": "332ad1c674f37880f95d8b969594a574a1e8bdd3ce0a014cea4d7c7dae9ae520",
+      "content_type": "video/mp4",
+      "downloaded_at": "2026-04-04T19:53:03.710362"
+    },
+    {
+      "path": "images/products/modular_standard/exterior_1.jpeg",
+      "url": "https://97import.com/images/products/modular_standard/exterior_1.jpeg",
+      "size_bytes": 113114,
+      "size": "110.46 Ko",
+      "sha256": "354fb5481ebf61b9ddd67d7bcb5ee61d72196255e7c6c2cbfae18db11c70f5f6",
+      "content_type": "image/jpeg",
+      "downloaded_at": "2026-04-04T19:53:03.938148"
+    },
+    {
+      "path": "images/products/modular_standard/exterior_2.jpeg",
+      "url": "https://97import.com/images/products/modular_standard/exterior_2.jpeg",
+      "size_bytes": 95878,
+      "size": "93.63 Ko",
+      "sha256": "ba54254f660c0d4e566cce567043a4d66e6a07eb98e49925b8332e5872b4b9be",
+      "content_type": "image/jpeg",
+      "downloaded_at": "2026-04-04T19:53:04.190094"
+    },
+    {
+      "path": "images/products/modular_standard/exterior_3.jpeg",
+      "url": "https://97import.com/images/products/modular_standard/exterior_3.jpeg",
+      "size_bytes": 221845,
+      "size": "216.65 Ko",
+      "sha256": "98906e7c50e518c92b5a1c7b3f0c92551887c061fa3d66e820f1fee448822c29",
+      "content_type": "image/jpeg",
+      "downloaded_at": "2026-04-04T19:53:04.529480"
+    },
+    {
+      "path": "images/products/modular_standard/exterior_4.jpeg",
+      "url": "https://97import.com/images/products/modular_standard/exterior_4.jpeg",
+      "size_bytes": 77030,
+      "size": "75.22 Ko",
+      "sha256": "9826a6e5cf9e8dcd88105020ab61b08efa43aacfa526b1d99e3d9c70b4202413",
+      "content_type": "image/jpeg",
+      "downloaded_at": "2026-04-04T19:53:04.802378"
+    },
+    {
+      "path": "images/products/modular_standard/exterior_5.jpeg",
+      "url": "https://97import.com/images/products/modular_standard/exterior_5.jpeg",
+      "size_bytes": 199894,
+      "size": "195.21 Ko",
+      "sha256": "18f09685f1fdbca911075c51bfad357d6a054dbc439fd1b044f23daf9d839d70",
+      "content_type": "image/jpeg",
+      "downloaded_at": "2026-04-04T19:53:05.155094"
+    },
+    {
+      "path": "images/products/modular_standard/exterior_6.jpeg",
+      "url": "https://97import.com/images/products/modular_standard/exterior_6.jpeg",
+      "size_bytes": 191090,
+      "size": "186.61 Ko",
+      "sha256": "fa845eed970daa04b45da2c591cf6d245240cfdb10a1d1ad51276f16dbced7df",
+      "content_type": "image/jpeg",
+      "downloaded_at": "2026-04-04T19:53:05.381626"
+    },
+    {
+      "path": "images/products/modular_standard/exterior_7.jpeg",
+      "url": "https://97import.com/images/products/modular_standard/exterior_7.jpeg",
+      "size_bytes": 193806,
+      "size": "189.26 Ko",
+      "sha256": "692d8d783999e8be81c32997307156c7a00390501878cb70844794321a777661",
+      "content_type": "image/jpeg",
+      "downloaded_at": "2026-04-04T19:53:05.645486"
+    },
+    {
+      "path": "images/products/modular_standard/video_1.mp4",
+      "url": "https://97import.com/images/products/modular_standard/video_1.mp4",
+      "size_bytes": 3699264,
+      "size": "3.53 Mo",
+      "sha256": "2ddfab59c5038440782e3490fe15ec3de8372c9069d68ae43a788c4ff06e398f",
+      "content_type": "video/mp4",
+      "downloaded_at": "2026-04-04T19:53:05.966425"
+    },
+    {
+      "path": "images/products/modular_standard/video_2.mp4",
+      "url": "https://97import.com/images/products/modular_standard/video_2.mp4",
+      "size_bytes": 15909716,
+      "size": "15.17 Mo",
+      "sha256": "35bd9676baf77c2f907aa499652166626acb69f0036b5c09fa0567bec22f9819",
+      "content_type": "video/mp4",
+      "downloaded_at": "2026-04-04T19:53:06.837874"
+    },
+    {
+      "path": "images/products/modular_standard/video_3.mp4",
+      "url": "https://97import.com/images/products/modular_standard/video_3.mp4",
+      "size_bytes": 14016412,
+      "size": "13.37 Mo",
+      "sha256": "c14a49ab3680243872aac0bc7ec2b3b00c4e73726b45c93bd91f5c3845dbca60",
+      "content_type": "video/mp4",
+      "downloaded_at": "2026-04-04T19:53:07.756708"
+    },
+    {
+      "path": "images/products/r10_eco_main.png",
+      "url": "https://97import.com/images/products/r10_eco_main.png",
+      "size_bytes": 505988,
+      "size": "494.13 Ko",
+      "sha256": "c2b959adbc8b73d016e45538ef83df85fe0b315e65f55a9f03478df1d973341e",
+      "content_type": "image/png",
+      "downloaded_at": "2026-04-04T19:53:08.431070"
+    },
+    {
+      "path": "images/products/r10_eco_main.webp",
+      "url": "https://97import.com/images/products/r10_eco_main.webp",
+      "size_bytes": 315370,
+      "size": "307.98 Ko",
+      "sha256": "8d0ca3093a6482526bffcac507275bc9a8fcb4f1b094c822b00420b4deeffa7c",
+      "content_type": "image/webp",
+      "downloaded_at": "2026-04-04T19:53:08.701561"
+    },
+    {
+      "path": "images/products/r13_pro.png",
+      "url": "https://97import.com/images/products/r13_pro.png",
+      "size_bytes": 20019,
+      "size": "19.55 Ko",
+      "sha256": "b034c010cf72b37f4bccb2febce20416217c6d77a678efc0ef1c0b431e0670b5",
+      "content_type": "image/png",
+      "downloaded_at": "2026-04-04T19:53:09.156916"
+    },
+    {
+      "path": "images/products/r13_pro.webp",
+      "url": "https://97import.com/images/products/r13_pro.webp",
+      "size_bytes": 11348,
+      "size": "11.08 Ko",
+      "sha256": "836d5a242e57971e37e7cca59b624dc7ea7bbbc4583880a8f53bfe3ace679b45",
+      "content_type": "image/webp",
+      "downloaded_at": "2026-04-04T19:53:09.349289"
+    },
+    {
+      "path": "images/products/r15_eco.png",
+      "url": "https://97import.com/images/products/r15_eco.png",
+      "size_bytes": 20019,
+      "size": "19.55 Ko",
+      "sha256": "b034c010cf72b37f4bccb2febce20416217c6d77a678efc0ef1c0b431e0670b5",
+      "content_type": "image/png",
+      "downloaded_at": "2026-04-04T19:53:09.540407"
+    },
+    {
+      "path": "images/products/r15_eco.webp",
+      "url": "https://97import.com/images/products/r15_eco.webp",
+      "size_bytes": 11348,
+      "size": "11.08 Ko",
+      "sha256": "836d5a242e57971e37e7cca59b624dc7ea7bbbc4583880a8f53bfe3ace679b45",
+      "content_type": "image/webp",
+      "downloaded_at": "2026-04-04T19:53:09.755505"
+    },
+    {
+      "path": "images/products/r18_pro.png",
+      "url": "https://97import.com/images/products/r18_pro.png",
+      "size_bytes": 152128,
+      "size": "148.56 Ko",
+      "sha256": "12b38ddcda4860acdd6882172727653a9f172532b741ff8b96c5bb6ec4d2e413",
+      "content_type": "image/png",
+      "downloaded_at": "2026-04-04T19:53:09.983720"
+    },
+    {
+      "path": "images/products/r18_pro.webp",
+      "url": "https://97import.com/images/products/r18_pro.webp",
+      "size_bytes": 94064,
+      "size": "91.86 Ko",
+      "sha256": "f5ad1550246d2bf88c9d782933ac48cc614e35e04d8c03574819b4ec0fbec9c9",
+      "content_type": "image/webp",
+      "downloaded_at": "2026-04-04T19:53:10.297778"
+    },
+    {
+      "path": "images/products/r18_pro/r18_pro_cab_view.png",
+      "url": "https://97import.com/images/products/r18_pro/r18_pro_cab_view.png",
+      "size_bytes": 267084,
+      "size": "260.82 Ko",
+      "sha256": "6e132958b89edbd2e469a0b60095093428856acb38b655cd01ee6ad2bdfe25b8",
+      "content_type": "image/png",
+      "downloaded_at": "2026-04-04T19:53:10.536945"
+    },
+    {
+      "path": "images/products/r18_pro/r18_pro_cab_view.webp",
+      "url": "https://97import.com/images/products/r18_pro/r18_pro_cab_view.webp",
+      "size_bytes": 165584,
+      "size": "161.70 Ko",
+      "sha256": "8a878d1299b7d857d58e1d778ec78b7e3d8ffa687fbcc6afff3b8ceb9dbaa330",
+      "content_type": "image/webp",
+      "downloaded_at": "2026-04-04T19:53:10.755599"
+    },
+    {
+      "path": "images/products/r18_pro/r18_pro_main_view.png",
+      "url": "https://97import.com/images/products/r18_pro/r18_pro_main_view.png",
+      "size_bytes": 481200,
+      "size": "469.92 Ko",
+      "sha256": "c835b58fd93f12c437a9b7231e4aa5e02158413e9ec1b55a369474229b166bf2",
+      "content_type": "image/png",
+      "downloaded_at": "2026-04-04T19:53:10.980031"
+    },
+    {
+      "path": "images/products/r18_pro/r18_pro_main_view.webp",
+      "url": "https://97import.com/images/products/r18_pro/r18_pro_main_view.webp",
+      "size_bytes": 296496,
+      "size": "289.55 Ko",
+      "sha256": "457c329f7fd22f52bf4e798843b89031465bac9e83b0b198fd30ad6e9be14636",
+      "content_type": "image/webp",
+      "downloaded_at": "2026-04-04T19:53:11.194474"
+    },
+    {
+      "path": "images/products/r18_pro/r18_pro_rear_view.png",
+      "url": "https://97import.com/images/products/r18_pro/r18_pro_rear_view.png",
+      "size_bytes": 1035968,
+      "size": "1011.69 Ko",
+      "sha256": "d7d6277402d049d966f0234b4ed9b3b2e8d34cfe84866e116ef75bac809f6f1a",
+      "content_type": "image/png",
+      "downloaded_at": "2026-04-04T19:53:11.549826"
+    },
+    {
+      "path": "images/products/r18_pro/r18_pro_rear_view.webp",
+      "url": "https://97import.com/images/products/r18_pro/r18_pro_rear_view.webp",
+      "size_bytes": 587626,
+      "size": "573.85 Ko",
+      "sha256": "ed47c8dea1631c4756346e99ba7535a045ac3871b77f592aec2f6d2f71c0a68d",
+      "content_type": "image/webp",
+      "downloaded_at": "2026-04-04T19:53:11.789262"
+    },
+    {
+      "path": "images/products/r18_pro/r18_pro_side_view.png",
+      "url": "https://97import.com/images/products/r18_pro/r18_pro_side_view.png",
+      "size_bytes": 1054352,
+      "size": "1.01 Mo",
+      "sha256": "7611e8b0ff080fcdc02167d69760118c9b4894433cb1a737e7d243121dff54a0",
+      "content_type": "image/png",
+      "downloaded_at": "2026-04-04T19:53:12.042341"
+    },
+    {
+      "path": "images/products/r18_pro/r18_pro_side_view.webp",
+      "url": "https://97import.com/images/products/r18_pro/r18_pro_side_view.webp",
+      "size_bytes": 595472,
+      "size": "581.52 Ko",
+      "sha256": "bdef31a4ac1b03086c608f81b88105eee6a1ee740c907c538bf318239c74870c",
+      "content_type": "image/webp",
+      "downloaded_at": "2026-04-04T19:53:12.320615"
+    },
+    {
+      "path": "images/products/r22_pro.png",
+      "url": "https://97import.com/images/products/r22_pro.png",
+      "size_bytes": 154410,
+      "size": "150.79 Ko",
+      "sha256": "d42d51d4c63a63cc8f37dcacc15d9ed0162bbddaa7c69c778bbc38a7f84d4e76",
+      "content_type": "image/png",
+      "downloaded_at": "2026-04-04T19:53:12.629808"
+    },
+    {
+      "path": "images/products/r22_pro.webp",
+      "url": "https://97import.com/images/products/r22_pro.webp",
+      "size_bytes": 95840,
+      "size": "93.59 Ko",
+      "sha256": "edbd70ebd689eb98613c2a935398e1f6d4e687c601ef497d3d93a76c8b5f808a",
+      "content_type": "image/webp",
+      "downloaded_at": "2026-04-04T19:53:12.873107"
+    },
+    {
+      "path": "images/products/r22_pro/r22_pro_cab_view.png",
+      "url": "https://97import.com/images/products/r22_pro/r22_pro_cab_view.png",
+      "size_bytes": 241670,
+      "size": "236.01 Ko",
+      "sha256": "d469db92a27c4c3ca1b2fe9b46a43840a7a7eed1409f77c105dce5ebe8698631",
+      "content_type": "image/png",
+      "downloaded_at": "2026-04-04T19:53:13.097256"
+    },
+    {
+      "path": "images/products/r22_pro/r22_pro_cab_view.webp",
+      "url": "https://97import.com/images/products/r22_pro/r22_pro_cab_view.webp",
+      "size_bytes": 151484,
+      "size": "147.93 Ko",
+      "sha256": "02c3201f4190290da2b78371c84b943d041e3cb189e6058f203fd1a542d26af6",
+      "content_type": "image/webp",
+      "downloaded_at": "2026-04-04T19:53:13.601570"
+    },
+    {
+      "path": "images/products/r22_pro/r22_pro_main_view.png",
+      "url": "https://97import.com/images/products/r22_pro/r22_pro_main_view.png",
+      "size_bytes": 481348,
+      "size": "470.07 Ko",
+      "sha256": "21cd0793b182b0784cf8accbe1352902a4fea939ec73044b2c0616282a06f6fb",
+      "content_type": "image/png",
+      "downloaded_at": "2026-04-04T19:53:13.894765"
+    },
+    {
+      "path": "images/products/r22_pro/r22_pro_main_view.webp",
+      "url": "https://97import.com/images/products/r22_pro/r22_pro_main_view.webp",
+      "size_bytes": 307638,
+      "size": "300.43 Ko",
+      "sha256": "8d3ea01ddef0e5c4b89848f49654cf585a79df1e8148024e4ff185db29806157",
+      "content_type": "image/webp",
+      "downloaded_at": "2026-04-04T19:53:14.131778"
+    },
+    {
+      "path": "images/products/r22_pro/r22_pro_rear_view.png",
+      "url": "https://97import.com/images/products/r22_pro/r22_pro_rear_view.png",
+      "size_bytes": 1048122,
+      "size": "1023.56 Ko",
+      "sha256": "9074ffd9b465fe34512cbe379e10e366a9979888da8160d6a6247ae5478949e5",
+      "content_type": "image/png",
+      "downloaded_at": "2026-04-04T19:53:14.604971"
+    },
+    {
+      "path": "images/products/r22_pro/r22_pro_rear_view.webp",
+      "url": "https://97import.com/images/products/r22_pro/r22_pro_rear_view.webp",
+      "size_bytes": 616010,
+      "size": "601.57 Ko",
+      "sha256": "0769d138d405f1dd5c4d6754ddb99f716850dd817bb628f56e0a6f07e1f6bb93",
+      "content_type": "image/webp",
+      "downloaded_at": "2026-04-04T19:53:14.851359"
+    },
+    {
+      "path": "images/products/r22_pro/r22_pro_side_view.png",
+      "url": "https://97import.com/images/products/r22_pro/r22_pro_side_view.png",
+      "size_bytes": 1059056,
+      "size": "1.01 Mo",
+      "sha256": "8054209ae1ade0b29dd2a177f360490248f21859bb0fecc42b62b343e77c88db",
+      "content_type": "image/png",
+      "downloaded_at": "2026-04-04T19:53:15.241441"
+    },
+    {
+      "path": "images/products/r22_pro/r22_pro_side_view.webp",
+      "url": "https://97import.com/images/products/r22_pro/r22_pro_side_view.webp",
+      "size_bytes": 621110,
+      "size": "606.55 Ko",
+      "sha256": "965e4ceceb9c8a2844c95ba904bdb9ee881c6c694278c74970f5ac682ca30003",
+      "content_type": "image/webp",
+      "downloaded_at": "2026-04-04T19:53:15.518252"
+    },
+    {
+      "path": "images/products/r22_pro_main.png",
+      "url": "https://97import.com/images/products/r22_pro_main.png",
+      "size_bytes": 481348,
+      "size": "470.07 Ko",
+      "sha256": "21cd0793b182b0784cf8accbe1352902a4fea939ec73044b2c0616282a06f6fb",
+      "content_type": "image/png",
+      "downloaded_at": "2026-04-04T19:53:15.785012"
+    },
+    {
+      "path": "images/products/r22_pro_main.webp",
+      "url": "https://97import.com/images/products/r22_pro_main.webp",
+      "size_bytes": 307638,
+      "size": "300.43 Ko",
+      "sha256": "8d3ea01ddef0e5c4b89848f49654cf585a79df1e8148024e4ff185db29806157",
+      "content_type": "image/webp",
+      "downloaded_at": "2026-04-04T19:53:16.083597"
+    },
+    {
+      "path": "images/products/r32_pro.png",
+      "url": "https://97import.com/images/products/r32_pro.png",
+      "size_bytes": 147878,
+      "size": "144.41 Ko",
+      "sha256": "458df99ad6e4609c39d4863a9cde5f8c7be08e032cd10db602766d077ab9329e",
+      "content_type": "image/png",
+      "downloaded_at": "2026-04-04T19:53:16.332901"
+    },
+    {
+      "path": "images/products/r32_pro.webp",
+      "url": "https://97import.com/images/products/r32_pro.webp",
+      "size_bytes": 94134,
+      "size": "91.93 Ko",
+      "sha256": "fa545ad817ce7282b8ba6969a2f83e452b2c384c7dd51ced56664890a902392f",
+      "content_type": "image/webp",
+      "downloaded_at": "2026-04-04T19:53:16.581219"
+    },
+    {
+      "path": "images/products/r32_pro/r32_pro_cab_view.png",
+      "url": "https://97import.com/images/products/r32_pro/r32_pro_cab_view.png",
+      "size_bytes": 219701,
+      "size": "214.55 Ko",
+      "sha256": "d343ae3fab2bbc9f5d127583929469aa2391f204f6e51127e65815fc0a059cd5",
+      "content_type": "image/png",
+      "downloaded_at": "2026-04-04T19:53:17.142427"
+    },
+    {
+      "path": "images/products/r32_pro/r32_pro_cab_view.webp",
+      "url": "https://97import.com/images/products/r32_pro/r32_pro_cab_view.webp",
+      "size_bytes": 136010,
+      "size": "132.82 Ko",
+      "sha256": "d37a9588ce895f7e3d6ea5543a770ce8edfbc25c6f733a3a8d20838b4ed34b2d",
+      "content_type": "image/webp",
+      "downloaded_at": "2026-04-04T19:53:17.388493"
+    },
+    {
+      "path": "images/products/r32_pro/r32_pro_main_view.png",
+      "url": "https://97import.com/images/products/r32_pro/r32_pro_main_view.png",
+      "size_bytes": 473034,
+      "size": "461.95 Ko",
+      "sha256": "baf8229700dd110c3ff90dd63a3390ee1c47b9b87fc63eb52286ff21b6425478",
+      "content_type": "image/png",
+      "downloaded_at": "2026-04-04T19:53:17.599360"
+    },
+    {
+      "path": "images/products/r32_pro/r32_pro_main_view.webp",
+      "url": "https://97import.com/images/products/r32_pro/r32_pro_main_view.webp",
+      "size_bytes": 310594,
+      "size": "303.31 Ko",
+      "sha256": "9d52a587e99c2b95529bd7364ededc643155bd23be3379c3efccc7f6197f1880",
+      "content_type": "image/webp",
+      "downloaded_at": "2026-04-04T19:53:17.905184"
+    },
+    {
+      "path": "images/products/r32_pro/r32_pro_rear_view.png",
+      "url": "https://97import.com/images/products/r32_pro/r32_pro_rear_view.png",
+      "size_bytes": 935342,
+      "size": "913.42 Ko",
+      "sha256": "350fe003a00b4b8219bfb4b14877df56173df2997387669f2f170eb065cbc078",
+      "content_type": "image/png",
+      "downloaded_at": "2026-04-04T19:53:18.394971"
+    },
+    {
+      "path": "images/products/r32_pro/r32_pro_rear_view.webp",
+      "url": "https://97import.com/images/products/r32_pro/r32_pro_rear_view.webp",
+      "size_bytes": 550754,
+      "size": "537.85 Ko",
+      "sha256": "cddf0ef887300bef162fd5dfef86eee5e7203012f1b52dfec34724810b56f47e",
+      "content_type": "image/webp",
+      "downloaded_at": "2026-04-04T19:53:18.677519"
+    },
+    {
+      "path": "images/products/r32_pro/r32_pro_side_view.png",
+      "url": "https://97import.com/images/products/r32_pro/r32_pro_side_view.png",
+      "size_bytes": 1046764,
+      "size": "1022.23 Ko",
+      "sha256": "10e922e5305376b3ee6cbf9d4b58c87aceeeff5b9228d6e76a092c5b2d4aef1a",
+      "content_type": "image/png",
+      "downloaded_at": "2026-04-04T19:53:18.948795"
+    },
+    {
+      "path": "images/products/r32_pro/r32_pro_side_view.webp",
+      "url": "https://97import.com/images/products/r32_pro/r32_pro_side_view.webp",
+      "size_bytes": 609336,
+      "size": "595.05 Ko",
+      "sha256": "93d9243b46db66bdf80ce4630ced47dc72e252ac7be9113cb6d7929611559cb0",
+      "content_type": "image/webp",
+      "downloaded_at": "2026-04-04T19:53:19.348351"
+    },
+    {
+      "path": "images/products/r57_pro/r57_pro_main_view.png",
+      "url": "https://97import.com/images/products/r57_pro/r57_pro_main_view.png",
+      "size_bytes": 211748,
+      "size": "206.79 Ko",
+      "sha256": "4ece0a3c00cae0dbdd02beca4933d4bd5fe2ec883d0677ef1b5ac7aec2c0eaae",
+      "content_type": "image/png",
+      "downloaded_at": "2026-04-04T19:53:19.583107"
+    },
+    {
+      "path": "images/products/solar_kits/battery_lifepo4.png",
+      "url": "https://97import.com/images/products/solar_kits/battery_lifepo4.png",
+      "size_bytes": 187759,
+      "size": "183.36 Ko",
+      "sha256": "e493d1e2770967b5ac5dec235604cde946470b0fa1eb4273ed6a304d87bdb05a",
+      "content_type": "image/png",
+      "downloaded_at": "2026-04-04T19:53:19.858885"
+    },
+    {
+      "path": "images/products/solar_kits/deye_inverter.png",
+      "url": "https://97import.com/images/products/solar_kits/deye_inverter.png",
+      "size_bytes": 52007,
+      "size": "50.79 Ko",
+      "sha256": "178a1be19ba8d5dfaf9f7c17632f2fdfc9dbd94a7c4c9cf523acb3cf3b78cdcf",
+      "content_type": "image/png",
+      "downloaded_at": "2026-04-04T19:53:20.119284"
+    },
+    {
+      "path": "images/products/solar_kits/jinko_600w_bifacial.webp",
+      "url": "https://97import.com/images/products/solar_kits/jinko_600w_bifacial.webp",
+      "size_bytes": 22582,
+      "size": "22.05 Ko",
+      "sha256": "925f8b2cdad114aacdf2ee85af37c3bc18de71a3605fdd569c53acb0e0e3d9e1",
+      "content_type": "image/webp",
+      "downloaded_at": "2026-04-04T19:53:20.264266"
+    },
+    {
+      "path": "images/products/solar_kits/jinko_installation_toiture.webp",
+      "url": "https://97import.com/images/products/solar_kits/jinko_installation_toiture.webp",
+      "size_bytes": 60678,
+      "size": "59.26 Ko",
+      "sha256": "3c92ba44a962d33dafa54ed3ac511557f976d995e5b73bab27fa04b4a0e3c548",
+      "content_type": "image/webp",
+      "downloaded_at": "2026-04-04T19:53:20.526551"
+    },
+    {
+      "path": "images/products/solar_kits/jinko_panel_layers.png",
+      "url": "https://97import.com/images/products/solar_kits/jinko_panel_layers.png",
+      "size_bytes": 240921,
+      "size": "235.27 Ko",
+      "sha256": "84f9d125de340f1994b7c9986238fff114546872856735de7b3e71090c46fe07",
+      "content_type": "image/png",
+      "downloaded_at": "2026-04-04T19:53:20.766338"
+    },
+    {
+      "path": "images/products/solar_kits/jinko_panels_pair.webp",
+      "url": "https://97import.com/images/products/solar_kits/jinko_panels_pair.webp",
+      "size_bytes": 20226,
+      "size": "19.75 Ko",
+      "sha256": "96a5632f6fd775b092a3e938acb88462ab0d60ec2f0bc799185df6901c33fdf4",
+      "content_type": "image/webp",
+      "downloaded_at": "2026-04-04T19:53:20.939047"
+    },
+    {
+      "path": "images/products/solar_kits/jinko_tiger_neo_fiche.webp",
+      "url": "https://97import.com/images/products/solar_kits/jinko_tiger_neo_fiche.webp",
+      "size_bytes": 17506,
+      "size": "17.10 Ko",
+      "sha256": "c3d5549a4274bb850284464b87267d04d690b9bfb82a798d6d093e8d9759d8b7",
+      "content_type": "image/webp",
+      "downloaded_at": "2026-04-04T19:53:21.100632"
+    },
+    {
+      "path": "images/products/solar_kits/jinko_warehouse_stock.webp",
+      "url": "https://97import.com/images/products/solar_kits/jinko_warehouse_stock.webp",
+      "size_bytes": 71756,
+      "size": "70.07 Ko",
+      "sha256": "bf11400af267d495d7da26cbe081893e3638feea96459dbcef875bc6f3632e34",
+      "content_type": "image/webp",
+      "downloaded_at": "2026-04-04T19:53:21.342932"
+    },
+    {
+      "path": "images/products/solar_kits/solar_cables.png",
+      "url": "https://97import.com/images/products/solar_kits/solar_cables.png",
+      "size_bytes": 501223,
+      "size": "489.48 Ko",
+      "sha256": "f6a0c366d8e426729b7a532a6a40f2d18a44b08f31c7cc4b359ccf41b1f62709",
+      "content_type": "image/png",
+      "downloaded_at": "2026-04-04T19:53:21.583418"
+    },
+    {
+      "path": "images/products/solar_kits/tiger_neo_585w.avif",
+      "url": "https://97import.com/images/products/solar_kits/tiger_neo_585w.avif",
+      "size_bytes": 16164,
+      "size": "15.79 Ko",
+      "sha256": "77bc9911d21148186df1f84c1817ea41f05c71b2325e8022ee621abfb7d6d25e",
+      "content_type": "image/avif",
+      "downloaded_at": "2026-04-04T19:53:21.735552"
+    },
+    {
+      "path": "images/rippa-dom-tom-white.png",
+      "url": "https://97import.com/images/rippa-dom-tom-white.png",
+      "size_bytes": 116183,
+      "size": "113.46 Ko",
+      "sha256": "a90e91cbec9969e473afdb1d685834bbf8cb8a6b60100da6cabf9120f73355ca",
+      "content_type": "image/png",
+      "downloaded_at": "2026-04-04T19:53:21.978948"
+    },
+    {
+      "path": "images/solar/battery_6fm250.webp",
+      "url": "https://97import.com/images/solar/battery_6fm250.webp",
+      "size_bytes": 209908,
+      "size": "204.99 Ko",
+      "sha256": "0d63bd05f8e25ff4d1380a0b3f763b34a053d26e320caafbfac738bd12f910f1",
+      "content_type": "image/webp",
+      "downloaded_at": "2026-04-04T19:53:22.206226"
+    },
+    {
+      "path": "images/solar/deye_inverter.webp",
+      "url": "https://97import.com/images/solar/deye_inverter.webp",
+      "size_bytes": 26026,
+      "size": "25.42 Ko",
+      "sha256": "a5eb57ffdf8af30a459f0bc9ba0b1560bf252ba7d4f67f7b68c2ca45113073dd",
+      "content_type": "image/webp",
+      "downloaded_at": "2026-04-04T19:53:22.421127"
+    },
+    {
+      "path": "images/solar/jinko_600w_tiger_neo.jpg",
+      "url": "https://97import.com/images/solar/jinko_600w_tiger_neo.jpg",
+      "size_bytes": 22582,
+      "size": "22.05 Ko",
+      "sha256": "925f8b2cdad114aacdf2ee85af37c3bc18de71a3605fdd569c53acb0e0e3d9e1",
+      "content_type": "image/jpeg",
+      "downloaded_at": "2026-04-04T19:53:22.585648"
+    },
+    {
+      "path": "images/solar/jinko_truck_delivery.jpg",
+      "url": "https://97import.com/images/solar/jinko_truck_delivery.jpg",
+      "size_bytes": 113238,
+      "size": "110.58 Ko",
+      "sha256": "4eb2dca299ad767b480a0677ca8c2d03423865e0e6a102fd13373d127c232dbc",
+      "content_type": "image/jpeg",
+      "downloaded_at": "2026-04-04T19:53:22.829620"
+    },
+    {
+      "path": "images/solar/jinko_warehouse.jpg",
+      "url": "https://97import.com/images/solar/jinko_warehouse.jpg",
+      "size_bytes": 71756,
+      "size": "70.07 Ko",
+      "sha256": "bf11400af267d495d7da26cbe081893e3638feea96459dbcef875bc6f3632e34",
+      "content_type": "image/jpeg",
+      "downloaded_at": "2026-04-04T19:53:23.050260"
+    },
+    {
+      "path": "images/solar/kit_overview.webp",
+      "url": "https://97import.com/images/solar/kit_overview.webp",
+      "size_bytes": 42414,
+      "size": "41.42 Ko",
+      "sha256": "44e39fd4f2a5cd374e14194452321a0a49df34cb4f0fdd5d86aee9d139878278",
+      "content_type": "image/webp",
+      "downloaded_at": "2026-04-04T19:53:23.209793"
+    },
+    {
+      "path": "images/solar/mounting_structure.webp",
+      "url": "https://97import.com/images/solar/mounting_structure.webp",
+      "size_bytes": 59394,
+      "size": "58.00 Ko",
+      "sha256": "8bbdd91e6170120c623d0088bb33ab31aad84abe3064172ceafa48d2ac908067",
+      "content_type": "image/webp",
+      "downloaded_at": "2026-04-04T19:53:23.390771"
+    },
+    {
+      "path": "images/solar/panel_detail.webp",
+      "url": "https://97import.com/images/solar/panel_detail.webp",
+      "size_bytes": 102046,
+      "size": "99.65 Ko",
+      "sha256": "a3b713816b1e73b8f53a4897a345fafc6aa0823c2eaa876f4e230ab19ce13385",
+      "content_type": "image/webp",
+      "downloaded_at": "2026-04-04T19:53:23.758379"
+    },
+    {
+      "path": "images/solar/solar_cables.webp",
+      "url": "https://97import.com/images/solar/solar_cables.webp",
+      "size_bytes": 306396,
+      "size": "299.21 Ko",
+      "sha256": "0fe20f19dd01379db17c5d857c16e13b01182b65415800468671e8980e601d10",
+      "content_type": "image/webp",
+      "downloaded_at": "2026-04-04T19:53:24.118205"
+    },
+    {
+      "path": "images/solar/solar_installations.jpg",
+      "url": "https://97import.com/images/solar/solar_installations.jpg",
+      "size_bytes": 60678,
+      "size": "59.26 Ko",
+      "sha256": "3c92ba44a962d33dafa54ed3ac511557f976d995e5b73bab27fa04b4a0e3c548",
+      "content_type": "image/jpeg",
+      "downloaded_at": "2026-04-04T19:53:24.303873"
+    },
+    {
+      "path": "pages/minipelles.html",
+      "url": "https://97import.com/minipelles",
+      "size_bytes": 1466,
+      "size": "1.43 Ko",
+      "sha256": "73f02db339cf3889a2117900a5d0b4a8728580ccf0108c7a7c51132c3fcf0f63",
+      "content_type": "text/html; charset=utf-8",
+      "downloaded_at": "2026-04-04T19:53:24.451498"
+    },
+    {
+      "path": "pages/maisons.html",
+      "url": "https://97import.com/maisons",
+      "size_bytes": 1466,
+      "size": "1.43 Ko",
+      "sha256": "73f02db339cf3889a2117900a5d0b4a8728580ccf0108c7a7c51132c3fcf0f63",
+      "content_type": "text/html; charset=utf-8",
+      "downloaded_at": "2026-04-04T19:53:24.481865"
+    },
+    {
+      "path": "pages/maisons_standard.html",
+      "url": "https://97import.com/maisons/standard",
+      "size_bytes": 1466,
+      "size": "1.43 Ko",
+      "sha256": "73f02db339cf3889a2117900a5d0b4a8728580ccf0108c7a7c51132c3fcf0f63",
+      "content_type": "text/html; charset=utf-8",
+      "downloaded_at": "2026-04-04T19:53:24.512243"
+    },
+    {
+      "path": "pages/maisons_premium.html",
+      "url": "https://97import.com/maisons/premium",
+      "size_bytes": 1466,
+      "size": "1.43 Ko",
+      "sha256": "73f02db339cf3889a2117900a5d0b4a8728580ccf0108c7a7c51132c3fcf0f63",
+      "content_type": "text/html; charset=utf-8",
+      "downloaded_at": "2026-04-04T19:53:24.542274"
+    },
+    {
+      "path": "pages/maisons_camping-car-deluxe.html",
+      "url": "https://97import.com/maisons/camping-car-deluxe",
+      "size_bytes": 1466,
+      "size": "1.43 Ko",
+      "sha256": "73f02db339cf3889a2117900a5d0b4a8728580ccf0108c7a7c51132c3fcf0f63",
+      "content_type": "text/html; charset=utf-8",
+      "downloaded_at": "2026-04-04T19:53:24.572367"
+    },
+    {
+      "path": "pages/solaire.html",
+      "url": "https://97import.com/solaire",
+      "size_bytes": 1466,
+      "size": "1.43 Ko",
+      "sha256": "73f02db339cf3889a2117900a5d0b4a8728580ccf0108c7a7c51132c3fcf0f63",
+      "content_type": "text/html; charset=utf-8",
+      "downloaded_at": "2026-04-04T19:53:24.604145"
+    },
+    {
+      "path": "pages/agricole.html",
+      "url": "https://97import.com/agricole",
+      "size_bytes": 1466,
+      "size": "1.43 Ko",
+      "sha256": "73f02db339cf3889a2117900a5d0b4a8728580ccf0108c7a7c51132c3fcf0f63",
+      "content_type": "text/html; charset=utf-8",
+      "downloaded_at": "2026-04-04T19:53:24.637439"
+    },
+    {
+      "path": "pages/accessoires.html",
+      "url": "https://97import.com/accessoires",
+      "size_bytes": 1466,
+      "size": "1.43 Ko",
+      "sha256": "73f02db339cf3889a2117900a5d0b4a8728580ccf0108c7a7c51132c3fcf0f63",
+      "content_type": "text/html; charset=utf-8",
+      "downloaded_at": "2026-04-04T19:53:24.669084"
+    },
+    {
+      "path": "pages/connexion.html",
+      "url": "https://97import.com/connexion",
+      "size_bytes": 1466,
+      "size": "1.43 Ko",
+      "sha256": "73f02db339cf3889a2117900a5d0b4a8728580ccf0108c7a7c51132c3fcf0f63",
+      "content_type": "text/html; charset=utf-8",
+      "downloaded_at": "2026-04-04T19:53:24.710841"
+    },
+    {
+      "path": "pages/cart.html",
+      "url": "https://97import.com/cart",
+      "size_bytes": 1466,
+      "size": "1.43 Ko",
+      "sha256": "73f02db339cf3889a2117900a5d0b4a8728580ccf0108c7a7c51132c3fcf0f63",
+      "content_type": "text/html; charset=utf-8",
+      "downloaded_at": "2026-04-04T19:53:24.782694"
+    },
+    {
+      "path": "pages/mon-compte.html",
+      "url": "https://97import.com/mon-compte",
+      "size_bytes": 1466,
+      "size": "1.43 Ko",
+      "sha256": "73f02db339cf3889a2117900a5d0b4a8728580ccf0108c7a7c51132c3fcf0f63",
+      "content_type": "text/html; charset=utf-8",
+      "downloaded_at": "2026-04-04T19:53:24.813409"
+    },
+    {
+      "path": "pages/terms.html",
+      "url": "https://97import.com/terms",
+      "size_bytes": 1466,
+      "size": "1.43 Ko",
+      "sha256": "73f02db339cf3889a2117900a5d0b4a8728580ccf0108c7a7c51132c3fcf0f63",
+      "content_type": "text/html; charset=utf-8",
+      "downloaded_at": "2026-04-04T19:53:24.844624"
+    },
+    {
+      "path": "pages/privacy.html",
+      "url": "https://97import.com/privacy",
+      "size_bytes": 1466,
+      "size": "1.43 Ko",
+      "sha256": "73f02db339cf3889a2117900a5d0b4a8728580ccf0108c7a7c51132c3fcf0f63",
+      "content_type": "text/html; charset=utf-8",
+      "downloaded_at": "2026-04-04T19:53:24.889796"
+    },
+    {
+      "path": "pages/legal.html",
+      "url": "https://97import.com/legal",
+      "size_bytes": 1466,
+      "size": "1.43 Ko",
+      "sha256": "73f02db339cf3889a2117900a5d0b4a8728580ccf0108c7a7c51132c3fcf0f63",
+      "content_type": "text/html; charset=utf-8",
+      "downloaded_at": "2026-04-04T19:53:24.920069"
+    },
+    {
+      "path": "pages/services.html",
+      "url": "https://97import.com/services",
+      "size_bytes": 1466,
+      "size": "1.43 Ko",
+      "sha256": "73f02db339cf3889a2117900a5d0b4a8728580ccf0108c7a7c51132c3fcf0f63",
+      "content_type": "text/html; charset=utf-8",
+      "downloaded_at": "2026-04-04T19:53:24.948722"
+    },
+    {
+      "path": "pages/contact.html",
+      "url": "https://97import.com/contact",
+      "size_bytes": 1466,
+      "size": "1.43 Ko",
+      "sha256": "73f02db339cf3889a2117900a5d0b4a8728580ccf0108c7a7c51132c3fcf0f63",
+      "content_type": "text/html; charset=utf-8",
+      "downloaded_at": "2026-04-04T19:53:24.981646"
+    },
+    {
+      "path": "pages/delivery.html",
+      "url": "https://97import.com/delivery",
+      "size_bytes": 1466,
+      "size": "1.43 Ko",
+      "sha256": "73f02db339cf3889a2117900a5d0b4a8728580ccf0108c7a7c51132c3fcf0f63",
+      "content_type": "text/html; charset=utf-8",
+      "downloaded_at": "2026-04-04T19:53:25.014761"
+    },
+    {
+      "path": "pages/confirmation.html",
+      "url": "https://97import.com/confirmation",
+      "size_bytes": 1466,
+      "size": "1.43 Ko",
+      "sha256": "73f02db339cf3889a2117900a5d0b4a8728580ccf0108c7a7c51132c3fcf0f63",
+      "content_type": "text/html; charset=utf-8",
+      "downloaded_at": "2026-04-04T19:53:25.045810"
+    },
+    {
+      "path": "pages/admin.html",
+      "url": "https://97import.com/admin",
+      "size_bytes": 1466,
+      "size": "1.43 Ko",
+      "sha256": "73f02db339cf3889a2117900a5d0b4a8728580ccf0108c7a7c51132c3fcf0f63",
+      "content_type": "text/html; charset=utf-8",
+      "downloaded_at": "2026-04-04T19:53:25.075358"
+    }
+  ],
+  "errors": []
+}

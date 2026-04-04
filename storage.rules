@@ -1,0 +1,14 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Lecture publique — médias produits accessibles sans auth
+    match /{allPaths=**} {
+      allow read: if true;
+    }
+    // Écriture sécurisée — utilisateurs authentifiés uniquement
+    // Les scripts admin utilisent firebase-admin SDK (bypass des règles)
+    match /{allPaths=**} {
+      allow write: if request.auth != null;
+    }
+  }
+}

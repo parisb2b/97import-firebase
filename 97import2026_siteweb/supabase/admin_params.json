@@ -1,0 +1,108 @@
+[
+  {
+    "key": "config_acompte",
+    "value": {
+      "max_acomptes": 3,
+      "montant_defaut": 500
+    },
+    "label": "Configuration acomptes",
+    "updated_at": "2026-03-31T14:53:18.163626+00:00"
+  },
+  {
+    "key": "multiplicateurs",
+    "value": {
+      "user": 2,
+      "partner": 1.2
+    },
+    "label": "Multiplicateurs prix",
+    "updated_at": "2026-03-31T14:53:18.163626+00:00"
+  },
+  {
+    "key": "rib_perso",
+    "value": {
+      "bic": "TSBDEB1XXX",
+      "url": null,
+      "iban": "DE93100110012625258423",
+      "label": "Compte particulier",
+      "banque": "N26 Bank GmbH",
+      "titulaire": "MICHEL CHEN"
+    },
+    "label": "RIB personnel",
+    "updated_at": "2026-04-01T14:11:10.768+00:00"
+  },
+  {
+    "key": "rib",
+    "value": {
+      "bic": "SXPYDEHH",
+      "url": null,
+      "iban": "DE76202208000059568830",
+      "label": "Compte professionnel",
+      "banque": "Banking Circle S.A.",
+      "titulaire": "LUXENT LIMITED"
+    },
+    "label": "RIB (compat)",
+    "updated_at": "2026-04-01T14:11:10.768+00:00"
+  },
+  {
+    "key": "rib_pro",
+    "value": {
+      "bic": "SXPYDEHH",
+      "url": null,
+      "iban": "DE76202208000059568830",
+      "label": "Compte professionnel",
+      "banque": "Banking Circle S.A.",
+      "titulaire": "LUXENT LIMITED"
+    },
+    "label": "RIB professionnel",
+    "updated_at": "2026-04-01T14:11:10.768+00:00"
+  },
+  {
+    "key": "emetteur",
+    "value": {
+      "nom": "LUXENT LIMITED",
+      "pays": "Royaume-Uni",
+      "email": "luxent@ltd-uk.eu",
+      "siret": "14852122",
+      "ville": "HA4 7AE LONDON",
+      "adresse": "2ND FLOOR COLLEGE HOUSE",
+      "adresse2": "17 KING EDWARDS ROAD RUISLIP"
+    },
+    "label": "Émetteur (compat)",
+    "updated_at": "2026-04-01T14:11:10.768+00:00"
+  },
+  {
+    "key": "acompte_defaut",
+    "value": {
+      "max_nb": 3,
+      "pourcentage": 30
+    },
+    "label": "Config acomptes",
+    "updated_at": "2026-04-01T14:11:10.768+00:00"
+  },
+  {
+    "key": "emetteur_pro",
+    "value": {
+      "nom": "LUXENT LIMITED",
+      "pays": "Royaume-Uni",
+      "email": "luxent@ltd-uk.eu",
+      "siret": "14852122",
+      "ville": "HA4 7AE LONDON",
+      "adresse": "2ND FLOOR COLLEGE HOUSE",
+      "adresse2": "17 KING EDWARDS ROAD RUISLIP"
+    },
+    "label": "Émetteur professionnel",
+    "updated_at": "2026-04-01T14:11:10.768+00:00"
+  },
+  {
+    "key": "emetteur_perso",
+    "value": {
+      "nom": "Chen Michel",
+      "pays": "France",
+      "email": "parisb2b@gmail.com",
+      "ville": "A compléter",
+      "adresse": "A compléter"
+    },
+    "label": "Émetteur personnel",
+    "updated_at": "2026-04-01T14:11:10.768+00:00"
+  }
+]

@@ -1,0 +1,55 @@
+ 
+
+claude --dangerously-skip-permissions --auto-execute
+
+
+
+
+CD C:\DATA-MC-2030\97IMPORT
+taskkill /F /IM node.exe /T
+
+CD C:\DATA-MC-2030\97IMPORT
+npx @anthropic-ai/claude-code --dangerously-skip-permissions
+
+CD C:\DATA-MC-2030\97IMPORT
+npm run dev
+
+CD C:\DATA-MC-2030\python\
+C:\DATA-MC-2030\python\python.exe     à préciser dans toutes les conversation: 
+
+C:\DATA-MC-2030\python\python C:\DATA-MC-2030\97IMPORT\SAVE2026\extract_vercel.py
+
+C:\DATA-MC-2030\97IMPORT\comparaison_fichiers_report.csv
+
+
+
+
+
+Get-ChildItem "C:\DATA-MC-2030\MIGRATION_PACKAGE_FINAL" -Recurse -Name | Select-Object -First 60
+
+
+Auth Email/Password est activé sur import2030. localhost est autorisé.
+Crée les 5 comptes test dans C:\DATA-MC-2030\97IMPORT
+
+Script Node.js avec firebase-admin (service-account.json).
+Mot de passe pour tous : 20262026
+
+Comptes :
+1. admin@97import.com     → role: admin   | Admin 97import
+2. client@97import.com    → role: user    | Jean Dupont
+3. vip@97import.com       → role: vip     | Marie Martin
+4. partenaire@97import.com → role: partner | Pierre Bernard
+5. client2@97import.com   → role: user    | Sophie Leblanc
+
+Pour chaque compte :
+- Si email existe déjà → supprimer puis recréer
+- createUser({ email, password: "20262026", displayName })
+- setDoc /profiles/{uid} avec tous les champs UserProfile complets
+- Afficher tableau final uid / email / role
+
+Email	Rôle	MDP
+admin@97import.com	admin	20262026
+client@97import.com	user	20262026
+vip@97import.com	vip	20262026
+partenaire@97import.com	partner	20262026
+client2@97import.com	user	20262026

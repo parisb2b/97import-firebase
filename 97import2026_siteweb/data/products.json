@@ -1,0 +1,1778 @@
+[
+  {
+    "id": "r18-pro",
+    "name": "R18 PRO",
+    "description": "Mini-pelle puissante et polyvalente",
+    "longDescription": "Le Rippa R18 PRO est une mini-pelle puissante et polyvalente, idéale pour les chantiers de construction, d'aménagement paysager et de rénovation. Grâce à son design compact, à son moteur diesel Briggs & Stratton fiable et à sa cabine ergonomique, elle offre une combinaison idéale de performance, de précision et de maniabilité. Avec un poids opérationnel de 1 806 kg, une profondeur de creusement de 2,22 mètres et une force de creusement de 15,8 kN, la R18 PRO excelle dans toutes les tâches, même les plus exigeantes, tout en garantissant un contrôle optimal.",
+    "price": 12400,
+    "priceDisplay": "12 400,00 EUR HT",
+    "image": "/images/products/r18_pro.webp",
+    "link": "/products/r18-pro",
+    "category": "Mini-pelles",
+    "subcategory": "Série Pro",
+    "active": true,
+    "pdf": "/documents/r18_pro_fiche_technique.pdf",
+    "features": [
+      "Godet denté de 35 cm pour un creusement efficace",
+      "Moteur diesel Briggs & Stratton fiable et économique",
+      "Force de creusement élevée (15,8 kN) pour une productivité maximale",
+      "Conception compacte pour les espaces restreints"
+    ],
+    "gallery": [
+      {
+        "type": "image",
+        "src": "/images/products/r18_pro/r18_pro_main_view.webp",
+        "alt": "R18 PRO vue principale"
+      },
+      {
+        "type": "image",
+        "src": "/images/products/r18_pro/r18_pro_side_view.webp",
+        "alt": "R18 PRO vue latérale"
+      },
+      {
+        "type": "image",
+        "src": "/images/products/r18_pro/r18_pro_rear_view.webp",
+        "alt": "R18 PRO vue arrière"
+      },
+      {
+        "type": "image",
+        "src": "/images/products/r18_pro/r18_pro_cab_view.webp",
+        "alt": "R18 PRO vue cabine"
+      }
+    ],
+    "specs": {
+      "weight": "1806 kg",
+      "power": "13.5 PS / 10.0 kW",
+      "depth": "2.22 m",
+      "width": "990 mm",
+      "engine": "Briggs & Stratton Vanguard"
+    },
+    "detailedSpecs": {
+      "Paramètres de base": [
+        {
+          "label": "Poids opérationnel",
+          "value": "1806 kg"
+        },
+        {
+          "label": "Godet standard",
+          "value": "Godet denté de 35 cm"
+        },
+        {
+          "label": "Méthode d'opération",
+          "value": "Pilotes hydrauliques"
+        },
+        {
+          "label": "Force de creusement",
+          "value": "15,8 kN"
+        },
+        {
+          "label": "Traction",
+          "value": "Chenilles caoutchouc 230 mm"
+        },
+        {
+          "label": "Vitesse de déplacement",
+          "value": "2,5 km/h"
+        },
+        {
+          "label": "Capacité du godet",
+          "value": "0,04 m³"
+        }
+      ],
+      "Moteur": [
+        {
+          "label": "Modèle",
+          "value": "Briggs & Stratton Vanguard"
+        },
+        {
+          "label": "Type",
+          "value": "Diesel"
+        },
+        {
+          "label": "Puissance",
+          "value": "13.5 PS / 10.0 kW"
+        },
+        {
+          "label": "Cylindrée",
+          "value": "570 cc"
+        },
+        {
+          "label": "Régime nominal",
+          "value": "3600 tr/min"
+        },
+        {
+          "label": "Émissions",
+          "value": "Euro 5 / EPA Tier 4"
+        },
+        {
+          "label": "Capacité réservoir",
+          "value": "25 L"
+        }
+      ],
+      "Dimensions": [
+        {
+          "label": "Longueur totale",
+          "value": "3630 mm"
+        },
+        {
+          "label": "Largeur hors tout",
+          "value": "990 mm"
+        },
+        {
+          "label": "Hauteur cabine",
+          "value": "2370 mm"
+        },
+        {
+          "label": "Rayon de rotation arrière",
+          "value": "680 mm"
+        },
+        {
+          "label": "Profondeur de creusement max",
+          "value": "2220 mm"
+        },
+        {
+          "label": "Hauteur de déchargement max",
+          "value": "2670 mm"
+        },
+        {
+          "label": "Portée max au sol",
+          "value": "3580 mm"
+        }
+      ],
+      "Système hydraulique": [
+        {
+          "label": "Type de pompe",
+          "value": "Pompe à engrenages"
+        },
+        {
+          "label": "Débit max",
+          "value": "2 × 27,3 L/min"
+        },
+        {
+          "label": "Pression de service",
+          "value": "20,6 MPa"
+        },
+        {
+          "label": "Capacité huile hydraulique",
+          "value": "28 L"
+        },
+        {
+          "label": "Auxiliaire hydraulique",
+          "value": "Oui (brise-roche, tarière)"
+        },
+        {
+          "label": "Vérin de flèche",
+          "value": "Φ60 × Φ35 × 430 mm"
+        },
+        {
+          "label": "Vérin de bras",
+          "value": "Φ55 × Φ30 × 460 mm"
+        }
+      ]
+    }
+  },
+  {
+    "id": "r22-pro",
+    "name": "R22 PRO",
+    "description": "Mini-pelle polyvalente pour projets moyens à grands",
+    "longDescription": "Le Rippa R22 PRO est une mini-pelle puissante et polyvalente, idéale pour les projets de construction et d'aménagement paysager de taille moyenne à grande. Grâce à sa conception robuste et à son moteur diesel Kubota performant, elle allie efficacité, précision et fiabilité pour une utilisation professionnelle. Avec un poids opérationnel de 2 371,5 kg, une profondeur de creusement de 2,29 mètres et une force de creusement de 18,4 kN, la R22 PRO exécute sans effort les tâches les plus exigeantes tout en offrant un contrôle optimal à chaque mouvement.",
+    "price": 15795,
+    "priceDisplay": "15 795,00 EUR HT",
+    "image": "/images/products/r22_pro_main.webp",
+    "link": "/products/r22-pro",
+    "category": "Mini-pelles",
+    "subcategory": "Série Pro",
+    "active": true,
+    "pdf": "/documents/r22_pro_fiche_technique.pdf",
+    "features": [
+      "Godet denté de 40 cm pour un creusement précis",
+      "Moteur diesel Kubota puissant (certifié Euro 5)",
+      "Force de creusement élevée pour une performance optimale",
+      "Structure robuste pour une longue durée de vie"
+    ],
+    "gallery": [
+      {
+        "type": "image",
+        "src": "/images/products/r22_pro/r22_pro_main_view.webp",
+        "alt": "R22 PRO vue principale"
+      },
+      {
+        "type": "image",
+        "src": "/images/products/r22_pro/r22_pro_side_view.webp",
+        "alt": "R22 PRO vue latérale"
+      },
+      {
+        "type": "image",
+        "src": "/images/products/r22_pro/r22_pro_rear_view.webp",
+        "alt": "R22 PRO vue arrière"
+      },
+      {
+        "type": "image",
+        "src": "/images/products/r22_pro/r22_pro_cab_view.webp",
+        "alt": "R22 PRO vue cabine"
+      }
+    ],
+    "specs": {
+      "weight": "2371,5 kg",
+      "power": "24.8 PS / 18.2 kW",
+      "depth": "2.29 m",
+      "width": "1300 mm",
+      "engine": "Kubota D1105"
+    },
+    "detailedSpecs": {
+      "Paramètres de base": [
+        {
+          "label": "Poids opérationnel",
+          "value": "2371,5 kg / 5228 lb"
+        },
+        {
+          "label": "Capacité du godet",
+          "value": "0,049 m³ / 1,9 ft³"
+        },
+        {
+          "label": "Vitesse de déplacement (basse/haute)",
+          "value": "0–1,5 / 2,8 km/h / 0–0,93 / 1,71 mph"
+        },
+        {
+          "label": "Pente maximale",
+          "value": "30 %"
+        },
+        {
+          "label": "Pression au sol",
+          "value": "33,4 kPa / 4,84 psi"
+        },
+        {
+          "label": "Force de creusement max.",
+          "value": "18,4 kN"
+        },
+        {
+          "label": "Rayon de creusement max.",
+          "value": "4143 mm / 163,1 in"
+        },
+        {
+          "label": "Profondeur de creusement max.",
+          "value": "2293 mm / 90,3 in"
+        },
+        {
+          "label": "Hauteur de creusement max.",
+          "value": "3761 mm / 148,1 in"
+        },
+        {
+          "label": "Hauteur de déversement max.",
+          "value": "3496 mm / 138,9 in"
+        },
+        {
+          "label": "Écartement de voie (rétracté/étendu)",
+          "value": "1300–1500 mm / 51,2–59,1 in"
+        }
+      ],
+      "Moteur": [
+        {
+          "label": "Marque",
+          "value": "Kubota"
+        },
+        {
+          "label": "Modèle",
+          "value": "D1105"
+        },
+        {
+          "label": "Puissance max.",
+          "value": "≈24,8 hp"
+        },
+        {
+          "label": "Puissance nominale",
+          "value": "18,2 kW"
+        },
+        {
+          "label": "Régime max.",
+          "value": "3000 rpm"
+        },
+        {
+          "label": "Cylindrée",
+          "value": "1,23 L / 0,31 gal"
+        },
+        {
+          "label": "Nombre de cylindres",
+          "value": "3"
+        },
+        {
+          "label": "Refroidissement",
+          "value": "À eau"
+        },
+        {
+          "label": "Huile moteur (quantité de vidange)",
+          "value": "4,2 L / 1,1 gal"
+        },
+        {
+          "label": "Carburant",
+          "value": "Diesel"
+        },
+        {
+          "label": "Qualité de carburant",
+          "value": "No. 0 / -10"
+        },
+        {
+          "label": "Consommation théorique",
+          "value": "1,3–1,5 L/h / 0,34–0,40 gal/h"
+        }
+      ],
+      "Dimensions": [
+        {
+          "label": "Longueur de transport",
+          "value": "2824 mm / 111,2 in"
+        },
+        {
+          "label": "Largeur de transport",
+          "value": "1300 mm / 51,2 in"
+        },
+        {
+          "label": "Hauteur de transport",
+          "value": "2361 mm / 92,9 in"
+        },
+        {
+          "label": "Garde au sol min.",
+          "value": "450 mm / 17,7 in"
+        },
+        {
+          "label": "Largeur du godet",
+          "value": "450 mm / 17,7 in"
+        },
+        {
+          "label": "Longueur de flèche",
+          "value": "1825 mm / 71,9 in"
+        },
+        {
+          "label": "Longueur du balancier",
+          "value": "1185 mm / 46,7 in"
+        },
+        {
+          "label": "Largeur de la lame",
+          "value": "1300 mm / 51,2 in"
+        }
+      ],
+      "Système hydraulique": [
+        {
+          "label": "Pompe principale type/modèle",
+          "value": "Load sensitive variable piston pump / 28"
+        },
+        {
+          "label": "Marque de la pompe",
+          "value": "Taifeng"
+        },
+        {
+          "label": "Débit max.",
+          "value": "67,2 L/min"
+        },
+        {
+          "label": "Distributeur hydraulique",
+          "value": "9-way hydraulic multi-way valve"
+        },
+        {
+          "label": "Marque du distributeur",
+          "value": "Taifeng"
+        },
+        {
+          "label": "Pression nominale",
+          "value": "18 MPa"
+        },
+        {
+          "label": "Pression maximale",
+          "value": "20 MPa"
+        },
+        {
+          "label": "Moteur de translation (type)",
+          "value": "LTM03CDK"
+        },
+        {
+          "label": "Marque moteur de translation",
+          "value": "Likuchuan"
+        }
+      ]
+    }
+  },
+  {
+    "id": "r32-pro",
+    "name": "R32 PRO",
+    "description": "Mini-pelle professionnelle haute performance",
+    "longDescription": "Le Rippa R32 PRO est une mini-pelle professionnelle haute performance, idéale pour les grands projets de construction, les travaux d'excavation profonds et les opérations de terrassement exigeantes. Avec sa combinaison de puissance massive, de contrôle précis et de conception robuste, c'est le choix parfait pour les professionnels qui apprécient l'efficacité et la durabilité. Propulsée par un puissant moteur diesel Kubota, la R32 PRO offre des performances exceptionnelles avec un poids opérationnel de 3 375 kg, une profondeur de creusement de 2,83 mètres et une force de creusement de 27 kN – assurant une productivité maximale pour chaque tâche.",
+    "price": 18585,
+    "priceDisplay": "18 585,00 EUR HT",
+    "image": "/images/products/r32_pro.webp",
+    "link": "/products/r32-pro",
+    "category": "Mini-pelles",
+    "subcategory": "Série Pro",
+    "active": true,
+    "pdf": "/documents/r32_pro_fiche_technique.pdf",
+    "features": [
+      "Godet denté de 40 cm pour un creusement précis",
+      "Moteur diesel Kubota puissant (certifié Euro 5)",
+      "Force de creusement élevée pour les travaux lourds",
+      "Conception robuste pour une utilisation professionnelle durable"
+    ],
+    "gallery": [
+      {
+        "type": "image",
+        "src": "/images/products/r32_pro/r32_pro_main_view.webp",
+        "alt": "R32 PRO vue principale"
+      },
+      {
+        "type": "image",
+        "src": "/images/products/r32_pro/r32_pro_side_view.webp",
+        "alt": "R32 PRO vue latérale"
+      },
+      {
+        "type": "image",
+        "src": "/images/products/r32_pro/r32_pro_rear_view.webp",
+        "alt": "R32 PRO vue arrière"
+      },
+      {
+        "type": "image",
+        "src": "/images/products/r32_pro/r32_pro_cab_view.webp",
+        "alt": "R32 PRO vue cabine"
+      }
+    ],
+    "specs": {
+      "weight": "3200 kg",
+      "power": "25 PS / 18.5 kW",
+      "depth": "2.83 m",
+      "width": "1500 mm",
+      "engine": "Kubota V1505"
+    },
+    "detailedSpecs": {
+      "Paramètres de base": [
+        {
+          "label": "Poids opérationnel",
+          "value": "3375 kg / 7441 lb"
+        },
+        {
+          "label": "Capacité du godet",
+          "value": "0,06 m³ / 2,12 ft³"
+        },
+        {
+          "label": "Vitesse de déplacement (basse/haute)",
+          "value": "0–2,2 / 4,2 km/h / 0–1,37 / 2,61 mph"
+        },
+        {
+          "label": "Pente maximale",
+          "value": "30 %"
+        },
+        {
+          "label": "Pression au sol",
+          "value": "33,7 kPa / 4,89 psi"
+        },
+        {
+          "label": "Force de creusement max.",
+          "value": "27 kN"
+        },
+        {
+          "label": "Rayon de creusement max.",
+          "value": "4845 mm / 190,7 in"
+        },
+        {
+          "label": "Profondeur de creusement max.",
+          "value": "2830 mm / 111,4 in"
+        },
+        {
+          "label": "Hauteur de creusement max.",
+          "value": "4530 mm / 178,3 in"
+        },
+        {
+          "label": "Hauteur de déversement max.",
+          "value": "3235 mm / 127,4 in"
+        }
+      ],
+      "Moteur": [
+        {
+          "label": "Marque",
+          "value": "Kubota"
+        },
+        {
+          "label": "Modèle",
+          "value": "V1505"
+        },
+        {
+          "label": "Puissance max.",
+          "value": "25 PS / 25 hp"
+        },
+        {
+          "label": "Puissance nominale",
+          "value": "18,5 kW"
+        },
+        {
+          "label": "Régime max.",
+          "value": "3000 rpm"
+        },
+        {
+          "label": "Cylindrée",
+          "value": "1,498 L / 0,40 gal"
+        },
+        {
+          "label": "Nombre de cylindres",
+          "value": "4"
+        },
+        {
+          "label": "Refroidissement",
+          "value": "Refroidissement à eau + huile hydraulique"
+        },
+        {
+          "label": "Huile moteur (vidange)",
+          "value": "5,7 L / 1,5 gal"
+        },
+        {
+          "label": "Carburant",
+          "value": "Diesel"
+        },
+        {
+          "label": "Qualité de carburant",
+          "value": "No. 0 / -10"
+        },
+        {
+          "label": "Consommation théorique",
+          "value": "1,5–1,8 L/h / 0,40–0,48 gal/h"
+        }
+      ],
+      "Dimensions": [
+        {
+          "label": "Longueur de transport",
+          "value": "4520 mm / 178,0 in"
+        },
+        {
+          "label": "Largeur de transport",
+          "value": "1500 mm / 59,1 in"
+        },
+        {
+          "label": "Hauteur de transport",
+          "value": "2465 mm / 97,0 in"
+        },
+        {
+          "label": "Garde au sol (contrepoids)",
+          "value": "553 mm / 21,8 in"
+        },
+        {
+          "label": "Largeur du godet",
+          "value": "520 mm / 20,5 in"
+        },
+        {
+          "label": "Longueur de flèche",
+          "value": "2280 mm / 89,8 in"
+        },
+        {
+          "label": "Longueur du balancier",
+          "value": "1480 mm / 58,3 in"
+        },
+        {
+          "label": "Largeur de la lame",
+          "value": "1500 mm / 59,1 in"
+        }
+      ],
+      "Système hydraulique": [
+        {
+          "label": "Pompe principale type/modèle",
+          "value": "Load sensitive variable piston pump / 36"
+        },
+        {
+          "label": "Marque de la pompe",
+          "value": "Hengli"
+        },
+        {
+          "label": "Débit max.",
+          "value": "86,4 L/min"
+        },
+        {
+          "label": "Distributeur hydraulique",
+          "value": "9-way hydraulic multi-way valve"
+        },
+        {
+          "label": "Marque du distributeur",
+          "value": "Hengli"
+        },
+        {
+          "label": "Pression nominale",
+          "value": "22 MPa"
+        },
+        {
+          "label": "Pression maximale",
+          "value": "25 MPa"
+        },
+        {
+          "label": "Moteur de translation (type)",
+          "value": "LTM04"
+        },
+        {
+          "label": "Marque moteur de translation",
+          "value": "LIKECHUAN"
+        }
+      ]
+    }
+  },
+  {
+    "id": "r57-pro",
+    "name": "R57 PRO",
+    "description": "Mini-pelle de 5,7 tonnes pour puissance maximale",
+    "longDescription": "La Rippa R57 PRO est une mini-pelle de 5,7 tonnes conçue pour offrir une puissance et une efficacité maximales. Équipée d'un moteur Kubota V2607 fiable et performant, elle garantit une productivité élevée pour les travaux de construction, de terrassement et d'aménagement paysager les plus exigeants. Avec une profondeur de fouille de près de 3,9 mètres et une cabine confortable climatisée, la R57 PRO est l'outil ultime pour les professionnels.",
+    "price": 25900,
+    "priceDisplay": "25 900,00 EUR HT",
+    "image": "/images/products/r57_pro/r57_pro_main_view.png",
+    "link": "/products/r57-pro",
+    "category": "Mini-pelles",
+    "subcategory": "Série Pro",
+    "active": true,
+    "pdf": "/documents/r57_pro_fiche_technique.pdf",
+    "features": [
+      "Moteur Kubota V2607 puissant et fiable",
+      "Cabine fermée spacieuse avec climatisation",
+      "Chenilles en caoutchouc pour une meilleure traction",
+      "Ligne hydraulique auxiliaire pour accessoires"
+    ],
+    "gallery": [
+      {
+        "type": "image",
+        "src": "/images/products/r57_pro/r57_pro_main_view.png",
+        "alt": "R57 PRO vue principale"
+      }
+    ],
+    "specs": {
+      "weight": "5700 kg",
+      "power": "36.5 kW / 50 HP",
+      "depth": "3.89 m",
+      "width": "1960 mm",
+      "engine": "Kubota V2607"
+    },
+    "detailedSpecs": {
+      "Paramètres de base": [
+        {
+          "label": "Poids opérationnel",
+          "value": "5700 kg"
+        },
+        {
+          "label": "Capacité du godet",
+          "value": "0,21 m³"
+        },
+        {
+          "label": "Vitesse de déplacement",
+          "value": "2,4 / 4,4 km/h"
+        },
+        {
+          "label": "Pente maximale",
+          "value": "35°"
+        },
+        {
+          "label": "Pression au sol",
+          "value": "32 kPa"
+        },
+        {
+          "label": "Force de creusement max.",
+          "value": "38 kN"
+        },
+        {
+          "label": "Profondeur de creusement max.",
+          "value": "3890 mm"
+        },
+        {
+          "label": "Hauteur de creusement max.",
+          "value": "5630 mm"
+        },
+        {
+          "label": "Hauteur de déversement max.",
+          "value": "3980 mm"
+        }
+      ],
+      "Moteur": [
+        {
+          "label": "Marque",
+          "value": "Kubota"
+        },
+        {
+          "label": "Modèle",
+          "value": "V2607"
+        },
+        {
+          "label": "Puissance",
+          "value": "36.5 kW / 50 HP"
+        },
+        {
+          "label": "Cylindrée",
+          "value": "2,615 L"
+        },
+        {
+          "label": "Refroidissement",
+          "value": "Liquide"
+        },
+        {
+          "label": "Carburant",
+          "value": "Diesel"
+        }
+      ],
+      "Dimensions": [
+        {
+          "label": "Longueur de transport",
+          "value": "5960 mm"
+        },
+        {
+          "label": "Largeur de transport",
+          "value": "1960 mm"
+        },
+        {
+          "label": "Hauteur de transport",
+          "value": "2620 mm"
+        },
+        {
+          "label": "Largeur de la lame",
+          "value": "1960 mm"
+        }
+      ],
+      "Système hydraulique": [
+        {
+          "label": "Type de pompe",
+          "value": "Pompe à pistons axiaux"
+        },
+        {
+          "label": "Débit max.",
+          "value": "148 L/min"
+        },
+        {
+          "label": "Pression de travail",
+          "value": "24.5 MPa"
+        }
+      ]
+    }
+  },
+  {
+    "id": "maison-modulaire-standard",
+    "name": "Maison Modulaire Standard",
+    "description": "Solution idéale pour un habitat rapide, économique et durable",
+    "longDescription": "La solution idéale pour un habitat rapide, économique et durable.",
+    "price": 5600,
+    "priceDisplay": "À partir de 5 600 € HT",
+    "image": "/images/portal/modular_home.png",
+    "link": "/maisons/standard",
+    "category": "Maisons",
+    "subcategory": "Standard",
+    "active": true,
+    "pdf": "/docs/fiche_technique_maison_modulaire.pdf",
+    "specs": {},
+    "sizes": [
+      {
+        "id": "20ft",
+        "name": "20 Pieds (37m²)",
+        "price": 5600,
+        "approxM2": 40,
+        "shipping": {
+          "martinique": 5500,
+          "guadeloupe": 5500
+        }
+      },
+      {
+        "id": "30ft",
+        "name": "30 Pieds (57m²)",
+        "price": 7400,
+        "approxM2": 60,
+        "shipping": {
+          "martinique": 9500,
+          "guadeloupe": 8650
+        }
+      },
+      {
+        "id": "40ft",
+        "name": "40 Pieds (74m²)",
+        "price": 9200,
+        "approxM2": 80,
+        "shipping": {
+          "martinique": 9500,
+          "guadeloupe": 8650
+        }
+      }
+    ],
+    "options": [
+      {
+        "id": "extra_room",
+        "name": "Chambre Supplémentaire",
+        "description": "Ajout d'une cloison et porte pour créer une chambre additionnelle",
+        "price": 0,
+        "icon": "BedDouble",
+        "isQuote": true,
+        "volume": 0
+      },
+      {
+        "id": "ac",
+        "name": "Climatisation",
+        "description": "Pack climatisation tri-split 5.2kW (MIDEA ou équivalent)",
+        "price": 2500,
+        "icon": "Snowflake",
+        "volume": 0.8
+      },
+      {
+        "id": "solar",
+        "name": "Kit Panneaux Solaires",
+        "description": "10kW autonome (16 panneaux 585W + onduleur hybride + batteries lithium 10kW)",
+        "price": 7912,
+        "icon": "Sun",
+        "volume": 2.5
+      },
+      {
+        "id": "furniture",
+        "name": "Pack Meubles",
+        "description": "Mobilier de base (Sur demande)",
+        "price": 0,
+        "icon": "Sofa",
+        "isQuote": true,
+        "volume": 0
+      }
+    ],
+    "destinations": [
+      {
+        "id": "mq",
+        "name": "Martinique (Port de Fort-de-France)"
+      },
+      {
+        "id": "gp",
+        "name": "Guadeloupe (Port de Pointe-à-Pitre)"
+      },
+      {
+        "id": "gf",
+        "name": "Guyane (Port de Dégrad des Cannes)"
+      },
+      {
+        "id": "re",
+        "name": "La Réunion (Port de la Pointe des Galets)"
+      },
+      {
+        "id": "yt",
+        "name": "Mayotte (Port de Longoni)"
+      }
+    ],
+    "gallery": [
+      {
+        "type": "video",
+        "src": "/images/products/modular_standard/video_2.mp4",
+        "alt": "Visite vidéo 2"
+      },
+      {
+        "type": "video",
+        "src": "/images/products/modular_standard/video_3.mp4",
+        "alt": "Visite vidéo 3"
+      },
+      {
+        "type": "image",
+        "src": "/images/products/modular_standard/exterior_1.jpeg",
+        "alt": "Maison Modulaire Extérieur 1"
+      },
+      {
+        "type": "image",
+        "src": "/images/products/modular_standard/exterior_2.jpeg",
+        "alt": "Maison Modulaire Extérieur 2"
+      },
+      {
+        "type": "image",
+        "src": "/images/products/modular_standard/exterior_3.jpeg",
+        "alt": "Maison Modulaire Extérieur 3"
+      },
+      {
+        "type": "image",
+        "src": "/images/products/modular_standard/exterior_4.jpeg",
+        "alt": "Maison Modulaire Extérieur 4"
+      },
+      {
+        "type": "image",
+        "src": "/images/products/modular_standard/exterior_5.jpeg",
+        "alt": "Maison Modulaire Extérieur 5"
+      },
+      {
+        "type": "image",
+        "src": "/images/products/modular_standard/exterior_6.jpeg",
+        "alt": "Maison Modulaire Extérieur 6"
+      },
+      {
+        "type": "image",
+        "src": "/images/products/modular_standard/exterior_7.jpeg",
+        "alt": "Maison Modulaire Extérieur 7"
+      }
+    ],
+    "techSpecs": [
+      {
+        "label": "Structure",
+        "value": "Acier galvanisé 2.5mm (Poutres 80x100mm)"
+      },
+      {
+        "label": "Isolation Murs",
+        "value": "Panneaux sandwich EPS 75mm (Ignifuge)"
+      },
+      {
+        "label": "Isolation Toiture",
+        "value": "EPS 50mm + Tôle 0.45mm"
+      },
+      {
+        "label": "Sol",
+        "value": "Structure ciment 18mm + Revêtement PVC 2mm"
+      },
+      {
+        "label": "Menuiseries",
+        "value": "Porte Alu RPT + Double vitrage 5+12+5"
+      },
+      {
+        "label": "Électricité",
+        "value": "Tableau (1 diff + 3 disj), Prise CEE 32A, LED"
+      },
+      {
+        "label": "Résistance",
+        "value": "Vent 0.60 kN/m² / Séisme Niveau 8"
+      },
+      {
+        "label": "Cuisine (Incluse)",
+        "value": "Meuble en L, plan de travail, robinet, évier"
+      },
+      {
+        "label": "Sanitaire (Inclus)",
+        "value": "Douche + WC + Vasque"
+      }
+    ]
+  },
+  {
+    "id": "maison-modulaire-premium",
+    "name": "Maison Modulaire Premium",
+    "description": "Confort absolu avec toit en pente et terrasse intégrée",
+    "longDescription": "Le confort absolu avec toit en pente et terrasse intégrée.",
+    "price": 9920,
+    "priceDisplay": "À partir de 9 920 € HT",
+    "image": "/images/products/modular_premium/exterior_4.jpg",
+    "link": "/maisons/premium",
+    "category": "Maisons",
+    "subcategory": "Premium",
+    "active": true,
+    "pdf": "/docs/fiche_technique_maison_modulaire.pdf",
+    "specs": {},
+    "sizes": [
+      {
+        "id": "20ft",
+        "name": "20 Pieds (37m²)",
+        "price": 9920,
+        "approxM2": 40,
+        "shipping": {
+          "martinique": 11000,
+          "guadeloupe": 11000
+        }
+      },
+      {
+        "id": "30ft",
+        "name": "30 Pieds (57m²)",
+        "price": 10700,
+        "approxM2": 60,
+        "shipping": {
+          "martinique": 19000,
+          "guadeloupe": 17300
+        }
+      },
+      {
+        "id": "40ft",
+        "name": "40 Pieds (74m²)",
+        "price": 13300,
+        "approxM2": 80,
+        "shipping": {
+          "martinique": 19000,
+          "guadeloupe": 17300
+        }
+      }
+    ],
+    "options": [
+      {
+        "id": "extra_room",
+        "name": "Chambre Supplémentaire",
+        "description": "Ajout d'une cloison et porte pour créer une chambre additionnelle",
+        "price": 0,
+        "icon": "BedDouble",
+        "isQuote": true,
+        "volume": 0
+      },
+      {
+        "id": "ac",
+        "name": "Climatisation",
+        "description": "Pack climatisation tri-split 5.2kW (MIDEA ou équivalent)",
+        "price": 2500,
+        "icon": "Snowflake",
+        "volume": 0
+      },
+      {
+        "id": "solar",
+        "name": "Kit Panneaux Solaires",
+        "description": "10kW autonome (16 panneaux 585W + onduleur hybride + batteries lithium 10kW)",
+        "price": 7912,
+        "icon": "Sun",
+        "volume": 0
+      },
+      {
+        "id": "furniture",
+        "name": "Pack Meubles",
+        "description": "Mobilier de base (Sur demande)",
+        "price": 0,
+        "icon": "Sofa",
+        "isQuote": true,
+        "volume": 0
+      }
+    ],
+    "destinations": [
+      {
+        "id": "mq",
+        "name": "Martinique (Port de Fort-de-France)"
+      },
+      {
+        "id": "gp",
+        "name": "Guadeloupe (Port de Pointe-à-Pitre)"
+      },
+      {
+        "id": "gf",
+        "name": "Guyane (Port de Dégrad des Cannes)"
+      },
+      {
+        "id": "re",
+        "name": "La Réunion (Port de la Pointe des Galets)"
+      },
+      {
+        "id": "yt",
+        "name": "Mayotte (Port de Longoni)"
+      }
+    ],
+    "gallery": [
+      {
+        "type": "video",
+        "src": "/images/products/modular_premium/video_1.mp4",
+        "alt": "Visite Virtuelle Premium 1"
+      },
+      {
+        "type": "video",
+        "src": "/images/products/modular_premium/video_2.mp4",
+        "alt": "Visite Virtuelle Premium 2"
+      },
+      {
+        "type": "image",
+        "src": "/images/products/modular_premium/exterior_1.jpg",
+        "alt": "Vue Extérieure 1"
+      },
+      {
+        "type": "image",
+        "src": "/images/products/modular_premium/exterior_2.jpg",
+        "alt": "Vue Extérieure 2"
+      },
+      {
+        "type": "image",
+        "src": "/images/products/modular_premium/exterior_3.jpg",
+        "alt": "Vue Extérieure 3"
+      },
+      {
+        "type": "image",
+        "src": "/images/products/modular_premium/exterior_4.jpg",
+        "alt": "Vue Extérieure 4"
+      }
+    ],
+    "techSpecs": [
+      {
+        "label": "Toiture & Terrasse",
+        "value": "Toit double pente + Terrasse avant inclus",
+        "highlight": true
+      },
+      {
+        "label": "Structure",
+        "value": "Acier galvanisé renforcé (Poutres 100x100mm)"
+      },
+      {
+        "label": "Isolation Murs",
+        "value": "Panneaux sandwich PU 75mm (Haute densité)"
+      },
+      {
+        "label": "Isolation Toiture",
+        "value": "Laine de verre 100mm + Tuiles acier"
+      },
+      {
+        "label": "Sol",
+        "value": "Parquet stratifié haute résistance"
+      },
+      {
+        "label": "Menuiseries",
+        "value": "Baies vitrées Alu double vitrage thermique"
+      },
+      {
+        "label": "Électricité",
+        "value": "Installation complète norme NF, spots LED encastrés"
+      },
+      {
+        "label": "Résistance",
+        "value": "Vent 0.80 kN/m² / Séisme Niveau 9"
+      },
+      {
+        "label": "Cuisine (Incluse)",
+        "value": "Cuisine Premium avec îlot central (selon plan)"
+      },
+      {
+        "label": "Sanitaire (Inclus)",
+        "value": "Douche italienne + WC suspendu + Meuble vasque"
+      }
+    ]
+  },
+  {
+    "id": "camping-car-deluxe-hybride",
+    "name": "Camping Car Deluxe Hybride",
+    "description": "L'alliance parfaite de l'autonomie et du confort",
+    "longDescription": "L'alliance parfaite de l'autonomie et du confort pour vos aventures.",
+    "price": 53650,
+    "priceDisplay": "53 650 € HT",
+    "image": "/images/products/camping_car/exterior_main.webp",
+    "link": "/maisons/camping-car-deluxe",
+    "category": "Maisons",
+    "subcategory": "Camping-Car",
+    "active": true,
+    "specs": {
+      "model": "BYD T5DM",
+      "battery": "18.3 kWh",
+      "places": "6"
+    },
+    "destinations": [
+      {
+        "id": "mq",
+        "name": "Martinique (Port de Fort-de-France)",
+        "price": 9500
+      },
+      {
+        "id": "gp",
+        "name": "Guadeloupe (Port de Pointe-à-Pitre)",
+        "price": 8650
+      },
+      {
+        "id": "gf",
+        "name": "Guyane (Port de Dégrad des Cannes)",
+        "price": null
+      },
+      {
+        "id": "re",
+        "name": "La Réunion (Port de la Pointe des Galets)",
+        "price": null
+      },
+      {
+        "id": "yt",
+        "name": "Mayotte (Port de Longoni)",
+        "price": null
+      }
+    ],
+    "gallery": [
+      {
+        "type": "video",
+        "src": "/images/products/camping_car/video_tour.mp4",
+        "alt": "Visite virtuelle vidéo"
+      },
+      {
+        "type": "image",
+        "src": "/images/products/camping_car/exterior_main.webp",
+        "alt": "Vue Principale"
+      },
+      {
+        "type": "image",
+        "src": "/images/products/camping_car/exterior_front_side.jpg",
+        "alt": "Vue avant 3/4"
+      },
+      {
+        "type": "image",
+        "src": "/images/products/camping_car/exterior_side.jpg",
+        "alt": "Vue latérale"
+      },
+      {
+        "type": "image",
+        "src": "/images/products/camping_car/exterior_back.jpg",
+        "alt": "Vue arrière"
+      },
+      {
+        "type": "image",
+        "src": "/images/products/camping_car/interior_overview.jpg",
+        "alt": "Vue intérieure globale"
+      },
+      {
+        "type": "image",
+        "src": "/images/products/camping_car/interior_living.jpg",
+        "alt": "Espace de vie"
+      },
+      {
+        "type": "image",
+        "src": "/images/products/camping_car/dining_area.jpg",
+        "alt": "Coin repas"
+      },
+      {
+        "type": "image",
+        "src": "/images/products/camping_car/kitchen.jpg",
+        "alt": "Cuisine équipée"
+      },
+      {
+        "type": "image",
+        "src": "/images/products/camping_car/bedroom.jpg",
+        "alt": "Espace nuit"
+      },
+      {
+        "type": "image",
+        "src": "/images/products/camping_car/bathroom.jpg",
+        "alt": "Salle de bain"
+      },
+      {
+        "type": "image",
+        "src": "/images/products/camping_car/laundry.jpg",
+        "alt": "Espace buanderie"
+      }
+    ],
+    "techSpecs": [
+      {
+        "label": "Modèle",
+        "value": "BYD T5DM"
+      },
+      {
+        "label": "Dimensions",
+        "value": "5995 × 2300 × 3200 mm"
+      },
+      {
+        "label": "Moteur Thermique",
+        "value": "Essence 1.5T (146 ch)"
+      },
+      {
+        "label": "Moteur Électrique",
+        "value": "150 kW (204 ch)"
+      },
+      {
+        "label": "Batterie Lame",
+        "value": "18.3 kWh (Standard)",
+        "highlight": true
+      },
+      {
+        "label": "Réservoir Eau Propre",
+        "value": "350 L"
+      },
+      {
+        "label": "Onduleur",
+        "value": "6000 W"
+      },
+      {
+        "label": "Climatisation",
+        "value": "220V Incluse"
+      }
+    ]
+  },
+  {
+    "id": "kit-solaire-10kw",
+    "name": "Kit Solaire 10 kW",
+    "description": "10 kVA — 17 panneaux JinkoSolar Tiger Neo 600W + onduleur hybride + batterie LiFePO4 10 kWh",
+    "price": 7912,
+    "priceDisplay": "7 912 € HT",
+    "image": "/images/solar/kit_overview.webp",
+    "link": "/solaire/kit-10kw",
+    "category": "Solaire",
+    "subcategory": "Kits",
+    "specs": {},
+    "active": true
+  },
+  {
+    "id": "kit-solaire-12kw",
+    "name": "Kit Solaire 12 kW",
+    "description": "12 kVA — 20 panneaux JinkoSolar Tiger Neo 600W + onduleur hybride + batterie LiFePO4 15 kWh",
+    "price": 9500,
+    "priceDisplay": "9 500 € HT",
+    "image": "/images/solar/kit_overview.webp",
+    "link": "/solaire/kit-12kw",
+    "category": "Solaire",
+    "subcategory": "Kits",
+    "specs": {},
+    "active": true
+  },
+  {
+    "id": "kit-solaire-20kw",
+    "name": "Kit Solaire 20 kW",
+    "description": "20 kVA — 34 panneaux JinkoSolar Tiger Neo 600W + onduleur hybride + 2× batterie LiFePO4 15 kWh (30 kWh)",
+    "price": 15800,
+    "priceDisplay": "15 800 € HT",
+    "image": "/images/solar/kit_overview.webp",
+    "link": "/solaire/kit-20kw",
+    "category": "Solaire",
+    "subcategory": "Kits",
+    "specs": {},
+    "active": true
+  },
+  {
+    "id": "godet-dents",
+    "name": "Godet à dents",
+    "description": "Godet standard robuste pour tous types de travaux d'excavation. Disponible en plusieurs largeurs pour s'adapter à vos besoins.",
+    "price": 0,
+    "priceDisplay": "Voir tarifs",
+    "image": "/images/accessories/tooth_bucket_r18.webp",
+    "link": "/accessoires",
+    "category": "Accessoires",
+    "subcategory": "Godets",
+    "specs": {},
+    "active": true,
+    "models": [
+      {
+        "name": "R22 PRO",
+        "options": [
+          {
+            "size": "20 cm",
+            "price": "191 €"
+          },
+          {
+            "size": "60 cm",
+            "price": "182 €"
+          },
+          {
+            "size": "80 cm",
+            "price": "269 €"
+          }
+        ]
+      },
+      {
+        "name": "R32 PRO",
+        "options": [
+          {
+            "size": "20 cm",
+            "price": "243 €"
+          },
+          {
+            "size": "60 cm",
+            "price": "270 €"
+          },
+          {
+            "size": "80 cm",
+            "price": "330 €"
+          }
+        ]
+      },
+      {
+        "name": "R57 PRO",
+        "options": [
+          {
+            "size": "20 cm",
+            "price": "261 €"
+          },
+          {
+            "size": "60 cm",
+            "price": "330 €"
+          },
+          {
+            "size": "80 cm",
+            "price": "391 €"
+          },
+          {
+            "size": "100 cm",
+            "price": "413 €"
+          },
+          {
+            "size": "120 cm",
+            "price": "452 €"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "godet-plat",
+    "name": "Godet de curage",
+    "description": "Idéal pour le nivellement, le nettoyage de fossés et les travaux de finition. Conception large pour une efficacité maximale.",
+    "price": 0,
+    "priceDisplay": "Voir tarifs",
+    "image": "/images/accessories/flat_bucket_r18.webp",
+    "link": "/accessoires",
+    "category": "Accessoires",
+    "subcategory": "Godets",
+    "specs": {},
+    "active": true,
+    "models": [
+      {
+        "name": "R22 PRO",
+        "options": [
+          {
+            "size": "30 cm",
+            "price": "91 €"
+          },
+          {
+            "size": "60 cm",
+            "price": "243 €"
+          },
+          {
+            "size": "80 cm",
+            "price": "270 €"
+          },
+          {
+            "size": "100 cm",
+            "price": "287 €"
+          }
+        ]
+      },
+      {
+        "name": "R32 PRO",
+        "options": [
+          {
+            "size": "30 cm",
+            "price": "243 €"
+          },
+          {
+            "size": "60 cm",
+            "price": "270 €"
+          },
+          {
+            "size": "80 cm",
+            "price": "296 €"
+          },
+          {
+            "size": "100 cm",
+            "price": "330 €"
+          }
+        ]
+      },
+      {
+        "name": "R57 PRO",
+        "options": [
+          {
+            "size": "30 cm",
+            "price": "261 €"
+          },
+          {
+            "size": "60 cm",
+            "price": "278 €"
+          },
+          {
+            "size": "80 cm",
+            "price": "313 €"
+          },
+          {
+            "size": "100 cm",
+            "price": "348 €"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "godet-inclinable",
+    "name": "Godet inclinable",
+    "description": "Permet d'incliner le godet pour les travaux sur terrains en pente ou pour créer des formes complexes.",
+    "price": 0,
+    "priceDisplay": "Voir tarifs",
+    "image": "/images/accessories/tilt_bucket_r18.webp",
+    "link": "/accessoires",
+    "category": "Accessoires",
+    "subcategory": "Godets",
+    "specs": {},
+    "active": true,
+    "models": [
+      {
+        "name": "R22 PRO",
+        "options": [
+          {
+            "size": "80 cm",
+            "price": "435 €"
+          },
+          {
+            "size": "100 cm",
+            "price": "452 €"
+          }
+        ]
+      },
+      {
+        "name": "R32 PRO",
+        "options": [
+          {
+            "size": "80 cm",
+            "price": "461 €"
+          },
+          {
+            "size": "100 cm",
+            "price": "478 €"
+          }
+        ]
+      },
+      {
+        "name": "R57 PRO",
+        "options": [
+          {
+            "size": "80 cm",
+            "price": "748 €"
+          },
+          {
+            "size": "100 cm",
+            "price": "809 €"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "attache-rapide",
+    "name": "Attache rapide Hydraulique",
+    "description": "Changez d'accessoire en quelques secondes sans quitter la cabine. Indispensable pour la polyvalence.",
+    "price": 0,
+    "priceDisplay": "Voir tarifs",
+    "image": "/images/accessories/grapple_r18.webp",
+    "link": "/accessoires",
+    "category": "Accessoires",
+    "subcategory": "Attaches",
+    "specs": {},
+    "active": true,
+    "models": [
+      {
+        "name": "R22 PRO",
+        "options": [
+          {
+            "size": "Standard",
+            "price": "452 €"
+          }
+        ]
+      },
+      {
+        "name": "R32 PRO",
+        "options": [
+          {
+            "size": "Standard",
+            "price": "513 €"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "pince-pouce",
+    "name": "Pince-pouce Hydraulique",
+    "description": "Transformez votre godet en pince pour manipuler des rochers, des souches et d'autres objets encombrants.",
+    "price": 0,
+    "priceDisplay": "Voir tarifs",
+    "image": "/images/accessories/grapple_r18.webp",
+    "link": "/accessoires",
+    "category": "Accessoires",
+    "subcategory": "Pinces",
+    "specs": {},
+    "active": true,
+    "models": [
+      {
+        "name": "R22 PRO",
+        "options": [
+          {
+            "size": "Standard",
+            "price": "522 €"
+          }
+        ]
+      },
+      {
+        "name": "R32 PRO",
+        "options": [
+          {
+            "size": "Standard",
+            "price": "565 €"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "rateau",
+    "name": "Râteau",
+    "description": "Pour le nettoyage de terrain, le ramassage de débris végétaux et la préparation du sol.",
+    "price": 0,
+    "priceDisplay": "Voir tarifs",
+    "image": "/images/accessories/rake_r18.webp",
+    "link": "/accessoires",
+    "category": "Accessoires",
+    "subcategory": "Outils",
+    "specs": {},
+    "active": true,
+    "models": [
+      {
+        "name": "R22 PRO",
+        "options": [
+          {
+            "size": "40 cm",
+            "price": "217 €"
+          },
+          {
+            "size": "60 cm",
+            "price": "235 €"
+          },
+          {
+            "size": "80 cm",
+            "price": "261 €"
+          }
+        ]
+      },
+      {
+        "name": "R32 PRO",
+        "options": [
+          {
+            "size": "40 cm",
+            "price": "243 €"
+          },
+          {
+            "size": "60 cm",
+            "price": "261 €"
+          },
+          {
+            "size": "80 cm",
+            "price": "287 €"
+          }
+        ]
+      },
+      {
+        "name": "R57 PRO",
+        "options": [
+          {
+            "size": "40 cm",
+            "price": "209 €"
+          },
+          {
+            "size": "60 cm",
+            "price": "235 €"
+          },
+          {
+            "size": "80 cm",
+            "price": "261 €"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ripper",
+    "name": "Ripper",
+    "description": "Dent de dérochage pour sols durs, gelés ou pour l'extraction de racines et de pierres.",
+    "price": 0,
+    "priceDisplay": "Voir tarifs",
+    "image": "/images/accessories/ripper_r18.webp",
+    "link": "/accessoires",
+    "category": "Accessoires",
+    "subcategory": "Outils",
+    "specs": {},
+    "active": true,
+    "models": [
+      {
+        "name": "R22 PRO",
+        "options": [
+          {
+            "size": "Standard",
+            "price": "183 €"
+          }
+        ]
+      },
+      {
+        "name": "R32 PRO",
+        "options": [
+          {
+            "size": "Standard",
+            "price": "209 €"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "marteau-hydraulique",
+    "name": "Marteau hydraulique (Destructeur)",
+    "description": "Puissant brise-roche pour la démolition de béton, d'asphalte et de roche.",
+    "price": 0,
+    "priceDisplay": "Voir tarifs",
+    "image": "/images/accessories/hydraulic_hammer_r18.webp",
+    "link": "/accessoires",
+    "category": "Accessoires",
+    "subcategory": "Marteaux",
+    "specs": {},
+    "active": true,
+    "models": [
+      {
+        "name": "R22 PRO",
+        "options": [
+          {
+            "size": "Standard",
+            "price": "452 €"
+          }
+        ]
+      },
+      {
+        "name": "R32 PRO",
+        "options": [
+          {
+            "size": "Standard",
+            "price": "504 €"
+          }
+        ]
+      },
+      {
+        "name": "R57 PRO",
+        "options": [
+          {
+            "size": "Standard",
+            "price": "669 €"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tariere",
+    "name": "Tarière (Foret à terre)",
+    "description": "Pour le forage de trous de poteaux, de plantations ou de fondations.",
+    "price": 0,
+    "priceDisplay": "Voir tarifs",
+    "image": "/images/accessories/auger_r18.webp",
+    "link": "/accessoires",
+    "category": "Accessoires",
+    "subcategory": "Outils",
+    "specs": {},
+    "active": true,
+    "models": [
+      {
+        "name": "R22 PRO",
+        "options": [
+          {
+            "size": "Ø 80 mm – 20 cm",
+            "price": "330 €"
+          }
+        ]
+      },
+      {
+        "name": "R32 PRO",
+        "options": [
+          {
+            "size": "Ø 80 mm – 20 cm",
+            "price": "373 €"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "grappin",
+    "name": "Grappin",
+    "description": "Outil polyvalent pour la manutention de bois, de pierres et de déchets de démolition.",
+    "price": 0,
+    "priceDisplay": "Voir tarifs",
+    "image": "/images/accessories/grapple_r18.webp",
+    "link": "/accessoires",
+    "category": "Accessoires",
+    "subcategory": "Grappins",
+    "specs": {},
+    "active": true,
+    "models": [
+      {
+        "name": "R22 PRO",
+        "options": [
+          {
+            "size": "Standard",
+            "price": "330 €"
+          }
+        ]
+      },
+      {
+        "name": "R32 PRO",
+        "options": [
+          {
+            "size": "Standard",
+            "price": "365 €"
+          }
+        ]
+      },
+      {
+        "name": "R57 PRO",
+        "options": [
+          {
+            "size": "Standard",
+            "price": "748 €"
+          }
+        ]
+      }
+    ]
+  }
+]

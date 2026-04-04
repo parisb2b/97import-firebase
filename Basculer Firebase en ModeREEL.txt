@@ -1,0 +1,42 @@
+1. Basculer Firebase en "Mode Réel" (Sécurité)
+Actuellement, vos règles sont en "Mode Test" (ouvert à tous). Pour passer en mode réel, vous devez verrouiller l'accès :
+
+Firestore : Allez dans l'onglet Rules et remplacez la date d'expiration par une règle qui autorise la lecture à tout le monde mais l'écriture seulement aux administrateurs.
+
+Storage : Faites de même pour les images.
+
+Auth : Assurez-vous que les méthodes Google et Facebook ne sont plus en mode "Sandbox" mais bien actives.
+
+2. Le Prompt pour Claude Code : "Passage en Force"
+Pour que Claude arrête de créer des fichiers de test et construise le site final, donnez-lui cet ordre direct :
+
+"Oublie le mode test et les simulations. Nous passons en MODE PRODUCTION LOCAL.
+
+Actions immédiates :
+
+Data : Utilise les 20 produits importés comme base finale. Ne crée plus de produits fictifs.
+
+Authentification : Active le vrai flux de connexion. Un utilisateur qui se connecte via Google doit voir son vrai profil créé dans Firestore.
+
+Prix : Applique les formules réelles de calculPrix.ts (Yuan -> Euro + Marge 97import). Ce sont les prix que les clients verront.
+
+Génération PDF : Le bouton 'Générer Devis' doit produire un document prêt à être envoyé à un client (avec logo, RIB, et mentions légales).
+
+Images : Corrige le script d'upload pour que les 38 fichiers soient réellement accessibles sur le site.
+
+Lance npm run dev. Le site doit être 100% opérationnel comme s'il était déjà sur 97import.com."
+
+3. Pourquoi c'est une bonne idée ?
+En testant "pour de vrai" en local :
+
+Vous voyez exactement ce que le client verra sur IONOS plus tard.
+
+Vous pouvez remplir votre catalogue (descriptions en chinois, nouvelles photos) directement.
+
+Une fois que tout est parfait sur votre localhost:5173, il suffira de taper une seule commande (npm run build) pour envoyer le site final sur votre hébergement IONOS.
+
+🛠️ Résolution du blocage des images (Rappel)
+Puisque vous passez en mode réel, l'erreur "storage/unknown" de tout à l'heure doit être réglée.
+Vérifiez bien que vous avez cliqué sur "Commencer" dans l'onglet Storage de la console Firebase. Sans cette activation manuelle, même le mode production ne pourra pas afficher vos photos.
+
+On lance la production locale ? Si oui, dites à Claude de commencer par la "Phase 4 : UI Finale & Devis Réels".

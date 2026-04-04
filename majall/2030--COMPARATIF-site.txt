@@ -1,0 +1,294 @@
+Pour créer une solution **complète et professionnelle** afin d'avoir un site internet identique en **front-end** et **back-office** entre `http://localhost:5173/` (version locale avec Supabase) et `https://97import.com/` (version hébergée avec Firebase), tout en garantissant une **version bilingue (chinois et français)**, voici une approche structurée et efficace.
+
+---
+
+Tu es Lead Developer Full-Stack. Mission : rendre localhost:5173 
+identique à 97import.com visuellement, tout en gardant Firebase.
+
+ANALYSE DES DIFFÉRENCES CONSTATÉES :
+
+PROD (97import.com) avec Supabase :
+- Nav : Accueil | Mini-Pelle | Accessoires Mini-Pelle | 
+        Maison modulaire | Panneau Solaire | Services | Contact | Panier
+- Logo : bateau + 97import.com (grand, avec image)
+- Hero : vraie photo bateau cargo plein écran
+- Catégories : 4 cards avec vraies photos (Mini-pelles, Maisons, Solaires, Machines Agricoles)
+- Footer : complet avec TikTok, WhatsApp, mentions légales
+- Langue : français uniquement
+
+LOCAL (localhost:5173) avec Firebase :
+- Nav : Mini-pelles | Maisons modulaires | Kits solaires | Accessoires | Catalogue
+- Logo : texte simple "97import.com"
+- Hero : fond bleu dégradé + barre de recherche
+- Catégories : 4 cards mais images incorrectes
+- Bilingue FR/中文
+
+OBJECTIF : Aligner localhost sur la prod visuellement
+en gardant Firebase comme backend.
+
+═══════════════════════════════════════════════════════════
+ÉTAPE 1 — AUDIT COMPLET DES FICHIERS
+═══════════════════════════════════════════════════════════
+
+Lis ces fichiers et liste leur contenu exact :
+- C:\DATA-MC-2030\97IMPORT\src\pages\HomePage.tsx
+- C:\DATA-MC-2030\97IMPORT\97import2026_siteweb\vercel\ 
+  (liste tous les fichiers .tsx .jsx .html)
+- C:\DATA-MC-2030\97IMPORT\src\App.tsx
+
+═══════════════════════════════════════════════════════════
+ÉTAPE 2 — RECONSTRUIRE HomePage.tsx IDENTIQUE À LA PROD
+═══════════════════════════════════════════════════════════
+
+En lisant le code source de 97import.com (dans 97import2026_siteweb),
+recrée src/pages/HomePage.tsx avec :
+
+NAVBAR :
+- Logo : image /images/logos/logo_import97_large.png + texte "97import"
+- Liens : Mini-pelles | Maisons modulaires | Kits solaires | 
+          Accessoires | Catalogue | Contact
+- Droite : toggle FR/中文 | panier | Se connecter
+- Style : fond noir (#0F172A) texte blanc, liens en UPPERCASE
+
+HERO SECTION :
+- Fond : vraie image /images/portal/hero_ship.png en plein écran
+- Overlay sombre (rgba 0,0,0,0.5)
+- Titre : "97import.com" centré blanc 52px
+- Sous-titre : "L'importation n'a jamais été aussi simple..."
+- Barre de recherche blanche centrée
+
+CATÉGORIES (4 cards avec vraies images) :
+- Mini-pelles → /images/portal/agri_tractor.jpg → /mini-pelles
+- Maisons Modulaires → /images/portal/modular_home.webp → /maisons
+- Panneaux Solaires → /images/portal/solar_panel.jpg → /solaire
+- Accessoires → /images/accessories/godet_dents.png → /accessoires
+
+SECTION "Pourquoi 97import" :
+- 3 arguments : Expertise DOM-TOM | Qualité Certifiée | SAV Réactif
+- Fond blanc, icônes, texte bilingue FR/中文
+
+FOOTER :
+- Fond #111827
+- Logo + description
+- Liens navigation
+- Contact : WhatsApp +33 6 63 28 49 08 | info@97import.com
+- TikTok @direxport
+- Copyright : © 2026 97import.com — LUXENT LIMITED, UK
+
+═══════════════════════════════════════════════════════════
+ÉTAPE 3 — ALIGNER LA NAVBAR SUR TOUTES LES PAGES
+═══════════════════════════════════════════════════════════
+
+Dans App.tsx, ajoute ces routes manquantes :
+- /contact → nouvelle page ContactPage.tsx simple
+- /catalogue → déjà existe (CataloguePage)
+
+Dans CataloguePage.tsx, aligne la navbar avec HomePage.tsx
+(même logo, même couleurs, même liens).
+
+═══════════════════════════════════════════════════════════
+ÉTAPE 4 — CORRIGER LES IMAGES DES CATÉGORIES
+═══════════════════════════════════════════════════════════
+
+Les images des cards catégories pointent vers de mauvais fichiers.
+Vérifie que ces fichiers existent dans public/ :
+- /images/portal/hero_ship.png
+- /images/portal/modular_home.webp  
+- /images/portal/solar_panel.jpg
+- /images/accessories/godet_dents.png
+- /images/logos/logo_import97_large.png
+
+Si absents → cherche dans 97import2026_siteweb\ et copie vers public\.
+
+═══════════════════════════════════════════════════════════
+ÉTAPE 5 — CRÉER ContactPage.tsx
+═══════════════════════════════════════════════════════════
+
+Page /contact simple avec :
+- Même navbar que HomePage
+- Formulaire : Nom | Email | Message | Envoyer
+- WhatsApp : +33 6 63 28 49 08
+- Email : info@97import.com
+- Adresse : LUXENT LIMITED, Londres, UK
+
+═══════════════════════════════════════════════════════════
+ÉTAPE 6 — BUILD + VÉRIFICATION
+═══════════════════════════════════════════════════════════
+
+1. npm run build → doit passer sans erreur
+2. npm run dev
+3. Vérifie visuellement :
+   - / → Hero avec vraie photo bateau ✅
+   - /mini-pelles → produits avec images ✅
+   - /maisons → produits avec images ✅
+   - /accessoires → produits avec images ✅
+   - /contact → formulaire ✅
+
+═══════════════════════════════════════════════════════════
+ÉTAPE 7 — RAPPORT FINAL
+═══════════════════════════════════════════════════════════
+
+Génère RAPPORT-ALIGNEMENT.md avec :
+- Pages alignées sur la prod ✅/❌
+- Images manquantes/présentes
+- Routes fonctionnelles
+- Différences résiduelles documentées
+
+═══════════════════════════════════════════════════════════
+RÈGLES ABSOLUES
+═══════════════════════════════════════════════════════════
+- Encodage UTF-8 sur tous les fichiers
+- Garder Firebase (ne pas toucher à lib/firebase.ts)
+- Garder le système bilingue FR/中文 (LanguageContext)
+- Ne jamais créer de doublon
+- Tester npm run build avant de terminer
+
+
+
+### **📌 Solution Complète et Professionnelle**
+
+#### **1. Audit Complet et Synchronisation des Données**
+**Objectif** : Identifier et corriger toutes les différences entre les deux versions du site.
+
+##### **Étapes :**
+1. **Audit des Différences** :
+   - Utiliser un outil de **comparaison de sites** (comme **Diffchecker** ou **Screaming Frog**) pour identifier les différences entre `http://localhost:5173/` et `https://97import.com/`.
+   - Lister toutes les pages, les images, les textes, les styles CSS, et les fonctionnalités qui diffèrent.
+
+2. **Synchronisation des Données** :
+   - **Exporter les données** de Supabase et les importer dans Firebase (ou inversement) pour garantir que les deux bases de données sont synchronisées.
+   - Utiliser des scripts d'export/import pour les données structurées (produits, utilisateurs, etc.).
+
+3. **Comparaison des Fichiers Médias** :
+   - Utiliser le script Python précédent pour comparer et synchroniser les fichiers médias (images, PDF) entre les deux versions.
+
+---
+
+#### **2. Harmonisation du Front-End et du Back-Office**
+**Objectif** : Garantir que le front-end et le back-office sont identiques entre les deux versions.
+
+##### **Étapes :**
+1. **Utiliser un Système de Gestion de Contenu (CMS)** :
+   - Implémenter un CMS comme **Strapi** ou **Contentful** pour gérer le contenu de manière centralisée.
+   - Synchroniser le contenu entre Supabase et Firebase via des **webhooks** ou des **APIs**.
+
+2. **Harmonisation des Styles et des Composants** :
+   - Utiliser **shadcn/ui** pour garantir une cohérence des styles entre les deux versions.
+   - Créer des composants réutilisables pour le front-end et le back-office.
+
+3. **Gestion des Langues** :
+   - Utiliser **i18next** ou **react-i18next** pour gérer la traduction entre le chinois et le français.
+   - Créer des fichiers de traduction pour chaque page et chaque composant.
+
+---
+
+#### **3. Automatisation des Tests et Déploiement Continu**
+**Objectif** : Garantir que les deux versions du site restent synchronisées et fonctionnelles.
+
+##### **Étapes :**
+1. **Tests Automatiques** :
+   - Utiliser **Cypress** ou **Playwright** pour automatiser les tests de régression et garantir que les deux versions du site fonctionnent correctement.
+   - Tester les fonctionnalités clés (authentification, gestion des produits, etc.).
+
+2. **Déploiement Continu (CI/CD)** :
+   - Configurer un pipeline de déploiement continu avec **GitHub Actions** ou **GitLab CI/CD**.
+   - Automatiser les tests et le déploiement des deux versions du site.
+
+3. **Surveillance et Alertes** :
+   - Utiliser **Sentry** ou **New Relic** pour surveiller les erreurs et les performances des deux versions du site.
+   - Configurer des alertes pour être informé en cas de problème.
+
+---
+
+#### **4. Documentation et Maintenance**
+**Objectif** : Garantir que le site reste maintenable et documenté.
+
+##### **Étapes :**
+1. **Documentation Technique** :
+   - Documenter l'architecture du site, les dépendances, et les processus de déploiement.
+   - Créer des guides pour les développeurs et les administrateurs.
+
+2. **Maintenance Régulière** :
+   - Planifier des audits réguliers pour identifier et corriger les différences entre les deux versions.
+   - Mettre à jour les dépendances et les bibliothèques utilisées.
+
+---
+
+### **📌 Script d'Audit et Synchronisation**
+Voici un script Python pour automatiser l'audit et la synchronisation des données entre Supabase et Firebase :
+
+```python
+import os
+import json
+import requests
+from firebase_admin import credentials, firestore, initialize_app
+import supabase
+
+# --- CONFIGURATION ---
+SUPABASE_URL = "votre_url_supabase"
+SUPABASE_KEY = "votre_clé_supabase"
+FIREBASE_CREDENTIALS = "votre_fichier_credentials_firebase.json"
+
+# --- INITIALISATION ---
+supabase_client = supabase.create_client(SUPABASE_URL, SUPABASE_KEY)
+firebase_credentials = credentials.Certificate(FIREBASE_CREDENTIALS)
+firebase_app = initialize_app(firebase_credentials)
+firebase_db = firestore.client(firebase_app)
+
+# --- FONCTIONS ---
+def export_supabase_data():
+    """Exporte les données de Supabase."""
+    response = supabase_client.table("produits").select("*").execute()
+    return response.data
+
+def import_firebase_data(data):
+    """Importe les données dans Firebase."""
+    for item in data:
+        firebase_db.collection("produits").add(item)
+
+def compare_data(supabase_data, firebase_data):
+    """Compare les données entre Supabase et Firebase."""
+    report = []
+    for supabase_item in supabase_data:
+        firebase_item = next((f for f in firebase_data if f["id"] == supabase_item["id"]), None)
+        if not firebase_item:
+            report.append({
+                "id": supabase_item["id"],
+                "status": "Manquant dans Firebase"
+            })
+        elif supabase_item["last_modified"] > firebase_item["last_modified"]:
+            report.append({
+                "id": supabase_item["id"],
+                "status": "À mettre à jour dans Firebase"
+            })
+    return report
+
+# --- EXÉCUTION ---
+print("📥 Début de l'audit et de la synchronisation des données...")
+
+# 1. Exporter les données de Supabase
+supabase_data = export_supabase_data()
+
+# 2. Exporter les données de Firebase
+firebase_data = []
+docs = firebase_db.collection("produits").stream()
+for doc in docs:
+    firebase_data.append(doc.to_dict())
+
+# 3. Comparer les données
+report = compare_data(supabase_data, firebase_data)
+
+# 4. Importer les données dans Firebase
+import_firebase_data(supabase_data)
+
+# 5. Générer un rapport
+with open("data_sync_report.json", "w", encoding="utf-8") as f:
+    json.dump(report, f, ensure_ascii=False, indent=4)
+
+print("✅ Audit et synchronisation terminés. Rapport généré.")
+```
+
+---
+
+### **📌 Conclusion**
+Cette solution **complète et professionnelle** permet de garantir que les deux versions du site (`http://localhost:5173/` et `https://97import.com/`) sont identiques en **front-end** et **back-office**, tout en gérant les différences de base de données (Supabase vs Firebase) et en assurant une **version bilingue (chinois et français)**. En suivant ces étapes, vous pouvez **automatiser l'audit, la synchronisation, et la maintenance** du site pour garantir une expérience utilisateur cohérente et de haute qualité.

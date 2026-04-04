@@ -1,0 +1,44 @@
+L'export technique (`3-4---2026--export-techenique.txt`) révèle une architecture Supabase structurée autour de tables relationnelles précises (`products`, `quotes`, `profiles`, `partners`) et d'une arborescence front-end très dense incluant une centaine de médias locaux (`client/dist/images/...`). La logique des composants, notamment pour la configuration complexe des maisons modulaires (calculs de prix de livraison, intégration d'options) est également intégrée dans ce code.
+
+Pour réussir la **refonte complète vers Firebase** et préparer le déploiement statique sur Vercel sans briser l'interface existante, il faut opérer un remplacement chirurgical des méthodes d'accès aux données.
+
+### 🏗️ Plan d'Architecture de Refonte
+
+**1. Transformation du Modèle de Données (De SQL vers NoSQL)**
+Firebase Firestore fonctionne par collections de documents, ce qui exige de dénormaliser l'ancienne structure :
+* **Utilisateurs :** Les tables `profiles` et `partners` fusionnent en une seule collection Firestore `users`, différenciée par un champ `role` (admin, user, vip, partner).
+* **Transactions :** Les tables `quotes` et `invoices` s'intègrent dans une collection `quotes`, incluant des sous-champs pour les acomptes et les statuts (`facture_generee`, `pdf_url`).
+* **Catalogue :** La table `products` devient une collection contenant les spécifications techniques complètes et les prix d'achat.
+
+**2. Migration des Actifs Médias (Storage)**
+Actuellement, l'architecture charge des dizaines d'images, vidéos (.mov) et PDF en local. Pour que le déploiement Vercel soit léger et performant, tous les éléments du dossier `client/public/images/` et `client/public/documents/` doivent être migrés vers un Bucket Firebase Storage (Région Europe).
+
+**3. Mise à niveau de la Logique Front-End (React 19)**
+Tous les appels de type `supabase.from(...)` doivent être remplacés par les méthodes modulaires du SDK Firebase (`getDocs`, `doc`, `setDoc`). Le composant `ModularStandard` devra être restructuré pour récupérer ses tarifs (`optionPrices`, `destPrices`) depuis Firestore en temps réel, garantissant ainsi l'application immédiate de la conversion monétaire RMB/Euro.
+
+---
+
+### 💻 Prompt d'Exécution pour Claude Code
+
+Copiez et collez ce prompt directement dans l'interface de **Claude Code**. Il lui donne l'ordre d'analyser l'export et de recâbler toute l'application vers Firebase en respectant vos normes strictes.
+
+> "Agis en tant qu'**Architecte Cloud & React 19**. La mission est de finaliser la refonte complète de `97import` de Supabase vers Firebase, en préparant l'application pour un déploiement sur Vercel.
+>
+> **1. Rétro-ingénierie depuis l'Export :**
+> - Lis et analyse le fichier `3-4---2026--export-techenique.txt` présent à la racine.
+> - Cartographie les anciennes tables SQL (`products`, `quotes`, `profiles`, `partners`, `invoices`) et convertis-les en schémas NoSQL optimisés pour Firestore.
+> - Crée ou mets à jour les interfaces TypeScript correspondantes dans `src/types/`.
+>
+> **2. Migration du Moteur de Données (Backend) :**
+> - Remplace de manière exhaustive tous les imports et appels `supabase` dans les composants par leurs équivalents Firebase (`getFirestore`, `getDocs`, `addDoc`).
+> - Implémente Firebase Auth pour remplacer la gestion des sessions de l'ancienne table `profiles`.
+>
+> **3. Standardisation UI et Bilinguisme :**
+> - Applique le `LanguageContext` de manière globale. Identifie les textes statiques présents dans les composants de l'export (ex: les options de la Maison Modulaire) et intègre-les au dictionnaire de traduction.
+> - Assure-toi que le bouton **🌐 FR / 中文** bascule l'intégralité de la nouvelle interface connectée à Firebase.
+>
+> **4. Normes Absolues d'Exécution :**
+> - Applique un encodage **UTF-8** strict sur chaque fichier modifié pour préserver les caractères chinois (中文) et les accents.
+> - Aucune régression visuelle n'est tolérée ; l'interface de la page d'accueil doit rester identique à l'ancienne version.
+>
+> Génère d'abord le fichier des interfaces TypeScript pour Firestore et attends ma validation pour lancer les modifications sur les composants."

@@ -1,0 +1,141 @@
+Voici le **prompt optimisé** intégrant toutes les corrections demandées, avec une migration complète vers Vercel et une gestion rigoureuse des conversions monétaires :
+
+---
+
+### **📌 Prompt pour Claude Code : Mise à jour proactive d'un site React 19 + Vercel**
+**Contexte** :
+Tu es un **Expert Cloud FinOps** et **Architecte Logiciel Senior** chargé de :
+1. Corriger la logique de conversion monétaire (1€ = 8 RMB)
+2. Mettre à jour le site pour un déploiement Vercel
+3. Garantir l'intégrité des données techniques
+
+**Stack Technique** :
+- **Frontend** : React 19 + Vite 7 + TypeScript
+- **UI** : shadcn/ui + inline styles (ADMIN_COLORS)
+- **Routing** : wouter
+- **Backend** : Firebase (Auth, Firestore, Storage, Functions)
+- **Hosting** : Vercel
+- **Email** : Resend API via Firebase Cloud Functions
+- **PDF/Excel** : jsPDF + SheetJS (xlsx)
+- **Domaine** : 97import.com
+
+---
+
+### **🔧 Prérequis**
+1. **Commande Claude Code** :
+   ```bash
+   claude --dangerously-skip-permissions
+   ```
+
+2. **Dépendances** :
+   - Node.js 20.x
+   - pnpm 8.x
+   - Firebase CLI
+   - Vercel CLI
+
+3. **Répertoires** :
+   - **Source** : `C:\DATA-MC-2030\97IMPORT\97import2026_siteweb`
+   - **Destination** : `C:\DATA-MC-2030\97IMPORT`
+
+---
+
+### **📥 Script de Correction (TypeScript)**
+```typescript
+// src/utils/calculPrix.ts
+export const convertToRMB = (priceInEUR: number): number => {
+  return priceInEUR * 8; // Correction : Multiplication par 8
+};
+
+export const getPartnerPrice = (basePrice: number): number => {
+  return basePrice * 1.2; // Prix VIP (Partner)
+};
+
+export const formatPrice = (price: number, currency: 'EUR' | 'RMB'): string => {
+  const symbol = currency === 'EUR' ? '€' : '¥';
+  return `${price.toLocaleString()} ${symbol}`;
+};
+```
+
+---
+
+### **📝 Instructions pour Claude Code**
+1. **Correction de la conversion monétaire** :
+   - Modifier `src/utils/calculPrix.ts` pour implémenter la multiplication par 8
+   - Vérifier que tous les calculs utilisent cette nouvelle logique
+
+2. **Mise à jour du catalogue produits** :
+   ```bash
+   npx tsx src/scripts/importProducts.ts
+   ```
+
+3. **Validation des prix** :
+   - Vérifier que la R18 PRO affiche :
+     - Prix de base : 12400€
+     - Prix VIP : 14880€
+     - Prix RMB : 99200 RMB
+
+4. **Préparation Vercel** :
+   - Créer `vercel.json` :
+     ```json
+     {
+       "version": 2,
+       "builds": [
+         {
+           "src": "package.json",
+           "use": "@vercel/next"
+         }
+       ],
+       "routes": [
+         {
+           "src": "/(.*)",
+           "dest": "/index.html"
+         }
+       ]
+     }
+     ```
+
+5. **Déploiement** :
+   ```bash
+   vercel --prod
+   ```
+
+---
+
+### **⚠️ Points clés**
+1. **Conversion monétaire** :
+   - 1€ = 8 RMB (multiplication obligatoire)
+   - Tous les calculs doivent respecter cette règle
+
+2. **Intégrité des données** :
+   - Tous les champs de `detailedSpecs` doivent être conservés
+   - Aucune simplification des données techniques
+
+3. **Validation** :
+   - Vérifier les prix en mode chinois (affichage RMB)
+   - Confirmer l'affichage complet des spécifications techniques
+
+---
+
+### **📌 Exemple de log attendu**
+```
+[2024-05-20 14:30:00] 🚀 Correction de la conversion monétaire
+[2024-05-20 14:30:01] ✅ src/utils/calculPrix.ts mis à jour
+[2024-05-20 14:30:02] ✅ Import des produits terminé
+[2024-05-20 14:30:03] ✅ Validation R18 PRO :
+   - Prix base : 12400€
+   - Prix VIP : 14880€
+   - Prix RMB : 99200 RMB
+[2024-05-20 14:30:04] 🚀 Préparation Vercel
+[2024-05-20 14:30:05] ✅ Configuration Vercel créée
+[2024-05-20 14:30:06] 🎉 Déploiement Vercel en cours...
+```
+
+---
+
+### **🚀 Prochaines étapes**
+1. **Tester** le site local avec `npm run dev`
+2. **Vérifier** les conversions monétaires
+3. **Confirmer** l'affichage complet des spécifications techniques
+4. **Déployer** sur Vercel avec `vercel --prod`
+
+Toutes les modifications doivent être faites en **UTF-8** et sans confirmation manuelle.

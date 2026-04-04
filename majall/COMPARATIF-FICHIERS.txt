@@ -1,0 +1,173 @@
+ Python 的路径：
+
+Python 可执行文件位置：
+
+ 
+C:\DATA-MC-2030\python\python.exe
+
+---
+
+### **📌 Prompt pour Stepfun : Tableau Comparatif des Fichiers**
+**Contexte :**
+Tu es un assistant technique chargé de comparer les fichiers (PDF, images, vidéos) entre deux répertoires Windows. L'objectif est de générer un **tableau comparatif** listant :
+1. **Tous les fichiers** (PDF, images, vidéos) dans les répertoires source et destination.
+2. **Les différences** (fichiers manquants, versions obsolètes).
+3. **Les métadonnées** (date de modification, taille, chemin).
+
+---
+
+### **🔧 Objectifs**
+1. **Lister tous les fichiers** avec leurs métadonnées.
+2. **Comparer les fichiers** entre les deux répertoires.
+3. **Identifier les fichiers manquants** dans le répertoire de destination.
+4. **Vérifier les versions les plus récentes** (date de modification).
+5. **Générer un tableau comparatif** (format Markdown ou CSV).
+
+---
+
+### **📥 Script Python pour Stepfun**
+```python
+import os
+import pandas as pd
+from datetime import datetime
+
+# --- CONFIGURATION ---
+SOURCE_DIR = r"C:\DATA-MC-2030\97IMPORT\97import2026_siteweb"
+DEST_DIR = r"C:\DATA-MC-2030\97IMPORT"
+EXTENSIONS = [".pdf", ".jpeg", ".jpg", ".png", ".mov", ".mp4"]
+
+# --- FONCTIONS ---
+def get_file_info(file_path):
+    """Récupère les métadonnées d'un fichier (date, taille, chemin)."""
+    if not os.path.exists(file_path):
+        return None
+
+    stat = os.stat(file_path)
+    file_size = stat.st_size
+    last_modified = datetime.fromtimestamp(stat.st_mtime).strftime("%Y-%m-%d %H:%M:%S")
+
+    return {
+        "path": file_path,
+        "size": file_size,
+        "last_modified": last_modified
+    }
+
+def list_files(directory, extensions):
+    """Liste tous les fichiers avec les extensions spécifiées dans le répertoire."""
+    files = []
+    for root, _, filenames in os.walk(directory):
+        for filename in filenames:
+            if any(filename.lower().endswith(ext) for ext in extensions):
+                file_path = os.path.join(root, filename)
+                file_info = get_file_info(file_path)
+                if file_info:
+                    files.append(file_info)
+    return files
+
+def compare_files(source_files, dest_files):
+    """Compare les fichiers entre les répertoires source et destination."""
+    report = []
+
+    # Fichiers dans la source mais pas dans la destination
+    for source_file in source_files:
+        dest_file = next((f for f in dest_files if f["path"].endswith(source_file["path"].split("\\")[-1])), None)
+        if not dest_file:
+            report.append({
+                "status": "❌ Manquant dans la destination",
+                "source_path": source_file["path"],
+                "source_size": source_file["size"],
+                "source_date": source_file["last_modified"],
+                "dest_path": None,
+                "dest_size": None,
+                "dest_date": None
+            })
+        elif source_file["last_modified"] > dest_file["last_modified"]:
+            report.append({
+                "status": "⚠️ Plus récent dans la source",
+                "source_path": source_file["path"],
+                "source_size": source_file["size"],
+                "source_date": source_file["last_modified"],
+                "dest_path": dest_file["path"],
+                "dest_size": dest_file["size"],
+                "dest_date": dest_file["last_modified"]
+            })
+
+    # Fichiers dans la destination mais pas dans la source
+    for dest_file in dest_files:
+        source_file = next((f for f in source_files if f["path"].endswith(dest_file["path"].split("\\")[-1])), None)
+        if not source_file:
+            report.append({
+                "status": "❌ Manquant dans la source",
+                "source_path": None,
+                "source_size": None,
+                "source_date": None,
+                "dest_path": dest_file["path"],
+                "dest_size": dest_file["size"],
+                "dest_date": dest_file["last_modified"]
+            })
+
+    return report
+
+# --- EXÉCUTION ---
+if __name__ == "__main__":
+    print(f"📥 Début de la comparaison entre {SOURCE_DIR} et {DEST_DIR}")
+
+    # 1. Lister les fichiers dans les répertoires source et destination
+    source_files = list_files(SOURCE_DIR, EXTENSIONS)
+    dest_files = list_files(DEST_DIR, EXTENSIONS)
+
+    # 2. Comparer les fichiers
+    report = compare_files(source_files, dest_files)
+
+    # 3. Générer un tableau comparatif (Markdown)
+    if not report:
+        print("✅ Tous les fichiers sont à jour et identiques.")
+    else:
+        print("\n📋 Tableau comparatif des différences :")
+        print("| Statut                     | Chemin Source                     | Taille (Source) | Date (Source)       | Chemin Destination               | Taille (Destination) | Date (Destination)       |")
+        print("|----------------------------|------------------------------------|------------------|----------------------|----------------------------------|-----------------------|----------------------|")
+        for entry in report:
+            print(f"| {entry['status']} | {entry['source_path'] or ''} | {entry['source_size'] or ''} | {entry['source_date'] or ''} | {entry['dest_path'] or ''} | {entry['dest_size'] or ''} | {entry['dest_date'] or ''} |")
+
+    # 4. Sauvegarder le rapport dans un fichier CSV
+    df = pd.DataFrame(report)
+    df.to_csv(os.path.join(DEST_DIR, "comparaison_fichiers_report.csv"), index=False, encoding="utf-8-sig")
+    print(f"\n✅ Rapport sauvegardé dans {os.path.join(DEST_DIR, 'comparaison_fichiers_report.csv')}")
+```
+
+---
+
+### **📌 Exemple de Tableau Comparatif (Markdown)**
+```markdown
+| Statut                     | Chemin Source                     | Taille (Source) | Date (Source)       | Chemin Destination               | Taille (Destination) | Date (Destination)       |
+|----------------------------|------------------------------------|------------------|----------------------|----------------------------------|-----------------------|----------------------|
+| ❌ Manquant dans la destination | C:\DATA-MC-2030\97IMPORT\97import2026_siteweb\images\products\modular_standard\exterior_1.jpeg | 123456 | 2026-04-03 10:00:00 | None | None | None |
+| ⚠️ Plus récent dans la source | C:\DATA-MC-2030\97IMPORT\97import2026_siteweb\documents\devis_123.pdf | 567890 | 2026-04-04 15:30:00 | C:\DATA-MC-2030\97IMPORT\documents\devis_123.pdf | 567890 | 2026-04-03 14:00:00 |
+| ❌ Manquant dans la source | None | None | None | C:\DATA-MC-2030\97IMPORT\images\products\modular_standard\video_1.mov | 12345678 | 2026-04-02 09:00:00 |
+```
+
+---
+
+### **📌 Explications du Script**
+1. **Lister les fichiers** :
+   - Le script liste tous les fichiers avec les extensions spécifiées (PDF, images, vidéos) dans les répertoires source et destination.
+
+2. **Comparer les fichiers** :
+   - Le script compare les fichiers entre les deux répertoires en vérifiant :
+     - Si un fichier est manquant dans l'un des répertoires.
+     - Si les fichiers dans la source sont plus récents que ceux dans la destination.
+
+3. **Générer un tableau comparatif** :
+   - Le script génère un tableau Markdown et un fichier CSV avec les différences.
+
+---
+
+### **📌 Prochaines Étapes**
+1. **Exécuter le script** pour générer le tableau comparatif.
+2. **Analyser le rapport** pour identifier les fichiers manquants ou obsolètes.
+3. **Mettre à jour les fichiers** dans le répertoire de destination si nécessaire.
+4. **Documenter les modifications** apportées.
+
+---
+
+**🎉 Solution clé en main !** Ce script permet de générer un **tableau comparatif détaillé** des fichiers entre les deux répertoires, en vérifiant les dates, tailles et versions les plus récentes.

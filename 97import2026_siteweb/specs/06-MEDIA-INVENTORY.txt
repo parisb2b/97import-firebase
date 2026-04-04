@@ -1,0 +1,154 @@
+================================================================
+INVENTAIRE MEDIA — 97import.com
+Liste complete des fichiers a uploader sur Firebase Storage
+================================================================
+
+TOTAL : ~112 fichiers (images + videos + PDF)
+
+================================================================
+LOGOS (10 fichiers) — media/logos/
+================================================================
+direxport_logo_blue.png
+logo_import97.png
+logo_import97_large.png
+logo_import97_footer_transparent.png
+logo_import97_footer.png
+logo_rippa_domtom_transparent.png
+logo_rippa_new.png
+rippa-dom-tom-white.png
+rippa_logo.webp
+rippa_dom_tom.svg
+
+================================================================
+PRODUITS MINI-PELLES — media/products/
+================================================================
+
+Vignettes principales :
+  r10_eco_main.png / r10_eco_main.webp
+  r13_pro.png / r13_pro.webp
+  r15_eco.png / r15_eco.webp
+  r18_pro.png / r18_pro.webp
+  r22_pro.png / r22_pro.webp / r22_pro_main.png / r22_pro_main.webp
+  r32_pro.png / r32_pro.webp
+
+Galleries detaillees :
+  r18_pro/ — r18_pro_main_view, cab_view, rear_view, side_view (.png + .webp)
+  r22_pro/ — r22_pro_main_view, cab_view, rear_view, side_view (.png + .webp)
+  r32_pro/ — r32_pro_main_view, cab_view, rear_view, side_view (.png)
+  r57_pro/ — r57_pro_main_view (.png)
+
+================================================================
+ACCESSOIRES — media/accessories/
+================================================================
+
+Format double (jpeg/webp) pour chaque :
+  auger_r18        — tariere
+  flat_bucket_r18  — godet de curage
+  fourche          — fourche
+  godet_cribleur   — godet cribleur (.png + .webp)
+  godet_dents      — godet a dents (.png + .webp)
+  godet_inclinable — godet inclinable
+  godet_lisse      — godet lisse
+  grappin          — grappin
+  grapple_r18      — grappin R18
+  hydraulic_hammer_r18 — marteau hydraulique
+  marteau_hydraulique  — marteau (.png + .webp)
+  rake_r18         — rateau
+  ripper_r18       — ripper
+  tariere          — tariere
+  tilt_bucket_r18  — godet inclinable R18
+  tooth_bucket_r18 — godet a dents R18
+
+================================================================
+PORTAL (page accueil) — media/portal/
+================================================================
+
+hero_ship.png          — Image hero (cargo/logistique)
+agri_tractor.jpeg/.jpg — Tracteur agricole
+camping_car.png/.jpg   — Camping car
+modular_home.png/.webp — Maison modulaire
+solar_panel_jinko.png  — Panneau solaire Jinko
+solar_panel.jpg        — Panneau solaire generique
+
+================================================================
+SOLAIRE — media/solar/
+================================================================
+
+jinko_600w_tiger_neo.jpg    — Panneau Jinko 600W
+jinko_truck_delivery.jpg    — Livraison camion
+jinko_warehouse.jpg         — Entrepot stock
+solar_installations.jpg     — Installation toiture
+battery_6fm250.webp         — Batterie
+deye_inverter.webp          — Onduleur Deye
+kit_overview.webp           — Vue ensemble kit
+mounting_structure.webp     — Structure montage
+panel_detail.webp           — Detail panneau
+solar_cables.webp           — Cables solaires
+
+Kits solaires (solar_kits/) :
+  jinko_600w_bifacial.webp
+  jinko_installation_toiture.webp
+  jinko_panels_pair.webp
+  jinko_tiger_neo_fiche.webp
+  jinko_warehouse_stock.webp
+  battery_lifepo4.png
+  deye_inverter.png
+  jinko_panel_layers.png
+  solar_cables.png
+
+================================================================
+MAISONS — media/houses/
+================================================================
+
+camping_car/ :
+  exterior_main.webp
+  exterior_back.jpg
+  exterior_front_side.jpg
+  exterior_side.jpg
+  interior_living.jpg
+  interior_overview.jpg
+  bathroom.jpg
+  bedroom.jpg
+  dining_area.jpg
+  kitchen.jpg
+  laundry.jpg
+  video_tour.mp4
+
+modular_premium/ :
+  exterior_1.jpg
+  exterior_2.jpg
+  exterior_3.jpg
+  exterior_4.jpg
+  video_1.mp4
+  video_2.mp4
+
+modular_standard/ :
+  exterior_1-7.jpeg (7 photos)
+  video_1.mp4
+  video_2.mp4
+  video_3.mp4
+
+================================================================
+DOCUMENTS PDF — media/documents/
+================================================================
+
+fiche_technique_maison_modulaire.pdf
+r18_pro_fiche_technique.pdf
+r22_pro_fiche_technique.pdf
+r32_pro_fiche_technique.pdf
+r57_pro_fiche_technique.pdf
+
+================================================================
+VIDEOS (6 fichiers) — media/videos/
+================================================================
+
+video_tour.mp4  — Tour camping car
+video_1.mp4     — Maison premium 1
+video_2.mp4     — Maison premium 2
+video_1.mp4     — Maison standard 1
+video_2.mp4     — Maison standard 2
+video_3.mp4     — Maison standard 3
+
+NOTE : Les noms sont dupliques entre dossiers.
+Dans le package, ils sont copies a plat dans media/videos/.
+Pour Firebase Storage, organiser en sous-dossiers par produit.

@@ -1,0 +1,64 @@
+# --- CONFIGURATION ---
+$PORT_5173 = 5173
+$PORT_5174 = 5174
+$SERVICE_URL = "http://localhost:5173/"
+
+# --- FONCTIONS ---
+function Stop-ProcessByPort {
+    param (
+        [int]$Port
+    )
+
+    # 1. Trouver le PID du processus utilisant le port
+    $process = Get-NetTCPConnection -LocalPort $Port | Select-Object -ExpandProperty OwningProcess
+    if ($process) {
+        $processName = (Get-Process -Id $process).Name
+        Write-Host "🚀 Fermeture du processus $processName (PID: $process)..."
+        Stop-Process -Id $process -Force
+        Write-Host "✅ Processus $processName (PID: $process) fermé."
+    } else {
+        Write-Host "⚠️ Aucun processus n'utilise le port $Port."
+    }
+}
+
+function Verify-PortIsFree {
+    param (
+        [int]$Port
+    )
+
+    $portInUse = Get-NetTCPConnection -LocalPort $Port
+    if ($portInUse) {
+        Write-Host "❌ Le port $Port est toujours en cours d'utilisation."
+        return $false
+    } else {
+        Write-Host "✅ Le port $Port est libre."
+        return $true
+    }
+}
+
+function Start-ServiceOnPort {
+    param (
+        [string]$Url
+    )
+
+    Write-Host "🚀 Démarrage du service sur $Url..."
+    # Remplacez cette commande par celle utilisée pour démarrer votre service (ex: npm run dev, vite, etc.)
+    Start-Process "cmd.exe" -ArgumentList "/C npm run dev -- --port $PORT_5173" -NoNewWindow
+    Write-Host "✅ Service démarré sur $Url."
+}
+
+# --- EXÉCUTION ---
+Write-Host "📥 Début de la fermeture des services et ports..."
+
+# 1. Fermer les processus utilisant les ports 5173 et 5174
+Stop-ProcessByPort -Port $PORT_5173
+Stop-ProcessByPort -Port $PORT_5174
+
+# 2. Vérifier que les ports sont libres
+Verify-PortIsFree -Port $PORT_5173
+Verify-PortIsFree -Port $PORT_5174
+
+# 3. Redémarrer le service sur le port 5173
+Start-ServiceOnPort -Url $SERVICE_URL
+
+Write-Host "✅ Tous les services et ports ont été fermés et le service a été redémarré sur $SERVICE_URL."

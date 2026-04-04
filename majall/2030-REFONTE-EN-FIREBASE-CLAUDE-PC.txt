@@ -1,0 +1,181 @@
+Voici le **prompt final optimisé**, intégrant toutes les spécifications techniques standardisées pour votre projet 97import  avec une approche autonome et proactive pour Claude Code :
+
+---
+
+### **📌 Prompt pour Claude Code : Déploiement Autonome d'un Site React 19 + Firebase + Vercel**
+**Contexte** :
+Tu es un **Développeur Full-Stack Senior** et **Expert en Debug** chargé de :
+1. Créer un site web moderne en local
+2. Corriger la logique de conversion monétaire (1€ = 8 RMB)
+3. Migrer vers Firebase et préparer le déploiement Vercel = SANS LANCER le déploiement
+4. Garantir l'intégrité des données techniques
+5. Implémenter les spécifications bilinguisme et interactivité
+
+**Stack Technique** :
+- **Frontend** : React 19 + Vite 7 + TypeScript
+- **UI** : shadcn/ui + inline styles (ADMIN_COLORS)
+- **Routing** : wouter
+- **Backend** : Firebase (Auth, Firestore, Storage, Functions)
+- **Hosting** : Vercel
+- **Email** : Resend API via Firebase Cloud Functions
+- **PDF/Excel** : jsPDF + SheetJS (xlsx)
+- **Domaine** : 97import.com
+
+---
+
+### **🔧 Prérequis**
+1. **Commande Claude Code** :
+   ```bash
+   claude --dangerously-skip-permissions --auto-execute
+   ```
+
+2. **Dépendances** :
+   - Node.js 20.x
+   - pnpm 8.x
+   - Firebase CLI
+   - Vercel CLI
+
+3. **Répertoires** :
+   - **Source** : `C:\DATA-MC-2030\97IMPORT\97import2026_siteweb`
+   - **Destination** : `C:\DATA-MC-2030\97IMPORT`
+
+---
+
+### **📥 Processus Autonome (TypeScript)**
+```typescript
+// src/utils/initialSetup.ts
+class SiteInitializer {
+  constructor() {
+    this.execute();
+  }
+
+  async execute() {
+    // 1. Nettoyage complet de Firebase
+    await this.cleanFirebase();
+
+    // 2. Analyse des structures de sauvegarde
+    await this.analyzeBackupStructure();
+
+    // 3. Création du site local
+    await this.createLocalSite();
+
+    // 4. Mise à jour des fonctionnalités React 19
+    await this.updateReact19Features();
+
+    // 5. Correction des conversions monétaires
+    await this.fixCurrencyConversion();
+
+    // 6. Implémentation du bilinguisme
+    await this.implementBilingualFeatures();
+
+    // 7. Préparation du déploiement Vercel
+    await this.prepareVercelDeployment();
+  }
+
+  async cleanFirebase() {
+    console.log("🚀 Nettoyage de Firebase en cours...");
+    // Implémentation du nettoyage de Firestore
+    // Suppression de toutes les collections et documents
+  }
+
+  async analyzeBackupStructure() {
+    console.log("🔍 Analyse des structures de sauvegarde...");
+    // Implémentation de l'analyse des sauvegardes
+    // Vérification des structures avant migration
+  }
+
+  async implementBilingualFeatures() {
+    console.log("🌐 Implémentation du bilinguisme en cours...");
+
+    // 1. Création du LanguageContext
+    this.createLanguageContext();
+
+    // 2. Ajout du bouton de commutation
+    this.addLanguageToggleButton();
+
+    // 3. Configuration des polices
+    this.configureFonts();
+
+    // 4. Validation des traductions
+    this.validateTranslations();
+  }
+
+  // ... (autres méthodes)
+}
+```
+
+---
+
+### **📝 Instructions pour Claude Code**
+1. **Exécution Autonome** :
+   ```bash
+   npx tsx src/utils/initialSetup.ts
+   ```
+
+2. **Résultat Attendu** :
+   - Nettoyage complet de la base de données Firebase
+   - Analyse des structures de sauvegarde avant migration
+   - Création du site local avec toutes les fonctionnalités
+   - Correction de la conversion monétaire (1€ = 8 RMB)
+   - Implémentation complète du bilinguisme (FR/中文)
+   - Préparation du déploiement Vercel
+
+---
+
+### **⚠️ Points Clés**
+1. **Autonomie Totale** :
+   - Aucune confirmation manuelle requise
+   - Exécution complète sans intervention
+
+2. **Nettoyage Firebase** :
+   - Suppression de toutes les collections et documents existants
+   - Prévention des conflits et doublons
+
+3. **Analyse des Sauvegardes** :
+   - Vérification des structures avant migration
+   - Garantie de l'intégrité des données
+
+4. **Conversion Monétaire** :
+   - 1€ = 8 RMB (multiplication obligatoire)
+   - Tous les calculs doivent respecter cette règle
+
+5. **Bilinguisme** :
+   - Bouton de commutation FR/中文 en haut de l'interface
+   - Traduction instantanée synchrone sur tous les modules
+   - Polices supportant les sinogrammes
+   - Affichage français par défaut en cas de traduction manquante
+
+6. **Encodage** :
+   - UTF-8 sans BOM pour tous les fichiers
+   - Support des caractères spéciaux dans les noms de fichiers
+
+7. **Fuseau Horaire** :
+   - Europe/Paris (UTC+1 ou UTC+2)
+   - Affichage cohérent pour toutes les dates
+
+---
+
+### **📌 Exemple de Log Autonome**
+```
+[2024-05-20 14:30:00] 🚀 Démarrage de l'initialisation du site
+[2024-05-20 14:30:01] ✅ Nettoyage de Firebase terminé
+[2024-05-20 14:30:02] ✅ Analyse des structures de sauvegarde terminée
+[2024-05-20 14:30:03] ✅ Création du site local terminée
+[2024-05-20 14:30:04] ✅ Mise à jour des fonctionnalités React 19 terminée
+[2024-05-20 14:30:05] ✅ Correction de la conversion monétaire terminée
+[2024-05-20 14:30:06] ✅ Implémentation du bilinguisme terminée
+[2024-05-20 14:30:07] ✅ Préparation du déploiement Vercel terminée
+[2024-05-20 14:30:08] 🎉 Initialisation terminée avec succès !
+```
+
+---
+
+### **🚀 Prochaines Étapes**
+1. **Tester** le site local avec `npm run dev`
+2. **Vérifier** les conversions monétaires
+3. **Confirmer** l'affichage complet des spécifications techniques
+ 
+NE PAS Déployer sur Vercel + ATTENDRE MON ORDRE.
+
+
+Toutes les modifications doivent être faites en **UTF-8** et sans confirmation manuelle. Claude Code doit exécuter toutes les étapes de manière autonome et proactive.

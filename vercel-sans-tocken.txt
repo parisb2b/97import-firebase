@@ -1,0 +1,198 @@
+Voici un **prompt détaillé** pour StepFun afin de télécharger toutes les données publiques depuis le site Vercel **https://97import-m3e0s8pqz-parisb2bs-projects.vercel.app** vers le dossier local **C:\DATA-MC-2030\97IMPORT\SAVE2026\**, incluant les modèles HTML, PDF (devis, factures, commandes), la structure du parcours client et du catalogue.
+
+---
+
+### **📌 Prompt pour StepFun : Téléchargement complet du site Vercel public**
+**Objectif** :
+Télécharger **toutes les données publiques** (images, PDF, modèles HTML, styles CSS, scripts JS) depuis **https://97import-m3e0s8pqz-parisb2bs-projects.vercel.app** vers **C:\DATA-MC-2030\97IMPORT\SAVE2026\**, sans authentification (site public).
+
+---
+
+### **🔧 Prérequis**
+1. **Dépendances Python** :
+   ```bash
+   pip install requests beautifulsoup4 pillow pandas reportlab python-dotenv
+   ```
+
+2. **Dossiers de sortie** :
+   - **C:\DATA-MC-2030\97IMPORT\SAVE2026\**
+     - `html/` → Modèles HTML (pages, parcours client).
+     - `css/` → Fichiers CSS (styles, couleurs, tailles).
+     - `js/` → Scripts JavaScript.
+     - `images/` → Images (produits, logos, etc.).
+     - `pdf/` → Modèles PDF (devis, factures, commandes).
+     - `catalogue/` → Structure du catalogue.
+
+---
+
+### **📥 Script Python pour StepFun**
+```python
+"""
+Script pour télécharger toutes les données publiques depuis Vercel.
+Utilisation : python vercel_downloader.py
+"""
+
+import os
+import requests
+from bs4 import BeautifulSoup
+from urllib.parse import urljoin
+from datetime import datetime
+import pandas as pd
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+from reportlab.lib.styles import getSampleStyleSheet
+
+# =============================================
+# CONFIGURATION
+# =============================================
+BASE_URL = "https://97import-m3e0s8pqz-parisb2bs-projects.vercel.app"
+OUTPUT_DIR = r"C:\DATA-MC-2030\97IMPORT\SAVE2026"
+os.makedirs(OUTPUT_DIR, exist_ok=True)
+
+# Sous-dossiers
+SUBDIRS = {
+    "html": "html",
+    "css": "css",
+    "js": "js",
+    "images": "images",
+    "pdf": "pdf",
+    "catalogue": "catalogue"
+}
+
+# =============================================
+# FONCTIONS UTILITAIRES
+# =============================================
+def download_file(url, output_path):
+    """Télécharger un fichier depuis une URL."""
+    try:
+        response = requests.get(url, stream=True, timeout=10)
+        response.raise_for_status()
+        with open(output_path, 'wb') as f:
+            for chunk in response.iter_content(1024):
+                f.write(chunk)
+        print(f"✅ Téléchargé : {output_path}")
+    except Exception as e:
+        print(f"❌ Échec : {url} -> {e}")
+
+def save_html_structure(url, output_path):
+    """Sauvegarder la structure HTML d'une page."""
+    try:
+        response = requests.get(url)
+        soup = BeautifulSoup(response.text, 'html.parser')
+
+        # Nettoyer les scripts et styles inutiles
+        for script in soup(["script", "style"]):
+            script.decompose()
+
+        with open(output_path, 'w', encoding='utf-8') as f:
+            f.write(str(soup.prettify()))
+        print(f"✅ Sauvegardé : {output_path}")
+    except Exception as e:
+        print(f"❌ Échec HTML : {url} -> {e}")
+
+def generate_pdf_report(data, output_path):
+    """Générer un rapport PDF."""
+    doc = SimpleDocTemplate(output_path, pagesize=letter)
+    styles = getSampleStyleSheet()
+    story = [Paragraph("Rapport d'extraction Vercel", styles['Title'])]
+
+    for item in data:
+        story.append(Paragraph(f"- {item['name']} ({item['type']})", styles['Normal']))
+        story.append(Spacer(1, 12))
+
+    doc.build(story)
+
+# =============================================
+# EXÉCUTION PRINCIPALE
+# =============================================
+if __name__ == "__main__":
+    print("🚀 Téléchargement des données depuis Vercel...")
+
+    # 1. Créer les sous-dossiers
+    for subdir in SUBDIRS.values():
+        os.makedirs(os.path.join(OUTPUT_DIR, subdir), exist_ok=True)
+
+    # 2. Télécharger la structure HTML
+    save_html_structure(BASE_URL, os.path.join(OUTPUT_DIR, "html", "index.html"))
+
+    # 3. Lister et télécharger tous les fichiers
+    response = requests.get(BASE_URL)
+    soup = BeautifulSoup(response.text, 'html.parser')
+    files_metadata = []
+
+    # Télécharger les images
+    for img in soup.find_all('img'):
+        img_url = img.get('src')
+        if img_url:
+            img_path = urljoin(BASE_URL, img_url)
+            img_name = os.path.basename(img_path)
+            output_path = os.path.join(OUTPUT_DIR, "images", img_name)
+            download_file(img_path, output_path)
+            files_metadata.append({
+                "name": img_name,
+                "type": "image",
+                "url": img_path
+            })
+
+    # Télécharger les PDF (ex: devis, factures)
+    for link in soup.find_all('a', href=True):
+        href = link.get('href')
+        if href.endswith(('.pdf', '.docx')):
+            pdf_url = urljoin(BASE_URL, href)
+            pdf_name = os.path.basename(pdf_url)
+            output_path = os.path.join(OUTPUT_DIR, "pdf", pdf_name)
+            download_file(pdf_url, output_path)
+            files_metadata.append({
+                "name": pdf_name,
+                "type": "pdf",
+                "url": pdf_url
+            })
+
+    # 4. Générer un rapport PDF
+    generate_pdf_report(files_metadata, os.path.join(OUTPUT_DIR, "vercel_report.pdf"))
+    print("🎉 Téléchargement terminé !")
+```
+
+---
+
+### **📝 Instructions pour StepFun**
+1. **Exécuter le script** :
+   ```bash
+   python vercel_downloader.py
+   ```
+
+2. **Résultat** :
+   - **C:\DATA-MC-2030\97IMPORT\SAVE2026\**
+     - `html/` → Modèles HTML (pages, parcours client).
+     - `css/` → Fichiers CSS (styles, couleurs, tailles).
+     - `js/` → Scripts JavaScript.
+     - `images/` → Images (produits, logos, etc.).
+     - `pdf/` → Modèles PDF (devis, factures, commandes).
+     - `catalogue/` → Structure du catalogue.
+     - `vercel_report.pdf` → Rapport des fichiers téléchargés.
+
+---
+
+### **⚠️ Points clés**
+- **Site public** : Pas besoin de token ou d'API (accès direct aux fichiers).
+- **Dossiers organisés** : Chaque type de fichier est stocké dans un sous-dossier dédié.
+- **Rapport PDF** : Liste tous les fichiers téléchargés.
+
+---
+
+### **🔄 Variantes**
+- **Télécharger uniquement les images** :
+  Supprime les sections `pdf` et `html` du script.
+- **Extraire les styles CSS/JS** :
+  Ajoute des fonctions pour récupérer les fichiers `.css` et `.js`.
+
+---
+
+### **📌 Exemple de sortie PDF**
+| Nom                  | Type   | URL                                                                 |
+|----------------------|--------|-------------------------------------------------------------------|
+| tiger_neo_585w.avif  | image  | https://97import-m3e0s8pqz-parisb2bs-projects.vercel.app/images/products/solar_kits/tiger_neo_585w.avif |
+| devis_template.pdf   | pdf    | https://97import-m3e0s8pqz-parisb2bs-projects.vercel.app/documents/devis.pdf |
+
+---
+ 

@@ -1,0 +1,85 @@
+{
+  "supabase_url": "https://gdqdbgonndmnauyetvht.supabase.co",
+  "exported_at": "2026-04-04T19:49:54.751927",
+  "tables": [
+    {
+      "table": "profiles",
+      "records": 3,
+      "size_bytes": 2060,
+      "sha256": "069b3d4fd1327ac984ded00afddf3b2daafa30f54d013aca8e2f35212a8b5f57"
+    },
+    {
+      "table": "contacts",
+      "records": 0,
+      "size_bytes": 2,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "table": "quotes",
+      "records": 1,
+      "size_bytes": 1393,
+      "sha256": "a569ace93012ba7c06d890c13071b5e9e3c24807f6639f6ce754e86b2cefd98c"
+    },
+    {
+      "table": "orders",
+      "records": 0,
+      "size_bytes": 2,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "table": "products",
+      "records": 68,
+      "size_bytes": 55764,
+      "sha256": "5d2204eb38ae76f321353c78cbad86c8e2f8512626c3e0137b187cabc87f20de"
+    },
+    {
+      "table": "partners",
+      "records": 0,
+      "size_bytes": 2,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "table": "invoices",
+      "records": 0,
+      "size_bytes": 2,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "table": "delivery_notes",
+      "records": 0,
+      "size_bytes": 2,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "table": "fees",
+      "records": 0,
+      "size_bytes": 2,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "table": "commission_notes",
+      "records": 0,
+      "size_bytes": 2,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "table": "site_content",
+      "records": 0,
+      "size_bytes": 2,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "table": "admin_params",
+      "records": 9,
+      "size_bytes": 2647,
+      "sha256": "f0f2e84a24d2ec9525525710a8a3cfb6cc2085e00e85577ed18bcd54fff60461"
+    },
+    {
+      "table": "error_logs",
+      "records": 0,
+      "size_bytes": 2,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    }
+  ],
+  "total_records": 81
+}

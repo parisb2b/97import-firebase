@@ -1,0 +1,53 @@
+[
+  {
+    "id": "62018c8b-a403-4e14-aad1-6394db635076",
+    "user_id": "9c77dcd1-da01-4879-b8ab-14b1d3539a97",
+    "email": "97importcom@gmail.com",
+    "nom": "CHRISTELLE CHEN",
+    "telephone": "0666666666777",
+    "message": null,
+    "produits": [
+      {
+        "id": "kit-solaire-12kw",
+        "nom": "Kit Solaire 12 kW",
+        "quantite": 3,
+        "prixAffiche": 8990,
+        "prixUnitaire": 8990
+      }
+    ],
+    "prix_total_calcule": 26970.0,
+    "prix_negocie": null,
+    "role_client": "user",
+    "statut": "nouveau",
+    "notes_admin": null,
+    "created_at": "2026-04-03T18:46:08.198899+00:00",
+    "updated_at": "2026-04-03T18:46:08.198899+00:00",
+    "numero_devis": "D2600022",
+    "pdf_url": null,
+    "facture_url": null,
+    "facture_generee": false,
+    "adresse_client": "12220 rue la roue ",
+    "ville_client": "92700 martinique",
+    "pays_client": "France",
+    "signature_client": null,
+    "signe_le": null,
+    "partner_id": null,
+    "commission_montant": null,
+    "commission_payee": false,
+    "commission_pdf_url": null,
+    "partenaire_code": null,
+    "partenaire_id": null,
+    "acomptes": [
+      {
+        "date": "2026-04-03T18:48:16.766Z",
+        "type": "perso",
+        "numero": 1,
+        "statut": "en_attente",
+        "montant": 5550
+      }
+    ],
+    "total_encaisse": 0.0,
+    "solde_restant": null,
+    "invoice_number": null
+  }
+]

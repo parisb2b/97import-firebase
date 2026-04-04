@@ -1,0 +1,128 @@
+================================================================
+ROUTES & SEO — 97import.com
+Cartographie complete des URLs pour conservation SEO
+================================================================
+
+================================================================
+ROUTES PUBLIQUES
+================================================================
+
+/                           PortalHome          Page d'accueil portal
+/minipelles                 MiniPelles          Catalogue mini-pelles
+/maisons                    ModularHomes        Catalogue maisons modulaires
+/maisons/standard           ModularStandard     Maison modulaire standard
+/maisons/premium            ModularPremium      Maison modulaire premium
+/maisons/camping-car-deluxe CampingCarDeluxe    Camping car BYD T5DM
+/solaire                    Solar               Kits solaires
+/solaire/:slug              SolarKitDetail      Detail kit solaire (dynamique)
+/agricole                   Agriculture         Machines agricoles (coming soon)
+/accessoires                Accessories         Accessoires mini-pelles
+/products/:id               ProductDetail       Detail produit (dynamique)
+/products/:id.html          ProductDetail       Idem format .html
+
+/cart                       Cart                Panier
+/mon-compte                 MonCompte           Espace client (profil, devis, commandes)
+/connexion                  Connexion           Connexion / inscription
+/mot-de-passe-oublie        ForgotPassword      Reinitialisation mot de passe
+/reset-password             ResetPassword       Nouveau mot de passe (lien email)
+/auth/callback              AuthCallback        Callback OAuth
+
+/confirmation               Confirmation        Confirmation commande/devis
+
+/terms                      Terms               CGV
+/privacy                    Privacy             Politique confidentialite
+/legal                      Legal               Mentions legales
+/services                   Services            SAV & Services
+/contact                    Contact             Page contact
+/delivery                   Delivery            Livraison DOM-TOM
+
+================================================================
+ROUTES ALTERNATIVES (.html) — SEO / Liens stables
+================================================================
+
+/index.html                 → PortalHome
+/minipelles.html            → MiniPelles
+/mini-pelle.html            → MiniPelles
+/maisons.html               → ModularHomes
+/maison-modulaire.html      → ModularHomes
+/solaire.html               → Solar
+/panneau-solaire.html       → Solar
+/accessoires.html           → Accessories
+/accessoires-mini-pelle.html → Accessories
+/services.html              → Services
+/contact.html               → Contact
+/panier.html                → Cart
+/mon-compte.html            → MonCompte
+/mes-informations.html      → MonCompte
+/mes-commandes.html         → MonCompte
+/mes-devis.html             → MonCompte
+/securite.html              → MonCompte
+/connexion.html             → Connexion
+
+================================================================
+ROUTES ADMIN (/admin/*)
+================================================================
+
+/admin                      AdminLogin          Page connexion admin
+
+--- Section Commerce ---
+/admin/dashboard            AdminDashboard      Tableau de bord KPIs
+/admin/devis                AdminQuotes         Liste devis & facturation
+/admin/devis/:id            AdminQuoteDetail    Detail d'un devis (UUID)
+/admin/clients              AdminUsers          Liste clients
+/admin/partenaires          AdminPartenaires    Gestion partenaires
+
+--- Section Catalogue ---
+/admin/produits             AdminProducts       Gestion produits
+/admin/suivi-achats         AdminSuiviAchats    Suivi des achats
+/admin/medias               AdminMedia          Mediatheque
+
+--- Section Analyse ---
+/admin/analytics            AdminAnalytics      KPIs, top produits, graphiques
+
+--- Section Systeme (admin only) ---
+/admin/logs                 AdminLogs           Journal des erreurs
+
+--- Section Configuration (admin only) ---
+/admin/parametres           AdminParametres     Parametres (emetteur, RIB, multiplicateurs)
+/admin/contenu              AdminContenu        Gestion contenu des pages
+
+================================================================
+VERCEL CONFIG (vercel.json)
+================================================================
+
+{
+  "installCommand": "pnpm install",
+  "buildCommand": "vite build",
+  "outputDirectory": "client/dist",
+  "rewrites": [
+    { "source": "/((?!assets/).*)", "destination": "/index.html" }
+  ]
+}
+
+Toutes les routes non-assets sont renvoyees vers /index.html (SPA).
+
+================================================================
+PROTECTION DES ROUTES
+================================================================
+
+Routes admin :
+  - Authentification requise (redirect → /admin si non connecte)
+  - Role admin ou collaborateur requis
+  - Pages logs, parametres, contenu → admin uniquement
+
+Routes espace client (/mon-compte) :
+  - Authentification requise
+  - Redirect → /connexion si non connecte
+
+Routes publiques :
+  - Accessibles sans authentification
+  - Prix visibles seulement si connecte (visitor → "Connectez-vous")
+
+================================================================
+PARAMETRES URL DYNAMIQUES
+================================================================
+
+?q=          Recherche produits (MiniPelles filtre par nom/ref)
+:id          UUID produit ou devis
+:slug        Slug kit solaire

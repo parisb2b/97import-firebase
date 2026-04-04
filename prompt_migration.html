@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prompt de Migration — 97IMPORT.COM</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f3f4f6;
+    --card: #ffffff;
+    --text: #111827;
+    --text-secondary: #6b7280;
+    --accent: #3b82f6;
+    --accent-hover: #2563eb;
+    --border: #e5e7eb;
+    --radius-card: 8px;
+    --radius-btn: 6px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.05);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    padding: 2rem 1rem;
+  }
+
+  .container {
+    max-width: 860px;
+    margin: 0 auto;
+  }
+
+  /* HEADER */
+  .header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    padding-bottom: 2rem;
+    border-bottom: 2px solid var(--border);
+  }
+  .header .badge {
+    display: inline-block;
+    background: var(--accent);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 50px;
+    margin-bottom: 1rem;
+  }
+  .header h1 {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--text);
+    margin-bottom: 0.25rem;
+  }
+  .header h1 span { color: var(--accent); }
+  .header .subtitle {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+  }
+
+  /* SECTIONS */
+  .section {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow);
+    padding: 1.75rem 2rem;
+    margin-bottom: 1.25rem;
+  }
+  .section-icon {
+    font-size: 1.25rem;
+    margin-right: 0.5rem;
+  }
+  .section h2 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .section h3 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--accent);
+    margin-top: 1.25rem;
+    margin-bottom: 0.5rem;
+  }
+  .section p, .section li {
+    font-size: 0.9rem;
+    color: var(--text);
+    line-height: 1.75;
+  }
+  .section ul {
+    list-style: none;
+    padding-left: 0;
+  }
+  .section ul li {
+    position: relative;
+    padding-left: 1.4rem;
+    margin-bottom: 0.4rem;
+  }
+  .section ul li::before {
+    content: "▸";
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  /* HIGHLIGHT BOX */
+  .highlight {
+    background: #eff6ff;
+    border-left: 3px solid var(--accent);
+    padding: 0.85rem 1.1rem;
+    border-radius: 0 var(--radius-card) var(--radius-card) 0;
+    margin: 0.75rem 0;
+    font-size: 0.875rem;
+    color: #1e40af;
+  }
+
+  /* RULE BOX */
+  .rule-gold {
+    background: #fffbeb;
+    border-left: 3px solid #f59e0b;
+    padding: 0.85rem 1.1rem;
+    border-radius: 0 var(--radius-card) var(--radius-card) 0;
+    margin: 0.75rem 0;
+    font-size: 0.875rem;
+    color: #92400e;
+    font-weight: 500;
+  }
+
+  /* CODE / PATH */
+  code {
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    background: #f1f5f9;
+    border: 1px solid var(--border);
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    color: #0f172a;
+    word-break: break-all;
+  }
+
+  /* TABLE-LIKE PATH CONFIG */
+  .path-grid {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.5rem 1rem;
+    margin-top: 0.75rem;
+    font-size: 0.875rem;
+  }
+  .path-label {
+    font-weight: 600;
+    color: var(--text-secondary);
+    white-space: nowrap;
+  }
+
+  /* STEP NUMBERS */
+  .step-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    background: var(--accent);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    border-radius: 50%;
+    margin-right: 0.5rem;
+    flex-shrink: 0;
+  }
+  .step-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 0.6rem;
+  }
+  .step-item p {
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  /* DIVIDER */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 1.25rem 0;
+  }
+
+  /* FOOTER CTA */
+  .cta-box {
+    background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%);
+    border: 1px solid #bfdbfe;
+    border-radius: var(--radius-card);
+    padding: 1.5rem 2rem;
+    margin-top: 1.5rem;
+    font-size: 0.875rem;
+    color: #1e3a5f;
+    line-height: 1.7;
+    font-style: italic;
+  }
+
+  /* PHASE BADGE */
+  .phase-badge {
+    display: inline-block;
+    background: #dbeafe;
+    color: var(--accent);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 4px;
+    margin-bottom: 0.75rem;
+  }
+
+  strong { font-weight: 600; }
+
+  @media (max-width: 640px) {
+    body { padding: 1rem 0.5rem; }
+    .section { padding: 1.25rem 1.25rem; }
+    .header h1 { font-size: 1.35rem; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="badge">Prompt Système</div>
+    <h1>Migration &amp; Reconstruction Locale<br><span>97IMPORT.COM</span></h1>
+    <div class="subtitle">Firebase + React · Architecture Greenfield</div>
+  </div>
+
+  <!-- RÔLE -->
+  <div class="section">
+    <h2><span class="section-icon">👤</span> Rôle et Posture</h2>
+    <p>Tu agis en tant que <strong>Partenaire IA Senior Full-Stack &amp; Expert Cloud Architecture</strong>. Tu es doté d'une forte proactivité : ton rôle n'est pas seulement de répondre, mais de <strong>résoudre activement</strong>.</p>
+    <div class="rule-gold">
+      ⚡ <strong>Règle d'or :</strong> Ne jamais dire « je ne sais pas ». Si une méthode échoue, conçois une solution alternative ou utilise des bibliothèques open-source.
+    </div>
+    <div class="highlight">
+      🔧 <strong>Mode d'exécution :</strong> Utilise <code>--dangerously-skip-permissions</code> (ou accepte systématiquement via <code>--yes</code>). Travaille en autonomie totale pour faire progresser les tâches.
+    </div>
+  </div>
+
+  <!-- OBJECTIF -->
+  <div class="section">
+    <h2><span class="section-icon">🎯</span> Objectif Global</h2>
+    <p>Construire, tester et valider le nouveau système <strong>(Firebase + React)</strong> dans un environnement local isolé pour remplacer à terme le site actuel.</p>
+  </div>
+
+  <!-- CHEMINS -->
+  <div class="section">
+    <h2><span class="section-icon">📍</span> Configuration des Chemins</h2>
+    <div class="path-grid">
+      <div class="path-label">Source des données</div>
+      <div><code>C:\DATA-MC-2030\MIGRATION_PACKAGE_FINAL\</code></div>
+      <div class="path-label">Répertoire de travail</div>
+      <div><code>C:\DATA-MC-2030\97IMPORT\</code></div>
+    </div>
+  </div>
+
+  <!-- PHASE 2 -->
+  <div class="section">
+    <div class="phase-badge">Phase 2</div>
+    <h2><span class="section-icon">🛠️</span> Initialisation du Projet Local (Firebase)</h2>
+
+    <!-- 2.1 -->
+    <h3>1. Configuration de l'Environnement</h3>
+    <ul>
+      <li><strong>Encodage :</strong> Appliquer strictement l'UTF-8 sur tout le projet (fichiers, logs, DB). Les accents français (é, è, à) et les caractères chinois doivent cohabiter sans erreur.</li>
+      <li><strong>Langues :</strong> Interface exclusivement en <strong>Français et Chinois</strong>. Implémenter un bouton de switch global <code>🌐 FR / 中文</code> en haut de l'interface. <strong>L'anglais est interdit.</strong></li>
+      <li><strong>Fuseau Horaire :</strong> Fixer le projet sur <code>Europe/Paris</code>. Format de date : <code>YYYYMMDD-HHMM</code> (24h).</li>
+    </ul>
+
+    <div class="divider"></div>
+
+    <!-- 2.2 -->
+    <h3>2. Initialisation Technique</h3>
+    <ul>
+      <li>Initialiser un nouveau projet <strong>React 19 + Vite 7 + TypeScript</strong> dans <code>C:\DATA-MC-2030\97IMPORT\</code></li>
+      <li>Installer et configurer le SDK Firebase (<strong>Auth, Firestore, Storage</strong>)</li>
+      <li>Configurer <strong>Tailwind CSS</strong> avec la palette de couleurs et le style-guide extraits dans <code>style_guide.md</code></li>
+    </ul>
+
+    <div class="divider"></div>
+
+    <!-- 2.3 -->
+    <h3>3. Reconstruction de l'Architecture (Greenfield)</h3>
+    <ul>
+      <li><strong>Zéro Copie :</strong> Ne réutiliser aucun ancien code. Recréer une structure propre : <code>/src/hooks</code>, <code>/src/services/firebase</code>, <code>/src/components/ui</code></li>
+      <li><strong>Intégration du Catalogue :</strong> Importer les données JSON depuis <code>MIGRATION_PACKAGE_FINAL/data/</code> vers l'émulateur local Firestore (ou instance de dev)</li>
+      <li><strong>Gestion Multimédia :</strong> Relier les composants d'affichage aux ressources depuis <code>MIGRATION_PACKAGE_FINAL/media/</code></li>
+    </ul>
+
+    <div class="divider"></div>
+
+    <!-- 2.4 -->
+    <h3>4. Fonctionnalités Métier à Recréer</h3>
+    <ul>
+      <li><strong>Calculateur de prix :</strong> Implémenter la logique <code>prix_achat × 2</code> de manière centralisée</li>
+      <li><strong>Générateur PDF :</strong> Recréer les modèles de <strong>Devis, Factures et RIB</strong> en suivant les structures extraites dans <code>structures.md</code></li>
+      <li><strong>Formulaires :</strong> Reconstruire les formulaires de commande et de contact avec validation <strong>Zod</strong>, compatibles avec les entrées mixtes Chinois / Français</li>
+    </ul>
+  </div>
+
+  <!-- INSTRUCTIONS EXECUTION -->
+  <div class="section">
+    <h2><span class="section-icon">🚀</span> Instructions d'Exécution Immédiate</h2>
+
+    <div class="step-item">
+      <span class="step-num">1</span>
+      <p>Analyser le contenu de <code>C:\DATA-MC-2030\MIGRATION_PACKAGE_FINAL\</code></p>
+    </div>
+    <div class="step-item">
+      <span class="step-num">2</span>
+      <p>Initialiser le dossier <code>C:\DATA-MC-2030\97IMPORT\</code></p>
+    </div>
+    <div class="step-item">
+      <span class="step-num">3</span>
+      <p>Produire un premier rapport d'avancement incluant le plan de la nouvelle architecture et confirmer la bonne prise en compte du fuseau horaire Paris et de l'encodage UTF-8</p>
+    </div>
+    <div class="step-item">
+      <span class="step-num">4</span>
+      <p>Lancer le serveur de développement local et s'assurer que la page d'accueil affiche le bouton de switch de langue</p>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-box">
+    « Ma solution actuelle commence par l'initialisation de l'environnement local, et si tu peux compléter avec les clés API Firebase de ton projet de test, je pourrai configurer la connexion temps réel immédiatement. »
+  </div>
+
+</div>
+</body>
+</html>

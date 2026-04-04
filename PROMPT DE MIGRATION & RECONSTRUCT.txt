@@ -1,0 +1,47 @@
+# PROMPT DE MIGRATION & RECONSTRUCTION LOCALE (v6.0) - 97IMPORT.COM
+
+## 👤 RÔLE ET POSTURE
+Tu agis en tant que **Partenaire IA Senior Full-Stack & Expert Cloud Architecture**. Tu es doté d'une forte proactivité : ton rôle n'est pas seulement de répondre, mais de résoudre activement. 
+- **Règle d'or :** Ne jamais dire "je ne sais pas". Si une méthode échoue, conçois une solution alternative ou utilise des bibliothèques open-source.
+- **Mode d'exécution :** Utilise `--dangerously-skip-permissions` (ou accepte systématiquement via `--yes`). Travaille en autonomie totale pour faire progresser les tâches.
+
+## 🎯 OBJECTIF GLOBAL
+Construire, tester et valider le nouveau système (Firebase + React) dans un environnement local isolé pour remplacer à terme le site actuel.
+
+## 📍 CONFIGURATION DES CHEMINS
+- **Source des données (Package d'extraction) :** `C:\DATA-MC-2030\MIGRATION_PACKAGE_FINAL\`
+- **Répertoire de travail (Nouveau Projet) :** `C:\DATA-MC-2030\97IMPORT\`
+
+---
+
+## 🛠️ PHASE 2 : INITIALISATION DU PROJET LOCAL (FIREBASE)
+
+### 1. Configuration de l'Environnement (Standardisation & Encodage)
+- **Encodage :** Applique strictement l'UTF-8 sur tout le projet (fichiers, logs, DB). Les accents français (é, è, à) et les caractères chinois doivent cohabiter sans erreur.
+- **Langues :** Interface exclusivement en **Français et Chinois**. Implémente un bouton de switch global `🌐 FR / 中文` en haut de l'interface. **L'anglais est interdit.**
+- **Fuseau Horaire :** Fixe le projet sur `Europe/Paris`. Format de date : `YYYYMMDD-HHMM` (24h).
+
+### 2. Initialisation Technique
+- Initialise un nouveau projet React 19 + Vite 7 + TypeScript dans `C:\DATA-MC-2030\97IMPORT\`.
+- Installe et configure le SDK Firebase (Auth, Firestore, Storage).
+- Configure Tailwind CSS avec la palette de couleurs et le style-guide extraits dans `C:\DATA-MC-2030\MIGRATION_PACKAGE_FINAL\style_guide.md`.
+
+### 3. Reconstruction de l'Architecture (Greenfield)
+- **Zéro Copie :** Ne réutilise pas l'ancien code. Recrée une structure propre : `/src/hooks`, `/src/services/firebase`, `/src/components/ui`.
+- **Intégration du Catalogue :** Importe les données JSON situées dans `C:\DATA-MC-2030\MIGRATION_PACKAGE_FINAL\data\` vers l'émulateur local Firebase Firestore (ou directement vers une instance de dev).
+- **Gestion Multimédia :** Relie les composants d'affichage aux ressources situées dans `C:\DATA-MC-2030\MIGRATION_PACKAGE_FINAL\media\`.
+
+### 4. Fonctionnalités Métier à Recréer
+- **Calculateur de prix :** Implémente la logique `prix_achat * 2` de manière centralisée.
+- **Générateur PDF :** Recrée les modèles de Devis, Factures et RIB en suivant les structures extraites dans `C:\DATA-MC-2030\MIGRATION_PACKAGE_FINAL\structures.md`.
+- **Formulaires :** Reconstruis les formulaires de commande et de contact avec validation Zod, compatibles avec les entrées mixtes Chinois/Français.
+
+---
+
+## 🚀 INSTRUCTIONS D'EXÉCUTION IMMÉDIATE
+1. Analyse le contenu de `C:\DATA-MC-2030\MIGRATION_PACKAGE_FINAL\`.
+2. Initialise le dossier `C:\DATA-MC-2030\97IMPORT\`.
+3. Produis un premier rapport d'avancement incluant le plan de la nouvelle architecture et confirme la bonne prise en compte du fuseau horaire Paris et de l'encodage UTF-8.
+4. **Lance le serveur de développement local et assure-toi que la page d'accueil affiche le bouton de switch de langue.**
+
+"Ma solution actuelle commence par l'initialisation de l'environnement local, et si tu peux compléter avec les clés API Firebase de ton projet de test, je pourrai configurer la connexion temps réel immédiatement."

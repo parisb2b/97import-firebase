@@ -1,0 +1,4 @@
+id,first_name,last_name,phone,created_at,updated_at,email,role,adresse_facturation,ville_facturation,code_postal_facturation,pays_facturation,adresse_livraison,ville_livraison,code_postal_livraison,pays_livraison,adresse_livraison_identique,cp_facturation,cp_livraison
+9c77dcd1-da01-4879-b8ab-14b1d3539a97,CHRISTELLE,CHEN,0666666666777,2026-04-03T18:03:19.255471+00:00,2026-04-03T18:03:19.255471+00:00,97importcom@gmail.com,user,12220 rue la roue ,martinique,,France,,,,France,true,92700,
+bf1b73d9-f6c7-404f-9a5c-a5daed483055,INTERENOVATIONS,SAS,0666666,2026-04-03T17:53:27.287698+00:00,2026-04-03T17:53:27.287698+00:00,interenovations@gmail.com,user,,,,France,,,,France,true,,
+d815a4f5-a4f2-4cd3-84fc-9a05821ac148,michel,chen,0620607448,2026-03-20T14:53:53.226787+00:00,2026-03-20T14:53:53.226787+00:00,parisb2b@gmail.com,admin,11 Rue de Lagny,Saint-Thibault-des-Vignes,,France,,,,France,true,,

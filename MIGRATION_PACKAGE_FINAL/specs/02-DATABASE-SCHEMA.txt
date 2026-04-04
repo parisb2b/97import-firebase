@@ -1,0 +1,244 @@
+================================================================
+DATABASE SCHEMA — 97import.com
+Tables Supabase (PostgreSQL) — pour migration Firestore
+================================================================
+
+TABLES : 12 au total
+  contacts, profiles, orders, partners, quotes, products,
+  invoices, delivery_notes, fees, commission_notes,
+  site_content, admin_params, error_logs
+
+================================================================
+TABLE : contacts
+================================================================
+id              UUID        PK, default gen_random_uuid()
+name            TEXT        NOT NULL
+email           TEXT        NOT NULL
+phone           TEXT
+subject         TEXT
+message         TEXT
+source          TEXT        default 'contact' (contact|devis|produit|whatsapp)
+product_id      TEXT
+created_at      TIMESTAMPTZ default NOW()
+read            BOOLEAN     default FALSE
+archived        BOOLEAN     default FALSE
+
+================================================================
+TABLE : profiles
+================================================================
+id              UUID        PK, FK → auth.users(id)
+first_name      TEXT
+last_name       TEXT
+email           TEXT
+phone           TEXT
+role            TEXT        (admin|collaborateur|partner|vip|user)
+prix_negocie    JSONB       Record<productId, number> — prix VIP par produit
+created_at      TIMESTAMPTZ default NOW()
+updated_at      TIMESTAMPTZ default NOW()
+adresse_facturation       TEXT
+ville_facturation         TEXT
+cp_facturation            TEXT
+pays_facturation          TEXT    default 'France'
+adresse_livraison         TEXT
+ville_livraison           TEXT
+cp_livraison              TEXT
+pays_livraison            TEXT    default 'France'
+adresse_livraison_identique BOOLEAN default TRUE
+
+================================================================
+TABLE : orders
+================================================================
+id              UUID        PK
+user_id         UUID        FK → auth.users
+product_name    TEXT
+amount          NUMERIC(10,2)
+status          TEXT        default 'pending'
+created_at      TIMESTAMPTZ default NOW()
+
+================================================================
+TABLE : partners
+================================================================
+id              UUID        PK
+nom             TEXT        NOT NULL
+email           TEXT
+telephone       TEXT
+user_id         UUID        FK → profiles, UNIQUE WHERE user_id IS NOT NULL
+actif           BOOLEAN     default TRUE
+created_at      TIMESTAMPTZ default NOW()
+
+================================================================
+TABLE : quotes (table principale devis)
+================================================================
+id                    UUID          PK
+numero_devis          TEXT          UNIQUE
+nom                   TEXT          nom client
+email                 TEXT          email client
+telephone             TEXT
+message               TEXT
+user_id               UUID          FK → auth.users
+produits              JSONB         [{nom, prixUnitaire, quantite, total, reference_interne?, prixPublic?}]
+prix_total_calcule    NUMERIC
+prix_negocie          NUMERIC
+role_client           TEXT          (visitor|user|vip|partner|collaborateur|admin)
+statut                TEXT          (nouveau|en_cours|negociation|accepte|refuse|non_conforme)
+partner_id            UUID          FK → partners
+commission_montant    DECIMAL(10,2)
+commission_payee      BOOLEAN       default FALSE
+commission_pdf_url    TEXT
+pdf_url               TEXT
+facture_url           TEXT
+facture_generee       BOOLEAN       default FALSE
+adresse_client        TEXT
+ville_client          TEXT
+pays_client           TEXT          default 'France'
+signature_client      TEXT
+signe_le              TIMESTAMPTZ
+acompte_pourcentage   DECIMAL(5,2)  default 30
+acompte_paye          BOOLEAN       default FALSE
+solde_paye            BOOLEAN       default FALSE
+acomptes              JSONB         [{date, montant, statut, numero_facture?}]
+total_encaisse        NUMERIC       default 0
+solde_restant         NUMERIC       default 0
+date_livraison_prevue DATE
+notes_internes        TEXT
+bl_genere             BOOLEAN       default FALSE
+invoice_number        TEXT
+created_at            TIMESTAMPTZ   default NOW()
+updated_at            TIMESTAMPTZ
+
+================================================================
+TABLE : products
+================================================================
+id                UUID/TEXT   PK
+nom               TEXT        NOT NULL
+categorie         TEXT
+reference         TEXT
+numero_interne    TEXT
+reference_interne TEXT
+description       TEXT
+prix_achat        DECIMAL(12,2)
+prix_public       DECIMAL(12,2)
+poids_kg          DECIMAL(8,2)
+dimensions        TEXT
+image_url         TEXT
+images            JSONB       [URLs]
+actif             BOOLEAN     default TRUE
+ordre             INTEGER     default 0
+created_at        TIMESTAMPTZ default NOW()
+updated_at        TIMESTAMPTZ default NOW()
+
+================================================================
+TABLE : invoices
+================================================================
+id                UUID        PK
+numero_facture    TEXT        UNIQUE NOT NULL
+quote_id          UUID        FK → quotes
+user_id           UUID        FK → auth.users
+date_facture      DATE        default CURRENT_DATE
+montant_ht        DECIMAL(12,2) NOT NULL
+montant_acompte   DECIMAL(12,2) default 0
+type_facture      TEXT        default 'standard' (standard|acompte|solde)
+numero_acompte    INTEGER     default 0
+statut            TEXT        default 'emise' (emise|payee|annulee)
+type_paiement     TEXT        (pro|perso)
+pdf_url           TEXT
+envoye_client     BOOLEAN     default FALSE
+created_at        TIMESTAMPTZ default NOW()
+
+================================================================
+TABLE : delivery_notes
+================================================================
+id                UUID        PK
+numero_bl         TEXT        UNIQUE NOT NULL
+quote_id          UUID        FK → quotes
+user_id           UUID        FK → auth.users
+date_livraison    DATE        default CURRENT_DATE
+adresse_livraison TEXT
+ville_livraison   TEXT
+pays_livraison    TEXT        default 'France'
+produits          JSONB
+notes             TEXT
+statut            TEXT        default 'brouillon' (brouillon|envoye|livre)
+pdf_url           TEXT
+envoye_client     BOOLEAN     default FALSE
+created_at        TIMESTAMPTZ default NOW()
+
+================================================================
+TABLE : fees
+================================================================
+id                UUID        PK
+numero_document   TEXT        UNIQUE NOT NULL
+quote_id          UUID        FK → quotes
+type_frais        TEXT        NOT NULL (maritime|dedouanement)
+date_document     DATE        default CURRENT_DATE
+montant_ht        DECIMAL(12,2) NOT NULL
+description       TEXT
+details           JSONB
+pdf_url           TEXT
+envoye_client     BOOLEAN     default FALSE
+created_at        TIMESTAMPTZ default NOW()
+
+================================================================
+TABLE : commission_notes
+================================================================
+id                  UUID        PK
+numero_commission   TEXT        UNIQUE NOT NULL
+partner_id          UUID        FK → partners
+quote_id            UUID        FK → quotes
+date_commission     DATE        default CURRENT_DATE
+montant_commission  DECIMAL(12,2) NOT NULL
+statut              TEXT        default 'emise' (emise|payee)
+pdf_url             TEXT
+created_at          TIMESTAMPTZ default NOW()
+
+================================================================
+TABLE : site_content
+================================================================
+key               TEXT        PK
+value             JSONB       NOT NULL
+updated_at        TIMESTAMPTZ default NOW()
+
+================================================================
+TABLE : admin_params
+================================================================
+key               TEXT        PK
+value             JSONB       NOT NULL
+label             TEXT
+updated_at        TIMESTAMPTZ default NOW()
+
+Valeurs par defaut :
+  emetteur → {nom: "97 IMPORT", adresse, ville, pays, email, telephone, siret, tva_intra}
+  rib → {banque, iban, bic}
+  acompte_defaut → {pourcentage: 30}
+  multiplicateurs → {user: 2, partner: 1.2, vip: 1.3}
+
+================================================================
+TABLE : error_logs
+================================================================
+id              UUID        PK
+type            TEXT        (api_error|auth_error|ui_error|network|info)
+message         TEXT        NOT NULL
+context         TEXT
+user_email      TEXT
+stack_trace     TEXT
+resolved        BOOLEAN     default FALSE
+created_at      TIMESTAMPTZ default NOW()
+
+================================================================
+SEQUENCES SQL (numerotation auto)
+================================================================
+get_next_devis_numero()    → D + YY + XXXXX (ex: D2600001)
+get_next_facture_numero()  → FA + YY + XXXXX
+get_next_bl_numero()       → BL + YY + XXXXX
+get_next_fm_numero()       → FM + YY + XXXXX
+get_next_dd_numero()       → DD + YY + XXXXX
+get_next_nc_numero()       → NC + YY + XXXXX
+
+================================================================
+MULTIPLICATEURS DE PRIX
+================================================================
+  visitor     → null (connexion requise)
+  user        → prix_achat × 2
+  partner     → prix_achat × 1.2
+  vip         → prix_negocie ?? prix_achat × 1.3
+  collaborateur/admin → voit prix_achat + niveaux

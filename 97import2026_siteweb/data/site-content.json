@@ -1,0 +1,303 @@
+{
+  "siteSettings": {
+    "siteName": "97 import",
+    "logo": "/images/logo_import97_large.png",
+    "primaryColor": "#4A90D9",
+    "whatsappNumber": "33663284908",
+    "topBanner": "-50% PAR RAPPORT AU PRIX DE VENTE EN MARTINIQUE",
+    "footerText": "© 2026 97 import - Tous droits réservés",
+    "footerDescription": "97 import simplifie l'importation de produits de qualité (maisons, solaire, agricole) depuis la Chine vers les Antilles. Service clé en main.",
+    "contactEmail": "info@97import.com",
+    "contactPhone": "+33 6 63 28 49 08 / +33 6 20 60 74 48",
+    "metaDescription": "97 import - Spécialiste de l'importation depuis la Chine vers les DOM-TOM. Mini-pelles, maisons modulaires, panneaux solaires.",
+    "faviconUrl": "/favicon.ico",
+    "tiktokUrl": "https://www.tiktok.com/@direxport",
+    "youtubeUrl": ""
+  },
+  "navigation": {
+    "menuItems": [
+      {
+        "label": "Accueil",
+        "path": "/",
+        "visible": true
+      },
+      {
+        "label": "Mini-Pelle",
+        "path": "/minipelles",
+        "visible": true
+      },
+      {
+        "label": "Accessoires Mini-Pelle",
+        "path": "/accessoires",
+        "visible": true
+      },
+      {
+        "label": "Maison modulaire",
+        "path": "/maisons",
+        "visible": true
+      },
+      {
+        "label": "Panneau Solaire",
+        "path": "/solaire",
+        "visible": true
+      },
+      {
+        "label": "Machine Agricole",
+        "path": "/agricole",
+        "visible": true
+      },
+      {
+        "label": "Services",
+        "path": "/services",
+        "visible": true
+      },
+      {
+        "label": "Contact",
+        "path": "/contact",
+        "visible": true
+      }
+    ]
+  },
+  "pages": {
+    "home": {
+      "heroTitle": "97import.com",
+      "heroSubtitle": "L'importation n'a jamais été aussi simple depuis la Chine vers les Antilles.",
+      "heroButtonText": "Rechercher",
+      "heroImage": "/images/portal/hero_ship.png",
+      "trustTitle": "Pourquoi choisir 97import.com ?",
+      "trustItems": [
+        {
+          "title": "Expertise DOM TOM",
+          "description": "Livraison maîtrisée vers la Guadeloupe, Martinique, Guyane, Réunion et Mayotte.",
+          "icon": "globe"
+        },
+        {
+          "title": "Qualité Certifiée",
+          "description": "Des produits rigoureusement sélectionnés pour leur robustesse et leur durabilité.",
+          "icon": "check"
+        },
+        {
+          "title": "SAV Réactif",
+          "description": "Assistance technique disponible via WhatsApp pour vous accompagner.",
+          "icon": "support"
+        }
+      ],
+      "sections": [
+        {
+          "id": "categories",
+          "title": "Nos Catégories",
+          "visible": true
+        }
+      ]
+    },
+    "minipelles": {
+      "pageTitle": "Mini-pelle Série Pro",
+      "pageSubtitle": "NOTRE GAMME",
+      "ctaTitle": "Besoin d'accessoires ?",
+      "ctaDescription": "Optimisez votre mini-pelle avec notre gamme complète d'accessoires : godets, marteaux, tarières et plus encore.",
+      "ctaButtonText": "Voir tous les accessoires",
+      "ctaButtonLink": "97import.com/accessoires",
+      "bottomSections": [
+        {
+          "icon": "truck",
+          "title": "Expédition DOM TOM",
+          "description": "Livraison depuis la Chine jusqu'à votre destination en 30 à 45 jours."
+        },
+        {
+          "icon": "shield",
+          "title": "Garantie & Support",
+          "description": "Service après-vente dédié et pièces détachées disponibles localement."
+        },
+        {
+          "icon": "quality",
+          "title": "Qualité Pro",
+          "description": "Machines conçues pour une utilisation intensive et professionnelle."
+        }
+      ]
+    },
+    "maisons": {
+      "pageTitle": "Maison Modulaire",
+      "pageSubtitle": "NOTRE GAMME",
+      "ctaTitle": "Un projet sur mesure ?",
+      "ctaDescription": "Nos équipes vous accompagnent dans la conception de votre espace modulaire idéal. Contactez-nous pour une étude personnalisée.",
+      "ctaButtonText": "Demander un devis",
+      "ctaButtonLink": "https://wa.me/33663284908",
+      "ctaButtonExternal": true,
+      "bottomSections": [
+        {
+          "icon": "home",
+          "title": "Prêt à Vivre",
+          "description": "Installation rapide et finitions soignées pour un confort immédiat."
+        },
+        {
+          "icon": "shield",
+          "title": "Durabilité",
+          "description": "Matériaux résistants aux climats tropicaux et isolation performante."
+        },
+        {
+          "icon": "design",
+          "title": "Design Moderne",
+          "description": "Esthétique contemporaine s'intégrant parfaitement à votre environnement."
+        }
+      ]
+    },
+    "solaire": {
+      "pageTitle": "Panneau Solaire",
+      "pageSubtitle": "NOTRE GAMME",
+      "ctaTitle": "Une étude solaire ?",
+      "ctaDescription": "Dimensionnez votre installation selon vos besoins réels. Nos experts vous conseillent pour optimiser votre production.",
+      "ctaButtonText": "Demander un devis",
+      "ctaButtonLink": "https://wa.me/33663284908",
+      "ctaButtonExternal": true,
+      "galleryImages": [
+        "/images/solar/solar_installations.jpg",
+        "/images/solar/jinko_600w_tiger_neo.jpg",
+        "/images/solar/deye_inverter.webp",
+        "/images/solar/battery_6fm250.webp",
+        "/images/solar/solar_cables.webp",
+        "/images/solar/jinko_warehouse.jpg",
+        "/images/solar/jinko_truck_delivery.jpg"
+      ],
+      "bottomSections": [
+        {
+          "icon": "sun",
+          "title": "Haute Performance",
+          "description": "Panneaux monocristallins à haut rendement pour une production maximale."
+        },
+        {
+          "icon": "battery",
+          "title": "Autonomie",
+          "description": "Solutions de stockage pour une énergie disponible jour et nuit."
+        },
+        {
+          "icon": "bolt",
+          "title": "Économies",
+          "description": "Réduisez durablement vos factures d'électricité."
+        }
+      ]
+    },
+    "agricole": {
+      "pageTitle": "Machine Agricole",
+      "pageSubtitle": "NOTRE GAMME",
+      "comingSoonTitle": "Page Machines Agricoles en maintenance",
+      "comingSoonDescription": "Notre gamme de machines agricoles (tracteurs, compacteurs) est en cours de mise à jour pour mieux vous servir. Revenez très bientôt !",
+      "bottomSections": []
+    },
+    "accessoires": {
+      "pageTitle": "Accessoires Mini-pelle",
+      "pageSubtitle": "NOTRE GAMME",
+      "bottomSections": []
+    },
+    "services": {
+      "pageTitle": "Nos Services & Engagements",
+      "pageSubtitle": "Transparence, fiabilité et accompagnement complet pour votre activité dans les DOM TOM.",
+      "description": ""
+    },
+    "delivery": {
+      "pageTitle": "Livraison DOM-TOM",
+      "pageSubtitle": "Nous simplifions l'importation de matériel lourd et de structures modulaires vers les Antilles, la Guyane, la Réunion et Mayotte.",
+      "content": ""
+    },
+    "terms": {
+      "pageTitle": "Conditions Générales de Vente",
+      "content": ""
+    },
+    "privacy": {
+      "pageTitle": "Politique de Confidentialité",
+      "content": ""
+    },
+    "legal": {
+      "pageTitle": "Mentions Légales",
+      "content": ""
+    }
+  },
+  "pagesConfig": {
+    "minipelles": {
+      "enabled": true,
+      "label": "Mini-pelles"
+    },
+    "maisons": {
+      "enabled": true,
+      "label": "Maisons Modulaires"
+    },
+    "solaire": {
+      "enabled": true,
+      "label": "Panneaux Solaires"
+    },
+    "agricole": {
+      "enabled": false,
+      "label": "Machines Agricoles"
+    },
+    "accessoires": {
+      "enabled": true,
+      "label": "Accessoires"
+    },
+    "services": {
+      "enabled": true,
+      "label": "Services"
+    },
+    "delivery": {
+      "enabled": true,
+      "label": "Livraison"
+    },
+    "contact": {
+      "enabled": true,
+      "label": "Contact"
+    },
+    "about": {
+      "enabled": true,
+      "label": "À propos"
+    },
+    "terms": {
+      "enabled": true,
+      "label": "CGV"
+    },
+    "privacy": {
+      "enabled": true,
+      "label": "Confidentialité"
+    },
+    "legal": {
+      "enabled": true,
+      "label": "Mentions Légales"
+    }
+  },
+  "shipping": {
+    "pricePerCubicMeter": 250,
+    "destinations": [
+      {
+        "name": "Martinique",
+        "onQuote": true
+      },
+      {
+        "name": "Guadeloupe",
+        "onQuote": true
+      },
+      {
+        "name": "Guyane",
+        "onQuote": true
+      },
+      {
+        "name": "Réunion",
+        "onQuote": true
+      },
+      {
+        "name": "Mayotte",
+        "onQuote": true
+      },
+      {
+        "name": "Autre",
+        "onQuote": true
+      }
+    ],
+    "containers": {
+      "twenty": {
+        "volume": 33,
+        "label": "Conteneur 20 pieds"
+      },
+      "forty": {
+        "volume": 67,
+        "label": "Conteneur 40 pieds"
+      }
+    }
+  }
+}

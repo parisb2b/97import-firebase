@@ -1,0 +1,274 @@
+Voici le prompt complet pour Claude Code :
+
+---
+
+```
+Tu es Lead Developer & DBA sur le projet 97import.com (Firebase).
+Exécute tout en autonomie complète sans demander confirmation.
+
+CONTEXTE :
+- Projet local : C:\DATA-MC-2030\97IMPORT
+- Source de vérité : C:\DATA-MC-2030\MIGRATION_PACKAGE_FINAL\
+- Firebase projet : import2030
+- Service account : C:\DATA-MC-2030\97IMPORT\service-account.json
+
+═══════════════════════════════════════════════════════════
+ÉTAPE 1 — RESET COMPLET FIREBASE STORAGE
+═══════════════════════════════════════════════════════════
+
+Crée et exécute un script Node.js qui :
+1. Initialise firebase-admin avec service-account.json
+2. Liste TOUS les fichiers dans le bucket import2030.firebasestorage.app
+3. Supprime CHAQUE fichier (images, videos, PDFs, logos)
+4. Affiche le nombre de fichiers supprimés
+5. Confirme "Storage vidé ✅"
+
+═══════════════════════════════════════════════════════════
+ÉTAPE 2 — RESET COMPLET FIRESTORE
+═══════════════════════════════════════════════════════════
+
+Crée et exécute un script Node.js qui supprime TOUS les documents
+dans ces collections :
+- products
+- profiles
+- quotes
+- invoices
+- partners
+- admin_params
+- site_content
+- counters
+- delivery_notes
+- fees
+- commission_notes
+
+Affiche le nombre de documents supprimés par collection.
+
+═══════════════════════════════════════════════════════════
+ÉTAPE 3 — UPLOAD MÉDIAS DEPUIS MIGRATION_PACKAGE_FINAL
+═══════════════════════════════════════════════════════════
+
+Upload TOUS les fichiers depuis :
+C:\DATA-MC-2030\MIGRATION_PACKAGE_FINAL\media\
+
+Structure exacte à respecter dans Storage :
+- media\logos\*        → logos/*
+- media\portal\*       → portal/*
+- media\products\**    → products/**
+- media\accessories\*  → accessories/*
+- media\houses\**      → houses/**
+- media\solar\*        → solar/*
+- media\documents\*    → documents/*
+- media\videos\*       → videos/*
+
+Pour chaque fichier :
+- Détecte le contentType automatiquement (image/webp, image/jpeg, video/mp4, etc.)
+- Upload avec public:true
+- Sauvegarde toutes les URLs dans _storage-urls.json
+
+═══════════════════════════════════════════════════════════
+ÉTAPE 4 — IMPORT PRODUITS DEPUIS products.json
+═══════════════════════════════════════════════════════════
+
+Lis C:\DATA-MC-2030\MIGRATION_PACKAGE_FINAL\data\products.json
+et importe les 20 produits dans Firestore avec :
+
+Prix d'achat HT exacts :
+- r18-pro → 9538
+- r22-pro → 12150
+- r32-pro → 14296
+- r57-pro → 19923
+- kit-solaire-10kw → 6146
+- kit-solaire-12kw → 6915
+- kit-solaire-20kw → 14608
+- maison-modulaire-standard → 4308
+- maison-modulaire-premium → 7631
+- camping-car-deluxe-hybride → 41269
+- tous les accessoires → 0 (prix sur demande)
+
+Catégories normalisées (champ "categorie" Firestore) :
+- "Mini-pelles" → "mini-pelles"
+- "Maisons" → "maisons"
+- "Solaire" → "solaire"
+- "Accessoires" → "accessoires"
+
+Numéros internes :
+- r18-pro → MP-R18-001
+- r22-pro → MP-R22-001
+- r32-pro → MP-R32-001
+- r57-pro → MP-R57-001
+- maison-modulaire-standard → MS-20-001
+- maison-modulaire-premium → MP-20-001
+- camping-car-deluxe-hybride → CC-BYD-001
+- kit-solaire-10kw → KS-10K-001
+- kit-solaire-12kw → KS-12K-001
+- kit-solaire-20kw → KS-20K-001
+- godet-dents → ACC-GD-001
+- godet-plat → ACC-GC-001
+- godet-inclinable → ACC-GI-001
+- attache-rapide → ACC-AR-001
+- pince-pouce → ACC-PP-001
+- rateau → ACC-RT-001
+- ripper → ACC-RP-001
+- marteau-hydraulique → ACC-MH-001
+- tariere → ACC-TA-001
+- grappin → ACC-GP-001
+
+Champs obligatoires par produit :
+- actif: true
+- images: [URLs Firebase Storage depuis _storage-urls.json]
+- models: [] (tarifs accessoires depuis products.json)
+- sizes: [] (tailles maisons depuis products.json)
+- description_fr: longDescription ou description
+- created_at + updated_at: serverTimestamp()
+
+═══════════════════════════════════════════════════════════
+ÉTAPE 5 — INITIALISATION FIRESTORE (admin_params + counters)
+═══════════════════════════════════════════════════════════
+
+Crée ces documents dans Firestore :
+
+/counters/devis → { value: 0 }
+
+/admin_params/emetteur_pro → {
+  nom: "LUXENT LIMITED",
+  adresse: "2ND FLOOR COLLEGE HOUSE",
+  adresse2: "17 KING EDWARDS ROAD RUISLIP",
+  ville: "HA4 7AE LONDON",
+  pays: "Royaume-Uni",
+  siret: "14852122",
+  email: "luxent@ltd-uk.eu",
+  iban: "",
+  bic: ""
+}
+
+/admin_params/emetteur_perso → {
+  nom: "Chen Michel",
+  adresse: "À compléter",
+  ville: "À compléter",
+  pays: "France",
+  email: "parisb2b@gmail.com",
+  iban: "",
+  bic: ""
+}
+
+/admin_params/multiplicateurs → { user: 2, partner: 1.2 }
+/admin_params/config_acompte → { max_acomptes: 3 }
+/admin_params/rib_pro → { label: "Compte professionnel", url: "" }
+/admin_params/rib_perso → { label: "Compte particulier", url: "" }
+
+/site_content/banniere → {
+  texte: "-50% PAR RAPPORT AU PRIX DE VENTE EN MARTINIQUE",
+  actif: true,
+  couleur: "#2563EB"
+}
+
+/partners/TD → { nom: "Thierry D.", code: "TD", email: "", telephone: "", actif: true }
+/partners/JM → { nom: "Jean-Marc V.", code: "JM", email: "", telephone: "", actif: true }
+/partners/MC → { nom: "MC", code: "MC", email: "", telephone: "", actif: true }
+
+═══════════════════════════════════════════════════════════
+ÉTAPE 6 — CRÉATION DES 5 COMPTES TEST (Firebase Auth + Firestore)
+═══════════════════════════════════════════════════════════
+
+Crée ces 5 comptes via firebase-admin (Auth + profil Firestore) :
+Mot de passe IDENTIQUE pour tous : 20262026
+
+| Email | Rôle | Prénom | Nom |
+|-------|------|--------|-----|
+| admin@97import.com | admin | Admin | 97import |
+| client@97import.com | user | Jean | Dupont |
+| vip@97import.com | vip | Marie | Martin |
+| partenaire@97import.com | partner | Pierre | Bernard |
+| client2@97import.com | user | Sophie | Leblanc |
+
+Pour chaque compte, crée aussi le document /profiles/{uid} avec :
+{
+  email: "...",
+  role: "...",
+  first_name: "...",
+  last_name: "...",
+  phone: "",
+  adresse_facturation: "",
+  ville_facturation: "",
+  cp_facturation: "",
+  pays_facturation: "France",
+  adresse_livraison: "",
+  ville_livraison: "",
+  cp_livraison: "",
+  pays_livraison: "France",
+  adresse_livraison_identique: true,
+  created_at: serverTimestamp()
+}
+
+═══════════════════════════════════════════════════════════
+ÉTAPE 7 — CORRECTION ROUTES (App.tsx + HomePage.tsx)
+═══════════════════════════════════════════════════════════
+
+Dans src/App.tsx :
+- Vérifie que la route /mini-pelles existe (avec tiret)
+- Vérifie que /catalogue, /maisons, /solaire, /accessoires existent
+
+Dans src/pages/HomePage.tsx :
+- Remplace TOUTES les occurrences de "/minipelles" par "/mini-pelles"
+- Vérifie que la navbar et les cards catégories pointent vers /mini-pelles
+
+═══════════════════════════════════════════════════════════
+ÉTAPE 8 — BUILD + RAPPORT FINAL
+═══════════════════════════════════════════════════════════
+
+1. Lance : npm run build
+2. Si erreurs → corrige et relance
+3. Lance : npm run dev
+4. Génère le fichier RAPPORT-RESET.md avec :
+
+# Rapport Reset Complet — 97import.com
+## Date : [date]
+
+### Storage
+- Fichiers supprimés : X
+- Fichiers uploadés : X
+- Erreurs : X
+
+### Firestore
+- Collections vidées : X
+- Produits importés : 20/20
+- Documents admin_params : X
+- Comptes créés : 5/5
+
+### Routes vérifiées
+- / ✅
+- /mini-pelles ✅ ou ❌
+- /maisons ✅ ou ❌
+- /solaire ✅ ou ❌
+- /accessoires ✅ ou ❌
+- /catalogue ✅ ou ❌
+
+### Comptes test
+- admin@97import.com (admin) ✅
+- client@97import.com (user) ✅
+- vip@97import.com (vip) ✅
+- partenaire@97import.com (partner) ✅
+- client2@97import.com (user) ✅
+
+### Build
+- npm run build : ✅ SUCCÈS ou ❌ ERREUR
+
+═══════════════════════════════════════════════════════════
+RÈGLES ABSOLUES
+═══════════════════════════════════════════════════════════
+- Encodage UTF-8 obligatoire sur tous les fichiers
+- Ne jamais créer de doublon (vérifie avant chaque opération)
+- Exécuter dans l'ordre : Reset → Upload → Import → Comptes → Routes → Build
+- Langue française dans tous les logs et commentaires
+- En cas d'erreur sur une étape → log l'erreur et continue les étapes suivantes
+```
+
+---
+
+**Pour l'utiliser :**
+
+1. Clique sur **"Code"** en haut de la fenêtre Claude
+2. Colle ce prompt
+3. Claude Code va tout exécuter automatiquement
+
+Quand c'est terminé, colle ici le contenu de `RAPPORT-RESET.md` !

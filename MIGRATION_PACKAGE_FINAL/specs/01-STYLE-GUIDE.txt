@@ -1,0 +1,187 @@
+================================================================
+STYLE GUIDE — 97import.com
+Guide visuel complet pour reconstruction
+================================================================
+
+1. PALETTE DE COULEURS
+================================================================
+
+Couleur principale (Brand)
+  #4A90D9  rgb(74, 144, 217)   — Bleu 97import, boutons, liens, focus
+  #3A7BC8  rgb(58, 123, 200)   — Hover du bleu principal
+
+Couleurs neutres
+  #FFFFFF  rgb(255, 255, 255)  — Fond pages, cartes
+  #F9FAFB  rgb(249, 250, 251)  — Fond sections alternees (gray-50)
+  #F3F4F6  rgb(243, 244, 246)  — Fond muted, accents (gray-100)
+  #E5E7EB  rgb(229, 231, 235)  — Bordures, inputs (gray-200)
+  #6B7280  rgb(107, 114, 128)  — Texte secondaire (gray-500)
+  #4B5563  rgb(75, 85, 99)     — Texte body (gray-600)
+  #374151  rgb(55, 65, 81)     — Texte principal admin (gray-700)
+  #333333                      — Texte foreground general
+
+Couleurs categorie (icones portal)
+  #2563EB  text-blue-600       — Mini-pelles
+  #059669  text-emerald-600    — Maisons modulaires
+  #EAB308  text-yellow-500     — Panneaux solaires
+  #EA580C  text-orange-600     — Machines agricoles
+
+Couleurs PDF par type de document
+  #1E3A5F  rgb(30, 58, 95)     — Devis (Navy)
+  #047857  rgb(4, 120, 87)     — Facture (Green)
+  #16A34A  rgb(22, 163, 74)    — Bon de livraison (Green)
+  #B45309  rgb(180, 83, 9)     — Commission (Amber)
+  #0284C7  rgb(2, 132, 199)    — Frais maritimes (Cyan)
+  #7C3AED  rgb(124, 58, 237)   — Dedouanement (Purple)
+
+Couleurs VIP
+  #6B21A8  rgb(107, 33, 168)   — Prix negocie VIP (violet)
+  #C0C0C0  rgb(192, 192, 192)  — Prix barre (strikethrough)
+
+Couleurs semantiques
+  Rouge destructif : oklch(0.6 0.2 20)
+  Vert succes      : #059669 (emerald-600)
+  Amber warning    : #D97706 (amber-600)
+
+
+2. TYPOGRAPHIE
+================================================================
+
+Police principale : Inter (Google Fonts)
+  Fallback : -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif
+
+Police secondaire : serif (pour les titres h1-h6 avec font-serif)
+
+Graisses utilisees :
+  400 (normal)   — corps de texte
+  500 (medium)   — labels
+  600 (semibold) — sous-titres
+  700 (bold)     — titres, boutons, nav
+
+Tailles :
+  text-xs   12px  — texte secondaire, badges
+  text-sm   14px  — body, labels (le plus utilise)
+  text-base 16px  — texte standard
+  text-lg   18px  — sous-titres
+  text-xl   20px  — titres de sections
+  text-2xl  24px  — titres moyens
+  text-3xl  30px  — titres importants
+  text-4xl  36px  — titres de page
+  text-5xl  48px  — hero title
+
+Espacement lettres :
+  tracking-tight   — titres comprimes
+  tracking-wider   — liens nav, boutons (uppercase)
+  tracking-widest  — labels uppercase
+
+Interligne :
+  leading-tight    1.25 — titres
+  leading-relaxed  1.625 — paragraphes
+
+
+3. ESPACEMENTS & LAYOUT
+================================================================
+
+Conteneur principal :
+  max-width: 1280px (7xl)
+  padding: 16px (mobile) / 24px (sm) / 32px (lg)
+
+Gaps (flex/grid) :
+  gap-1  4px
+  gap-2  8px   (le plus courant)
+  gap-3  12px
+  gap-4  16px
+  gap-8  32px  (entre sections)
+
+Paddings courants :
+  p-1    4px   — elements compacts
+  p-4    16px  — cartes standard
+  p-6    24px  — sections
+  p-8    32px  — grandes sections
+  px-3   12px  — boutons petits
+  px-4   16px  — boutons moyens
+  px-8   32px  — boutons CTA
+  py-2   8px   — boutons standard
+  py-3   12px  — inputs, boutons
+  py-16  64px  — sections de page
+  py-20  80px  — grandes sections
+
+
+4. BORDER RADIUS
+================================================================
+
+Base : 0.75rem (12px)
+
+  rounded-xs   2px     — micro-elements
+  rounded-md   6px     — inputs, badges
+  rounded-lg   8px     — cartes admin
+  rounded-xl   12px    — cartes portal (le plus courant)
+  rounded-2xl  16px    — grandes cartes
+  rounded-3xl  24px    — cartes categorie portal
+  rounded-full 9999px  — boutons pill, avatars
+
+
+5. OMBRES
+================================================================
+
+  shadow-xs   — bordures subtiles
+  shadow-sm   — cartes admin, inputs (le plus courant)
+  shadow-md   — cartes elevees
+  shadow-lg   — dropdowns, popovers
+  shadow-xl   — cartes portal, hero elements
+  shadow-2xl  — hover cartes portal
+
+
+6. BREAKPOINTS RESPONSIVE
+================================================================
+
+  sm:  640px   — mobile landscape
+  md:  768px   — tablette (le plus utilise)
+  lg:  1024px  — desktop
+  xl:  1280px  — grand ecran
+
+
+7. COMPOSANTS CLES
+================================================================
+
+Bouton principal (.btn-rippa) :
+  bg: #4A90D9
+  text: white, bold, uppercase
+  tracking: widest
+  padding: px-8 py-3
+  radius: rounded-xl
+  hover: bg-primary/90
+  transition: all 300ms
+
+Lien navigation (.nav-link) :
+  color: gray-600
+  hover: #4A90D9
+  font: bold uppercase tracking-wider text-sm
+  transition: colors 200ms
+
+Carte produit :
+  bg: white
+  radius: rounded-3xl
+  shadow: shadow-xl
+  hover: shadow-2xl + scale image
+  overflow: hidden
+  transition: all
+
+Admin back-office :
+  font-family: Inter !important
+  font-size: 12px
+  color: #374151
+  -webkit-font-smoothing: antialiased
+
+
+8. ANIMATIONS
+================================================================
+
+  Librairie : tw-animate-css (Tailwind Animation CSS)
+  Framer Motion pour les pages portal :
+    fadeIn : opacity 0→1, y 20→0, duration 0.5-0.6s
+    stagger : delay index * 0.1s entre les cartes
+  Transitions CSS :
+    duration-200 — liens, hover rapides
+    duration-300 — boutons, cartes
+    duration-700 — zoom images

@@ -1,0 +1,762 @@
+Je lis d'abord la liste de fichiers de référence :Maintenant j'ai une image complète. C'est la **vraie structure de référence** de 97import.com avec Supabase — **527 fichiers**, architecture très différente du projet Firebase actuel. Voici le prompt pour Claude Code :
+
+---
+
+```
+Tu es Lead Developer Full-Stack. 
+Mission critique : aligner C:\DATA-MC-2030\97IMPORT avec la 
+structure de référence du site prod 97import.com
+
+FICHIER DE RÉFÉRENCE :
+C:\DATA-MC-2030\97IMPORT\LISTE-FICHIERS-97IMPORT-2026.txt
+(Structure complète du site prod avec Supabase — commit 3fd3224)
+
+SOURCE DES FICHIERS :
+C:\DATA-MC-2030\97IMPORT\97import2026_siteweb\
+
+DESTINATION :
+C:\DATA-MC-2030\97IMPORT\
+
+═══════════════════════════════════════════════════════════
+ÉTAPE 1 — ANALYSE DE LA STRUCTURE DE RÉFÉRENCE
+═══════════════════════════════════════════════════════════
+
+Lis LISTE-FICHIERS-97IMPORT-2026.txt et extrait :
+
+A) PAGES (client/src/pages/) — 27 pages au total :
+About, Accessories, Agriculture, AuthCallback, CampingCarDeluxe,
+Cart, Confirmation, Connexion, Contact, Delivery, ForgotPassword,
+Legal, MiniPelles, ModularHomes, ModularPremium, ModularStandard,
+MonCompte, NotFound, PortalHome, Privacy, ProductDetail,
+ResetPassword, Services, Solar, SolarKitDetail, SolarPanels, Terms
++ Admin pages (17) : AdminAnalytics, AdminContenu, AdminDashboard,
+AdminHeaderFooter, AdminInvoices, AdminLayout, AdminLeads,
+AdminLogin, AdminMedia, AdminPages, AdminParametres, AdminPartenaires,
+AdminPartners, AdminPricing, AdminProducts, AdminQuotes, AdminSettings,
+AdminShipping, AdminSuiviAchats, AdminUsers
+
+B) COMPOSANTS UI (client/src/components/ui/) — 37 composants :
+accordion, alert-dialog, alert, aspect-ratio, avatar, badge,
+breadcrumb, button-group, button, calendar, card, carousel,
+chart, checkbox, collapsible, command, context-menu, dialog,
+drawer, dropdown-menu, empty, field, form, hover-card,
+input-group, input-otp, input, item, kbd, label, menubar,
+navigation-menu, pagination, popover, progress, radio-group,
+resizable, scroll-area, select, separator, sheet, sidebar,
+skeleton, slider, sonner, spinner, switch, table, tabs,
+textarea, toggle-group, toggle, tooltip
+
+C) FEATURES (client/src/features/) :
+- account/tabs/ : CommissionsTab, OrdersTab, ProfileTab, QuotesTab, SecurityTab
+- auth/model/ : permissions.ts, roles.ts
+- excel/ : suivi-achats.ts
+- pdf/ : index.ts + lib/ (engine, helpers, theme) + templates/ (5 PDFs)
+- pricing/model/ : pricing.ts
+
+D) HOOKS (client/src/hooks/) :
+useComposition, useContactForm, useMobile, usePersistFn,
+useProducts, useRole, useSiteContent
+
+E) MEDIAS public/ — structure exacte :
+docs/, documents/, images/accessories/, images/logo/,
+images/portal/, images/products/r18_pro/, r22_pro/, r32_pro/,
+r57_pro/, solar_kits/, camping_car/, modular_premium/,
+modular_standard/, images/solar/
+
+F) DATA files (client/src/data/) :
+analytics.json, pricing.ts, products.json, settings.json,
+site-content.json, translations.json
+
+═══════════════════════════════════════════════════════════
+ÉTAPE 2 — AUDIT DES FICHIERS MANQUANTS
+═══════════════════════════════════════════════════════════
+
+Compare la liste de référence avec C:\DATA-MC-2030\97IMPORT\src\
+Génère 3 listes :
+- MANQUANTS : fichiers dans la référence, absents dans src/
+- PRÉSENTS : fichiers dans les 2
+- EXTRA : fichiers dans src/ non présents dans la référence
+
+═══════════════════════════════════════════════════════════
+ÉTAPE 3 — COPIE DES MEDIAS MANQUANTS VERS public/
+═══════════════════════════════════════════════════════════
+
+Source des médias : C:\DATA-MC-2030\97IMPORT\97import2026_siteweb\
+
+Crée la structure exacte dans C:\DATA-MC-2030\97IMPORT\public\ :
+
+public/
+├── docs/
+│   └── fiche_technique_maison_modulaire.pdf
+├── documents/
+│   ├── r18_pro_fiche_technique.pdf
+│   ├── r22_pro_fiche_technique.pdf
+│   ├── r32_pro_fiche_technique.pdf
+│   └── r57_pro_fiche_technique.pdf
+├── images/
+│   ├── accessories/     (26 fichiers jpeg+webp+png)
+│   ├── logo/            (rippa logos)
+│   ├── logos/           (logo_import97_*)
+│   ├── portal/          (hero_ship, modular_home, solar, camping_car...)
+│   ├── products/
+│   │   ├── r18_pro/     (4 vues × 2 formats)
+│   │   ├── r22_pro/     (4 vues × 2 formats)
+│   │   ├── r32_pro/     (4 vues × 2 formats)
+│   │   ├── r57_pro/     (1 vue)
+│   │   ├── solar_kits/  (9 images)
+│   │   ├── camping_car/ (11 fichiers)
+│   │   ├── modular_premium/  (4 images + 2 vidéos)
+│   │   └── modular_standard/ (7 images + 3 vidéos)
+│   └── solar/           (9 images webp+jpg)
+├── direxport_logo_blue.png
+├── logo_import97.png
+├── logo_import97_footer_transparent.png
+├── logo_import97_large.png
+├── logo_rippa_domtom_transparent.png
+├── logo_rippa_new.png
+└── rippa-dom-tom-white.png
+
+Pour chaque fichier manquant :
+1. Cherche dans 97import2026_siteweb\ (récursivement par nom)
+2. Si trouvé → copie vers le bon chemin dans public\
+3. Log le résultat
+
+═══════════════════════════════════════════════════════════
+ÉTAPE 4 — CRÉER LES PAGES MANQUANTES (stub Firebase)
+═══════════════════════════════════════════════════════════
+
+Les pages suivantes MANQUENT dans src/pages/ — crée des stubs
+fonctionnels qui utilisent Firebase (pas Supabase) :
+
+PAGES PUBLIQUES manquantes :
+- About.tsx → page "À propos" simple
+- Agriculture.tsx → page catégorie machines agricoles
+- AuthCallback.tsx → gère le retour OAuth Google
+- Cart.tsx → panier (utiliser CartContext existant)
+- Confirmation.tsx → page confirmation commande
+- Contact.tsx → formulaire contact Firebase
+- Delivery.tsx → page livraison DOM-TOM
+- ForgotPassword.tsx → reset mdp Firebase Auth
+- Legal.tsx → mentions légales
+- NotFound.tsx → page 404
+- Privacy.tsx → politique confidentialité
+- ResetPassword.tsx → nouvelle mdp Firebase Auth
+- Services.tsx → page services
+- SolarPanels.tsx → alias de /solaire
+- SolarKitDetail.tsx → fiche détail kit solaire
+- Terms.tsx → CGV
+
+RÈGLES POUR LES STUBS :
+- Utiliser authClient de lib/firebase.ts (pas Supabase)
+- Même navbar que HomePage.tsx
+- Même footer que HomePage.tsx
+- Encodage UTF-8
+- Bilingue FR/中文 via useLang()
+
+═══════════════════════════════════════════════════════════
+ÉTAPE 5 — METTRE À JOUR App.tsx AVEC TOUTES LES ROUTES
+═══════════════════════════════════════════════════════════
+
+Ajoute dans App.tsx toutes les routes manquantes :
+/about, /agriculture, /auth/callback, /panier,
+/confirmation, /contact, /livraison,
+/mot-de-passe-oublie, /mentions-legales,
+/not-found, /confidentialite, /reinitialiser-mdp,
+/services, /solaire/panneau, /solaire/:id,
+/conditions-vente
++ Route catch-all → NotFound
+
+═══════════════════════════════════════════════════════════
+ÉTAPE 6 — CRÉER LES HOOKS MANQUANTS
+═══════════════════════════════════════════════════════════
+
+Crée dans src/hooks/ :
+- useProducts.ts → lit les produits depuis Firestore
+- useRole.ts → retourne le rôle depuis AuthContext
+- useSiteContent.ts → lit site_content depuis Firestore
+- useMobile.tsx → détecte mobile (window.innerWidth < 768)
+- useContactForm.ts → gère le formulaire contact
+
+═══════════════════════════════════════════════════════════
+ÉTAPE 7 — BUILD + RAPPORT FINAL
+═══════════════════════════════════════════════════════════
+
+1. npm run build → corrige toutes les erreurs TypeScript
+2. npm run dev
+
+Génère RAPPORT-STRUCTURE.md :
+
+# Rapport Alignement Structure
+## Référence : 97import.com (commit 3fd3224)
+
+### Pages
+| Page | Statut | Notes |
+|------|--------|-------|
+| PortalHome | ✅ Présent | HomePage.tsx |
+| MiniPelles | ✅/❌ | |
+...
+
+### Composants UI
+- shadcn/ui installés : X/37
+- Manquants : liste
+
+### Médias public/
+- Fichiers présents : X/150
+- Manquants : liste
+
+### Routes App.tsx
+- Routes actives : X
+- Routes manquantes : liste
+
+### Build
+- npm run build : ✅/❌
+- Erreurs résiduelles : liste
+
+═══════════════════════════════════════════════════════════
+RÈGLES ABSOLUES
+═══════════════════════════════════════════════════════════
+- NE PAS toucher à lib/firebase.ts
+- NE PAS installer Supabase
+- NE PAS modifier .env.local
+- Encodage UTF-8 partout
+- Bilingue FR/中文 sur toutes les nouvelles pages
+- npm run build doit passer SANS erreur avant de terminer
+- En cas d'erreur TypeScript → corrige et relance le build
+```
+
+---
+
+**Ce prompt va :**
+
+| Action | Résultat |
+|---|---|
+| Analyser 527 fichiers de référence | Audit complet |
+| Copier 150+ médias manquants | `public/` complet |
+| Créer 16 pages manquantes | Stubs Firebase |
+| Ajouter 15+ routes manquantes | `App.tsx` complet |
+| Créer 5 hooks manquants | Architecture alignée |
+| Build sans erreur | Prêt pour déploiement |
+
+
+ 
+
+========================================================
+PARTIE 1 — ARBORESCENCE COMPLETE
+========================================================
+
+./.DS_Store
+./.env.example
+./.gitignore
+./.gitkeep
+./.manus-logs/browserConsole.log
+./.manus-logs/networkRequests.log
+./.manus-logs/sessionReplay.log
+./.prettierignore
+./.prettierrc
+./GEMINI-AUDIT.md
+./GEMINI-SOURCE.md
+./MAJALL.TXT
+./client/dist/.gitkeep
+./client/dist/__manus__/debug-collector.js
+./client/dist/assets/html2canvas.esm-B0tyYwQk.js
+./client/dist/assets/index-CT2C80ie.css
+./client/dist/assets/index-siQTXOqc.js
+./client/dist/assets/index.es-DIFVuygY.js
+./client/dist/assets/products-BJoR1Gvg.js
+./client/dist/assets/purify.es-BgtpMKW3.js
+./client/dist/assets/site-content-BILJux3o.js
+./client/dist/docs/fiche_technique_maison_modulaire.pdf
+./client/dist/documents/r18_pro_fiche_technique.pdf
+./client/dist/documents/r22_pro_fiche_technique.pdf
+./client/dist/documents/r32_pro_fiche_technique.pdf
+./client/dist/documents/r57_pro_fiche_technique.pdf
+./client/dist/images/accessories/auger_r18.jpeg
+./client/dist/images/accessories/auger_r18.webp
+./client/dist/images/accessories/flat_bucket_r18.jpeg
+./client/dist/images/accessories/flat_bucket_r18.webp
+./client/dist/images/accessories/fourche.jpeg
+./client/dist/images/accessories/fourche.webp
+./client/dist/images/accessories/godet_cribleur.png
+./client/dist/images/accessories/godet_cribleur.webp
+./client/dist/images/accessories/godet_dents.png
+./client/dist/images/accessories/godet_dents.webp
+./client/dist/images/accessories/godet_inclinable.jpeg
+./client/dist/images/accessories/godet_inclinable.webp
+./client/dist/images/accessories/godet_lisse.jpeg
+./client/dist/images/accessories/godet_lisse.webp
+./client/dist/images/accessories/grappin.jpeg
+./client/dist/images/accessories/grappin.webp
+./client/dist/images/accessories/grapple_r18.jpeg
+./client/dist/images/accessories/grapple_r18.webp
+./client/dist/images/accessories/hydraulic_hammer_r18.jpeg
+./client/dist/images/accessories/hydraulic_hammer_r18.webp
+./client/dist/images/accessories/marteau_hydraulique.png
+./client/dist/images/accessories/marteau_hydraulique.webp
+./client/dist/images/accessories/rake_r18.jpeg
+./client/dist/images/accessories/rake_r18.webp
+./client/dist/images/accessories/ripper_r18.jpeg
+./client/dist/images/accessories/ripper_r18.webp
+./client/dist/images/accessories/tariere.jpeg
+./client/dist/images/accessories/tariere.webp
+./client/dist/images/accessories/tilt_bucket_r18.jpeg
+./client/dist/images/accessories/tilt_bucket_r18.webp
+./client/dist/images/accessories/tooth_bucket_r18.jpeg
+./client/dist/images/accessories/tooth_bucket_r18.webp
+./client/dist/images/direxport_logo_blue.png
+./client/dist/images/logo/logo_import97_footer.png
+./client/dist/images/logo/rippa_dom_tom.svg
+./client/dist/images/logo/rippa_logo.svg+xml
+./client/dist/images/logo/rippa_logo.webp
+./client/dist/images/logo_import97.png
+./client/dist/images/logo_import97_footer_transparent.png
+./client/dist/images/logo_import97_large.png
+./client/dist/images/logo_rippa_domtom_transparent.png
+./client/dist/images/logo_rippa_new.png
+./client/dist/images/portal/agri_tractor.jpeg
+./client/dist/images/portal/agri_tractor.jpg
+./client/dist/images/portal/camping_car.jpg
+./client/dist/images/portal/camping_car.png
+./client/dist/images/portal/hero_ship.png
+./client/dist/images/portal/modular_home.png
+./client/dist/images/portal/modular_home.webp
+./client/dist/images/portal/solar_panel.jpg
+./client/dist/images/portal/solar_panel_jinko.png
+./client/dist/images/portal/solar_roof.jpg
+./client/dist/images/products/camping_car/bathroom.jpg
+./client/dist/images/products/camping_car/bedroom.jpg
+./client/dist/images/products/camping_car/dining_area.jpg
+./client/dist/images/products/camping_car/exterior_back.jpg
+./client/dist/images/products/camping_car/exterior_front_side.jpg
+./client/dist/images/products/camping_car/exterior_main.webp
+./client/dist/images/products/camping_car/exterior_side.jpg
+./client/dist/images/products/camping_car/interior_living.jpg
+./client/dist/images/products/camping_car/interior_overview.jpg
+./client/dist/images/products/camping_car/kitchen.jpg
+./client/dist/images/products/camping_car/laundry.jpg
+./client/dist/images/products/camping_car/video_tour.mp4
+./client/dist/images/products/modular_premium/exterior_1.jpg
+./client/dist/images/products/modular_premium/exterior_2.jpg
+./client/dist/images/products/modular_premium/exterior_3.jpg
+./client/dist/images/products/modular_premium/exterior_4.jpg
+./client/dist/images/products/modular_premium/video_1.mov
+./client/dist/images/products/modular_premium/video_2.mov
+./client/dist/images/products/modular_standard/exterior_1.jpeg
+./client/dist/images/products/modular_standard/exterior_2.jpeg
+./client/dist/images/products/modular_standard/exterior_3.jpeg
+./client/dist/images/products/modular_standard/exterior_4.jpeg
+./client/dist/images/products/modular_standard/exterior_5.jpeg
+./client/dist/images/products/modular_standard/exterior_6.jpeg
+./client/dist/images/products/modular_standard/exterior_7.jpeg
+./client/dist/images/products/modular_standard/video_1.mov
+./client/dist/images/products/modular_standard/video_2.mov
+./client/dist/images/products/modular_standard/video_3.mov
+./client/dist/images/products/r10_eco_main.png
+./client/dist/images/products/r10_eco_main.webp
+./client/dist/images/products/r13_pro.png
+./client/dist/images/products/r13_pro.webp
+./client/dist/images/products/r15_eco.png
+./client/dist/images/products/r15_eco.webp
+./client/dist/images/products/r18_pro.png
+./client/dist/images/products/r18_pro.webp
+./client/dist/images/products/r18_pro/r18_pro_cab_view.png
+./client/dist/images/products/r18_pro/r18_pro_cab_view.webp
+./client/dist/images/products/r18_pro/r18_pro_main_view.png
+./client/dist/images/products/r18_pro/r18_pro_main_view.webp
+./client/dist/images/products/r18_pro/r18_pro_rear_view.png
+./client/dist/images/products/r18_pro/r18_pro_rear_view.webp
+./client/dist/images/products/r18_pro/r18_pro_side_view.png
+./client/dist/images/products/r18_pro/r18_pro_side_view.webp
+./client/dist/images/products/r22_pro.png
+./client/dist/images/products/r22_pro.webp
+./client/dist/images/products/r22_pro/r22_pro_cab_view.png
+./client/dist/images/products/r22_pro/r22_pro_cab_view.webp
+./client/dist/images/products/r22_pro/r22_pro_main_view.png
+./client/dist/images/products/r22_pro/r22_pro_main_view.webp
+./client/dist/images/products/r22_pro/r22_pro_rear_view.png
+./client/dist/images/products/r22_pro/r22_pro_rear_view.webp
+./client/dist/images/products/r22_pro/r22_pro_side_view.png
+./client/dist/images/products/r22_pro/r22_pro_side_view.webp
+./client/dist/images/products/r22_pro_main.png
+./client/dist/images/products/r22_pro_main.webp
+./client/dist/images/products/r32_pro.png
+./client/dist/images/products/r32_pro.webp
+./client/dist/images/products/r32_pro/r32_pro_cab_view.png
+./client/dist/images/products/r32_pro/r32_pro_cab_view.webp
+./client/dist/images/products/r32_pro/r32_pro_main_view.png
+./client/dist/images/products/r32_pro/r32_pro_main_view.webp
+./client/dist/images/products/r32_pro/r32_pro_rear_view.png
+./client/dist/images/products/r32_pro/r32_pro_rear_view.webp
+./client/dist/images/products/r32_pro/r32_pro_side_view.png
+./client/dist/images/products/r32_pro/r32_pro_side_view.webp
+./client/dist/images/products/r57_pro/r57_pro_main_view.png
+./client/dist/images/products/solar_kits/battery_lifepo4.png
+./client/dist/images/products/solar_kits/deye_inverter.png
+./client/dist/images/products/solar_kits/jinko_600w_bifacial.webp
+./client/dist/images/products/solar_kits/jinko_installation_toiture.webp
+./client/dist/images/products/solar_kits/jinko_panel_layers.png
+./client/dist/images/products/solar_kits/jinko_panels_pair.webp
+./client/dist/images/products/solar_kits/jinko_tiger_neo_fiche.webp
+./client/dist/images/products/solar_kits/jinko_warehouse_stock.webp
+./client/dist/images/products/solar_kits/solar_cables.png
+./client/dist/images/products/solar_kits/tiger_neo_585w.avif
+./client/dist/images/rippa-dom-tom-white.png
+./client/dist/images/solar/battery_6fm250.webp
+./client/dist/images/solar/deye_inverter.webp
+./client/dist/images/solar/jinko_600w_tiger_neo.jpg
+./client/dist/images/solar/jinko_truck_delivery.jpg
+./client/dist/images/solar/jinko_warehouse.jpg
+./client/dist/images/solar/kit_overview.webp
+./client/dist/images/solar/mounting_structure.webp
+./client/dist/images/solar/panel_detail.webp
+./client/dist/images/solar/solar_cables.webp
+./client/dist/images/solar/solar_installations.jpg
+./client/dist/index.html
+./client/index.html
+./client/public/.gitkeep
+./client/public/__manus__/debug-collector.js
+./client/public/docs/fiche_technique_maison_modulaire.pdf
+./client/public/documents/r18_pro_fiche_technique.pdf
+./client/public/documents/r22_pro_fiche_technique.pdf
+./client/public/documents/r32_pro_fiche_technique.pdf
+./client/public/documents/r57_pro_fiche_technique.pdf
+./client/public/images/accessories/auger_r18.jpeg
+./client/public/images/accessories/auger_r18.webp
+./client/public/images/accessories/flat_bucket_r18.jpeg
+./client/public/images/accessories/flat_bucket_r18.webp
+./client/public/images/accessories/fourche.jpeg
+./client/public/images/accessories/fourche.webp
+./client/public/images/accessories/godet_cribleur.png
+./client/public/images/accessories/godet_cribleur.webp
+./client/public/images/accessories/godet_dents.png
+./client/public/images/accessories/godet_dents.webp
+./client/public/images/accessories/godet_inclinable.jpeg
+./client/public/images/accessories/godet_inclinable.webp
+./client/public/images/accessories/godet_lisse.jpeg
+./client/public/images/accessories/godet_lisse.webp
+./client/public/images/accessories/grappin.jpeg
+./client/public/images/accessories/grappin.webp
+./client/public/images/accessories/grapple_r18.jpeg
+./client/public/images/accessories/grapple_r18.webp
+./client/public/images/accessories/hydraulic_hammer_r18.jpeg
+./client/public/images/accessories/hydraulic_hammer_r18.webp
+./client/public/images/accessories/marteau_hydraulique.png
+./client/public/images/accessories/marteau_hydraulique.webp
+./client/public/images/accessories/rake_r18.jpeg
+./client/public/images/accessories/rake_r18.webp
+./client/public/images/accessories/ripper_r18.jpeg
+./client/public/images/accessories/ripper_r18.webp
+./client/public/images/accessories/tariere.jpeg
+./client/public/images/accessories/tariere.webp
+./client/public/images/accessories/tilt_bucket_r18.jpeg
+./client/public/images/accessories/tilt_bucket_r18.webp
+./client/public/images/accessories/tooth_bucket_r18.jpeg
+./client/public/images/accessories/tooth_bucket_r18.webp
+./client/public/images/direxport_logo_blue.png
+./client/public/images/logo/logo_import97_footer.png
+./client/public/images/logo/rippa_dom_tom.svg
+./client/public/images/logo/rippa_logo.svg+xml
+./client/public/images/logo/rippa_logo.webp
+./client/public/images/logo_import97.png
+./client/public/images/logo_import97_footer_transparent.png
+./client/public/images/logo_import97_large.png
+./client/public/images/logo_rippa_domtom_transparent.png
+./client/public/images/logo_rippa_new.png
+./client/public/images/portal/agri_tractor.jpeg
+./client/public/images/portal/agri_tractor.jpg
+./client/public/images/portal/camping_car.jpg
+./client/public/images/portal/camping_car.png
+./client/public/images/portal/hero_ship.png
+./client/public/images/portal/modular_home.png
+./client/public/images/portal/modular_home.webp
+./client/public/images/portal/solar_panel.jpg
+./client/public/images/portal/solar_panel_jinko.png
+./client/public/images/portal/solar_roof.jpg
+./client/public/images/products/camping_car/bathroom.jpg
+./client/public/images/products/camping_car/bedroom.jpg
+./client/public/images/products/camping_car/dining_area.jpg
+./client/public/images/products/camping_car/exterior_back.jpg
+./client/public/images/products/camping_car/exterior_front_side.jpg
+./client/public/images/products/camping_car/exterior_main.webp
+./client/public/images/products/camping_car/exterior_side.jpg
+./client/public/images/products/camping_car/interior_living.jpg
+./client/public/images/products/camping_car/interior_overview.jpg
+./client/public/images/products/camping_car/kitchen.jpg
+./client/public/images/products/camping_car/laundry.jpg
+./client/public/images/products/camping_car/video_tour.mp4
+./client/public/images/products/modular_premium/exterior_1.jpg
+./client/public/images/products/modular_premium/exterior_2.jpg
+./client/public/images/products/modular_premium/exterior_3.jpg
+./client/public/images/products/modular_premium/exterior_4.jpg
+./client/public/images/products/modular_premium/video_1.mov
+./client/public/images/products/modular_premium/video_2.mov
+./client/public/images/products/modular_standard/exterior_1.jpeg
+./client/public/images/products/modular_standard/exterior_2.jpeg
+./client/public/images/products/modular_standard/exterior_3.jpeg
+./client/public/images/products/modular_standard/exterior_4.jpeg
+./client/public/images/products/modular_standard/exterior_5.jpeg
+./client/public/images/products/modular_standard/exterior_6.jpeg
+./client/public/images/products/modular_standard/exterior_7.jpeg
+./client/public/images/products/modular_standard/video_1.mov
+./client/public/images/products/modular_standard/video_2.mov
+./client/public/images/products/modular_standard/video_3.mov
+./client/public/images/products/r10_eco_main.png
+./client/public/images/products/r10_eco_main.webp
+./client/public/images/products/r13_pro.png
+./client/public/images/products/r13_pro.webp
+./client/public/images/products/r15_eco.png
+./client/public/images/products/r15_eco.webp
+./client/public/images/products/r18_pro.png
+./client/public/images/products/r18_pro.webp
+./client/public/images/products/r18_pro/r18_pro_cab_view.png
+./client/public/images/products/r18_pro/r18_pro_cab_view.webp
+./client/public/images/products/r18_pro/r18_pro_main_view.png
+./client/public/images/products/r18_pro/r18_pro_main_view.webp
+./client/public/images/products/r18_pro/r18_pro_rear_view.png
+./client/public/images/products/r18_pro/r18_pro_rear_view.webp
+./client/public/images/products/r18_pro/r18_pro_side_view.png
+./client/public/images/products/r18_pro/r18_pro_side_view.webp
+./client/public/images/products/r22_pro.png
+./client/public/images/products/r22_pro.webp
+./client/public/images/products/r22_pro/r22_pro_cab_view.png
+./client/public/images/products/r22_pro/r22_pro_cab_view.webp
+./client/public/images/products/r22_pro/r22_pro_main_view.png
+./client/public/images/products/r22_pro/r22_pro_main_view.webp
+./client/public/images/products/r22_pro/r22_pro_rear_view.png
+./client/public/images/products/r22_pro/r22_pro_rear_view.webp
+./client/public/images/products/r22_pro/r22_pro_side_view.png
+./client/public/images/products/r22_pro/r22_pro_side_view.webp
+./client/public/images/products/r22_pro_main.png
+./client/public/images/products/r22_pro_main.webp
+./client/public/images/products/r32_pro.png
+./client/public/images/products/r32_pro.webp
+./client/public/images/products/r32_pro/r32_pro_cab_view.png
+./client/public/images/products/r32_pro/r32_pro_cab_view.webp
+./client/public/images/products/r32_pro/r32_pro_main_view.png
+./client/public/images/products/r32_pro/r32_pro_main_view.webp
+./client/public/images/products/r32_pro/r32_pro_rear_view.png
+./client/public/images/products/r32_pro/r32_pro_rear_view.webp
+./client/public/images/products/r32_pro/r32_pro_side_view.png
+./client/public/images/products/r32_pro/r32_pro_side_view.webp
+./client/public/images/products/r57_pro/r57_pro_main_view.png
+./client/public/images/products/solar_kits/battery_lifepo4.png
+./client/public/images/products/solar_kits/deye_inverter.png
+./client/public/images/products/solar_kits/jinko_600w_bifacial.webp
+./client/public/images/products/solar_kits/jinko_installation_toiture.webp
+./client/public/images/products/solar_kits/jinko_panel_layers.png
+./client/public/images/products/solar_kits/jinko_panels_pair.webp
+./client/public/images/products/solar_kits/jinko_tiger_neo_fiche.webp
+./client/public/images/products/solar_kits/jinko_warehouse_stock.webp
+./client/public/images/products/solar_kits/solar_cables.png
+./client/public/images/products/solar_kits/tiger_neo_585w.avif
+./client/public/images/rippa-dom-tom-white.png
+./client/public/images/solar/battery_6fm250.webp
+./client/public/images/solar/deye_inverter.webp
+./client/public/images/solar/jinko_600w_tiger_neo.jpg
+./client/public/images/solar/jinko_truck_delivery.jpg
+./client/public/images/solar/jinko_warehouse.jpg
+./client/public/images/solar/kit_overview.webp
+./client/public/images/solar/mounting_structure.webp
+./client/public/images/solar/panel_detail.webp
+./client/public/images/solar/solar_cables.webp
+./client/public/images/solar/solar_installations.jpg
+./client/src/App.tsx
+./client/src/components/AuthModal.tsx
+./client/src/components/CartNotification.tsx
+./client/src/components/ComingSoon.tsx
+./client/src/components/CookieConsent.tsx
+./client/src/components/DeliveryEstimator.tsx
+./client/src/components/DevisForm.tsx
+./client/src/components/ErrorBoundary.tsx
+./client/src/components/Footer.tsx
+./client/src/components/Header.tsx
+./client/src/components/ManusDialog.tsx
+./client/src/components/Map.tsx
+./client/src/components/PrixOuDevis.tsx
+./client/src/components/ProductCard.tsx
+./client/src/components/ProductNotices.tsx
+./client/src/components/SEO.tsx
+./client/src/components/ScrollToTop.tsx
+./client/src/components/TikTokIcon.tsx
+./client/src/components/admin/AdminUI.tsx
+./client/src/components/ui/accordion.tsx
+./client/src/components/ui/alert-dialog.tsx
+./client/src/components/ui/alert.tsx
+./client/src/components/ui/aspect-ratio.tsx
+./client/src/components/ui/avatar.tsx
+./client/src/components/ui/badge.tsx
+./client/src/components/ui/breadcrumb.tsx
+./client/src/components/ui/button-group.tsx
+./client/src/components/ui/button.tsx
+./client/src/components/ui/calendar.tsx
+./client/src/components/ui/card.tsx
+./client/src/components/ui/carousel.tsx
+./client/src/components/ui/chart.tsx
+./client/src/components/ui/checkbox.tsx
+./client/src/components/ui/collapsible.tsx
+./client/src/components/ui/command.tsx
+./client/src/components/ui/context-menu.tsx
+./client/src/components/ui/dialog.tsx
+./client/src/components/ui/drawer.tsx
+./client/src/components/ui/dropdown-menu.tsx
+./client/src/components/ui/empty.tsx
+./client/src/components/ui/field.tsx
+./client/src/components/ui/form.tsx
+./client/src/components/ui/hover-card.tsx
+./client/src/components/ui/input-group.tsx
+./client/src/components/ui/input-otp.tsx
+./client/src/components/ui/input.tsx
+./client/src/components/ui/item.tsx
+./client/src/components/ui/kbd.tsx
+./client/src/components/ui/label.tsx
+./client/src/components/ui/menubar.tsx
+./client/src/components/ui/navigation-menu.tsx
+./client/src/components/ui/pagination.tsx
+./client/src/components/ui/popover.tsx
+./client/src/components/ui/progress.tsx
+./client/src/components/ui/radio-group.tsx
+./client/src/components/ui/resizable.tsx
+./client/src/components/ui/scroll-area.tsx
+./client/src/components/ui/select.tsx
+./client/src/components/ui/separator.tsx
+./client/src/components/ui/sheet.tsx
+./client/src/components/ui/sidebar.tsx
+./client/src/components/ui/skeleton.tsx
+./client/src/components/ui/slider.tsx
+./client/src/components/ui/sonner.tsx
+./client/src/components/ui/spinner.tsx
+./client/src/components/ui/switch.tsx
+./client/src/components/ui/table.tsx
+./client/src/components/ui/tabs.tsx
+./client/src/components/ui/textarea.tsx
+./client/src/components/ui/toggle-group.tsx
+./client/src/components/ui/toggle.tsx
+./client/src/components/ui/tooltip.tsx
+./client/src/const.ts
+./client/src/contexts/AuthContext.tsx
+./client/src/contexts/CartContext.tsx
+./client/src/contexts/LanguageContext.tsx
+./client/src/contexts/ThemeContext.tsx
+./client/src/data/analytics.json
+./client/src/data/pricing.ts
+./client/src/data/products.json
+./client/src/data/settings.json
+./client/src/data/site-content.json
+./client/src/data/translations.json
+./client/src/features/account/tabs/CommissionsTab.tsx
+./client/src/features/account/tabs/OrdersTab.tsx
+./client/src/features/account/tabs/ProfileTab.tsx
+./client/src/features/account/tabs/QuotesTab.tsx
+./client/src/features/account/tabs/SecurityTab.tsx
+./client/src/features/auth/model/permissions.ts
+./client/src/features/auth/model/roles.ts
+./client/src/features/excel/suivi-achats.ts
+./client/src/features/pdf/index.ts
+./client/src/features/pdf/lib/pdf-engine.ts
+./client/src/features/pdf/lib/pdf-helpers.ts
+./client/src/features/pdf/lib/pdf-theme.ts
+./client/src/features/pdf/templates/commission-pdf.ts
+./client/src/features/pdf/templates/delivery-note-pdf.ts
+./client/src/features/pdf/templates/fees-pdf.ts
+./client/src/features/pdf/templates/invoice-pdf.ts
+./client/src/features/pdf/templates/quote-pdf.ts
+./client/src/features/pricing/model/pricing.ts
+./client/src/hooks/useComposition.ts
+./client/src/hooks/useContactForm.ts
+./client/src/hooks/useMobile.tsx
+./client/src/hooks/usePersistFn.ts
+./client/src/hooks/useProducts.ts
+./client/src/hooks/useRole.ts
+./client/src/hooks/useSiteContent.ts
+./client/src/index.css
+./client/src/lib/analytics.ts
+./client/src/lib/notifications.ts
+./client/src/lib/storage.ts
+./client/src/lib/supabase.ts
+./client/src/lib/utils.ts
+./client/src/main.tsx
+./client/src/pages/About.tsx
+./client/src/pages/Accessories.tsx
+./client/src/pages/Agriculture.tsx
+./client/src/pages/AuthCallback.tsx
+./client/src/pages/CampingCarDeluxe.tsx
+./client/src/pages/Cart.tsx
+./client/src/pages/Confirmation.tsx
+./client/src/pages/Connexion.tsx
+./client/src/pages/Contact.tsx
+./client/src/pages/Delivery.tsx
+./client/src/pages/ForgotPassword.tsx
+./client/src/pages/Legal.tsx
+./client/src/pages/MiniPelles.tsx
+./client/src/pages/ModularHomes.tsx
+./client/src/pages/ModularPremium.tsx
+./client/src/pages/ModularStandard.tsx
+./client/src/pages/MonCompte.tsx
+./client/src/pages/NotFound.tsx
+./client/src/pages/PortalHome.tsx
+./client/src/pages/Privacy.tsx
+./client/src/pages/ProductDetail.tsx
+./client/src/pages/ResetPassword.tsx
+./client/src/pages/Services.tsx
+./client/src/pages/Solar.tsx
+./client/src/pages/SolarKitDetail.tsx
+./client/src/pages/SolarPanels.tsx
+./client/src/pages/Terms.tsx
+./client/src/pages/admin/AdminAnalytics.tsx
+./client/src/pages/admin/AdminContenu.tsx
+./client/src/pages/admin/AdminDashboard.tsx
+./client/src/pages/admin/AdminHeaderFooter.tsx
+./client/src/pages/admin/AdminInvoices.tsx
+./client/src/pages/admin/AdminLayout.tsx
+./client/src/pages/admin/AdminLeads.tsx
+./client/src/pages/admin/AdminLogin.tsx
+./client/src/pages/admin/AdminMedia.tsx
+./client/src/pages/admin/AdminPages.tsx
+./client/src/pages/admin/AdminParametres.tsx
+./client/src/pages/admin/AdminPartenaires.tsx
+./client/src/pages/admin/AdminPartners.tsx
+./client/src/pages/admin/AdminPricing.tsx
+./client/src/pages/admin/AdminProducts.tsx
+./client/src/pages/admin/AdminQuotes.tsx
+./client/src/pages/admin/AdminSettings.tsx
+./client/src/pages/admin/AdminShipping.tsx
+./client/src/pages/admin/AdminSuiviAchats.tsx
+./client/src/pages/admin/AdminUsers.tsx
+./client/src/utils/calculPrix.ts
+./client/src/utils/generateCommissionPDF.ts
+./client/src/utils/generateDeliveryNotePDF.ts
+./client/src/utils/generateDevisPDF.ts
+./client/src/utils/generateFacturePDF.ts
+./client/src/utils/generateFeesPDF.ts
+./client/vercel.json
+./components.json
+./export-structure.md
+./ideas.md
+./package.json
+./patches/wouter@3.7.1.patch
+./pnpm-lock.yaml
+./scripts/add-address-columns.sql
+./scripts/auto-create-profile-trigger.sql
+./scripts/seed-products.mjs
+./scripts/setup-partners.sql
+./scripts/sync-profiles.sql
+./scripts/v5-setup.sql
+./scripts/v53-fixes.sql
+./scripts/v58-fixes.sql
+./server/index.ts
+./shared/const.ts
+./supabase.sql
+./supabase/.temp/cli-latest
+./supabase/.temp/gotrue-version
+./supabase/.temp/pooler-url
+./supabase/.temp/postgres-version
+./supabase/.temp/project-ref
+./supabase/.temp/rest-version
+./supabase/.temp/storage-migration
+./supabase/.temp/storage-version
+./supabase/config.toml
+./supabase/functions/send-email/index.ts
+./tsconfig.json
+./tsconfig.node.json
+./vercel.json
+./vite-api-plugin.ts
+./vite.config.ts

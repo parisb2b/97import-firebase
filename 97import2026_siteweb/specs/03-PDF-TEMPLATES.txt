@@ -1,0 +1,180 @@
+================================================================
+PDF TEMPLATES — 97import.com
+Specifications completes pour reproduire les documents PDF
+================================================================
+
+TECHNOLOGIE : jsPDF v4.2.1 + jspdf-autotable v5.0.7
+FORMAT : A4 Portrait (210mm x 297mm)
+MARGES : 15mm gauche/droite, 20mm haut/bas
+POLICE : Helvetica (integree jsPDF)
+
+================================================================
+5 TYPES DE DOCUMENTS
+================================================================
+
+1. DEVIS        — Couleur accent : #1E3A5F (Navy)      — 2 pages
+2. FACTURE      — Couleur accent : #047857 (Green)      — 2 pages
+3. BON LIVRAISON — Couleur accent : #16A34A (Green)     — 1 page
+4. COMMISSION   — Couleur accent : #B45309 (Amber)      — 1 page
+5. FRAIS        — Maritime #0284C7 / Dedouanement #7C3AED — 1 page
+
+================================================================
+STRUCTURE PAGE 1 — COMMUNE A TOUS
+================================================================
+
+--- HEADER (Y=18mm) ---
+
+Gauche :
+  "{Type} {Numero}" — Helvetica Bold 20pt, couleur accent
+  "Date : {date}"   — Helvetica Normal 9pt, #6B7280
+
+Droite (aligne droite X=195mm) :
+  "97import.com"             — Helvetica Bold 16pt, couleur accent
+  "Importation & Distribution" — Helvetica Normal 8.5pt, #6B7280
+
+Ligne separateur : #BFDBFE, 0.8mm, Y=30mm, X=15 a 195mm
+
+--- BLOCS EMETTEUR / DESTINATAIRE (2 colonnes) ---
+
+Colonne gauche X=15mm (largeur 85mm) — EMETTEUR :
+  Label "EMETTEUR" — Bold 7.5pt, #4A90D9
+  "LUXENT LIMITED" — Bold 10pt, #1E3A5F
+  "2ND FLOOR COLLEGE HOUSE"     — Normal 8.5pt, #374151
+  "17 KING EDWARDS ROAD RUISLIP"
+  "HA4 7AE LONDON, Royaume-Uni"
+  "N deg entreprise : 14852122"
+  "Email : luxent@ltd-uk.eu"
+
+Colonne droite X=105mm (largeur 85mm) — DESTINATAIRE :
+  Label "DESTINATAIRE" — Bold 7.5pt, #4A90D9
+  "{client.nom}"    — Bold 10pt, #1E3A5F
+  "{client.adresse}" — Normal 8.5pt, #374151
+  "{client.ville}"
+  "{client.pays}"
+  "Email : {client.email}"
+  "Tel : {client.telephone}"
+
+Ligne separateur : #BFDBFE, 0.5mm, Y=max(gauche,droite)+4mm
+
+--- TABLEAU PRODUITS ---
+
+Devis/Facture — 5 colonnes :
+  Ref. Interne | Produit | Prix HT | Qte | Total HT
+  30mm         | 80mm    | 25mm    | 15mm| 30mm
+
+Bon Livraison — 4 colonnes :
+  Ref. Interne | Produit | Qte | Etat
+  35mm         | 95mm    | 20mm| 30mm
+
+Commission — 6 colonnes :
+  Ref. devis | Client | Produit | Prix remise | Prix partenaire | Commission
+  25mm       | 28mm   | 49mm    | 28mm        | 26mm            | 24mm
+
+Frais — 2 colonnes :
+  Libelle | Montant HT
+  140mm   | 40mm
+
+Style tableau :
+  Header : Bold 9pt, #1E3A5F, fond blanc, bordure #BFDBFE 0.4mm
+  Body : Normal 9pt, #374151, fond blanc
+  Padding cellule : 4mm haut/bas, 3mm gauche/droite
+  Hauteur min : 10mm
+  Lignes : #BFDBFE, 0.3mm
+
+--- RENDU VIP (Devis/Facture) ---
+
+Ligne 1 (prix barre) :
+  Normal Italic 7.5pt, #C0C0C0
+  Ligne barre horizontale a Y=35% de la cellule
+
+Ligne 2 (prix negocie) :
+  Bold 8.5pt, #6B21A8 (violet)
+  Texte "Nom Produit ★ VIP"
+  Pourcentage remise en 6.5pt a Y=88%
+
+--- BLOC TOTAL ---
+
+Boite arrondie 2mm, bordure accent 0.8mm
+Position : X=113mm, largeur 82mm, hauteur 14mm
+Label gauche : Bold 10pt, couleur accent, "TOTAL HT :"
+Montant droite : Bold 10pt, couleur accent
+
+Facture specifique — totaux multiples :
+  Total HT — fond #EFF6FF, hauteur 12mm
+  Acomptes — fond #ECFDDF, en boucle
+  Solde restant — fond #FFF7ED si > 0, Bold 11pt #EA580C
+  Ou "ENTIEREMENT SOLDEE ✓" — fond #ECFDDF, Bold 11pt green
+
+--- MENTION TVA ---
+
+Boite fond #F9FAFB, bordure #BFDBFE 0.3mm, arrondi 1.5mm
+Texte : Italic 8pt #6B7280
+"TVA non applicable, art. 293 B du CGI"
+
+--- PIED DE PAGE ---
+
+Ligne : #BFDBFE, 0.3mm, Y=H-12mm
+Centre : Normal 7.5pt #6B7280, "[NumDoc] — 97import.com / LUXENT LIMITED"
+Droite : "Page {n} / {total}" (si multi-pages)
+
+================================================================
+PAGE 2 — CONDITIONS (Devis + Facture)
+================================================================
+
+--- DEVIS : CONDITIONS GENERALES + BON POUR ACCORD ---
+
+Titre : Bold 13pt #1E3A5F, "Conditions generales & Bon pour accord"
+
+Sections (boites fond #EFF6FF, bordure #BFDBFE) :
+  1. "Conditions de reglement"
+     "A reception de la facture."
+  2. "Mode de reglement"
+     "Virement bancaire — coordonnees fournies sur la facture."
+  3. "Livraison"
+     "Les delais sont donnes a titre indicatif."
+     "Frais de livraison et dedouanement non inclus."
+  4. "Validite"
+     "Ce devis est valable 30 jours a compter du {date}."
+
+Zone signature (84mm hauteur) :
+  "Bon pour accord" — Bold 11pt, centre
+  Gauche : "Fait a :" + zone signature (boite 22mm hauteur)
+  Droite : "Le :" + "Qualite du signataire :"
+
+--- FACTURE : CONDITIONS DE REGLEMENT ---
+
+Sections :
+  1. "Mode de reglement"
+     "Virement bancaire"
+     "IBAN : a confirmer par email a luxent@ltd-uk.eu"
+     "Reference : {invoiceNumber}"
+  2. "Date de paiement"
+     "A reception de la presente facture."
+  3. "Reference devis" (si disponible)
+     "Suite au devis {numeroDevis} du {date}."
+  4. "Informations legales"
+     "LUXENT LIMITED — N deg 14852122"
+     "2nd Floor College House, 17 King Edwards Road Ruislip, HA4 7AE London, UK"
+
+================================================================
+DONNEES EMETTEUR (FIXE)
+================================================================
+
+Societe    : LUXENT LIMITED
+Adresse    : 2ND FLOOR COLLEGE HOUSE
+             17 KING EDWARDS ROAD RUISLIP
+             HA4 7AE LONDON, Royaume-Uni
+N entreprise: 14852122
+Email       : luxent@ltd-uk.eu
+
+================================================================
+NUMEROTATION DOCUMENTS
+================================================================
+
+Prefixe + Annee (2 chiffres) + Compteur (5 chiffres)
+  Devis      : D2600001, D2600002, ...
+  Facture    : FA2600001
+  Bon livr.  : BL2600001
+  Frais marit: FM2600001
+  Dedouanem. : DD2600001
+  Commission : NC2600001

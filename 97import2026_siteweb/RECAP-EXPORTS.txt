@@ -1,0 +1,235 @@
+================================================================
+RECAPITULATIF DES 3 EXPORTS — 97import.com
+Date : 2026-04-04
+Dossier racine : /Users/mactell/97import2026_siteweb/
+Taille totale : 302 Mo
+================================================================
+
+
+================================================================
+EXPORT 1 — CODE SOURCE (depuis Git local)
+================================================================
+Source    : /Users/mactell/manus siteweb/ (repo GitHub parisb2b/manus-siteweb)
+Branche  : main — commit 440d7d1
+Tag      : v6.5-migration-package
+Methode  : Copie directe des fichiers sources + build Vite
+
+Contenu :
+  /data/            16 fichiers   220 Ko
+    products.json        — Catalogue complet 68 produits (1777 lignes)
+    pricing.ts           — Prix d'achat HT, multiplicateurs (x2, x1.2, x1.3), shipping DOM-TOM
+    site-content.json    — Contenu CMS pages (titres, textes, menus, SEO)
+    settings.json        — Config generale (WhatsApp, couleurs, logo)
+    analytics.json       — Config analytics
+    translations.json    — Traductions
+    + 10 scripts SQL     — Schemas tables, triggers, RLS, migrations
+
+  /images/          143 fichiers  115 Mo
+    logos/           11 fichiers   — PNG, SVG, WebP (97import + Rippa)
+    products/        41 fichiers   — Mini-pelles R18/R22/R32/R57 (vignettes + galleries 4 vues)
+    accessories/     32 fichiers   — 16 types accessoires (JPEG + WebP double format)
+    portal/          10 fichiers   — Hero, categories page accueil
+    solar/           20 fichiers   — Panneaux Jinko, kits, composants
+    houses/          28 fichiers   — Maisons standard/premium, camping car + videos
+
+  /documents/        5 fichiers   968 Ko
+    Fiches techniques PDF (R18, R22, R32, R57, maison modulaire)
+
+  /videos/           4 fichiers    66 Mo
+    Videos produits MP4 (camping car, maisons)
+
+  /assets/           6 fichiers   2.2 Mo
+    Build Vite local (JS + CSS compiles, noms hashes)
+
+  /specs/            7 fichiers    60 Ko
+    00-INDEX.txt           — Index general du package
+    01-STYLE-GUIDE.txt     — Palette couleurs (#4A90D9), typo Inter, espacements, composants
+    02-DATABASE-SCHEMA.txt — 12 tables Supabase avec colonnes, types, valeurs par defaut
+    03-PDF-TEMPLATES.txt   — 5 types PDF (devis, facture, BL, commission, frais) layout au mm
+    04-ROUTES-SEO.txt      — 40+ URLs publiques + admin, redirects .html, protection roles
+    05-FORMS-LOGIC.txt     — Formulaires, workflows devis, panier, prix, admin
+    06-MEDIA-INVENTORY.txt — Inventaire complet fichiers media
+
+  /scripts/          2 fichiers     8 Ko
+    backup_supabase.py     — Export automatise des 13 tables Supabase en JSON
+    validate_backup.py     — Verification integrite SHA-256 de tous les fichiers
+
+  index.html         1 fichier    1.4 Ko
+    Point d'entree SPA (build local)
+
+  metadata.json      Inventaire SHA-256 de 183 fichiers
+
+
+================================================================
+EXPORT 2 — SUPABASE LIVE (base de donnees production)
+================================================================
+Source    : https://gdqdbgonndmnauyetvht.supabase.co
+Methode   : API REST Supabase (anon key) — requete SELECT * sur chaque table
+Date      : 2026-04-04
+
+Contenu : /supabase/        14 fichiers
+
+  TABLE                   ENREGISTREMENTS   DESCRIPTION
+  ---------------------------------------------------------------
+  profiles.json                    3        Profils utilisateurs (admin, test)
+  products.json                   68        Catalogue complet produits
+  admin_params.json                9        Parametres admin (emetteur, RIB, multiplicateurs)
+  quotes.json                      1        Devis existants
+  contacts.json                    0        Formulaires de contact
+  orders.json                      0        Commandes
+  partners.json                    0        Partenaires
+  invoices.json                    0        Factures
+  delivery_notes.json              0        Bons de livraison
+  fees.json                        0        Frais maritimes/dedouanement
+  commission_notes.json            0        Notes de commission
+  site_content.json                0        Contenu CMS Supabase
+  error_logs.json                  0        Journal erreurs
+  _manifest.json                   —        Manifest avec SHA-256 et stats
+
+  TOTAL : 81 enregistrements dans 13 tables
+
+
+================================================================
+EXPORT 3 — VERCEL PRODUCTION (site en ligne)
+================================================================
+Source    : https://97import.com (Vercel production)
+Methode   : Telechargement HTTP direct de chaque fichier
+Date      : 2026-04-04
+Statut    : 167 fichiers, 0 erreur
+
+Contenu : /vercel/          167 fichiers  118 Mo
+
+  index.html             1 fichier    1.4 Ko
+    Point d'entree SPA tel que servi par Vercel
+
+  assets/                2 fichiers   1.6 Mo
+    index-B1YsO-WO.js     — Bundle JS production (1.49 Mo, hash Vite)
+    index-fcmVpsNi.css     — CSS production (145 Ko, hash Vite)
+
+  images/              145 fichiers   115 Mo
+    Toutes les images telles que servies en production
+    (logos, produits, accessoires, portal, solaire, maisons)
+
+  documents/             5 fichiers   968 Ko
+    Fiches techniques PDF en production
+
+  docs/                  1 fichier
+    Fiche technique maison modulaire
+
+  pages/                19 fichiers    76 Ko
+    Snapshots HTML des routes SPA :
+    minipelles, maisons, maisons_standard, maisons_premium,
+    maisons_camping-car-deluxe, solaire, agricole, accessoires,
+    connexion, cart, mon-compte, terms, privacy, legal,
+    services, contact, delivery, confirmation, admin
+
+  metadata_vercel.json   Inventaire complet avec URL source, SHA-256, content-type
+
+
+================================================================
+COMPARAISON DES 3 EXPORTS
+================================================================
+
+                    SOURCE GIT      SUPABASE LIVE     VERCEL PROD
+  ---------------------------------------------------------------
+  Fichiers          183             14                167
+  Taille            184 Mo          ~50 Ko            118 Mo
+  Images            143             —                 145
+  Videos            4               —                 0 (>50Mo skip)
+  PDFs              5               —                 6
+  JS/CSS build      6 (local)       —                 2 (production)
+  Donnees JSON      6               13 tables         —
+  SQL schemas       10              —                 —
+  Specs techniques  7               —                 —
+  Scripts Python    2               —                 —
+  Pages HTML        1               —                 19 (snapshots)
+  Metadata SHA-256  OUI             OUI               OUI
+
+DIFFERENCES NOTABLES :
+  - Les noms de fichiers JS/CSS different entre le build local
+    (index-Dwg-9PEm.js) et Vercel production (index-B1YsO-WO.js)
+    car Vercel fait son propre build avec des hashes differents.
+  - Les videos MP4 (66 Mo) sont presentes dans l'export source
+    mais absentes de l'export Vercel (trop volumineux pour HTTP simple).
+  - Les donnees dynamiques (produits, profils, parametres) ne sont
+    disponibles QUE dans l'export Supabase.
+  - Les specs techniques et scripts Python ne sont QUE dans l'export source.
+
+
+================================================================
+VERIFICATION D'INTEGRITE
+================================================================
+
+Export 1 (Source)  : metadata.json      — 183/183 SHA-256 OK
+Export 2 (Supabase): _manifest.json     — 13 tables exportees avec SHA-256
+Export 3 (Vercel)  : metadata_vercel.json — 167 fichiers avec SHA-256 + URL
+
+Pour re-verifier :
+  python3 /Users/mactell/97import2026_siteweb/scripts/validate_backup.py
+
+
+================================================================
+STRUCTURE COMPLETE DU DOSSIER
+================================================================
+
+/Users/mactell/97import2026_siteweb/          302 Mo total
+|
+|-- index.html                    Build local SPA
+|-- metadata.json                 SHA-256 export source (183 fichiers)
+|
+|-- assets/                       Build Vite local (JS/CSS)
+|-- images/                       Images depuis sources Git
+|   |-- logos/                    11 fichiers
+|   |-- products/                 41 fichiers
+|   |-- accessories/              32 fichiers
+|   |-- portal/                   10 fichiers
+|   |-- solar/                    20 fichiers
+|   |-- houses/                   28 fichiers
+|
+|-- documents/                    PDFs fiches techniques
+|-- videos/                       MP4 produits (66 Mo)
+|-- data/                         JSON catalogue + SQL schemas
+|-- specs/                        7 guides techniques migration
+|-- scripts/                      backup_supabase.py + validate_backup.py
+|
+|-- supabase/                     Export live 13 tables (81 enregistrements)
+|   |-- profiles.json
+|   |-- products.json
+|   |-- admin_params.json
+|   |-- quotes.json
+|   |-- (+ 9 tables vides)
+|   |-- _manifest.json
+|
+|-- vercel/                       Site production telecharge (118 Mo)
+|   |-- index.html                HTML production
+|   |-- assets/                   JS/CSS production (hashes Vercel)
+|   |-- images/                   145 images production
+|   |-- documents/                PDFs production
+|   |-- pages/                    19 snapshots routes SPA
+|   |-- metadata_vercel.json
+
+
+================================================================
+UTILISATION POUR MIGRATION FIREBASE
+================================================================
+
+1. MEDIA → Firebase Storage
+   Utiliser /vercel/images/ (version production) ou /images/ (source)
+   + /videos/ pour les MP4
+
+2. DONNEES → Firestore
+   Utiliser /supabase/*.json pour importer les collections :
+   products (68), profiles (3), admin_params (9), quotes (1)
+
+3. SCHEMAS → Firestore Rules + Cloud Functions
+   Consulter /specs/02-DATABASE-SCHEMA.txt pour les structures
+   Consulter /specs/05-FORMS-LOGIC.txt pour la logique metier
+
+4. DESIGN → Tailwind Config
+   Consulter /specs/01-STYLE-GUIDE.txt pour reproduire le theme
+
+5. PDFs → Cloud Functions
+   Consulter /specs/03-PDF-TEMPLATES.txt pour les 5 types de documents
+
+6. ROUTES → Firebase Hosting
+   Consulter /specs/04-ROUTES-SEO.txt pour conserver les memes URLs

@@ -1,0 +1,593 @@
+Voici un **plan de refonte complet en 10 phases**, avec un **ordre exact d’exécution**, pensé pour être **professionnel, concret, exécutable**, et adapté à votre contexte :
+
+- **objectif :** rendre `http://localhost:5173/` **strictement aligné** avec `https://97import.com/`
+- **stack cible :** React 19 + Vite + TypeScript + Supabase + Vercel
+- **contrainte :** site **bilingue français / chinois**
+- **problème principal :** architecture hybride, médias mal reliés, contenu dispersé, écarts local / prod, admin non totalement unifié
+
+---
+
+# ### Plan de refonte 97import — Phases 1 à 10
+
+---
+
+## ### Phase 1 — Gel, sauvegarde et cadrage technique
+### Objectif
+Sécuriser l’existant avant toute modification et figer un point de départ fiable.
+
+### Actions exactes
+1. **Créer une sauvegarde complète** du projet local.
+2. **Créer une sauvegarde exportable** de :
+   - base Supabase
+   - storage / médias
+   - fichiers du projet
+   - export Vercel
+3. **Créer un tag Git de sécurité**.
+4. **Créer un dossier de travail dédié refonte** :
+   - `refonte-97import/`
+   - `audit/`
+   - `reports/`
+   - `migrations/`
+   - `scripts/`
+5. **Figer les modifications fonctionnelles** :
+   - ne plus faire de petites corrections dispersées
+   - tout passe désormais par le plan de refonte
+
+### Livrables
+- `BACKUP-INVENTAIRE.md`
+- `POINT-DE-DEPART-REFONTE.md`
+- tag Git de sauvegarde
+- archive complète du projet
+
+### Résultat attendu
+Aucune perte possible, base de départ propre, projet sécurisé.
+
+---
+
+## ### Phase 2 — Audit technique complet du projet
+### Objectif
+Comprendre **100 % de l’architecture réelle**, sans supposition.
+
+### Actions exactes
+1. Scanner tout le projet :
+   - pages
+   - composants
+   - hooks
+   - utils
+   - routes
+   - pages admin
+   - endpoints
+   - scripts SQL
+   - fichiers JSON
+   - fichiers de traduction
+   - médias
+2. Identifier les **sources de vérité actuelles** :
+   - Supabase
+   - JSON local
+   - code hardcodé
+   - export Vercel
+   - `dist`
+3. Cartographier les modules critiques :
+   - produits
+   - catégories
+   - médias
+   - pricing
+   - devis
+   - factures/PDF
+   - auth
+   - back-office
+   - i18n
+4. Identifier les éléments legacy :
+   - wrappers deprecated
+   - scripts obsolètes
+   - endpoints dev-only
+   - fichiers en double
+   - composants non utilisés
+
+### Livrables
+- `AUDIT-COMPLET.md`
+- `CARTOGRAPHIE-ROUTES.md`
+- `CARTOGRAPHIE-DONNEES.md`
+- `CARTOGRAPHIE-ADMIN.md`
+- `LISTE-LEGACY.md`
+
+### Résultat attendu
+Vous savez précisément :
+- ce qui est utilisé
+- ce qui est doublonné
+- ce qui est obsolète
+- ce qui casse l’alignement local / production
+
+---
+
+## ### Phase 3 — Audit comparatif local vs production
+### Objectif
+Mesurer tous les écarts entre le site local et le site en production.
+
+### Actions exactes
+1. Comparer page par page :
+   - accueil
+   - catégories
+   - fiches produit
+   - panier
+   - compte client
+   - admin
+2. Comparer les éléments visibles :
+   - header
+   - footer
+   - menus
+   - héros/bannières
+   - boutons
+   - sections marketing
+   - cartes produit
+   - prix
+   - images
+   - PDF
+3. Comparer les éléments structurels :
+   - routes
+   - SEO
+   - métadonnées
+   - chargement des assets
+   - comportement responsive
+4. Capturer les écarts avec un rapport clair.
+
+### Livrables
+- `ECARTS-LOCAL-VS-PROD.md`
+- `CHECKLIST-PAGES.md`
+- `CHECKLIST-COMPONENTS.md`
+- dossier captures d’écran comparatives
+
+### Résultat attendu
+Une vision claire de **tout ce qui diffère**, sans devoir le découvrir au fur et à mesure.
+
+---
+
+## ### Phase 4 — Audit et remapping complet des médias
+### Objectif
+Réorganiser proprement toutes les images et tous les PDF, et les relier correctement aux produits.
+
+### Actions exactes
+1. Scanner tous les médias présents dans :
+   - projet local
+   - export Vercel
+   - dossiers source
+   - storage existant si déjà utilisé
+2. Classer les fichiers :
+   - image produit principale
+   - galerie produit
+   - PDF fiche technique
+   - PDF commercial
+   - logos
+   - bannières
+   - documents divers
+3. Détecter :
+   - médias orphelins
+   - médias dupliqués
+   - médias absents
+   - médias non reliés à un produit
+   - produits sans image
+   - produits sans PDF
+4. Mettre en place une logique de correspondance :
+   - par `slug`
+   - par `id`
+   - par `sku`
+   - par nom de fichier normalisé
+5. Préparer un **mapping officiel** produit ↔ média.
+
+### Livrables
+- `MEDIA-INVENTAIRE.csv`
+- `MEDIA-MAPPING.csv`
+- `MEDIA-ORPHELINS.csv`
+- `MEDIA-MANQUANTS.csv`
+- `MEDIA-DOUBLONS.csv`
+
+### Résultat attendu
+Chaque produit a une correspondance claire avec :
+- image principale
+- galerie
+- PDF
+- documents techniques
+
+---
+
+## ### Phase 5 — Définition de l’architecture cible
+### Objectif
+Définir la structure finale avant de coder la refonte.
+
+### Actions exactes
+1. Définir la **source unique de vérité** :
+   - Supabase Database
+   - Supabase Storage
+2. Définir le schéma final des données :
+   - produits
+   - traductions produits
+   - catégories
+   - traductions catégories
+   - médias produits
+   - paramètres site
+   - pages éditoriales si nécessaire
+3. Définir les conventions techniques :
+   - nommage des slugs
+   - structure des médias
+   - règles de traduction
+   - structure des composants
+   - règles de design system
+4. Décider ce qui reste en code et ce qui sort en base.
+
+### Structure cible recommandée
+- `products`
+- `product_translations`
+- `product_media`
+- `categories`
+- `category_translations`
+- `site_settings`
+- `pages`
+- `page_translations`
+
+### Livrables
+- `SCHEMA-DATA-CIBLE.md`
+- `ARCHITECTURE-CIBLE.md`
+- `CONVENTIONS-NOMMAGE.md`
+- `REGLES-MEDIA.md`
+- `REGLES-I18N.md`
+
+### Résultat attendu
+Plus aucune ambiguïté sur l’architecture finale.
+
+---
+
+## ### Phase 6 — Migration des données et centralisation dans Supabase
+### Objectif
+Faire de Supabase la seule base métier fiable.
+
+### Actions exactes
+1. Nettoyer les anciennes structures de données inutiles.
+2. Préparer les migrations SQL.
+3. Créer / ajuster les tables cibles.
+4. Migrer les données depuis :
+   - JSON locaux
+   - anciennes structures
+   - exports techniques
+5. Vérifier l’intégrité :
+   - produits actifs
+   - catégories
+   - prix
+   - références
+   - liens médias
+   - paramètres site
+6. Ajouter les contraintes nécessaires :
+   - unicité
+   - foreign keys
+   - ordre de tri
+   - flags actif/inactif
+
+### Livrables
+- scripts SQL de migration
+- `RAPPORT-MIGRATION-DATA.md`
+- `CHECK-INTEGRITE-DATA.md`
+
+### Résultat attendu
+Toutes les données critiques vivent désormais dans une structure propre, unique, stable.
+
+---
+
+## ### Phase 7 — Refonte du front-office
+### Objectif
+Reconstruire le front pour qu’il soit **strictement cohérent**, maintenable et identique à la production cible.
+
+### Ordre exact d’exécution
+1. **Layout global**
+   - app shell
+   - header
+   - footer
+   - navigation
+2. **Design system**
+   - couleurs
+   - boutons
+   - cartes
+   - sections
+   - formulaires
+   - tableaux
+3. **Page Accueil**
+4. **Pages catégories**
+5. **Fiches produit**
+6. **Panier / demande de devis**
+7. **Compte client**
+8. **Pages institutionnelles**
+   - CGV
+   - contact
+   - mentions légales
+   - livraison, etc.
+9. **Responsive et finitions**
+
+### Contraintes
+- pas de contenu métier durcodé si évitable
+- pas de lecture métier depuis `dist`
+- composants réutilisables
+- structure claire
+- chargement des médias depuis sources officielles
+
+### Livrables
+- nouveau front unifié
+- `FRONT-REFACTOR-LOG.md`
+
+### Résultat attendu
+Le local et la production ont le même rendu cible, avec une base front saine.
+
+---
+
+## ### Phase 8 — Refonte du back-office
+### Objectif
+Construire un back-office réellement central, cohérent et exploitable.
+
+### Ordre exact d’exécution
+1. **Dashboard admin**
+2. **Gestion produits**
+3. **Gestion catégories**
+4. **Gestion médias**
+5. **Gestion PDF / documents**
+6. **Gestion traductions FR / ZH**
+7. **Gestion prix**
+8. **Gestion paramètres site**
+9. **Gestion devis / factures / documents**
+10. **Contrôles de cohérence**
+
+### Fonctions indispensables
+- voir tous les produits
+- éditer les champs par langue
+- affecter images et PDF
+- définir image principale
+- visualiser médias manquants
+- détecter produits incomplets
+- modifier prix selon logique métier
+- administrer textes site
+
+### Livrables
+- back-office rationalisé
+- `ADMIN-REFACTOR-LOG.md`
+- `CHECKLIST-ADMIN-FONCTIONS.md`
+
+### Résultat attendu
+Le back-office pilote réellement tout le site sans dépendre de fichiers dispersés.
+
+---
+
+## ### Phase 9 — Mise en place complète du bilingue FR / chinois
+### Objectif
+Rendre le site réellement bilingue, de façon native et propre.
+
+### Actions exactes
+1. Définir les langues officielles :
+   - `fr`
+   - `zh`
+2. Uniformiser l’i18n :
+   - labels interface
+   - contenus pages
+   - contenus produits
+   - catégories
+   - CTA
+   - messages système
+3. Mettre en place le fallback :
+   - si `zh` absent, fallback contrôlé vers `fr`
+4. Ajouter la gestion bilingue dans l’admin :
+   - champs FR
+   - champs ZH
+   - statut traduit / incomplet
+5. Tester toutes les routes dans les 2 langues.
+
+### Livrables
+- `MATRICE-TRADUCTIONS.md`
+- `TRADUCTIONS-MANQUANTES.csv`
+- `I18N-IMPLEMENTATION-LOG.md`
+
+### Résultat attendu
+Le site fonctionne proprement en **français** et en **chinois**, sans zones mixtes ou oubliées.
+
+---
+
+## ### Phase 10 — Tests finaux, recette, alignement production et déploiement
+### Objectif
+Valider la refonte et déployer proprement.
+
+### Actions exactes
+1. Tests techniques :
+   - build
+   - routes
+   - chargement images
+   - chargement PDFs
+   - auth
+   - admin
+   - pricing
+   - formulaires
+   - génération PDF
+2. Tests fonctionnels :
+   - navigation
+   - affichage produits
+   - panier
+   - devis
+   - espace client
+   - rôles
+3. Tests bilingues :
+   - FR
+   - ZH
+4. Tests visuels :
+   - desktop
+   - mobile
+   - tablette
+5. Comparaison finale avec la prod
+6. Correction des écarts restants
+7. Déploiement
+8. Contrôle post-déploiement
+9. Documentation finale
+
+### Livrables
+- `RECETTE-FINALE.md`
+- `COMPARE-FINAL-LOCAL-PROD.md`
+- `DEPLOIEMENT.md`
+- `RUNBOOK-EXPLOITATION.md`
+
+### Résultat attendu
+Une version stable, propre, documentée, déployable et maintenable.
+
+---
+
+# ### Ordre exact d’exécution résumé
+
+## **Ordre strict**
+1. **Phase 1** — Gel + sauvegarde + sécurisation  
+2. **Phase 2** — Audit technique complet  
+3. **Phase 3** — Audit comparatif local vs prod  
+4. **Phase 4** — Audit et mapping des médias  
+5. **Phase 5** — Définition de l’architecture cible  
+6. **Phase 6** — Migration des données vers Supabase  
+7. **Phase 7** — Refonte du front-office  
+8. **Phase 8** — Refonte du back-office  
+9. **Phase 9** — Bilingue FR / chinois complet  
+10. **Phase 10** — Tests finaux + déploiement
+
+---
+
+# ### Dépendances entre phases
+
+## Ce qu’il ne faut surtout pas faire
+- **Ne pas refondre le front avant l’audit**
+- **Ne pas reconnecter les médias avant le mapping**
+- **Ne pas refaire l’admin avant le schéma cible**
+- **Ne pas implémenter le bilingue au hasard dans les composants**
+- **Ne pas corriger page par page sans centraliser les données**
+
+---
+
+# ### Priorité métier réelle
+
+## Si vous voulez aller au plus efficace, l’ordre de priorité est :
+1. **Sources de données**
+2. **Médias**
+3. **Architecture cible**
+4. **Front**
+5. **Admin**
+6. **Bilingue**
+7. **Recette finale**
+
+👉 Car aujourd’hui, le vrai problème n’est pas seulement visuel.  
+Le vrai problème est que **le site ne repose pas encore sur une structure unique et maîtrisée**.
+
+---
+
+# ### Version ultra-concrète par sprint
+
+## **Sprint 1**
+- Phases 1 + 2  
+- Sauvegarde + audit complet
+
+## **Sprint 2**
+- Phases 3 + 4  
+- Comparatif local/prod + médias
+
+## **Sprint 3**
+- Phases 5 + 6  
+- Architecture cible + migrations Supabase
+
+## **Sprint 4**
+- Phase 7  
+- Refonte front
+
+## **Sprint 5**
+- Phase 8  
+- Refonte admin
+
+## **Sprint 6**
+- Phase 9  
+- bilingue FR/ZH
+
+## **Sprint 7**
+- Phase 10  
+- recette, correction finale, déploiement
+
+---
+
+# ### Critères de validation par phase
+
+## Phase 1 validée si
+- sauvegardes créées
+- repo sécurisé
+- point de départ documenté
+
+## Phase 2 validée si
+- inventaire complet disponible
+- legacy identifié
+- cartographie claire
+
+## Phase 3 validée si
+- toutes les pages majeures comparées
+- écarts documentés
+
+## Phase 4 validée si
+- chaque produit a un état média connu
+- mapping officiel produit ↔ média disponible
+
+## Phase 5 validée si
+- schéma cible approuvé
+- conventions techniques figées
+
+## Phase 6 validée si
+- Supabase devient la source centrale fiable
+
+## Phase 7 validée si
+- front unifié et cohérent
+
+## Phase 8 validée si
+- admin central et exploitable
+
+## Phase 9 validée si
+- FR/ZH fonctionnel partout
+
+## Phase 10 validée si
+- build ok
+- tests ok
+- prod alignée
+- documentation finalisée
+
+---
+
+# ### Recommandation importante
+
+Je vous conseille de **demander à Claude Code de travailler en mode livrables obligatoires par phase**, et non en mode “je corrige tout d’un coup”.
+
+## Pourquoi ?
+Parce que sinon il risque de :
+- mélanger audit et correction
+- modifier sans cartographie
+- casser des dépendances
+- oublier des liens médias
+- ne pas documenter les décisions
+
+---
+
+# ### Formulation recommandée pour Claude Code
+
+Vous pouvez lui imposer cette règle :
+
+> **Tu ne passes jamais à la phase suivante tant que les livrables de la phase en cours ne sont pas générés et vérifiés.**  
+> Tu dois produire un rapport clair à la fin de chaque phase, puis seulement enchaîner.
+
+---
+
+Si vous voulez, je peux maintenant vous préparer la **suite directe** :
+
+## **Option 1**
+un **prompt Claude Code ultra-strict basé sur ces 10 phases**
+
+## **Option 2**
+un **tableau de pilotage complet** avec :
+- phase
+- tâches
+- priorité
+- dépendances
+- livrables
+- statut
+
+## **Option 3**
+une **todo list exécutable pour Claude Code**, fichier par fichier
+
+Je peux vous faire directement les **3** en version professionnelle.

@@ -1,0 +1,1679 @@
+================================================================
+MAJALL.TXT — Projet 97import.com
+Référence maître ultra-détaillée — Journal technique + Cahier des charges
+Dernière mise à jour : 2026-04-03 (v6.4)
+Dépôt : https://github.com/parisb2b/manus-siteweb
+Déploiement : Vercel SPA — React 19 + Vite 7 + TypeScript + Supabase + wouter
+================================================================
+
+RÈGLES PERMANENTES CLAUDE CODE :
+1. git fetch origin && git reset --hard origin/main
+2. git tag backup-$(date +%Y%m%d-%H%M) && git push origin --tags
+3. git log --oneline -3
+4. Lire ce fichier avant toute modification
+5. pnpm build → git add . → git commit → git push après chaque étape
+
+================================================================
+ARCHITECTURE TECHNIQUE
+================================================================
+
+Stack :
+  - Frontend : React 19 + Vite 7 + TypeScript
+  - Routeur  : wouter (SPA, pas de react-router)
+  - Backend  : Supabase uniquement (PostgreSQL + Auth + Storage)
+  - Deploy   : Vercel — vercel.json :
+      installCommand : pnpm install
+      buildCommand   : vite build
+      outputDirectory: client/dist
+      rewrites       : [{ source: "/((?!assets/).*)", destination: "/index.html" }]
+  - PDF      : jsPDF + jspdf-autotable
+  - Package  : pnpm (pnpm-lock.yaml présent)
+
+Chemins clés :
+  /Users/mactell/manus siteweb/           ← racine du projet
+  client/src/App.tsx                      ← toutes les routes
+  client/src/components/Header.tsx        ← navigation + logo
+  client/src/pages/MonCompte.tsx          ← espace client complet
+  client/src/pages/Cart.tsx               ← panier
+  client/src/pages/admin/AdminLayout.tsx  ← back-office
+  client/src/contexts/AuthContext.tsx     ← auth + profil
+  client/src/contexts/CartContext.tsx     ← état du panier
+  client/src/hooks/useRole.ts             ← rôle utilisateur
+  client/src/utils/calculPrix.ts          ← source unique des prix
+  client/src/features/pdf/               ← moteur PDF (v3.0)
+    lib/pdf-theme.ts                      ← constantes couleurs
+    lib/pdf-helpers.ts                    ← formatPrix, formatDate, EMETTEUR
+    lib/pdf-engine.ts                     ← fonctions partagées
+    templates/quote-pdf.ts               ← devis
+    templates/invoice-pdf.ts             ← facture
+    templates/commission-pdf.ts          ← commission
+  client/src/utils/generateDevisPDF.ts    ← shim 7 lignes → features/pdf
+  client/src/utils/generateFacturePDF.ts  ← shim 7 lignes → features/pdf
+  client/src/utils/generateCommissionPDF.ts \u2190 shim 5 lignes \u2192 features/pdf
+  client/src/utils/generateFeesPDF.ts       \u2190 shim \u2192 features/pdf (V5)
+  client/src/utils/generateDeliveryNotePDF.ts \u2190 shim \u2192 features/pdf (V5)
+  client/src/features/pdf/templates/fees-pdf.ts         \u2190 FM + DD (V5)
+  client/src/features/pdf/templates/delivery-note-pdf.ts \u2190 BL (V5)
+  client/src/features/excel/suivi-achats.ts  \u2190 Export Excel bilingue (V5)
+  client/src/lib/notifications.ts            \u2190 Service email (V5)
+  client/src/pages/admin/AdminInvoices.tsx    \u2190 Listing factures (V5)
+  scripts/v5-setup.sql                       \u2190 SQL V5 (tables + fonctions)
+
+Tables Supabase :
+  profiles  : id, email, role, first_name, last_name, phone,
+              adresse_facturation, ville_facturation, cp_facturation, pays_facturation,
+              adresse_livraison, ville_livraison, cp_livraison, pays_livraison,
+              adresse_livraison_identique (boolean)
+  quotes    : id, user_id, numero_devis, produits (JSONB), prix_total_calcule,
+              prix_negocie, statut, facture_generee, signe_le,
+              adresse_client, ville_client, pdf_url, facture_url,
+              acompte_pourcentage, acompte_paye, solde_paye,
+              date_livraison_prevue, notes_internes, bl_genere, created_at
+  partners  : id, user_id, nom, email, telephone, actif, created_at
+  products  : id, nom, reference, reference_interne, categorie, description,
+              prix_achat, prix_public, image_url, actif, ordre, updated_at
+  invoices  : id, numero_facture, quote_id, user_id, date_facture,
+              montant_ht, montant_acompte, type_facture, statut, pdf_url (V5)
+  delivery_notes : id, numero_bl, quote_id, user_id, date_livraison,
+              adresse_livraison, produits (JSONB), statut, pdf_url (V5)
+  fees      : id, numero_document, quote_id, type_frais (maritime/dedouanement),
+              montant_ht, description, details (JSONB), pdf_url (V5)
+  commission_notes : id, numero_commission, partner_id, quote_id,
+              montant_commission, statut, pdf_url (V5)
+  admin_params : key, value (JSONB), label — émetteur, rib, acompte_defaut (V5)
+  site_content : CMS (logo, navigation, bannière, config pages)
+
+Rôles :
+  visitor | user | vip | partner | collaborateur | admin
+  Source unique : client/src/utils/calculPrix.ts → calculerPrix()
+  Multiplicateurs : user\u00D72, partner\u00D71.2, vip\u00D71.3
+
+================================================================
+HISTORIQUE DES COMMITS — DÉTAIL TECHNIQUE
+================================================================
+
+────────────────────────────────────────────────────────────────
+DATE : 2026-04-03
+TAG : v6.4-bugfix-cart-search-logs
+TYPE : fix
+DESCRIPTION : Crash devis + panier isolé + recherche filtrée + ville par défaut
+
+CORRIGES :
+  DevisForm — cart clear utilise "rippa_cart" (avant: "cart" = mauvaise clé)
+  DevisForm — global try/catch + crash log localStorage immédiat
+  DevisForm — ville pré-remplie seulement si cp/ville existent réellement
+  CartContext — clearCart() supprime aussi localStorage
+  CartContext — clear automatique sur SIGNED_IN / SIGNED_OUT (auth)
+  PortalHome — recherche passe ?q= dans l'URL au lieu de redirection simple
+  MiniPelles — filtre produits par nom/ref selon ?q= + message "aucun résultat"
+  AdminLogs — bouton "Logs locaux" pour exporter localStorage en JSON
+
+────────────────────────────────────────────────────────────────
+DATE : 2026-04-03
+TAG : v6.3-logs-email-fix
+TYPE : feat + fix
+DESCRIPTION : Journal erreurs admin + emails non-bloquants + logger global
+
+CREES :
+  lib/logger.ts — logError/logInfo avec insert error_logs Supabase
+  pages/admin/AdminLogs.tsx — 3 KPIs + filtres + tableau + export CSV + auto-refresh 30s
+  scripts/create-error-logs.sql — table + RLS + index
+
+MODIFIES :
+  AdminLayout — section Systeme + badge rouge erreurs non resolues
+  DevisForm — logError sur echec email + echec creation devis
+  QuotesTab — logError sur echec notification acompte
+
+────────────────────────────────────────────────────────────────
+DATE : 2026-04-03
+TAG : v6.2-backoffice-complet
+TYPE : feat
+DESCRIPTION : Back-office complet v6.2
+
+NOUVELLES FONCTIONNALITES :
+  AdminQuoteDetail : page detail devis avec paiements et documents
+  AdminQuotes : clic sur ligne -> detail devis
+  AdminUsers : gestion roles complete (user/vip/partner/collaborateur)
+  AdminPartenaires : KPIs + commissions + toggle actif
+  AdminProducts : numero_interne editable double-clic
+  AdminSuiviAchats : generation Excel 2 onglets
+  AdminAnalytics : KPIs CA/devis/clients + top produits + graphe mensuel
+  Parcours client : pop-up partenaire + pop-up acompte (DevisForm)
+  Espace client : accordion devis avec suivi acompte
+
+CORRECTIONS :
+  Route /admin/devis/:id corrigee (page blanche supprimee — extraction id via regex)
+  Anti-doublons applique sur tous les composants
+  Paths menu admin alignes : /admin/clients, /admin/produits, /admin/medias
+  DevisForm : partners.code supprime (colonne inexistante)
+  Notes admin editables avec sauvegarde dans AdminQuoteDetail
+  Dropdown partenaire + upgrade VIP dans detail devis
+
+TESTS A EFFECTUER :
+  Connexion back-office : parisb2b@gmail.com
+  Clic sur un devis -> page detail s'ouvre
+  Clients -> changement de role
+  Partenaires -> toggle actif/inactif
+  Produits -> double-clic sur ref. interne
+  Analytics -> KPIs et graphes
+  Site public -> panier -> generer devis -> pop-ups
+
+────────────────────────────────────────────────────────────────
+DATE : 2026-04-03
+TAG : v6.1-fix-colonnes-toutes-pages
+TYPE : fix
+DESCRIPTION : Correction colonnes réelles pour TOUTES les pages admin
+
+CORRIGÉS :
+  AdminUsers — first_name/last_name/phone/ville_facturation/pays_facturation (plus de nom/prenom/ile)
+  AdminPartenaires — actif (boolean) au lieu de code_partenaire/commission_rate/statut
+    → commissions enrichies depuis quotes.commission_montant
+  AdminProducts — images (JSON), reference, actif (boolean) au lieu de stock/image_url/prix_public
+    → prix_public calculé JS (prix_achat × 2), toggle actif/inactif ajouté
+
+AJOUTÉ :
+  scripts/fix-rls-v2.sql — script RLS complet avec ENABLE RLS + policies toutes tables
+
+────────────────────────────────────────────────────────────────
+DATE : 2026-04-03
+TAG : v6.0-refonte-backoffice
+TYPE : refactor + feat
+DESCRIPTION : Refonte complète du back-office admin from scratch
+
+SUPPRIMÉS (8 composants obsolètes — doublons et spinners infinis) :
+  AdminAnalytics, AdminHeaderFooter, AdminInvoices, AdminLeads
+  AdminPages, AdminPricing, AdminShipping, AdminUI (ancien)
+
+CRÉÉS :
+  lib/adminQuery.ts — utilitaire générique avec gestion erreurs
+  components/admin/AdminTable.tsx — tableau avec skeleton + pagination
+  components/admin/AdminBadge.tsx — 20+ statuts colorés
+  components/admin/AdminPageLayout.tsx — layout standardisé
+
+RECRÉÉS FROM SCRATCH (architecture adminQuery + AdminTable) :
+  AdminDashboard — 4 KPIs indépendants (chacun son try/catch) + derniers devis
+  AdminQuotes — filtres statut temps réel + recherche + export CSV + actions
+  AdminQuoteDetail — client/devis/montants + suivi paiements + 4 docs + actions
+  AdminUsers — enrichissement devis par client + upgrade VIP
+  AdminPartenaires — KPIs + commissions + toggle actif/inactif
+  AdminProducts — réf. interne éditable inline (double-clic → input → Enter)
+  AdminContenu — éditeur JSON CMS robuste
+
+AdminLayout modifié : route /admin/devis/:id → AdminQuoteDetail
+
+CONSERVÉS INCHANGÉS : AdminLogin, AdminParametres, AdminSuiviAchats, AdminMedia
+
+RÉSULTAT :
+  - 2034 lignes ajoutées, 6796 supprimées
+  - Bundle: 1720KB (-94KB vs ancien)
+  - 0 erreurs build (2352 modules)
+  - Architecture : adminQuery → AdminTable → pages (3 couches propres)
+
+────────────────────────────────────────────────────────────────
+DATE : 2026-04-03
+TAG : v5.14-corrections-analyse-externe
+TYPE : fix + feat
+DESCRIPTION : Corrections suite analyse externe v5.13 — 6 étapes vérifiées
+
+MODIFICATIONS :
+  ÉTAPE 1 — dist/ hors git : déjà OK (dist/ dans .gitignore, non tracké)
+  ÉTAPE 2 — DeliveryEstimator : déjà OK (gère null → "Estimation sur devis")
+  ÉTAPE 3 — PrixOuDevis rôles : déjà OK (tous les rôles couverts explicitement)
+  ÉTAPE 4 — Badge "Bientôt" /agricole : ajouté dans Header.tsx (desktop + mobile)
+            et Footer.tsx (lien Machines Agricoles)
+  ÉTAPE 5 — Options undefined panier : fallback "Option non disponible" dans
+            ModularStandard.tsx et ModularPremium.tsx (opt?.name ?? "Option non disponible")
+  ÉTAPE 6 — Images .webp : aucun fichier .webp présent dans public/images/,
+            donc aucun remplacement effectué (règle : ne jamais remplacer si .webp absent)
+
+FICHIERS :
+  client/src/components/Header.tsx (badge Bientôt desktop + mobile)
+  client/src/components/Footer.tsx (badge Bientôt Machines Agricoles)
+  client/src/pages/ModularStandard.tsx (fallback option non disponible)
+  client/src/pages/ModularPremium.tsx (fallback option non disponible)
+
+────────────────────────────────────────────────────────────────
+DATE : 2026-04-03
+TAG : v5.13-systeme-acompte-complet
+TYPE : feat + fix
+DESCRIPTION : Système acompte amélioré — badges, toast, statuts harmonisés
+
+MODIFICATIONS :
+  - AdminQuotes : badge acompte jaune/vert sur chaque ligne fermée du devis
+  - AdminQuotes : interface Quote typée avec acomptes, total_encaisse, solde_restant
+  - QuotesTab : toast descriptif "Votre virement de X€ a bien été déclaré" (8s)
+  - QuotesTab : harmonisation statuts encaisse/valide avec icônes ✓ et ⏳
+  - Diagnostic complet confirmé : système acompte JSON déjà fonctionnel
+    (acomptes array, total_encaisse, solde_restant, facture cumulative)
+  - PDF facture avec section acomptes déjà opérationnel (invoice-pdf.ts)
+  - Chargement infini déjà fixé (v5.12), isolation auth déjà fixée (v5.11)
+
+FICHIERS :
+  client/src/pages/admin/AdminQuotes.tsx (badge acompte ligne fermée, interface Quote)
+  client/src/features/account/tabs/QuotesTab.tsx (toast amélioré, statuts harmonisés)
+
+────────────────────────────────────────────────────────────────
+DATE : 2026-04-03
+TAG : v5.12-robustesse-backoffice-nc
+TYPE : fix + feat
+DESCRIPTION : Chargement infini back-office corrigé + bouton NC (Non Conforme)
+
+MODIFICATIONS :
+  - AdminQuotes/AdminPartenaires/AdminSuiviAchats/AdminProducts : try/catch sur toutes les requêtes Supabase
+  - Toutes les fonctions load() garantissent setLoading(false) même en cas d'erreur (finally)
+  - Messages d'erreur explicites + bouton Réessayer si requête Supabase échoue
+  - AdminDashboard : catch ajouté sur Promise.all
+  - Nouveau statut 'non_conforme' : type Statut, STATUT_LABELS, filtre barre statut
+  - Badge NC rouge foncé #991B1B dans BadgeStatut (AdminUI.tsx)
+  - Bouton NC rapide sur chaque ligne devis (1 clic → update statut)
+
+FICHIERS :
+  client/src/pages/admin/AdminQuotes.tsx (try/catch load, loadError, NC statut+bouton+filtre)
+  client/src/pages/admin/AdminPartenaires.tsx (try/catch load, loadError)
+  client/src/pages/admin/AdminSuiviAchats.tsx (try/catch load, loadError)
+  client/src/pages/admin/AdminProducts.tsx (try/catch loadSupabaseProds, supabaseError)
+  client/src/pages/admin/AdminDashboard.tsx (catch sur Promise.all)
+  client/src/components/admin/AdminUI.tsx (badge non_conforme)
+
+────────────────────────────────────────────────────────────────
+DATE : 2026-04-02
+TAG : v5.11-fix-admin-auth-enrichproduits
+TYPE : fix
+DESCRIPTION : Réparation connexion admin + isolation auth + enrichProduits activé sur PDFs
+
+MODIFICATIONS :
+  - AdminLayout : suppression useAuth(), auth directe via supabaseAdmin.auth.getSession/onAuthStateChange
+  - AdminLayout : signOut nettoie l'état local (setUser/setProfile null) avant supabase.auth.signOut
+  - Sessions 100% isolées : client storageKey ≠ admin storageKey, AuthContext ne pollue plus admin
+  - enrichProduits() désormais appelé avant chaque génération PDF (buildDevisData + buildFactureData async)
+  - reference_interne et numero_interne récupérés via jointure products table
+
+FICHIERS :
+  client/src/pages/admin/AdminLayout.tsx (auth directe supabaseAdmin, signOut propre)
+  client/src/pages/admin/AdminQuotes.tsx (buildDevisData/buildFactureData async + await enrichProduits)
+
+────────────────────────────────────────────────────────────────
+DATE : 2026-04-01
+TAG : v5.10-parcours-client-complet
+TYPE : feat + fix
+DESCRIPTION : Parcours client post-devis, sessions auth isolées, corrections admin + PDF
+
+MODIFICATIONS :
+  - Parcours client : pop-up partenaire + pop-up acompte 3 étapes après devis
+  - Panier vidé après génération devis (localStorage + sessionStorage + event)
+  - Suivi paiements back-office : ENCAISSER uniquement si acompte en_attente
+  - Commission masquée si aucun partenaire rattaché au devis
+  - Documents admin : suppression Facture acompte 30% et Facture solde (FA cumulative seule)
+  - Sessions auth isolées : storageKey '97import-client-auth' vs '97import-admin-auth'
+  - 18 fichiers admin migrés vers supabaseAdmin
+  - PDF facture : constantes pageWidth/marginRight/xLabel/xValue/fontSizeNormal/fontSizeSolde
+  - Enrichissement produits via jointure products (enrichProduits async)
+  - numero_interne éditable dans AdminProducts (interface + colonne table)
+
+FICHIERS :
+  client/src/components/DevisForm.tsx (pop-ups partenaire + acompte)
+  client/src/lib/supabase.ts (supabase + supabaseAdmin avec storageKey)
+  client/src/pages/admin/*.tsx (18 fichiers → import supabaseAdmin)
+  client/src/pages/admin/AdminQuotes.tsx (commission conditionnelle, docs progressifs, enrichProduits)
+  client/src/pages/admin/AdminProducts.tsx (numero_interne interface + colonne)
+  client/src/features/pdf/templates/invoice-pdf.ts (constantes alignement totaux)
+
+PUBLIÉ : 97import.com ✅
+
+────────────────────────────────────────────────────────────────
+DATE : 2026-04-01
+TAG : v5.10-pdf-uniformes
+TYPE : feat
+DESCRIPTION : Uniformisation de TOUS les PDFs — colonnes, prix barré gris + violet, suppression Description
+
+MODIFICATIONS :
+  - Tous les PDFs produits : colonne Description supprimée
+  - Tous les PDFs produits : Désignation → Produit
+  - Tous les PDFs produits : colonne Réf. Interne ajoutée avant Produit
+  - Devis + Facture : 2 lignes par produit (gris barré prix public + violet prix VIP)
+    via buildProductRows() partagé dans pdf-helpers.ts
+  - Fonction buildProductRows + productTableHooks mutualisées dans pdf-helpers.ts
+  - BL : colonnes Réf. Interne | Produit | Qté | État (35+95+20+30=180mm)
+  - FM + DD : colonnes Libellé | Montant HT (140+40=180mm), Description supprimée
+  - NC commission : colonnes Réf. devis | Client | Produit | Prix remisé | Prix partenaire | Commission
+  - AdminQuotes buildDevisData/buildFactureData : passage reference_interne, numero_interne, prix_achat
+  - QuoteData + InvoiceData : ajout prixNegocie, prixTotalCalcule pour calcul ratio VIP
+
+FICHIERS :
+  client/src/features/pdf/lib/pdf-helpers.ts (buildProductRows + productTableHooks)
+  client/src/features/pdf/templates/quote-pdf.ts (colonnes uniformes + buildProductRows)
+  client/src/features/pdf/templates/invoice-pdf.ts (colonnes uniformes + buildProductRows)
+  client/src/features/pdf/templates/delivery-note-pdf.ts (Réf. Interne + Produit + Qté + État)
+  client/src/features/pdf/templates/fees-pdf.ts (Libellé + Montant HT)
+  client/src/features/pdf/templates/commission-pdf.ts (colonnes corrigées)
+  client/src/features/pdf/index.ts (exports delivery-note + fees)
+  client/src/pages/admin/AdminQuotes.tsx (buildDevisData + buildFactureData enrichis)
+
+PUBLIÉ : 97import.com ✅
+
+────────────────────────────────────────────────────────────────
+DATE : 2026-04-01
+TAG : v5.9-pdf-corrections-notif
+TYPE : fix
+DESCRIPTION : PDF facture totals rewrite + PDF devis strikethrough + notification email admin acompte
+
+MODIFICATIONS :
+  - Invoice PDF : section totaux réécrite — Total HT → séparateur bleu → lignes Acompte N (vert)
+    → Total acomptes versés (fond vert) → SOLDE RESTANT (fond jaune, texte orange) ou SOLDÉE (fond vert)
+  - Invoice PDF : ajout didDrawCell strikethrough sur lignes prix public barré (STRIKE color)
+  - Quote PDF : didDrawCell étendu à toutes les colonnes (column.index >= 0 au lieu de >= 1)
+  - QuotesTab submitAcompte() : envoi email notification à parisb2b@gmail.com avec détails
+    (devis, client, montant, type compte) — silencieux en cas d'échec
+
+FICHIERS :
+  client/src/features/pdf/templates/invoice-pdf.ts (totaux réécrits + didDrawCell)
+  client/src/features/pdf/templates/quote-pdf.ts (didDrawCell toutes colonnes)
+  client/src/features/account/tabs/QuotesTab.tsx (sendEmail admin notification)
+
+PUBLIÉ : 97import.com ✅
+
+────────────────────────────────────────────────────────────────
+DATE : 2026-04-01
+TAG : v5.8-acomptes-pdf-roles
+TYPE : fix
+DESCRIPTION : Encaisser acompte fix + PDF facture/devis structure + roles partenaires + message 3eme acompte
+
+MODIFICATIONS :
+  - AdminQuotes PaiementRow : acomptes dynamiques depuis quote.acomptes,
+    bouton Encaisser → update statut + totaux + PDF cumulative + upload Storage + upsert invoices
+  - Invoice PDF : Total HT + Acomptes versés + Reste à payer (orange ou SOLDÉE vert)
+  - Quote PDF VIP : 2 lignes par produit (prix public barré gris 180,180,180 + prix remisé violet)
+  - AdminPartenaires : filtrage actif=true, order desc
+  - AdminParametres : section acomptes remplacée par texte informatif
+  - QuotesTab pop-up : message warning 3ème acompte, solde forcé au 4ème+
+  - SQL : 68 refs internes + contrainte partners.user_id + colonnes acomptes/totaux
+
+FICHIERS :
+  scripts/v58-fixes.sql (NOUVEAU — à exécuter dans Supabase)
+  client/src/pages/admin/AdminQuotes.tsx (PaiementRow dynamique + encaisser)
+  client/src/features/pdf/templates/invoice-pdf.ts (acomptes cumulés)
+  client/src/features/pdf/templates/quote-pdf.ts (VIP 2 lignes barré+violet)
+  client/src/pages/admin/AdminPartenaires.tsx (filtre actif)
+  client/src/pages/admin/AdminParametres.tsx (section acomptes simplifiée)
+  client/src/features/account/tabs/QuotesTab.tsx (message 3ème acompte)
+
+PUBLIÉ : 97import.com ✅
+
+────────────────────────────────────────────────────────────────
+DATE : 2026-04-01
+TAG : v5.6-client-space-redesign
+TYPE : fix
+DESCRIPTION : Espace client redesign + réf interne produit + cohérence partenaires + facture PDF
+
+MODIFICATIONS :
+  - ProductDetail + ProductCard : dual check numero_interne/reference_interne
+  - QuotesTab REFONDU : suppression Valider/Refuser, ajout suivi paiements,
+    documents grisés 🔒 selon admin, bouton Payer acompte orange
+  - Pop-up acompte 3 étapes : montant → type compte → RIB + confirmation
+  - AdminUsers : désactivation partner quand rôle change (actif=false)
+  - Invoice PDF : ref FA sans suffixe, prix public barré + VIP violet,
+    section acomptes cumulés, solde restant/entièrement soldée
+  - Edge Function send-email : from → notifications@97import.com
+
+FICHIERS :
+  client/src/pages/ProductDetail.tsx (dual ref check)
+  client/src/components/ProductCard.tsx (style ref)
+  client/src/features/account/tabs/QuotesTab.tsx (REFONDU)
+  client/src/pages/admin/AdminUsers.tsx (deactivate partner)
+  client/src/pages/admin/AdminQuotes.tsx (buildFactureData FA + prixPublic)
+  client/src/features/pdf/templates/invoice-pdf.ts (strikethrough + acomptes)
+  supabase/functions/send-email/index.ts (from domain)
+
+PUBLIÉ : 97import.com ✅
+
+────────────────────────────────────────────────────────────────
+DATE : 2026-04-01
+TAG : v5.5-fix-cors-email
+TYPE : fix
+DESCRIPTION : CORS Edge Function corrigé, appel fetch direct, domaine resend.dev
+
+MODIFICATIONS :
+  - Edge Function réécrite : Deno.serve, corsHeaders sur TOUTES les réponses
+  - from: onboarding@resend.dev (fonctionne sans vérification domaine)
+  - notifications.ts : appel fetch DIRECT (plus de supabase.functions.invoke)
+  - Headers : apikey + Authorization Bearer avec ANON KEY
+  - Test curl : {"success":true} — email reçu sur michelchen77400@gmail.com
+  - IMPORTANT : vérifier domaine 97import.com sur resend.com/domains pour envoyer à tous
+
+FICHIERS :
+  supabase/functions/send-email/index.ts (RÉÉCRIT — Deno.serve + CORS)
+  client/src/lib/notifications.ts (fetch direct, plus d'import supabase)
+
+PUBLIÉ : 97import.com ✅
+
+────────────────────────────────────────────────────────────────
+DATE : 2026-04-01
+TAG : v5.4-email-notifications
+TYPE : feat
+DESCRIPTION : Edge Function send-email + notifications automatiques GDF
+
+MODIFICATIONS :
+  - Edge Function Supabase "send-email" créée et déployée (Resend API)
+  - supabase/functions/send-email/index.ts : CORS, body texte ou html, Resend
+  - notifications.ts refondu : templates HTML enrichis (header navy, doc-badge, CTA)
+  - Nouvelles fonctions : sendAcompteNotification, emailTemplates
+  - AdminQuotes.tsx : email auto après encaissement acompte
+  - ACTION REQUISE : Ajouter RESEND_API_KEY dans Supabase Dashboard > Settings > Functions
+
+FICHIERS :
+  supabase/functions/send-email/index.ts (NOUVEAU)
+  supabase/config.toml (NOUVEAU)
+  client/src/lib/notifications.ts (REFONDU)
+  client/src/pages/admin/AdminQuotes.tsx (import + email auto)
+
+PUBLIÉ : 97import.com ✅
+
+────────────────────────────────────────────────────────────────
+DATE : 2026-04-01
+TAG : v5.3-design-maquette-exact
+TYPE : fix
+DESCRIPTION : Corrections v5.3 — design exact maquette + fixes back-office
+
+MODIFICATIONS :
+  - Police Inter uniforme tout le back-office (admin-root CSS + Google Fonts)
+  - Lignes devis fermées : blanc/gris alternés (#FFF/#F9FAFB), plus de bleu foncé
+  - Barre étapes guidées ①②③④ dans chaque devis déplié
+  - Prix public barré + prix VIP violet dans section produits
+  - Boutons documents : PDF + Envoyer (suppression doublon Générer)
+  - Couleurs documents : FA=vert, FM/DD=bleu avec inputs éditables, BL=gris, NC=violet
+  - Facture FA cumulative (un seul document mis à jour)
+  - AdminUsers : fallback RPC get_all_profiles si RLS restrictive
+  - AdminUsers : auto-insert partners quand rôle changé en partner
+  - AdminPartenaires : checkboxes sélection devis + boutons NC/FM/DD par ligne
+  - AdminContenu : chargement multi-format (single row + multi rows)
+  - AdminPricing : correction label ×1.5 → ×2
+  - Réf interne affichée sur fiches produit + cartes catalogue
+  - Vérification emails : système via Supabase Edge Function send-email en place
+
+FICHIERS MODIFIÉS (v5.3) :
+  client/index.html (Inter font import)
+  client/src/index.css (admin-root styles)
+  client/src/pages/admin/AdminLayout.tsx (className admin-root)
+  client/src/components/admin/AdminUI.tsx (ADMIN_COLORS.font)
+  client/src/pages/admin/AdminQuotes.tsx (refonte complète UI)
+  client/src/pages/admin/AdminUsers.tsx (RPC fallback + auto partner)
+  client/src/pages/admin/AdminPartenaires.tsx (checkboxes + NC/FM/DD)
+  client/src/pages/admin/AdminContenu.tsx (multi-format loading)
+  client/src/pages/admin/AdminPricing.tsx (label ×2)
+  client/src/pages/ProductDetail.tsx (réf interne)
+  client/src/components/ProductCard.tsx (réf interne)
+
+FICHIER CRÉÉ (v5.3) :
+  scripts/v53-fixes.sql (SQL pour get_all_profiles + site_content)
+
+SQL À EXÉCUTER DANS SUPABASE SI NÉCESSAIRE :
+  scripts/v53-fixes.sql
+
+PUBLIÉ : 97import.com ✅
+
+────────────────────────────────────────────────────────────────
+DATE : 2026-03-31
+TAG : v5.2-design-system-uniforme
+TYPE : refactor
+DESCRIPTION : Design System admin uniforme — AdminUI + refonte toutes pages
+
+PHASES IMPLEMENTEES (v5.2) :
+  Phase 1  : Création AdminUI.tsx — design system centralisé
+             ADMIN_COLORS, BadgeStatut, AdminButton, AdminCard, AdminCardHeader,
+             DocumentRow, PaiementRow, PaiementResume, AdminInput, AdminSelect,
+             SectionLabel — inline styles (pas Tailwind)
+  Phase 2  : Refonte complète AdminQuotes.tsx (Devis & Facturation)
+             — Header navy avec BadgeStatut + badge VIP + total
+             — Layout 2 colonnes (gauche: client/produits/paiements, droite 380px: documents)
+             — DocumentRow pour chaque type: Devis, Facture totale/acompte/solde, FM, DD, BL, NC
+             — PaiementRow acompte 30% + solde 70% avec PaiementResume
+             — Partenaire & Commission avec AdminSelect + badge commission payée
+             — Actions admin avec AdminSelect statut + AdminInput prix + notes
+  Phase 3  : Uniformisation AdminDashboard, AdminUsers, AdminProducts,
+             AdminPartenaires, AdminParametres, AdminContenu
+             — Remplacement Tailwind par inline styles ADMIN_COLORS
+             — Utilisation AdminCard + AdminCardHeader + AdminButton partout
+             — Headers navy, badges colorés, tables stylisées
+
+FICHIER CREE (v5.2) :
+  client/src/components/admin/AdminUI.tsx
+
+FICHIERS MODIFIES (v5.2) :
+  client/src/pages/admin/AdminQuotes.tsx (refonte complète)
+  client/src/pages/admin/AdminDashboard.tsx
+  client/src/pages/admin/AdminUsers.tsx
+  client/src/pages/admin/AdminProducts.tsx
+  client/src/pages/admin/AdminPartenaires.tsx
+  client/src/pages/admin/AdminParametres.tsx
+  client/src/pages/admin/AdminContenu.tsx
+
+PUBLIE : 97import.com
+
+────────────────────────────────────────────────────────────────
+DATE : 2026-03-31
+TAG : v5.0-complet
+TYPE : release
+DESCRIPTION : V5.0 complet — 8 phases détaillées
+
+PHASES IMPLÉMENTÉES (v5.0-complet) :
+  Phase 1  : Prix public ×2 — migration complète multiplicateur
+  Phase 2  : Sidebar admin v5.0 — 3 sections (Commerce/Catalogue/Configuration)
+             Routes : /admin/devis, /admin/partenaires, /admin/suivi-achats,
+                      /admin/parametres, /admin/contenu
+  Phase 3  : Partenaires dynamiques — codes 2 lettres, stats, Excel commissions
+             DevisForm : sélection partenaire, code appendé au numéro devis
+  Phase 4  : CRUD produits enrichi — nom_en, nom_zh, dimensions, poids, douane, notices
+  Phase 5  : Paramètres — 2 émetteurs PRO/PERSO, 2 RIB avec PDF, config acomptes
+  Phase 6  : Suivi Achats — filtres, checkbox, export Excel 22 colonnes FR/CH
+  Phase 7  : Contenu site — bannière, contact, footer, livraison DOM-TOM
+  Phase 8  : Notices produits — role-aware (visitor=lock), email auto solde
+
+FICHIERS CRÉÉS (v5.0-complet) :
+  client/src/pages/admin/AdminPartenaires.tsx
+  client/src/pages/admin/AdminSuiviAchats.tsx
+  client/src/pages/admin/AdminParametres.tsx
+  client/src/pages/admin/AdminContenu.tsx
+  client/src/components/ProductNotices.tsx
+
+FICHIERS MODIFIÉS (v5.0-complet) :
+  client/src/features/pricing/model/pricing.ts (user 1.5 → 2)
+  client/src/components/PrixOuDevis.tsx (labels ×2)
+  client/src/components/DevisForm.tsx (partenaire + code)
+  client/src/pages/admin/AdminLayout.tsx (sidebar v5)
+  client/src/pages/admin/AdminProducts.tsx (champs enrichis)
+  client/src/lib/notifications.ts (sendNoticeLinks)
+
+PUBLIÉ : 97import.com ✅
+
+────────────────────────────────────────────────────────────────
+DATE : 2026-03-31
+TAG : v5.0
+TYPE : release
+DESCRIPTION : V5.0 — Module GDF + Back-office restructur\u00E9 + 7 types PDF
+
+PHASES IMPL\u00C9MENT\u00C9ES :
+  Phase 0  : scripts/v5-setup.sql — tables invoices, delivery_notes, fees,
+             commission_notes, admin_params + enrichir products/quotes
+  Phase 1  : Prix user \u00D71.5 \u2192 \u00D72 dans calculPrix.ts (admin/collab aussi)
+  Phase 2  : Sidebar back-office 3 sections (Gestion / Catalogue / Syst\u00E8me)
+             + page AdminInvoices pour listing factures
+  Phase 3  : PDF devis VIP avec prix publics barr\u00E9s (7 colonnes, didDrawCell)
+  Phase 4  : Syst\u00E8me acomptes — boutons Facture totale / Acompte 30% / Solde
+             Enregistrement table invoices + d\u00E9duction automatique acomptes
+  Phase 5  : 3 nouveaux PDF : fees-pdf.ts (FM+DD), delivery-note-pdf.ts (BL)
+             pdf-engine DocType \u00E9tendu (frais_maritimes, dedouanement, bon_livraison)
+  Phase 6  : Boutons g\u00E9n\u00E9ration 7 documents dans AdminQuotes
+             (Devis, Facture, Acompte, Solde, FM, DD, BL + Commission)
+  Phase 7  : Export Excel Suivi Achats bilingue FR/CH (22 colonnes)
+             D\u00E9pendance xlsx (SheetJS) ajout\u00E9e
+  Phase 8  : CRUD produits + r\u00E9f\u00E9rence interne dans AdminProducts
+  Phase 9  : Param\u00E8tres admin (\u00E9metteur, RIB, config acomptes) via admin_params
+  Phase 10 : Contenu site (banni\u00E8re, footer, SEO) d\u00E9j\u00E0 en place dans AdminSettings
+  Phase 11 : Service notifications email (notifications.ts)
+             sendDocumentNotification() via Supabase Edge Function
+  Phase 12 : Tag v5.0 + MAJALL.TXT mis \u00E0 jour
+
+FICHIERS CR\u00C9\u00C9S :
+  scripts/v5-setup.sql
+  client/src/pages/admin/AdminInvoices.tsx
+  client/src/features/pdf/templates/fees-pdf.ts
+  client/src/features/pdf/templates/delivery-note-pdf.ts
+  client/src/features/excel/suivi-achats.ts
+  client/src/lib/notifications.ts
+  client/src/utils/generateFeesPDF.ts
+  client/src/utils/generateDeliveryNotePDF.ts
+
+FICHIERS MODIFI\u00C9S :
+  client/src/utils/calculPrix.ts (user \u00D71.5 \u2192 \u00D72)
+  client/src/pages/admin/AdminLayout.tsx (sidebar 3 sections + Factures)
+  client/src/pages/admin/AdminQuotes.tsx (acomptes + 7 boutons PDF + Excel)
+  client/src/pages/admin/AdminProducts.tsx (r\u00E9f interne + \u00D72)
+  client/src/pages/admin/AdminSettings.tsx (\u00E9metteur + RIB + acomptes)
+  client/src/features/pdf/templates/quote-pdf.ts (VIP prix barr\u00E9s)
+  client/src/features/pdf/lib/pdf-engine.ts (DocType \u00E9tendu)
+
+PUBLI\u00C9 : 97import.com \u2705
+
+────────────────────────────────────────────────────────────────
+DATE : 2026-03-24 10:35
+COMMIT : 6086e81
+TAG : v4.6-fix-pdf-all-docs
+TYPE : fix
+DESCRIPTION : Tous les PDF (devis, facture, commission) — autoTable direct
+CAUSE : addProductTable() de pdf-engine.ts fusionnait les lignes malgré body correct.
+  Les logs confirmaient 3 rows mais le rendu PDF montrait 1 seule ligne.
+FIX : Contournement total — appel autoTable directement dans chaque template.
+  body string[][] construit via for loop, tableWidth:180, minCellHeight:10.
+FICHIERS : quote-pdf.ts, invoice-pdf.ts, commission-pdf.ts
+PUBLIÉ : 97import.com ✅
+
+────────────────────────────────────────────────────────────────
+DATE : 2026-03-24 10:12
+COMMIT : e37ecdd
+TAG : v4.5-fix-pdf-tableau
+TYPE : fix
+DESCRIPTION : PDF produits s'écrasaient sur la même ligne
+CAUSE : produits pouvaient être string JSON ou double-stringify depuis Supabase JSONB.
+  Noms de champs variaient (nom/name, prixUnitaire/prixAffiche/prix, quantite/qty).
+  Largeurs colonnes dépassaient 180mm utile (182mm) → chevauchement visuel.
+FIX : parseProduits() robuste gère Array, string, double-stringify, objet.
+  Mapping avec fallbacks (nom||name, prixUnitaire||prixAffiche||prix, etc.).
+  Largeurs colonnes = 180mm exact (52+50+32+14+32).
+  Total recalculé depuis les items (jamais depuis Supabase).
+FICHIERS : quote-pdf.ts, invoice-pdf.ts, commission-pdf.ts
+PUBLIÉ : 97import.com ✅
+
+────────────────────────────────────────────────────────────────
+DATE : 2026-03-21 23:35
+COMMIT : 011f9a3
+TAG : v4.4-version-stable-20260321
+TYPE : release
+DESCRIPTION : Audit complet + certification version stable
+AUDIT :
+  - Build pnpm : ✅ 0 erreur
+  - TypeScript tsc --noEmit : ✅ 0 erreur
+  - console.warn/error : 1 légitime (supabase.ts — config warning)
+  - TODO/FIXME/HACK/@ts-ignore : 0
+  - PDF formatPrix : ✅ espaces ASCII (corrigé v4.3)
+  - AdminUsers query : ✅ profiles.select('*') correct
+  - Bouton rouge visiteur : ✅ #EF4444 sur toutes les pages
+  - vercel.json : ✅ outputDirectory=client/dist
+AUCUNE CORRECTION NÉCESSAIRE — code propre et stable
+PUBLIÉ : 97import.com ✅
+
+────────────────────────────────────────────────────────────────
+DATE : 2026-03-21 23:28
+COMMIT : 47d4763
+TAG : v4.3-fix-pdf-definitif
+TYPE : fix
+DESCRIPTION : PDF bug définitif — prix espaces cassés + total faux
+CAUSE : formatPrix() utilisait \u202F et \u00A0 (espaces insécables Unicode)
+  que jsPDF ne sait pas rendre → prix concaténés "15 /795,00 €".
+  totalHT utilisait prix_total_calcule Supabase au lieu de recalculer.
+FIX : formatPrix() utilise espaces ASCII standard + toFixed(2).
+  totalHT recalculé depuis lignes.reduce() dans devis et facture.
+FICHIERS :
+  - client/src/features/pdf/lib/pdf-helpers.ts (formatPrix corrigé)
+  - client/src/features/account/tabs/QuotesTab.tsx (totalHT recalculé)
+PUBLIÉ : 97import.com ✅
+
+────────────────────────────────────────────────────────────────
+DATE : 2026-03-21 22:29
+COMMIT : 645282a
+TAG : v4.0-phases-completes
+TYPE : chore
+DESCRIPTION : Phase 6 — Nettoyage final
+────────────────────────────────────────────────────────────────
+FICHIERS SUPPRIMÉS :
+  - client/src/pages/admin/AdminNavigation.tsx (composant orphelin)
+  - client/src/lib/api.ts (deprecated, 0 imports)
+
+FICHIERS MODIFIÉS :
+  - client/src/pages/AuthCallback.tsx (console.error supprimé)
+  - client/src/contexts/AuthContext.tsx (2 console.warn supprimés)
+  - client/src/contexts/CartContext.tsx (console.error supprimé)
+  - client/src/components/Map.tsx (2 console.error supprimés)
+  - client/src/lib/storage.ts (2 console.error supprimés)
+  - client/src/pages/ProductDetail.tsx (5 imports inutilisés supprimés)
+  - client/src/pages/ModularStandard.tsx (4 imports + formatPrice supprimés)
+  - client/src/pages/ModularPremium.tsx (formatPrice supprimé)
+  - client/src/pages/CampingCarDeluxe.tsx (5 imports + formatPrice supprimés)
+  - client/src/pages/Accessories.tsx (import Check supprimé)
+
+BILAN : 8 console.* prod supprimés, 13 imports inutilisés, 3 formatPrice(),
+        2 fichiers orphelins, -444 lignes nettes
+PUBLIÉ : 97import.com ✅
+
+────────────────────────────────────────────────────────────────
+DATE : 2026-03-21 22:29
+COMMIT : 8637048
+TYPE : feat
+DESCRIPTION : Phase 5 — PDF persistence Supabase Storage
+────────────────────────────────────────────────────────────────
+FICHIERS MODIFIÉS :
+  - client/src/lib/storage.ts (ajout uploadPdfBlob)
+  - client/src/features/account/tabs/QuotesTab.tsx
+
+DÉTAILS :
+  - uploadPdfBlob(blob, folder, filename) pour PDF devis/factures
+  - QuotesTab : après génération PDF → upload media/devis/ ou media/factures/
+  - Sauvegarde URL dans quotes.pdf_url / quotes.facture_url
+  - Si URL existe → téléchargement direct sans régénération
+  - Fallback : régénération à la volée si URL null
+
+PRÉ-REQUIS SQL :
+  ALTER TABLE quotes ADD COLUMN IF NOT EXISTS pdf_url TEXT;
+  ALTER TABLE quotes ADD COLUMN IF NOT EXISTS facture_url TEXT;
+
+PUBLIÉ : 97import.com ✅
+
+────────────────────────────────────────────────────────────────
+DATE : 2026-03-21 22:29
+COMMIT : da051a7
+TYPE : refactor
+DESCRIPTION : Phase 2 — Prix via calculPrix(), source unique pricing.ts
+────────────────────────────────────────────────────────────────
+FICHIERS CRÉÉS :
+  - client/src/data/pricing.ts (source centralisée prixAchat)
+
+FICHIERS MODIFIÉS :
+  - client/src/contexts/CartContext.tsx (ajout prixAchat? optionnel)
+  - client/src/pages/ProductDetail.tsx (suppression 4 prix display strings)
+  - client/src/pages/MiniPelles.tsx (import pricing.ts + Supabase fallback)
+  - client/src/pages/Accessories.tsx (52 prix strings supprimés)
+  - client/src/pages/Solar.tsx (import SOLAIRE_PRIX)
+  - client/src/pages/ModularStandard.tsx (import MODULAR_STANDARD_SIZES)
+  - client/src/pages/ModularPremium.tsx (import MODULAR_PREMIUM_SIZES)
+  - client/src/pages/CampingCarDeluxe.tsx (import CAMPING_CAR_PRIX_ACHAT)
+  - client/src/pages/Cart.tsx (utilise prixAchat quand disponible)
+
+DÉTAILS :
+  - pricing.ts contient : MINI_PELLES_PRIX, SOLAIRE_PRIX,
+    MODULAR_STANDARD_SIZES, MODULAR_PREMIUM_SIZES, MODULAR_OPTIONS_PRIX,
+    CAMPING_CAR_PRIX_ACHAT, CAMPING_CAR_SHIPPING
+  - Tous les prix display hardcodés supprimés (52 strings "XXX €")
+  - CartItem enrichi avec prixAchat optionnel (rétrocompatible)
+  - Cart.tsx : getItemPrice() utilise prixAchat au lieu de parsePrice()
+
+PUBLIÉ : 97import.com ✅
+
+────────────────────────────────────────────────────────────────
+DATE : 2026-03-21 19:19
+COMMIT : 301f512
+TYPE : refactor
+DESCRIPTION : Split MonCompte.tsx (1418→250 lignes) en 5 modules onglets
+────────────────────────────────────────────────────────────────
+FICHIERS CRÉÉS :
+  - client/src/features/account/tabs/ProfileTab.tsx
+  - client/src/features/account/tabs/OrdersTab.tsx
+  - client/src/features/account/tabs/QuotesTab.tsx
+  - client/src/features/account/tabs/CommissionsTab.tsx
+  - client/src/features/account/tabs/SecurityTab.tsx
+
+FICHIERS MODIFIÉS :
+  - client/src/pages/MonCompte.tsx (1418→250 lignes, thin shell)
+
+DÉTAILS TECHNIQUES :
+
+1. ProfileTab.tsx (~280 lignes)
+   - Infos personnelles (prénom, nom, email, téléphone) avec mode édition
+   - CRUD adresses facturation + livraison avec checkbox "identique"
+   - Props : { user: User, profile: any }
+   - Gère son propre state (editMode, adresseFact*, adresseLiv*, livIdent)
+
+2. OrdersTab.tsx (~135 lignes)
+   - Affiche les devis avec statut "accepte" (commandes confirmées)
+   - Panel expandable par commande (produits, total, adresse)
+   - Props : { user: User }
+
+3. QuotesTab.tsx (~305 lignes)
+   - Le plus complexe : liste devis, badges statut, panel détail
+   - Actions Valider/Refuser avec refetch immédiat
+   - Téléchargement PDF devis + facture (generateDevisPDF, generateFacturePDF)
+   - Props : { user: User, profile: any, role: string }
+
+4. CommissionsTab.tsx (~98 lignes)
+   - Visible uniquement pour role=partner
+   - Résumé dues/payées + liste avec téléchargement note commission
+   - Props : { user: User }
+
+5. SecurityTab.tsx (~120 lignes)
+   - Changement mot de passe via supabase.auth.updateUser()
+   - Règles mdp affichées, validation 6 chars + confirmation
+   - Aucune prop nécessaire
+
+6. MonCompte.tsx (thin shell ~250 lignes)
+   - Hero section + sidebar navigation + modal complétion profil
+   - Import des 5 onglets, rendu conditionnel par activeTab
+   - getInitialTab() pour URL-based tab detection préservé
+
+IMPACT : -1122 lignes nettes, architecture modulaire features/account/tabs/
+PUBLIÉ : 97import.com ✅
+
+────────────────────────────────────────────────────────────────
+DATE : 2026-03-21 ~18:00
+COMMIT : d09fdc7
+TYPE : feat/fix
+DESCRIPTION : Migration admin /api/ → Supabase Storage + cleanup console.logs
+────────────────────────────────────────────────────────────────
+FICHIERS CRÉÉS :
+  - client/src/lib/storage.ts (helper Supabase Storage : upload, delete, list)
+
+FICHIERS MODIFIÉS :
+  - client/src/pages/admin/AdminSettings.tsx (uploadLogo → uploadFile)
+  - client/src/pages/admin/AdminHeaderFooter.tsx (uploadLogo → uploadFile)
+  - client/src/lib/supabase.ts (suppression 2 console.log debug)
+
+DÉTAILS TECHNIQUES :
+
+1. lib/storage.ts — Nouveau helper Supabase Storage
+   - uploadFile(file, folder) → URL publique ou null
+   - deleteFile(path), listFiles(folder)
+   - Bucket "media", noms sécurisés (slug + timestamp)
+
+2. AdminSettings.tsx — Migration upload logo
+   - AVANT : FileReader + fetch("/api/images/upload") → 404 en prod
+   - APRÈS : uploadFile(file, "logos") → Supabase Storage direct
+   - Réduit de 14 lignes à 3 lignes
+
+3. AdminHeaderFooter.tsx — Même migration upload
+   - Remplacé /api/images/upload par uploadFile()
+
+4. supabase.ts — Suppression debug logs
+   - Supprimé console.log('[Supabase] URL:', ...) et KEY
+   - Ces logs étaient visibles en production
+
+NOTE : Les 13 autres /api/ calls (AdminMedia, AdminProducts, AdminLayout)
+       étaient déjà protégés par import.meta.env.DEV ou IS_LOCAL.
+       Seuls AdminSettings et AdminHeaderFooter étaient non-gardés.
+
+PRÉ-REQUIS : Créer bucket Supabase Storage "media" (public)
+  INSERT INTO storage.buckets (id, name, public) VALUES ('media', 'media', true)
+  ON CONFLICT DO NOTHING;
+
+PUBLIÉ : 97import.com ✅
+
+────────────────────────────────────────────────────────────────
+DATE : 2026-03-21 10:11
+COMMIT : 58ae50c / f687124
+TYPE : fix
+DESCRIPTION : Vérification MAJALL v5 — 3 écarts corrigés
+────────────────────────────────────────────────────────────────
+FICHIERS MODIFIÉS :
+  - client/src/App.tsx
+  - client/src/components/Header.tsx
+  - client/src/pages/MonCompte.tsx
+
+CORRECTIONS DÉTAILLÉES :
+
+1. Route /products/:id.html manquante
+   CAUSE : App.tsx avait /products/:id mais pas /products/:id.html
+   AVANT : <Route path="/products/:id" component={ProductDetail} />
+   APRÈS : + <Route path="/products/:id.html" component={ProductDetail} />
+   FICHIER : client/src/App.tsx lignes 44-45
+
+2. Header liens non-stables
+   CAUSE : /cart et /mon-compte ne finissaient pas en .html
+   AVANT : <Link href="/cart"> et <Link href="/mon-compte">
+   APRÈS : <Link href="/panier.html"> et <Link href="/mon-compte.html">
+   FICHIER : client/src/components/Header.tsx lignes 110, 127, 170, 194
+
+3. Badge devis non rafraîchi après Valider/Refuser
+   CAUSE : setExpandedDevisId restait ouvert → React ne re-rendait pas le badge
+           car le composant voyait le même expandedDevisId avant refetch
+   AVANT : refetchDevis() seul
+   APRÈS : setExpandedDevisId(null) → ferme le panel → force re-render complet
+           puis refetchDevis() recharge depuis Supabase
+   FICHIER : client/src/pages/MonCompte.tsx fonctions handleValiderDevis (l.355)
+             et handleRefuserDevis (l.372)
+
+PUBLIÉ : 97import.com ✅
+
+────────────────────────────────────────────────────────────────
+DATE : 2026-03-21 09:03
+COMMIT : db23c16
+TYPE : feat
+DESCRIPTION : Routes .html complètes + logo /index.html + toast anti-empilement + règles mdp + onglets MonCompte par URL
+────────────────────────────────────────────────────────────────
+FICHIERS MODIFIÉS :
+  - client/src/App.tsx
+  - client/src/components/Header.tsx
+  - client/src/components/CartNotification.tsx
+  - client/src/pages/MonCompte.tsx
+
+CORRECTIONS DÉTAILLÉES :
+
+1. 14 routes .html ajoutées dans App.tsx
+   /mini-pelle.html → MiniPelles
+   /maison-modulaire.html → ModularHomes
+   /panneau-solaire.html → Solar
+   /accessoires-mini-pelle.html → Accessories
+   /panier.html → Cart
+   /mon-compte.html → MonCompte
+   /mes-informations.html → MonCompte
+   /mes-commandes.html → MonCompte
+   /mes-devis.html → MonCompte
+   /securite.html → MonCompte
+   /connexion.html → Connexion
+   + aliases existants : /minipelles.html, /maisons.html, /solaire.html
+
+2. Logo → /index.html
+   AVANT : <Link href="/">
+   APRÈS : <Link href="/index.html">
+   FICHIER : client/src/components/Header.tsx ligne 58
+
+3. CartNotification anti-empilement
+   CAUSE : Sonner (toast lib) créait une nouvelle notification à chaque addToCart
+   SOLUTION : toast.dismiss("cart-notification") + toast("...", { id: "cart-notification" })
+   FICHIER : client/src/components/CartNotification.tsx
+
+4. Onglets MonCompte détectés depuis l'URL
+   FONCTION : getInitialTab() lit window.location.pathname
+   /mes-devis → tab "devis"
+   /mes-commandes → tab "commandes"
+   /securite → tab "securite"
+   /mes-informations → tab "infos"
+   FICHIER : client/src/pages/MonCompte.tsx lignes 21-29
+
+5. Page Sécurité : règles mot de passe affichées
+   Messages explicites : "6 caractères minimum", confirmation différente,
+   succès, erreur technique
+
+PUBLIÉ : 97import.com ✅
+
+────────────────────────────────────────────────────────────────
+DATE : 2026-03-21 08:20
+COMMIT : b39eed0
+TYPE : feat
+DESCRIPTION : MAJ02 — AdminNavigation supprimée + adresses CRUD + commandes/devis cliquables
+────────────────────────────────────────────────────────────────
+FICHIERS MODIFIÉS :
+  - client/src/pages/admin/AdminLayout.tsx
+  - client/src/App.tsx
+  - client/src/pages/MonCompte.tsx
+
+CORRECTIONS DÉTAILLÉES :
+
+1. AdminNavigation supprimée
+   CAUSE : page /admin/navigation cassée — "Impossible de charger le contenu"
+   SUPPRESSIONS :
+     - import Navigation depuis AdminLayout.tsx
+     - Bouton/lien "Navigation" dans le menu sidebar admin
+     - Route /admin/navigation dans App.tsx si présente
+   VÉRIFICATION : grep "navigation" AdminLayout.tsx → seul "/* Navigation */" reste
+                  comme commentaire de section HTML inerte
+
+2. Adresses CRUD dans MonCompte
+   COLONNES Supabase utilisées (table profiles) :
+     adresse_facturation    (text)
+     ville_facturation      (text)
+     cp_facturation (text)
+     pays_facturation       (text)
+     adresse_livraison      (text)
+     ville_livraison        (text)
+     cp_livraison  (text)
+     pays_livraison         (text)
+     adresse_livraison_identique (boolean)
+
+   FONCTIONS créées dans MonCompte.tsx :
+     handleSaveAdresseFact()    → UPDATE profiles SET adresse_facturation...
+     handleSaveAdresseLiv()     → UPDATE profiles SET adresse_livraison...
+     handleDeleteAdresseFact()  → UPDATE profiles SET adresse_facturation=null...
+                                  + window.confirm() obligatoire avant suppression
+     handleDeleteAdresseLiv()   → UPDATE profiles SET adresse_livraison=null...
+                                  + window.confirm() obligatoire avant suppression
+
+   useEffect sur [profile] : charge toutes les valeurs depuis profile au montage
+
+3. Mes commandes / Mes devis cliquables
+   PATTERN : useState expandedCmdId / expandedDevisId → null ou id
+   Clic sur carte → setExpanded(id === expanded ? null : id)
+   Panel expandé affiche : numéro, date, produits, total, adresse, statut
+
+PUBLIÉ : 97import.com ✅
+
+────────────────────────────────────────────────────────────────
+DATE : 2026-03-21 (session refonte)
+COMMIT : 9b8d0f1 → tag v3.0-refonte-architecture
+TYPE : refactor
+DESCRIPTION : Refonte architecturale complète domain-driven design
+────────────────────────────────────────────────────────────────
+FICHIERS CRÉÉS :
+  client/src/features/pdf/lib/pdf-theme.ts
+    → Constantes couleurs PDF :
+      NAVY=[30,58,95] (#1E3A5F)  BLUE=[74,144,217]  LIGHT_BLUE=[191,219,254]
+      TABLE_HEADER_BG=[239,246,255]  WHITE=[255,255,255]
+      GREEN_ACC=[4,120,87]  AMBER=[180,83,9]
+
+  client/src/features/pdf/lib/pdf-helpers.ts
+    → formatPrix(n) — euros sans espaces non-passants (bug jsPDF)
+    → formatDate() — ISO vers date française
+    → EMETTEUR — coordonnées LUXENT LIMITED
+
+  client/src/features/pdf/lib/pdf-engine.ts
+    → createDocument() : A4 helvetica
+    → addPageHeader() : header minimal, fond blanc, navy + accent
+    → addParties() : EMETTEUR gauche, DESTINATAIRE droite, séparateur bleu
+    → addProductTable() : tableaux jspdf-autotable fond pale, bordures bleu clair
+    → addTotal() : boîte blanche bordure navy (ZERO fond sombre)
+    → addTVAMention() : mention grise italique
+    → addConditionsPage() : page 2 conditions + bon pour accord
+    → addPageFooter() : séparateur bleu clair + numéro de page
+    → drawVipPriceCell() : prix barré + prix négocié bleu
+
+  client/src/features/pdf/templates/quote-pdf.ts
+    → generateQuotePDF() / generateDevisPDF() (alias)
+    → Gestion VIP prix barré via drawVipPriceCell
+
+  client/src/features/pdf/templates/invoice-pdf.ts
+    → generateInvoicePDF() / generateFacturePDF() (alias)
+    → Accent GREEN_ACC, mention "Date de paiement"
+
+  client/src/features/pdf/templates/commission-pdf.ts
+    → generateCommissionPDF()
+    → Accent AMBER, page unique
+
+  client/src/features/auth/model/roles.ts
+    → ROLES, Role, ROLE_LABELS, ROLE_COLORS, ADMIN_ROLES, PRIVILEGED_ROLES
+
+  client/src/features/auth/model/permissions.ts
+    → canSeePrix(), canAccessAdmin(), isFullAdmin(), isPartner(),
+      hasNegotiatedPrice(), hasPartnerPrice()
+
+  client/src/features/pricing/model/pricing.ts
+    → Re-export calculerPrix depuis utils/calculPrix
+    → PRICE_MULTIPLIERS, prixPublic(), prixPartenaire(), calcCommission()
+
+FICHIERS MODIFIÉS EN SHIMS (retrocompatibilité) :
+  client/src/utils/generateDevisPDF.ts   (360 lignes → 7 lignes)
+  client/src/utils/generateFacturePDF.ts (281 lignes → 7 lignes)
+  client/src/utils/generateCommissionPDF.ts (179 lignes → 5 lignes)
+
+ERREURS CORRIGÉES :
+  - /api/analytics → uniquement sur localhost (analytics.ts)
+  - /api/publish, /api/images, /api/backup → uniquement if import.meta.env.DEV
+  - lib/api.ts marqué @deprecated, fetchProducts() → Supabase
+  - Math.round(prixAchat * 1.5) → calculerPrix(prixAchat, "user")
+  - Math.round(prixAchat * 1.2) → calculerPrix(prixAchat, "partner") et calcPrixPartenaire()
+
+PUBLIÉ : 97import.com ✅
+
+────────────────────────────────────────────────────────────────
+DATE : 2026-03-20
+COMMIT : 61b812c (v2.3)
+TYPE : feat
+DESCRIPTION : Système partenaires + commissions + bouton rouge visiteur
+────────────────────────────────────────────────────────────────
+FICHIERS MODIFIÉS :
+  - client/src/pages/admin/AdminPartners.tsx (création)
+  - client/src/pages/admin/AdminQuotes.tsx
+  - client/src/utils/generateCommissionPDF.ts
+  - client/src/pages/MonCompte.tsx (onglet commissions)
+
+DÉTAIL :
+  - Table partners dans Supabase créée
+  - Calcul commission : prixNegocie - prixPartenaire(prixAchat)
+  - PDF commission avec accent AMBER
+  - Onglet "Mes commissions" visible uniquement si role="partner"
+  - Bouton rouge "Demander un devis" pour les visiteurs non connectés
+
+PUBLIÉ : 97import.com ✅
+
+────────────────────────────────────────────────────────────────
+DATE : 2026-03-19
+COMMIT : 9affcff (v2.2)
+TYPE : fix
+DESCRIPTION : Numéro devis unique + WhatsApp doublon
+────────────────────────────────────────────────────────────────
+CAUSE TECHNIQUE :
+  - duplicate key : INSERT générait un numero_devis aléatoire qui pouvait collisionner
+  - WhatsApp : DevisForm.tsx appelait sendWhatsApp() deux fois (onSubmit + useEffect)
+
+SOLUTION :
+  - Séquence SQL dans Supabase : CREATE SEQUENCE numero_devis_seq;
+    + RPC get_next_numero_devis() retournant LPAD(nextval, 5, '0')
+  - WhatsApp : suppression du double appel, un seul onSubmit
+
+PUBLIÉ : 97import.com ✅
+
+────────────────────────────────────────────────────────────────
+DATE : 2026-03-19
+COMMIT : 1b2e5ef (v2.2)
+TYPE : feat
+DESCRIPTION : Système devis PDF + formulaire + espace client
+────────────────────────────────────────────────────────────────
+FICHIERS CRÉÉS/MODIFIÉS :
+  - client/src/components/DevisForm.tsx (création)
+  - client/src/utils/generateDevisPDF.ts (version initiale 360 lignes)
+  - client/src/utils/generateFacturePDF.ts (version initiale 281 lignes)
+  - client/src/pages/MonCompte.tsx (onglets devis + commandes)
+  - client/src/pages/admin/AdminQuotes.tsx (gestion admin des devis)
+
+ERREURS CORRIGÉES DANS CETTE SESSION :
+  - "t.autoTable is not a function"
+    CAUSE : import ESM incorrect de jspdf-autotable
+    FIX : import autoTable from "jspdf-autotable" + autoTable(doc, {...})
+  - Prix avec espaces non-passants (\u00A0) cassant jsPDF
+    FIX : formatPrix() utilise replace(/\u00A0/g, " ")
+  - Colonnes tronquées
+    FIX : largeurs explicites en mm dans columnStyles
+  - Prix barré VIP absent
+    FIX : drawVipPriceCell hook dans jspdf-autotable
+
+PUBLIÉ : 97import.com ✅
+
+────────────────────────────────────────────────────────────────
+DATE : 2026-03-18
+COMMIT : 2f3bf4f (v2.0)
+TYPE : feat
+DESCRIPTION : Système rôles + prix dynamiques
+────────────────────────────────────────────────────────────────
+FICHIERS :
+  - client/src/utils/calculPrix.ts (SOURCE UNIQUE des prix)
+    Fonction : calculerPrix(prixAchat, role) → { prixAffiche, prixNegocie, ... }
+    Multiplicateurs : user\u00D72, partner\u00D71.2, vip\u00D71.3
+  - client/src/hooks/useRole.ts
+  - client/src/contexts/AuthContext.tsx
+  - client/src/components/PrixOuDevis.tsx
+
+ERREURS CORRIGÉES :
+  - Spinner infini /mon-compte : AuthContext timeout réduit + session résolue en max 3s
+  - Rôle "client" → renommé "user" partout y compris trigger Supabase
+
+SQL SUPABASE EXÉCUTÉ :
+  UPDATE auth.users SET raw_user_meta_data = jsonb_set(raw_user_meta_data, '{role}', '"user"')
+  WHERE raw_user_meta_data->>'role' = 'client';
+  -- + mise à jour du trigger handle_new_user pour créer role='user' au lieu de 'client'
+
+PUBLIÉ : 97import.com ✅
+
+────────────────────────────────────────────────────────────────
+DATE : 2026-03-18
+COMMIT : auth-complete
+TYPE : feat
+DESCRIPTION : Auth robuste tous providers + mot de passe oublié + reset
+────────────────────────────────────────────────────────────────
+FICHIERS :
+  - client/src/contexts/AuthContext.tsx
+  - client/src/pages/ForgotPassword.tsx
+  - client/src/pages/ResetPassword.tsx
+  - client/src/pages/AuthCallback.tsx
+
+CORRECTIONS :
+  - Google OAuth callback : échange code → session via exchangeCodeForSession()
+  - signOut() : Supabase signOut + redirect vers /
+  - Mot de passe oublié : Supabase resetPasswordForEmail()
+  - Reset password : updateUser({ password }) depuis le lien email
+
+PUBLIÉ : 97import.com ✅
+
+================================================================
+CAHIER DES CHARGES — SPÉCIFICATIONS TECHNIQUES PRÉCISES
+================================================================
+
+────────────────────────────────────────────────────────────────
+RÈGLES GÉNÉRALES (toutes pages)
+────────────────────────────────────────────────────────────────
+- URLs stables .html : toutes les pages importantes ont un alias .html
+  (ajouté dans client/src/App.tsx section "Routes .html")
+- Logo → /index.html : Header.tsx ligne 58 <Link href="/index.html">
+- Fiches produit : /products/[slug].html → App.tsx ligne 45
+- Aucun bouton sans effet : vérifier que tous les <button> ont onClick
+- Suppression = confirmation : window.confirm() avant tout DELETE/null
+- États UI : vide (message texte) / chargement (spinner) / erreur (alerte) / succès (badge vert)
+- Une seule notification visible : Sonner avec id fixe "cart-notification"
+
+────────────────────────────────────────────────────────────────
+PAGES ET ROUTES — ÉTAT ACTUEL COMPLET
+────────────────────────────────────────────────────────────────
+FICHIER : client/src/App.tsx
+
+Routes sans .html (compatibilité interne) :
+  /                    → PortalHome
+  /minipelles          → MiniPelles
+  /maisons             → ModularHomes
+  /maisons/standard    → ModularStandard
+  /maisons/premium     → ModularPremium
+  /maisons/camping-car-deluxe → CampingCarDeluxe
+  /solaire             → Solar
+  /solaire/:slug       → SolarKitDetail
+  /agricole            → Agriculture
+  /products/:id        → ProductDetail
+  /products/:id.html   → ProductDetail ✅
+  /accessoires         → Accessories
+  /cart                → Cart
+  /terms, /privacy, /legal, /services, /contact, /delivery
+  /confirmation
+  /mon-compte          → MonCompte
+  /connexion           → Connexion
+  /auth/callback       → AuthCallback
+  /mot-de-passe-oublie → ForgotPassword
+  /reset-password      → ResetPassword
+
+Routes .html stables ✅ :
+  /index.html, /minipelles.html, /mini-pelle.html
+  /maisons.html, /maison-modulaire.html
+  /solaire.html, /panneau-solaire.html
+  /accessoires.html, /accessoires-mini-pelle.html
+  /services.html, /contact.html
+  /panier.html
+  /mon-compte.html, /mes-informations.html
+  /mes-commandes.html, /mes-devis.html, /securite.html
+  /connexion.html
+  /admin → AdminLogin
+  /admin/:rest* → AdminLayout
+
+────────────────────────────────────────────────────────────────
+PANIER — Cart.tsx
+────────────────────────────────────────────────────────────────
+FICHIER : client/src/pages/Cart.tsx
+
+ÉTAT ACTUEL :
+  - parsePrice(item.price) : parse string → number (gère "1 500 €", "1500.00")
+  - formatPrice(n) : Intl.NumberFormat fr-FR
+  - total = sum(parsePrice * quantity)
+  - Passe produits à DevisForm via devisProduits[]
+
+REMARQUE : Cart utilise item.price (string venant de CartContext).
+  Les produits sont ajoutés au panier depuis les pages produits avec
+  un prix déjà formaté en string. Pas de recalcul dans Cart.tsx car
+  le rôle est déjà appliqué au moment de l'affichage sur la page produit.
+  → PAS de bug à corriger ici, comportement correct.
+
+NOTIFICATION PANIER :
+  FICHIER : client/src/components/CartNotification.tsx
+  SOLUTION : toast.dismiss("cart-notification") + toast(msg, { id: "cart-notification" })
+  → Une seule notification visible, auto-fermée après 3s ✅
+
+────────────────────────────────────────────────────────────────
+MON COMPTE — MonCompte.tsx
+────────────────────────────────────────────────────────────────
+FICHIER : client/src/pages/MonCompte.tsx (>1200 lignes)
+
+ONGLETS :
+  "infos"      → Mes informations (profil + adresses)
+  "commandes"  → Mes commandes (devis acceptés depuis Supabase)
+  "devis"      → Mes devis (tous statuts)
+  "commissions"→ Mes commissions (visible si role="partner")
+  "securite"   → Changement de mot de passe
+
+DÉTECTION URL → ONGLET :
+  getInitialTab() lignes 21-29 :
+    /mes-devis     → "devis"
+    /mes-commandes → "commandes"
+    /securite      → "securite"
+    /mes-informations → "infos"
+    défaut         → "infos"
+
+CHARGEMENT DES DONNÉES :
+  useEffect([activeTab, user]) → charge les devis/commandes uniquement
+  quand l'onglet est actif (lazy loading)
+
+────────────────────────────────────────────────────────────────
+ADRESSES — État actuel ✅ FONCTIONNEL
+────────────────────────────────────────────────────────────────
+FICHIER : client/src/pages/MonCompte.tsx lignes 140-256
+
+COLONNES SUPABASE (table profiles) :
+  adresse_facturation        (text, nullable)
+  ville_facturation          (text, nullable)
+  cp_facturation    (text, nullable)
+  pays_facturation           (text, nullable, défaut "France")
+  adresse_livraison          (text, nullable)
+  ville_livraison            (text, nullable)
+  cp_livraison      (text, nullable)
+  pays_livraison             (text, nullable, défaut "France")
+  adresse_livraison_identique (boolean, défaut true)
+
+SQL À EXÉCUTER DANS SUPABASE (si colonnes absentes) :
+  ALTER TABLE profiles
+    ADD COLUMN IF NOT EXISTS adresse_facturation text,
+    ADD COLUMN IF NOT EXISTS ville_facturation text,
+    ADD COLUMN IF NOT EXISTS cp_facturation text,
+    ADD COLUMN IF NOT EXISTS pays_facturation text DEFAULT 'France',
+    ADD COLUMN IF NOT EXISTS adresse_livraison text,
+    ADD COLUMN IF NOT EXISTS ville_livraison text,
+    ADD COLUMN IF NOT EXISTS cp_livraison text,
+    ADD COLUMN IF NOT EXISTS pays_livraison text DEFAULT 'France',
+    ADD COLUMN IF NOT EXISTS adresse_livraison_identique boolean DEFAULT true;
+
+FONCTIONS REACT :
+  handleSaveAdresseFact()    ligne ~176 → UPDATE profiles facturation
+  handleSaveAdresseLiv()     ligne ~191 → UPDATE profiles livraison
+  handleDeleteAdresseFact()  ligne ~229 → SET null + window.confirm()
+  handleDeleteAdresseLiv()   ligne ~243 → SET null + window.confirm()
+
+États React :
+  adresseFactEditing, adresseLivEditing : boolean (mode édition)
+  adresseFactLoading, adresseLivLoading : boolean (spinner)
+  adresseFactSuccess, adresseLivSuccess : boolean (badge vert 3s)
+
+────────────────────────────────────────────────────────────────
+MES DEVIS — État actuel ✅ FONCTIONNEL
+────────────────────────────────────────────────────────────────
+FICHIER : client/src/pages/MonCompte.tsx lignes 280-380
+
+QUERY Supabase :
+  .from("quotes")
+  .select("id,created_at,numero_devis,produits,prix_total_calcule,
+           prix_negocie,statut,facture_generee,adresse_client,ville_client")
+  .eq("user_id", user.id)
+  .order("created_at", { ascending: false })
+
+STATUTS et couleurs (lignes ~1015-1030) :
+  "nouveau"     → badge gris   "Nouveau"
+  "en_cours"    → badge bleu   "En cours"
+  "negociation" → badge orange "En négociation"
+  "accepte"     → badge vert   "Accepté"
+  "refuse"      → badge rouge  "Refusé"
+
+VALIDER UN DEVIS — handleValiderDevis(id) ligne 345 :
+  1. setDevisActionId(id) → spinner sur le bouton
+  2. UPDATE quotes SET statut="accepte", signe_le=now() WHERE id AND user_id
+  3. setExpandedDevisId(null) → ferme le panel ← CLÉ du fix badge
+  4. refetchDevis() → recharge la liste depuis Supabase
+  5. setDevisActionMsg("Votre devis a été validé...") auto-effacé 5s
+
+REFUSER UN DEVIS — handleRefuserDevis(id) ligne 362 :
+  1. setDevisActionId(id) → spinner
+  2. UPDATE quotes SET statut="refuse" WHERE id AND user_id
+  3. setExpandedDevisId(null) → ferme panel ← CLÉ du fix badge
+  4. refetchDevis()
+  5. Message "Devis refusé."
+
+BOUTONS VISIBLES : uniquement si statut in ["nouveau","en_cours","negociation"]
+  ligne ~1211 : {["nouveau", "en_cours", "negociation"].includes(d.statut) && ...}
+
+────────────────────────────────────────────────────────────────
+MES COMMANDES — État actuel ✅ FONCTIONNEL
+────────────────────────────────────────────────────────────────
+FICHIER : client/src/pages/MonCompte.tsx lignes 258-278
+
+Commandes = devis avec statut="accepte" uniquement
+  .from("quotes").eq("statut", "accepte")
+
+Panel expandé : numéro, date, produits JSON, total, adresse
+Si facture_generee=true → bouton "Télécharger ma facture"
+
+────────────────────────────────────────────────────────────────
+SÉCURITÉ — Changement mot de passe
+────────────────────────────────────────────────────────────────
+FICHIER : client/src/pages/MonCompte.tsx (onglet "securite")
+
+Règles affichées :
+  - Minimum 6 caractères
+  - Les lettres et chiffres sont autorisés
+  Messages d'erreur :
+    "Mot de passe trop court (6 caractères minimum)"
+    "Les mots de passe ne correspondent pas"
+    "Mot de passe mis à jour avec succès !" (badge vert)
+    Erreur technique affiché en rouge
+
+────────────────────────────────────────────────────────────────
+PDF — Architecture features/pdf/ ✅ FONCTIONNEL
+────────────────────────────────────────────────────────────────
+STYLE ABSOLU : zéro fond sombre
+  Fond : WHITE [255,255,255]
+  Texte : NAVY [30,58,95] = #1E3A5F
+  Bordures tableaux : LIGHT_BLUE [191,219,254] = #BFDBFE
+  En-têtes colonnes : TABLE_HEADER_BG [239,246,255] = #EFF6FF
+  Accent devis : BLUE [74,144,217]
+  Accent facture : GREEN_ACC [4,120,87]
+  Accent commission : AMBER [180,83,9]
+
+CORRECTION "une ligne par produit" :
+  CAUSE : produits peut être string JSON ou Array selon comment Supabase le retourne
+  FIX dans pdf-helpers.ts :
+    const items = typeof produits === "string" ? JSON.parse(produits) : produits
+    Puis Array.isArray(items) ? items : [items]
+  Chaque produit = une seule ligne dans le tableau autotable
+
+IMPORT jspdf-autotable CORRECT :
+  import autoTable from "jspdf-autotable"
+  → autoTable(doc, { head: [...], body: [...], ... })
+  NE PAS utiliser doc.autoTable() (ancienne API qui casse)
+
+────────────────────────────────────────────────────────────────
+ADMIN — État actuel ✅
+────────────────────────────────────────────────────────────────
+FICHIER : client/src/pages/admin/AdminLayout.tsx
+
+AdminNavigation SUPPRIMÉE :
+  - Plus d'import Navigation
+  - Plus de bouton/lien "Navigation" dans le sidebar
+  - La page /admin/navigation n'existe plus dans App.tsx
+  VÉRIFICATION : grep "navigation" AdminLayout.tsx → uniquement commentaire HTML
+
+Pages admin disponibles :
+  Dashboard, Produits, Prix, Devis/Factures, Partenaires,
+  Utilisateurs, Médias, Contenu/CMS
+
+Appels /api/ isolés (Vercel-safe) :
+  if (import.meta.env.DEV) { fetch("/api/...") }
+  Concerné : /api/publish, /api/publish-status, /api/images,
+             /api/backup, /api/restore
+
+================================================================
+TESTS FONCTIONNELS ATTENDUS
+================================================================
+
+Navigation :
+  ✓ Logo → /index.html
+  ✓ /mini-pelle.html, /maison-modulaire.html, etc. → bonnes pages
+  ✓ /panier.html → Cart
+  ✓ /mon-compte.html → MonCompte onglet "infos"
+  ✓ /mes-devis.html → MonCompte onglet "devis"
+  ✓ /products/abc123.html → ProductDetail
+
+Profil :
+  ✓ Modifier prénom/nom/téléphone → message succès 3s
+  ✓ Erreur Supabase → message rouge
+
+Adresses :
+  ✓ Ajouter facturation → formulaire vide, Enregistrer → badge vert
+  ✓ Modifier facturation → formulaire pré-rempli
+  ✓ Supprimer facturation → window.confirm → supprimé
+  ✓ Même chose pour livraison
+  ✓ "Identique facturation" checkbox → copie automatique
+
+Devis :
+  ✓ Liste s'affiche avec badge statut coloré
+  ✓ Clic carte → panel expandé
+  ✓ "Valider" → statut=Accepté, badge vert, panel fermé + rouvert
+  ✓ "Refuser" → statut=Refusé, badge rouge, panel fermé + rouvert
+  ✓ Télécharger PDF → génère le devis sans fond noir
+
+Commandes :
+  ✓ Seulement les devis acceptés apparaissent
+  ✓ Détail expandable
+
+Sécurité :
+  ✓ < 6 chars → message erreur
+  ✓ Confirmation différente → message erreur
+  ✓ Succès → badge vert
+
+Panier :
+  ✓ Ajout produit → une seule notification toast (pas d'empilement)
+  ✓ Compteur mis à jour immédiatement
+  ✓ Total = sum(parsePrice * quantity) cohérent
+
+PDF :
+  ✓ Une ligne par produit dans le tableau
+  ✓ Fond blanc partout
+  ✓ Texte navy lisible
+  ✓ VIP : prix barré visible + prix négocié en bleu
+
+Admin :
+  ✓ Plus de bouton "Navigation" dans le menu
+  ✓ Dashboard, Produits, Prix, Devis, Partenaires fonctionnels
+
+================================================================
+ERREURS DÉJÀ CORRIGÉES — NE PAS REFAIRE
+================================================================
+
+1. Spinner infini sur /mon-compte
+   CAUSE : AuthContext attendait indéfiniment la session OAuth
+   FIX : timeout 3s max + onAuthStateChange en premier
+   COMMIT : auth-complete (2026-03-18)
+
+2. Rôle "client" → "user"
+   CAUSE : Trigger Supabase créait role='client' au lieu de 'user'
+   FIX : UPDATE trigger + UPDATE auth.users meta + UPDATE profiles
+   COMMIT : 2f3bf4f (2026-03-18)
+
+3. duplicate key quotes_numero_devis_key
+   CAUSE : généré aléatoirement, collision possible
+   FIX : Séquence SQL Supabase + RPC get_next_numero_devis()
+   COMMIT : 9affcff (2026-03-19)
+
+4. Message WhatsApp envoyé en double
+   CAUSE : DevisForm appelait sendWhatsApp() dans onSubmit ET dans useEffect
+   FIX : Suppression du double appel, un seul dans onSubmit
+   COMMIT : 9affcff (2026-03-19)
+
+5. "t.autoTable is not a function"
+   CAUSE : import { autoTable } from "jspdf-autotable" (incorrect)
+   FIX : import autoTable from "jspdf-autotable" + appel autoTable(doc, {...})
+   COMMIT : 1086901 (2026-03-19)
+
+6. Prix avec espaces non-passants cassant jsPDF
+   CAUSE : Intl.NumberFormat insère \u00A0 (espace insécable) que jsPDF ne sait pas rendre
+   FIX : formatPrix() → replace(/\u00A0/g, " ") dans pdf-helpers.ts
+   COMMIT : 45dbe64 (2026-03-19)
+
+7. Appels /api/ sur Vercel (404 en production)
+   CAUSE : Vercel SPA sans serveur Node permanent → /api/ inexistant en prod
+   FIX : if (import.meta.env.DEV) { ... } autour de chaque fetch /api/
+   COMMIT : 091f176 (2026-03-20)
+
+8. Double source de vérité JSON + Supabase
+   CAUSE : lib/api.ts lisait des fichiers JSON locaux ET Supabase → incohérence
+   FIX : lib/api.ts marqué @deprecated, toutes les données depuis Supabase
+   COMMIT : 9b8d0f1 (2026-03-20)
+
+9. Fonds noirs dans PDF
+   CAUSE : fillColor était [0,0,0] dans les styles autotable
+   FIX : PDF_THEME avec WHITE/LIGHT_BLUE, zéro fond sombre
+   COMMIT : 9b8d0f1 (2026-03-20) tag v3.0
+
+10. vercel.json outputDirectory incorrect
+    CAUSE : pointait vers dist/ au lieu de client/dist/
+    FIX : "outputDirectory": "client/dist"
+    COMMIT : 1ed976b (2026-03-20)
+
+11. npm install → pnpm install
+    CAUSE : Vercel détectait pnpm-lock.yaml mais vercel.json forçait npm
+    FIX : "installCommand": "pnpm install" dans vercel.json
+    COMMIT : 1ed976b (2026-03-20)
+
+12. Auth Google callback (session non créée)
+    CAUSE : AuthCallback ne faisait pas exchangeCodeForSession()
+    FIX : supabase.auth.exchangeCodeForSession(code) dans AuthCallback.tsx
+    COMMIT : auth-complete (2026-03-18)
+
+13. AdminNavigation page cassée
+    CAUSE : page /admin/navigation — "Impossible de charger le contenu"
+    FIX : suppression complète de la page, import et lien menu
+    COMMIT : b39eed0 (2026-03-21)
+
+14. Badge devis non rafraîchi après Valider/Refuser
+    CAUSE : expandedDevisId restait ouvert, React ne re-rendait pas le badge
+    FIX : setExpandedDevisId(null) avant refetchDevis()
+    COMMIT : f687124 (2026-03-21)
+
+15. Header liens /cart /mon-compte non en .html
+    CAUSE : <Link href="/cart"> → redirige mais URL instable
+    FIX : /panier.html et /mon-compte.html
+    COMMIT : f687124 (2026-03-21)
+
+16. Route /products/:id.html manquante
+    CAUSE : App.tsx n'avait que /products/:id
+    FIX : ajout de <Route path="/products/:id.html" component={ProductDetail} />
+    COMMIT : f687124 (2026-03-21)
+
+17. Toast panier empilable
+    CAUSE : Sonner créait un nouveau toast à chaque addToCart
+    FIX : toast.dismiss("cart-notification") + toast("...", { id: "cart-notification" })
+    COMMIT : db23c16 (2026-03-21)
+
+────────────────────────────────────────────────────────────────
+DATE : 2026-03-21 23:00
+COMMIT : 1e9c56e (tag: v4.1-bugs-corriges)
+TYPE : fix
+DESCRIPTION : Badges devis valider/refuser, PDF une ligne par produit, adresses facturation/livraison dans profil
+────────────────────────────────────────────────────────────────
+FICHIERS MODIFIÉS :
+  - client/src/features/account/tabs/QuotesTab.tsx
+  - client/src/features/account/tabs/ProfileTab.tsx
+  - client/src/contexts/AuthContext.tsx
+  - client/src/components/DevisForm.tsx
+
+CORRECTIONS DÉTAILLÉES :
+
+BUG 1 — Badges devis Valider/Refuser
+   CAUSE : handleValider() et handleRefuser() appelaient fetchDevis()
+           (refetch async) au lieu de mettre à jour l'état local
+   FIX : setDevis(prev => prev.map(d => ...)) mise à jour immédiate
+         du statut dans le state local → badge couleur instantané
+         (bleu=nouveau, vert=accepté, rouge=refusé)
+   FICHIER : QuotesTab.tsx
+
+BUG 2 — PDF une ligne par produit
+   CAUSE : d.produits pouvait être un string JSON (Supabase jsonb
+           parfois sérialisé en string) → Array.isArray() retournait
+           false → 0 produits dans le PDF
+   FIX : Ajout JSON.parse() fallback dans 3 endroits :
+         - affichage liste produits (l.224)
+         - downloadDevisPdf() (l.112)
+         - downloadFacturePdf() (l.160)
+   FICHIER : QuotesTab.tsx
+
+BUG 3 — Adresses facturation/livraison colonnes SQL
+   CAUSE : Le code utilisait cp_facturation et
+           cp_livraison mais les colonnes SQL Supabase
+           sont cp_facturation et cp_livraison
+   FIX : Renommage dans 3 fichiers :
+         - ProfileTab.tsx (lecture, sauvegarde, suppression)
+         - AuthContext.tsx (type Profile)
+         - DevisForm.tsx (pré-remplissage formulaire devis)
+   COLONNES SQL EXISTANTES :
+     adresse_facturation, ville_facturation, cp_facturation, pays_facturation
+     adresse_livraison, ville_livraison, cp_livraison, pays_livraison
+     adresse_livraison_identique
+
+PUBLIÉ : 97import.com ✅
+
+────────────────────────────────────────────────────────────────
+DATE : 2026-03-21 23:06
+COMMIT : f086093 (tag: v4.2-corrections)
+TYPE : fix + audit
+DESCRIPTION : Audit complet + AdminUsers erreur détaillée
+────────────────────────────────────────────────────────────────
+AUDIT COMPLET :
+  ✅ 37 routes App.tsx — tous composants importés existent
+  ✅ AdminNavigation.tsx supprimé, aucune référence dans AdminLayout
+  ✅ QuotesTab badges — mise à jour locale immédiate (accepte/refuse)
+  ✅ PDF produits — JSON.parse fallback si string JSON
+  ✅ ProfileTab adresses — facturation + livraison avec checkbox
+  ✅ PrixOuDevis bouton rouge — bg-[#EF4444] hover:bg-[#DC2626] visiteurs
+
+CORRECTION :
+  AdminUsers.tsx — message d'erreur détaillé si 0 profils ou erreur Supabase
+  + bouton Réessayer dans l'encart d'erreur
+  CAUSE : comptes Google sans profil → 0 résultats → pas de message explicatif
+  FIX : gestion d'erreur complète avec { data, error } + messages contextuels
+
+FICHIERS MODIFIÉS :
+  - client/src/pages/admin/AdminUsers.tsx
+
+PUBLIÉ : 97import.com ✅
+
+────────────────────────────────────────────────────────────────
+DATE : 2026-03-21 23:10
+COMMIT : (scripts SQL uniquement)
+TYPE : feat
+DESCRIPTION : Trigger auto-création profil à l'inscription (Google OAuth)
+────────────────────────────────────────────────────────────────
+FICHIERS CRÉÉS :
+  - scripts/auto-create-profile-trigger.sql
+
+FICHIERS MODIFIÉS :
+  - scripts/add-address-columns.sql (renommage code_postal → cp)
+
+SQL À EXÉCUTER DANS SUPABASE :
+  Copier-coller scripts/auto-create-profile-trigger.sql dans SQL Editor
+  Ce script :
+  1. Crée la fonction handle_new_user() → insère dans profiles
+     avec extraction first_name/last_name depuis raw_user_meta_data
+  2. Crée le trigger on_auth_user_created sur auth.users AFTER INSERT
+  3. Synchronise les comptes existants sans profil (rattrapage)
+  4. Requête de vérification
+
+  RÉSULTAT : tout nouveau compte (email ou Google OAuth) aura
+  automatiquement une ligne dans profiles avec role='user'
+
+PUBLIÉ : script SQL prêt, à exécuter manuellement dans Supabase
+
+================================================================
+FIN DU JOURNAL — NE PAS SUPPRIMER LES ENTRÉES PASSÉES
+================================================================

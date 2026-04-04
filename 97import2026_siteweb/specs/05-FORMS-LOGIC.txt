@@ -1,0 +1,179 @@
+================================================================
+FORMULAIRES & LOGIQUE METIER — 97import.com
+Guide pour reconstruire les formulaires et workflows
+================================================================
+
+================================================================
+1. FORMULAIRE DEVIS (DevisForm)
+================================================================
+
+Champs :
+  nom        TEXT  requis  pre-rempli depuis profil (first_name + last_name)
+  email      TEXT  requis  pre-rempli depuis profil
+  telephone  TEXT  requis  pre-rempli depuis profil
+  adresse    TEXT  requis  pre-rempli depuis profil.adresse_facturation
+  ville      TEXT  requis  pre-rempli depuis profil (cp + ville_facturation)
+  pays       TEXT  optionnel  default "France"
+  message    TEXT  optionnel
+
+Selection partenaire :
+  Visible si role = partner | admin | collaborateur
+  Dropdown des partenaires actifs
+  Auto-selectionne si partner avec un seul partenaire lie
+
+Produits (passes en props) :
+  id, nom, quantite, prixAffiche, prixUnitaire, prixAchat, prixPublic
+
+Workflow submission :
+  1. Generer numero devis (sequence SQL ou fallback timestamp)
+  2. Appender code partenaire au numero si selectionne
+  3. Calculer lignes PDF (prix unitaire, prix public, remise VIP)
+  4. Total HT = somme des lignes (jamais prix total calcule separement)
+  5. Generer PDF via jsPDF
+  6. INSERT dans table quotes
+  7. MAJ profil (telephone si manquant, adresse si manquante)
+  8. Telecharger PDF automatiquement
+  9. Clear panier (localStorage "rippa_cart")
+  10. Si partenaire deja selectionne → popup acompte
+      Sinon → popup selection partenaire → popup acompte
+
+Post-devis flow (3 etapes) :
+  Etape 1 : Success + telechargement PDF
+  Etape 2 : Popup partenaire (si pas deja choisi)
+  Etape 3 : Popup acompte
+    - Montant (defaut 500 EUR)
+    - Type compte (perso/pro)
+    - INSERT acompte dans quote.acomptes (JSON)
+    - Envoi email admin notification
+
+================================================================
+2. FORMULAIRE CONTACT
+================================================================
+
+Champs :
+  name       TEXT  requis
+  email      TEXT  requis
+  phone      TEXT  optionnel
+  subject    TEXT  optionnel
+  message    TEXT  requis
+
+Action : INSERT dans table contacts
+Notification : email a parisb2b@gmail.com
+
+================================================================
+3. FORMULAIRE CONNEXION
+================================================================
+
+Email + mot de passe
+  → supabase.auth.signInWithPassword()
+  → Si role admin/collaborateur → redirect /admin/dashboard
+  → Si role standard → redirect /mon-compte
+
+Inscription :
+  Email + mot de passe + nom + prenom
+  → supabase.auth.signUp()
+  → Trigger auto-create profil (SQL trigger)
+
+Mot de passe oublie :
+  Email → supabase.auth.resetPasswordForEmail()
+
+================================================================
+4. ESPACE CLIENT (MonCompte)
+================================================================
+
+Onglets :
+  - Informations personnelles (profil editable)
+  - Mes devis (liste des quotes de l'utilisateur)
+  - Securite (changement mot de passe)
+
+Adresse facturation et livraison separees
+  Checkbox "Adresse de livraison identique"
+
+================================================================
+5. PANIER (Cart)
+================================================================
+
+Stockage : localStorage cle "rippa_cart"
+Structure CartItem :
+  id, name, price (string), prixAchat (number), image, quantity, type
+
+Types : machine | accessory | solar | house
+House specifique : houseConfig { size, options[] }
+
+Actions :
+  addToCart(item) — ajoute ou incremente quantite
+  removeFromCart(id)
+  updateQuantity(id, qty)
+  clearCart() — vide items + localStorage
+
+Auto-clear sur SIGNED_IN / SIGNED_OUT (changement d'utilisateur)
+
+================================================================
+6. LOGIQUE DE PRIX
+================================================================
+
+Multiplicateurs :
+  visitor      → null (pas de prix affiche, "Connectez-vous")
+  user         → prix_achat × 2 (label "Prix HT")
+  partner      → prix_achat × 1.2 (label "Prix partenaire HT")
+  vip          → prix_negocie ?? prix_achat × 1.3 (label "Votre prix negocie HT")
+  admin/collab → affiche prix_achat + niveaux (user ×2, partner ×1.2)
+
+Prix public (reference) = prix_achat × 2 (pour affichage barre VIP)
+Commission partenaire = prix_negocie - prix_partenaire
+
+================================================================
+7. RECHERCHE PRODUITS
+================================================================
+
+Page accueil → barre de recherche
+  Mots-cles → redirection avec ?q= :
+    pelle/rippa/r22/r32 → /minipelles?q={query}
+    maison/cabin/camping → /maisons?q={query}
+    solaire/panneau/energie → /solaire?q={query}
+    tracteur/agri/ferme → /agricole?q={query}
+    defaut → /minipelles?q={query}
+
+Page cible → filtre produits par nom/reference (includes)
+
+================================================================
+8. ADMIN — GESTION DEVIS
+================================================================
+
+Liste filtrable par statut (nouveau, en_cours, negociation, accepte, refuse)
+Clic sur ligne → detail /admin/devis/:id
+
+Detail devis :
+  - Infos client
+  - Produits (tableau)
+  - Changement statut (dropdown)
+  - Notes internes editables
+  - Selection/changement partenaire
+  - Upgrade VIP (recalcul prix)
+  - Generation facture
+  - Generation bon de livraison
+  - Gestion acomptes (ajout, suivi)
+  - Generation frais (maritime, dedouanement)
+  - Generation note de commission
+
+================================================================
+9. ADMIN — GESTION PARAMETRES
+================================================================
+
+Parametres cle/valeur JSONB :
+  emetteur    → nom, adresse, ville, pays, email, telephone, siret, tva_intra
+  rib         → banque, iban, bic
+  acompte_defaut → pourcentage (defaut 30)
+  multiplicateurs → user, partner, vip
+
+================================================================
+10. NOTIFICATIONS EMAIL
+================================================================
+
+Declencheurs :
+  - Nouveau devis cree → email admin (parisb2b@gmail.com)
+  - Acompte enregistre → email admin
+  - Contact soumis → email admin
+
+Emails non-bloquants : try/catch avec logError si echec
+Pas de template HTML specifique (texte simple)

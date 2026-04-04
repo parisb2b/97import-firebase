@@ -1,0 +1,90 @@
+================================================================
+MIGRATION PACKAGE — 97import.com → Firebase
+Index du package d'extraction
+================================================================
+Date : 2026-04-03
+Source : 97import.com (React 19 + Vite 7 + Supabase)
+Cible : Firebase (Firestore + Storage + Auth + Functions)
+
+================================================================
+CONTENU DU PACKAGE
+================================================================
+
+/data/
+  products.json          — Catalogue complet (1777 lignes, tous produits)
+  pricing.ts             — Prix d'achat HT + multiplicateurs + shipping
+  site-content.json      — Contenu CMS des pages (titres, textes, menus)
+  settings.json          — Config generale (WhatsApp, couleurs, logos)
+  v5-setup.sql           — Schema principal Supabase
+  setup-partners.sql     — Table partenaires
+  create-error-logs.sql  — Table logs erreurs
+  *.sql                  — Tous les scripts de migration/fix
+
+/media/
+  logos/         — 10 fichiers (PNG, SVG, WebP)
+  products/      — Mini-pelles (vignettes + galleries multi-vues)
+  accessories/   — 16 types d'accessoires (JPEG + WebP)
+  portal/        — Images page d'accueil (hero, categories)
+  solar/         — Panneaux, kits, composants
+  houses/        — Maisons standard, premium, camping car + videos
+  documents/     — 5 fiches techniques PDF
+  videos/        — 6 videos produits (MP4)
+
+/specs/
+  00-INDEX.txt           — Ce fichier
+  01-STYLE-GUIDE.txt     — Palette couleurs, typographie, espacements, composants
+  02-DATABASE-SCHEMA.txt — 12 tables avec colonnes, types, valeurs par defaut
+  03-PDF-TEMPLATES.txt   — 5 types de PDF avec layout precis (mm, couleurs, polices)
+  04-ROUTES-SEO.txt      — 40+ URLs publiques + admin, redirects, protection
+  05-FORMS-LOGIC.txt     — Formulaires, workflows devis, panier, prix, admin
+  06-MEDIA-INVENTORY.txt — Inventaire complet des 112 fichiers media
+
+================================================================
+MAPPING SUPABASE → FIRESTORE
+================================================================
+
+Table Supabase        →  Collection Firestore
+-----------------        ----------------------
+profiles              →  users/{uid}
+contacts              →  contacts/{autoId}
+quotes                →  quotes/{autoId}
+orders                →  orders/{autoId}
+products              →  products/{productId}
+partners              →  partners/{autoId}
+invoices              →  invoices/{autoId}
+delivery_notes        →  deliveryNotes/{autoId}
+fees                  →  fees/{autoId}
+commission_notes      →  commissions/{autoId}
+site_content          →  config/siteContent (document unique JSONB)
+admin_params          →  config/adminParams (document unique JSONB)
+error_logs            →  logs/{autoId}
+
+Supabase Auth         →  Firebase Auth (email/password)
+Supabase Storage      →  Firebase Storage (buckets)
+Supabase RPC          →  Cloud Functions (sequences, calculs)
+
+================================================================
+POINTS CLES POUR RECONSTRUCTION
+================================================================
+
+1. PRIX : Le prix d'achat est la source unique. Tout prix affiche
+   est calcule dynamiquement selon le role (×2, ×1.2, ×1.3 ou negocie).
+
+2. DEVIS PDF : 5 types de documents avec layout precis.
+   L'emetteur est toujours LUXENT LIMITED (UK).
+   TVA non applicable (art. 293 B du CGI).
+
+3. PANIER : localStorage "rippa_cart", clear sur changement d'auth.
+
+4. ROLES : admin → collaborateur → partner → vip → user → visitor
+   Chaque role voit des prix differents et a des acces differents.
+
+5. NUMEROTATION : Sequences SQL atomiques (D26XXXXX, FA26XXXXX, etc.)
+   A reimplementer via Firestore counters ou Cloud Functions.
+
+6. SEO : Conserver les URLs .html alternatives pour les liens existants.
+   SPA avec rewrite universel vers index.html.
+
+7. SHIPPING : Prix fixes par destination DOM-TOM, certaines "sur devis".
+
+8. PARTENAIRES : Systeme de commission = prix negocie - prix partenaire.

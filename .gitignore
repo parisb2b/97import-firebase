@@ -1,0 +1,23 @@
+# Dépendances
+node_modules/
+
+# Variables d'environnement — NE JAMAIS COMMITTER
+.env
+.env.local
+.env.*.local
+
+# Clé privée Firebase Admin — NE JAMAIS COMMITTER
+service-account.json
+*-service-account.json
+
+# Build
+dist/
+build/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
