@@ -1,0 +1,1073 @@
+{
+  "date": "2026-04-04T19:56:27.943Z",
+  "summary": {
+    "total_scanned": 286,
+    "synchronized": 143,
+    "different": 0,
+    "missing_in_prod": 0,
+    "only_in_prod": 0,
+    "copied": 0,
+    "final_count": 143
+  },
+  "products": {
+    "DOC": {
+      "name": "Documents PDF",
+      "ref": "DOC",
+      "images": 0,
+      "pdf": 2,
+      "videos": 0,
+      "files": [
+        "fiche_technique_maison_modulaire.pdf"
+      ]
+    },
+    "MP-R18-001": {
+      "name": "Mini-pelle R18 PRO",
+      "ref": "MP-R18-001",
+      "images": 52,
+      "pdf": 2,
+      "videos": 0,
+      "files": [
+        "r18_pro_fiche_technique.pdf",
+        "auger_r18.jpeg",
+        "auger_r18.webp",
+        "flat_bucket_r18.jpeg",
+        "flat_bucket_r18.webp",
+        "grapple_r18.jpeg",
+        "grapple_r18.webp",
+        "hydraulic_hammer_r18.jpeg",
+        "hydraulic_hammer_r18.webp",
+        "rake_r18.jpeg",
+        "rake_r18.webp",
+        "ripper_r18.jpeg",
+        "ripper_r18.webp",
+        "tilt_bucket_r18.jpeg",
+        "tilt_bucket_r18.webp",
+        "tooth_bucket_r18.jpeg",
+        "tooth_bucket_r18.webp",
+        "r18_pro_cab_view.png",
+        "r18_pro_cab_view.webp",
+        "r18_pro_main_view.png",
+        "r18_pro_main_view.webp",
+        "r18_pro_rear_view.png",
+        "r18_pro_rear_view.webp",
+        "r18_pro_side_view.png",
+        "r18_pro_side_view.webp",
+        "r18_pro.png",
+        "r18_pro.webp"
+      ]
+    },
+    "MP-R22-001": {
+      "name": "Mini-pelle R22 PRO",
+      "ref": "MP-R22-001",
+      "images": 24,
+      "pdf": 2,
+      "videos": 0,
+      "files": [
+        "r22_pro_fiche_technique.pdf",
+        "r22_pro_cab_view.png",
+        "r22_pro_cab_view.webp",
+        "r22_pro_main_view.png",
+        "r22_pro_main_view.webp",
+        "r22_pro_rear_view.png",
+        "r22_pro_rear_view.webp",
+        "r22_pro_side_view.png",
+        "r22_pro_side_view.webp",
+        "r22_pro.png",
+        "r22_pro.webp",
+        "r22_pro_main.png",
+        "r22_pro_main.webp"
+      ]
+    },
+    "MP-R32-001": {
+      "name": "Mini-pelle R32 PRO",
+      "ref": "MP-R32-001",
+      "images": 20,
+      "pdf": 2,
+      "videos": 0,
+      "files": [
+        "r32_pro_fiche_technique.pdf",
+        "r32_pro_cab_view.png",
+        "r32_pro_cab_view.webp",
+        "r32_pro_main_view.png",
+        "r32_pro_main_view.webp",
+        "r32_pro_rear_view.png",
+        "r32_pro_rear_view.webp",
+        "r32_pro_side_view.png",
+        "r32_pro_side_view.webp",
+        "r32_pro.png",
+        "r32_pro.webp"
+      ]
+    },
+    "MP-R57-001": {
+      "name": "Mini-pelle R57 PRO",
+      "ref": "MP-R57-001",
+      "images": 2,
+      "pdf": 2,
+      "videos": 0,
+      "files": [
+        "r57_pro_fiche_technique.pdf",
+        "r57_pro_main_view.png"
+      ]
+    },
+    "ACC-FR-001": {
+      "name": "Fourche",
+      "ref": "ACC-FR-001",
+      "images": 4,
+      "pdf": 0,
+      "videos": 0,
+      "files": [
+        "fourche.jpeg",
+        "fourche.webp"
+      ]
+    },
+    "ACC-GCR-001": {
+      "name": "Godet Cribleur",
+      "ref": "ACC-GCR-001",
+      "images": 4,
+      "pdf": 0,
+      "videos": 0,
+      "files": [
+        "godet_cribleur.png",
+        "godet_cribleur.webp"
+      ]
+    },
+    "ACC-GD-001": {
+      "name": "Godet Dente",
+      "ref": "ACC-GD-001",
+      "images": 4,
+      "pdf": 0,
+      "videos": 0,
+      "files": [
+        "godet_dents.png",
+        "godet_dents.webp"
+      ]
+    },
+    "ACC-GI-001": {
+      "name": "Godet Inclinable",
+      "ref": "ACC-GI-001",
+      "images": 4,
+      "pdf": 0,
+      "videos": 0,
+      "files": [
+        "godet_inclinable.jpeg",
+        "godet_inclinable.webp"
+      ]
+    },
+    "ACC-GC-001": {
+      "name": "Godet Lisse",
+      "ref": "ACC-GC-001",
+      "images": 4,
+      "pdf": 0,
+      "videos": 0,
+      "files": [
+        "godet_lisse.jpeg",
+        "godet_lisse.webp"
+      ]
+    },
+    "ACC-GP-001": {
+      "name": "Grappin",
+      "ref": "ACC-GP-001",
+      "images": 4,
+      "pdf": 0,
+      "videos": 0,
+      "files": [
+        "grappin.jpeg",
+        "grappin.webp"
+      ]
+    },
+    "ACC-MH-001": {
+      "name": "Marteau Hydraulique",
+      "ref": "ACC-MH-001",
+      "images": 4,
+      "pdf": 0,
+      "videos": 0,
+      "files": [
+        "marteau_hydraulique.png",
+        "marteau_hydraulique.webp"
+      ]
+    },
+    "ACC-TA-001": {
+      "name": "Tariere",
+      "ref": "ACC-TA-001",
+      "images": 4,
+      "pdf": 0,
+      "videos": 0,
+      "files": [
+        "tariere.jpeg",
+        "tariere.webp"
+      ]
+    },
+    "CC-BYD-001": {
+      "name": "Camping Car BYD",
+      "ref": "CC-BYD-001",
+      "images": 26,
+      "pdf": 0,
+      "videos": 2,
+      "files": [
+        "bathroom.jpg",
+        "bedroom.jpg",
+        "dining_area.jpg",
+        "exterior_back.jpg",
+        "exterior_front_side.jpg",
+        "exterior_main.webp",
+        "exterior_side.jpg",
+        "interior_living.jpg",
+        "interior_overview.jpg",
+        "kitchen.jpg",
+        "laundry.jpg",
+        "video_tour.mp4",
+        "camping_car.jpg",
+        "camping_car.png"
+      ]
+    },
+    "MP-20-001": {
+      "name": "Maison Premium",
+      "ref": "MP-20-001",
+      "images": 8,
+      "pdf": 0,
+      "videos": 4,
+      "files": [
+        "exterior_1.jpg",
+        "exterior_2.jpg",
+        "exterior_3.jpg",
+        "exterior_4.jpg",
+        "video_1.mp4",
+        "video_2.mp4"
+      ]
+    },
+    "MS-20-001": {
+      "name": "Maison Standard",
+      "ref": "MS-20-001",
+      "images": 14,
+      "pdf": 0,
+      "videos": 6,
+      "files": [
+        "exterior_1.jpeg",
+        "exterior_2.jpeg",
+        "exterior_3.jpeg",
+        "exterior_4.jpeg",
+        "exterior_5.jpeg",
+        "exterior_6.jpeg",
+        "exterior_7.jpeg",
+        "video_1.mp4",
+        "video_2.mp4",
+        "video_3.mp4"
+      ]
+    },
+    "LOGO": {
+      "name": "Logos site",
+      "ref": "LOGO",
+      "images": 20,
+      "pdf": 0,
+      "videos": 0,
+      "files": [
+        "direxport_logo_blue.png",
+        "logo_import97.png",
+        "logo_import97_footer.png",
+        "logo_import97_footer_transparent.png",
+        "logo_import97_large.png",
+        "logo_rippa_domtom_transparent.png",
+        "logo_rippa_new.png",
+        "rippa-dom-tom-white.png",
+        "rippa_dom_tom.svg",
+        "rippa_logo.webp"
+      ]
+    },
+    "PORTAL": {
+      "name": "Images portail",
+      "ref": "PORTAL",
+      "images": 10,
+      "pdf": 0,
+      "videos": 0,
+      "files": [
+        "agri_tractor.jpeg",
+        "agri_tractor.jpg",
+        "hero_ship.png",
+        "modular_home.png",
+        "modular_home.webp"
+      ]
+    },
+    "SOL-KIT": {
+      "name": "Kits Solaires",
+      "ref": "SOL-KIT",
+      "images": 44,
+      "pdf": 0,
+      "videos": 0,
+      "files": [
+        "solar_panel.jpg",
+        "solar_panel_jinko.png",
+        "solar_roof.jpg",
+        "battery_6fm250.webp",
+        "deye_inverter.webp",
+        "jinko_600w_tiger_neo.jpg",
+        "jinko_truck_delivery.jpg",
+        "jinko_warehouse.jpg",
+        "kit_overview.webp",
+        "mounting_structure.webp",
+        "panel_detail.webp",
+        "solar_cables.webp",
+        "solar_installations.jpg",
+        "battery_lifepo4.png",
+        "deye_inverter.png",
+        "jinko_600w_bifacial.webp",
+        "jinko_installation_toiture.webp",
+        "jinko_panels_pair.webp",
+        "jinko_panel_layers.png",
+        "jinko_tiger_neo_fiche.webp",
+        "jinko_warehouse_stock.webp",
+        "solar_cables.png"
+      ]
+    },
+    "MP-R10-001": {
+      "name": "Mini-pelle R10 ECO",
+      "ref": "MP-R10-001",
+      "images": 4,
+      "pdf": 0,
+      "videos": 0,
+      "files": [
+        "r10_eco_main.png",
+        "r10_eco_main.webp"
+      ]
+    },
+    "MP-R13-001": {
+      "name": "Mini-pelle R13 PRO",
+      "ref": "MP-R13-001",
+      "images": 4,
+      "pdf": 0,
+      "videos": 0,
+      "files": [
+        "r13_pro.png",
+        "r13_pro.webp"
+      ]
+    },
+    "MP-R15-001": {
+      "name": "Mini-pelle R15 ECO",
+      "ref": "MP-R15-001",
+      "images": 4,
+      "pdf": 0,
+      "videos": 0,
+      "files": [
+        "r15_eco.png",
+        "r15_eco.webp"
+      ]
+    }
+  },
+  "copies": [],
+  "prod_files": [
+    {
+      "name": "fiche_technique_maison_modulaire.pdf",
+      "rel": "documents/fiche_technique_maison_modulaire.pdf",
+      "size": 5586
+    },
+    {
+      "name": "r18_pro_fiche_technique.pdf",
+      "rel": "documents/r18_pro_fiche_technique.pdf",
+      "size": 315334
+    },
+    {
+      "name": "r22_pro_fiche_technique.pdf",
+      "rel": "documents/r22_pro_fiche_technique.pdf",
+      "size": 318461
+    },
+    {
+      "name": "r32_pro_fiche_technique.pdf",
+      "rel": "documents/r32_pro_fiche_technique.pdf",
+      "size": 325745
+    },
+    {
+      "name": "r57_pro_fiche_technique.pdf",
+      "rel": "documents/r57_pro_fiche_technique.pdf",
+      "size": 27922
+    },
+    {
+      "name": "auger_r18.jpeg",
+      "rel": "images/accessories/auger_r18.jpeg",
+      "size": 15210
+    },
+    {
+      "name": "auger_r18.webp",
+      "rel": "images/accessories/auger_r18.webp",
+      "size": 39188
+    },
+    {
+      "name": "flat_bucket_r18.jpeg",
+      "rel": "images/accessories/flat_bucket_r18.jpeg",
+      "size": 12636
+    },
+    {
+      "name": "flat_bucket_r18.webp",
+      "rel": "images/accessories/flat_bucket_r18.webp",
+      "size": 35552
+    },
+    {
+      "name": "fourche.jpeg",
+      "rel": "images/accessories/fourche.jpeg",
+      "size": 15210
+    },
+    {
+      "name": "fourche.webp",
+      "rel": "images/accessories/fourche.webp",
+      "size": 39188
+    },
+    {
+      "name": "godet_cribleur.png",
+      "rel": "images/accessories/godet_cribleur.png",
+      "size": 19712
+    },
+    {
+      "name": "godet_cribleur.webp",
+      "rel": "images/accessories/godet_cribleur.webp",
+      "size": 11848
+    },
+    {
+      "name": "godet_dents.png",
+      "rel": "images/accessories/godet_dents.png",
+      "size": 22602
+    },
+    {
+      "name": "godet_dents.webp",
+      "rel": "images/accessories/godet_dents.webp",
+      "size": 13568
+    },
+    {
+      "name": "godet_inclinable.jpeg",
+      "rel": "images/accessories/godet_inclinable.jpeg",
+      "size": 15210
+    },
+    {
+      "name": "godet_inclinable.webp",
+      "rel": "images/accessories/godet_inclinable.webp",
+      "size": 39188
+    },
+    {
+      "name": "godet_lisse.jpeg",
+      "rel": "images/accessories/godet_lisse.jpeg",
+      "size": 15210
+    },
+    {
+      "name": "godet_lisse.webp",
+      "rel": "images/accessories/godet_lisse.webp",
+      "size": 39188
+    },
+    {
+      "name": "grappin.jpeg",
+      "rel": "images/accessories/grappin.jpeg",
+      "size": 15210
+    },
+    {
+      "name": "grappin.webp",
+      "rel": "images/accessories/grappin.webp",
+      "size": 39188
+    },
+    {
+      "name": "grapple_r18.jpeg",
+      "rel": "images/accessories/grapple_r18.jpeg",
+      "size": 14770
+    },
+    {
+      "name": "grapple_r18.webp",
+      "rel": "images/accessories/grapple_r18.webp",
+      "size": 44190
+    },
+    {
+      "name": "hydraulic_hammer_r18.jpeg",
+      "rel": "images/accessories/hydraulic_hammer_r18.jpeg",
+      "size": 15095
+    },
+    {
+      "name": "hydraulic_hammer_r18.webp",
+      "rel": "images/accessories/hydraulic_hammer_r18.webp",
+      "size": 38840
+    },
+    {
+      "name": "marteau_hydraulique.png",
+      "rel": "images/accessories/marteau_hydraulique.png",
+      "size": 19491
+    },
+    {
+      "name": "marteau_hydraulique.webp",
+      "rel": "images/accessories/marteau_hydraulique.webp",
+      "size": 11700
+    },
+    {
+      "name": "rake_r18.jpeg",
+      "rel": "images/accessories/rake_r18.jpeg",
+      "size": 15593
+    },
+    {
+      "name": "rake_r18.webp",
+      "rel": "images/accessories/rake_r18.webp",
+      "size": 40346
+    },
+    {
+      "name": "ripper_r18.jpeg",
+      "rel": "images/accessories/ripper_r18.jpeg",
+      "size": 9464
+    },
+    {
+      "name": "ripper_r18.webp",
+      "rel": "images/accessories/ripper_r18.webp",
+      "size": 23990
+    },
+    {
+      "name": "tariere.jpeg",
+      "rel": "images/accessories/tariere.jpeg",
+      "size": 15210
+    },
+    {
+      "name": "tariere.webp",
+      "rel": "images/accessories/tariere.webp",
+      "size": 39188
+    },
+    {
+      "name": "tilt_bucket_r18.jpeg",
+      "rel": "images/accessories/tilt_bucket_r18.jpeg",
+      "size": 15268
+    },
+    {
+      "name": "tilt_bucket_r18.webp",
+      "rel": "images/accessories/tilt_bucket_r18.webp",
+      "size": 46726
+    },
+    {
+      "name": "tooth_bucket_r18.jpeg",
+      "rel": "images/accessories/tooth_bucket_r18.jpeg",
+      "size": 13604
+    },
+    {
+      "name": "tooth_bucket_r18.webp",
+      "rel": "images/accessories/tooth_bucket_r18.webp",
+      "size": 38234
+    },
+    {
+      "name": "bathroom.jpg",
+      "rel": "images/houses/camping_car/bathroom.jpg",
+      "size": 169068
+    },
+    {
+      "name": "bedroom.jpg",
+      "rel": "images/houses/camping_car/bedroom.jpg",
+      "size": 282151
+    },
+    {
+      "name": "dining_area.jpg",
+      "rel": "images/houses/camping_car/dining_area.jpg",
+      "size": 297165
+    },
+    {
+      "name": "exterior_back.jpg",
+      "rel": "images/houses/camping_car/exterior_back.jpg",
+      "size": 266225
+    },
+    {
+      "name": "exterior_front_side.jpg",
+      "rel": "images/houses/camping_car/exterior_front_side.jpg",
+      "size": 270887
+    },
+    {
+      "name": "exterior_main.webp",
+      "rel": "images/houses/camping_car/exterior_main.webp",
+      "size": 23808
+    },
+    {
+      "name": "exterior_side.jpg",
+      "rel": "images/houses/camping_car/exterior_side.jpg",
+      "size": 203618
+    },
+    {
+      "name": "interior_living.jpg",
+      "rel": "images/houses/camping_car/interior_living.jpg",
+      "size": 250186
+    },
+    {
+      "name": "interior_overview.jpg",
+      "rel": "images/houses/camping_car/interior_overview.jpg",
+      "size": 290082
+    },
+    {
+      "name": "kitchen.jpg",
+      "rel": "images/houses/camping_car/kitchen.jpg",
+      "size": 252603
+    },
+    {
+      "name": "laundry.jpg",
+      "rel": "images/houses/camping_car/laundry.jpg",
+      "size": 244161
+    },
+    {
+      "name": "video_tour.mp4",
+      "rel": "images/houses/camping_car/video_tour.mp4",
+      "size": 13812784
+    },
+    {
+      "name": "exterior_1.jpg",
+      "rel": "images/houses/modular_premium/exterior_1.jpg",
+      "size": 249609
+    },
+    {
+      "name": "exterior_2.jpg",
+      "rel": "images/houses/modular_premium/exterior_2.jpg",
+      "size": 196171
+    },
+    {
+      "name": "exterior_3.jpg",
+      "rel": "images/houses/modular_premium/exterior_3.jpg",
+      "size": 2706041
+    },
+    {
+      "name": "exterior_4.jpg",
+      "rel": "images/houses/modular_premium/exterior_4.jpg",
+      "size": 310526
+    },
+    {
+      "name": "video_1.mp4",
+      "rel": "images/houses/modular_premium/video_1.mp4",
+      "size": 10938624
+    },
+    {
+      "name": "video_2.mp4",
+      "rel": "images/houses/modular_premium/video_2.mp4",
+      "size": 30366314
+    },
+    {
+      "name": "exterior_1.jpeg",
+      "rel": "images/houses/modular_standard/exterior_1.jpeg",
+      "size": 113114
+    },
+    {
+      "name": "exterior_2.jpeg",
+      "rel": "images/houses/modular_standard/exterior_2.jpeg",
+      "size": 95878
+    },
+    {
+      "name": "exterior_3.jpeg",
+      "rel": "images/houses/modular_standard/exterior_3.jpeg",
+      "size": 221845
+    },
+    {
+      "name": "exterior_4.jpeg",
+      "rel": "images/houses/modular_standard/exterior_4.jpeg",
+      "size": 77030
+    },
+    {
+      "name": "exterior_5.jpeg",
+      "rel": "images/houses/modular_standard/exterior_5.jpeg",
+      "size": 199894
+    },
+    {
+      "name": "exterior_6.jpeg",
+      "rel": "images/houses/modular_standard/exterior_6.jpeg",
+      "size": 191090
+    },
+    {
+      "name": "exterior_7.jpeg",
+      "rel": "images/houses/modular_standard/exterior_7.jpeg",
+      "size": 193806
+    },
+    {
+      "name": "video_1.mp4",
+      "rel": "images/houses/modular_standard/video_1.mp4",
+      "size": 3699264
+    },
+    {
+      "name": "video_2.mp4",
+      "rel": "images/houses/modular_standard/video_2.mp4",
+      "size": 15909716
+    },
+    {
+      "name": "video_3.mp4",
+      "rel": "images/houses/modular_standard/video_3.mp4",
+      "size": 14016412
+    },
+    {
+      "name": "direxport_logo_blue.png",
+      "rel": "images/logos/direxport_logo_blue.png",
+      "size": 1529
+    },
+    {
+      "name": "logo_import97.png",
+      "rel": "images/logos/logo_import97.png",
+      "size": 100101
+    },
+    {
+      "name": "logo_import97_footer.png",
+      "rel": "images/logos/logo_import97_footer.png",
+      "size": 84059
+    },
+    {
+      "name": "logo_import97_footer_transparent.png",
+      "rel": "images/logos/logo_import97_footer_transparent.png",
+      "size": 122769
+    },
+    {
+      "name": "logo_import97_large.png",
+      "rel": "images/logos/logo_import97_large.png",
+      "size": 150200
+    },
+    {
+      "name": "logo_rippa_domtom_transparent.png",
+      "rel": "images/logos/logo_rippa_domtom_transparent.png",
+      "size": 18977
+    },
+    {
+      "name": "logo_rippa_new.png",
+      "rel": "images/logos/logo_rippa_new.png",
+      "size": 107332
+    },
+    {
+      "name": "rippa-dom-tom-white.png",
+      "rel": "images/logos/rippa-dom-tom-white.png",
+      "size": 116183
+    },
+    {
+      "name": "rippa_dom_tom.svg",
+      "rel": "images/logos/rippa_dom_tom.svg",
+      "size": 3267
+    },
+    {
+      "name": "rippa_logo.webp",
+      "rel": "images/logos/rippa_logo.webp",
+      "size": 48490
+    },
+    {
+      "name": "agri_tractor.jpeg",
+      "rel": "images/portal/agri_tractor.jpeg",
+      "size": 193806
+    },
+    {
+      "name": "agri_tractor.jpg",
+      "rel": "images/portal/agri_tractor.jpg",
+      "size": 54560
+    },
+    {
+      "name": "camping_car.jpg",
+      "rel": "images/portal/camping_car.jpg",
+      "size": 311159
+    },
+    {
+      "name": "camping_car.png",
+      "rel": "images/portal/camping_car.png",
+      "size": 655538
+    },
+    {
+      "name": "hero_ship.png",
+      "rel": "images/portal/hero_ship.png",
+      "size": 1087282
+    },
+    {
+      "name": "modular_home.png",
+      "rel": "images/portal/modular_home.png",
+      "size": 1429445
+    },
+    {
+      "name": "modular_home.webp",
+      "rel": "images/portal/modular_home.webp",
+      "size": 314936
+    },
+    {
+      "name": "solar_panel.jpg",
+      "rel": "images/portal/solar_panel.jpg",
+      "size": 411370
+    },
+    {
+      "name": "solar_panel_jinko.png",
+      "rel": "images/portal/solar_panel_jinko.png",
+      "size": 336832
+    },
+    {
+      "name": "solar_roof.jpg",
+      "rel": "images/portal/solar_roof.jpg",
+      "size": 129835
+    },
+    {
+      "name": "r10_eco_main.png",
+      "rel": "images/products/r10_eco_main.png",
+      "size": 505988
+    },
+    {
+      "name": "r10_eco_main.webp",
+      "rel": "images/products/r10_eco_main.webp",
+      "size": 315370
+    },
+    {
+      "name": "r13_pro.png",
+      "rel": "images/products/r13_pro.png",
+      "size": 20019
+    },
+    {
+      "name": "r13_pro.webp",
+      "rel": "images/products/r13_pro.webp",
+      "size": 11348
+    },
+    {
+      "name": "r15_eco.png",
+      "rel": "images/products/r15_eco.png",
+      "size": 20019
+    },
+    {
+      "name": "r15_eco.webp",
+      "rel": "images/products/r15_eco.webp",
+      "size": 11348
+    },
+    {
+      "name": "r18_pro_cab_view.png",
+      "rel": "images/products/r18_pro/r18_pro_cab_view.png",
+      "size": 267084
+    },
+    {
+      "name": "r18_pro_cab_view.webp",
+      "rel": "images/products/r18_pro/r18_pro_cab_view.webp",
+      "size": 165584
+    },
+    {
+      "name": "r18_pro_main_view.png",
+      "rel": "images/products/r18_pro/r18_pro_main_view.png",
+      "size": 481200
+    },
+    {
+      "name": "r18_pro_main_view.webp",
+      "rel": "images/products/r18_pro/r18_pro_main_view.webp",
+      "size": 296496
+    },
+    {
+      "name": "r18_pro_rear_view.png",
+      "rel": "images/products/r18_pro/r18_pro_rear_view.png",
+      "size": 1035968
+    },
+    {
+      "name": "r18_pro_rear_view.webp",
+      "rel": "images/products/r18_pro/r18_pro_rear_view.webp",
+      "size": 587626
+    },
+    {
+      "name": "r18_pro_side_view.png",
+      "rel": "images/products/r18_pro/r18_pro_side_view.png",
+      "size": 1054352
+    },
+    {
+      "name": "r18_pro_side_view.webp",
+      "rel": "images/products/r18_pro/r18_pro_side_view.webp",
+      "size": 595472
+    },
+    {
+      "name": "r18_pro.png",
+      "rel": "images/products/r18_pro.png",
+      "size": 152128
+    },
+    {
+      "name": "r18_pro.webp",
+      "rel": "images/products/r18_pro.webp",
+      "size": 94064
+    },
+    {
+      "name": "r22_pro_cab_view.png",
+      "rel": "images/products/r22_pro/r22_pro_cab_view.png",
+      "size": 241670
+    },
+    {
+      "name": "r22_pro_cab_view.webp",
+      "rel": "images/products/r22_pro/r22_pro_cab_view.webp",
+      "size": 151484
+    },
+    {
+      "name": "r22_pro_main_view.png",
+      "rel": "images/products/r22_pro/r22_pro_main_view.png",
+      "size": 481348
+    },
+    {
+      "name": "r22_pro_main_view.webp",
+      "rel": "images/products/r22_pro/r22_pro_main_view.webp",
+      "size": 307638
+    },
+    {
+      "name": "r22_pro_rear_view.png",
+      "rel": "images/products/r22_pro/r22_pro_rear_view.png",
+      "size": 1048122
+    },
+    {
+      "name": "r22_pro_rear_view.webp",
+      "rel": "images/products/r22_pro/r22_pro_rear_view.webp",
+      "size": 616010
+    },
+    {
+      "name": "r22_pro_side_view.png",
+      "rel": "images/products/r22_pro/r22_pro_side_view.png",
+      "size": 1059056
+    },
+    {
+      "name": "r22_pro_side_view.webp",
+      "rel": "images/products/r22_pro/r22_pro_side_view.webp",
+      "size": 621110
+    },
+    {
+      "name": "r22_pro.png",
+      "rel": "images/products/r22_pro.png",
+      "size": 154410
+    },
+    {
+      "name": "r22_pro.webp",
+      "rel": "images/products/r22_pro.webp",
+      "size": 95840
+    },
+    {
+      "name": "r22_pro_main.png",
+      "rel": "images/products/r22_pro_main.png",
+      "size": 481348
+    },
+    {
+      "name": "r22_pro_main.webp",
+      "rel": "images/products/r22_pro_main.webp",
+      "size": 307638
+    },
+    {
+      "name": "r32_pro_cab_view.png",
+      "rel": "images/products/r32_pro/r32_pro_cab_view.png",
+      "size": 219701
+    },
+    {
+      "name": "r32_pro_cab_view.webp",
+      "rel": "images/products/r32_pro/r32_pro_cab_view.webp",
+      "size": 136010
+    },
+    {
+      "name": "r32_pro_main_view.png",
+      "rel": "images/products/r32_pro/r32_pro_main_view.png",
+      "size": 473034
+    },
+    {
+      "name": "r32_pro_main_view.webp",
+      "rel": "images/products/r32_pro/r32_pro_main_view.webp",
+      "size": 310594
+    },
+    {
+      "name": "r32_pro_rear_view.png",
+      "rel": "images/products/r32_pro/r32_pro_rear_view.png",
+      "size": 935342
+    },
+    {
+      "name": "r32_pro_rear_view.webp",
+      "rel": "images/products/r32_pro/r32_pro_rear_view.webp",
+      "size": 550754
+    },
+    {
+      "name": "r32_pro_side_view.png",
+      "rel": "images/products/r32_pro/r32_pro_side_view.png",
+      "size": 1046764
+    },
+    {
+      "name": "r32_pro_side_view.webp",
+      "rel": "images/products/r32_pro/r32_pro_side_view.webp",
+      "size": 609336
+    },
+    {
+      "name": "r32_pro.png",
+      "rel": "images/products/r32_pro.png",
+      "size": 147878
+    },
+    {
+      "name": "r32_pro.webp",
+      "rel": "images/products/r32_pro.webp",
+      "size": 94134
+    },
+    {
+      "name": "r57_pro_main_view.png",
+      "rel": "images/products/r57_pro/r57_pro_main_view.png",
+      "size": 211748
+    },
+    {
+      "name": "battery_6fm250.webp",
+      "rel": "images/solar/battery_6fm250.webp",
+      "size": 209908
+    },
+    {
+      "name": "deye_inverter.webp",
+      "rel": "images/solar/deye_inverter.webp",
+      "size": 26026
+    },
+    {
+      "name": "jinko_600w_tiger_neo.jpg",
+      "rel": "images/solar/jinko_600w_tiger_neo.jpg",
+      "size": 22582
+    },
+    {
+      "name": "jinko_truck_delivery.jpg",
+      "rel": "images/solar/jinko_truck_delivery.jpg",
+      "size": 113238
+    },
+    {
+      "name": "jinko_warehouse.jpg",
+      "rel": "images/solar/jinko_warehouse.jpg",
+      "size": 71756
+    },
+    {
+      "name": "kit_overview.webp",
+      "rel": "images/solar/kit_overview.webp",
+      "size": 42414
+    },
+    {
+      "name": "mounting_structure.webp",
+      "rel": "images/solar/mounting_structure.webp",
+      "size": 59394
+    },
+    {
+      "name": "panel_detail.webp",
+      "rel": "images/solar/panel_detail.webp",
+      "size": 102046
+    },
+    {
+      "name": "solar_cables.webp",
+      "rel": "images/solar/solar_cables.webp",
+      "size": 306396
+    },
+    {
+      "name": "solar_installations.jpg",
+      "rel": "images/solar/solar_installations.jpg",
+      "size": 60678
+    },
+    {
+      "name": "battery_lifepo4.png",
+      "rel": "images/solar/solar_kits/battery_lifepo4.png",
+      "size": 187759
+    },
+    {
+      "name": "deye_inverter.png",
+      "rel": "images/solar/solar_kits/deye_inverter.png",
+      "size": 52007
+    },
+    {
+      "name": "jinko_600w_bifacial.webp",
+      "rel": "images/solar/solar_kits/jinko_600w_bifacial.webp",
+      "size": 22582
+    },
+    {
+      "name": "jinko_installation_toiture.webp",
+      "rel": "images/solar/solar_kits/jinko_installation_toiture.webp",
+      "size": 60678
+    },
+    {
+      "name": "jinko_panels_pair.webp",
+      "rel": "images/solar/solar_kits/jinko_panels_pair.webp",
+      "size": 20226
+    },
+    {
+      "name": "jinko_panel_layers.png",
+      "rel": "images/solar/solar_kits/jinko_panel_layers.png",
+      "size": 240921
+    },
+    {
+      "name": "jinko_tiger_neo_fiche.webp",
+      "rel": "images/solar/solar_kits/jinko_tiger_neo_fiche.webp",
+      "size": 17506
+    },
+    {
+      "name": "jinko_warehouse_stock.webp",
+      "rel": "images/solar/solar_kits/jinko_warehouse_stock.webp",
+      "size": 71756
+    },
+    {
+      "name": "solar_cables.png",
+      "rel": "images/solar/solar_kits/solar_cables.png",
+      "size": 501223
+    }
+  ]
+}

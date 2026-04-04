@@ -1,0 +1,6 @@
+{
+  "storage": {
+    "bucket": "import2030.firebasestorage.app",
+    "rules": "storage.rules"
+  }
+}
