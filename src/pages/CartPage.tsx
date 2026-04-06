@@ -158,6 +158,7 @@ export default function CartPage() {
         })),
         total_ht: totalHT,
         partenaire_code: selectedPartenaire || undefined,
+        lang: 'fr',
       })
 
       // ─── 7. UPLOAD PDF DANS STORAGE ───

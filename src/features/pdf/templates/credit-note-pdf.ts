@@ -1,11 +1,12 @@
 /**
- * invoice-pdf.ts — Generateur PDF Facture (Invoice)
- * Reproduit EXACTEMENT le design de F2600031.pdf / F2500039.pdf
+ * credit-note-pdf.ts — Generateur PDF Avoir (Credit Note)
+ * Reproduit EXACTEMENT le design de A2500001.pdf
  *
- * Differences avec le devis :
- * - Titre : "Facture FXXXXXXX" / "Invoice FXXXXXXX"
- * - Peut avoir un champ "Votre contact" dans l'emetteur
- * - PAS de section signature
+ * Differences avec la facture standard :
+ * - Titre : "Credit note AXXXXXXX" (toujours en anglais)
+ * - En-tete destinataire : "Bill to" au lieu de "Invoice to"
+ * - Tableau produits standard (5 colonnes)
+ * - Langue par defaut : anglais
  */
 import {
   createDoc, addHeader, addParties, addIBAN,
@@ -16,14 +17,14 @@ import {
 } from '../lib/pdf-engine'
 
 // ── Types ────────────────────────────────────────────
-export interface ProduitFacture {
+export interface ProduitAvoir {
   nom: string
   numero_interne?: string
   quantite: number
   prixUnitaire: number
 }
 
-export interface ClientFacture {
+export interface ClientAvoir {
   type?: 'societe' | 'particulier'
   nom: string
   prenom?: string
@@ -37,25 +38,26 @@ export interface ClientFacture {
   pays?: string
 }
 
-export interface FactureData {
-  numero_facture: string
+export interface AvoirData {
+  numero_avoir: string    // ex: "A2500001"
   date: string
-  contact?: string        // "Votre contact" (ex: "Nicolas Schmit")
-  client: ClientFacture
-  produits: ProduitFacture[]
+  contact?: string        // "Your contact"
+  client: ClientAvoir
+  produits: ProduitAvoir[]
   total_ht: number
+  facture_ref?: string    // facture d'origine si applicable
   lang?: 'fr' | 'en'
 }
 
 // ── Generateur ───────────────────────────────────────
-export function generateInvoicePDF(data: FactureData): ReturnType<typeof createDoc> {
+export function generateCreditNotePDF(data: AvoirData): ReturnType<typeof createDoc> {
   const doc = createDoc()
-  const lang = data.lang || 'fr'
+  const lang = data.lang || 'en'
   const fmt = lang === 'en' ? fmtEurEN : fmtEur
 
   // 1. En-tete
-  const titlePrefix = lang === 'en' ? 'Invoice' : 'Facture'
-  let y = addHeader(doc, `${titlePrefix} ${data.numero_facture}`, data.date)
+  const titlePrefix = lang === 'en' ? 'Credit note' : 'Avoir'
+  let y = addHeader(doc, `${titlePrefix} ${data.numero_avoir}`, data.date)
 
   // 2. Emetteur / Destinataire
   const clientNom = data.client.societe
@@ -87,12 +89,13 @@ export function generateInvoicePDF(data: FactureData): ReturnType<typeof createD
       telephone: data.client.telephone,
     },
     lang,
+    destTitle: lang === 'en' ? 'Bill to' : 'Destinataire',
   }, y)
 
   // 3. IBAN
   y = addIBAN(doc, y)
 
-  // 4. Section "Detail"
+  // 4. Section "Details"
   y = addSectionTitle(doc, lang === 'en' ? 'Details' : 'D\u00E9tail', y)
 
   // 5. Tableau produits
@@ -120,11 +123,11 @@ export function generateInvoicePDF(data: FactureData): ReturnType<typeof createD
     : 'TVA non applicable, art. 293 B du CGI'
   y = addTotal(doc, data.total_ht, y, tvaText, lang)
 
-  // 7. Conditions (PAS de signature pour les factures)
+  // 7. Conditions (PAS de signature pour les avoirs)
   addConditions(doc, y, lang)
 
   // 8. Pied de page
-  addFooter(doc, `${titlePrefix} ${data.numero_facture}`, 1, 1, lang)
+  addFooter(doc, `${titlePrefix} ${data.numero_avoir}`, 1, 1, lang)
 
   return doc
 }

@@ -3,6 +3,37 @@ Journal des modifications — Format v1.0
 
 ---
 
+## [2026-04-06 14:30] — v5.16-pdf-production
+### Modifications
+- `src/features/pdf/lib/pdf-engine.ts` : Moteur PDF mutualise LUXENT — couleurs, layout, helpers (addHeader, addParties, addIBAN, addSectionTitle, addProductTable, addTotal, addConditions, addSignature, addFooter)
+- `src/features/pdf/lib/logo-base64.ts` : Logo LUXENT LIMITED en base64 JPEG
+- `src/features/pdf/templates/quote-pdf.ts` : Reecrit — reproduction exacte D2600022.pdf (devis)
+- `src/features/pdf/templates/invoice-pdf.ts` : Reecrit — reproduction exacte F2600031.pdf (facture)
+- `src/features/pdf/templates/deposit-invoice-pdf.ts` : Cree — reproduction exacte FA2600007.pdf (facture d'acompte)
+- `src/features/pdf/templates/credit-note-pdf.ts` : Cree — reproduction exacte A2500001.pdf (avoir/credit note)
+- `src/pages/CartPage.tsx` : Ajout `lang: 'fr'` pour les devis generes depuis le panier
+
+### Fichiers touches
+- ➕ `src/features/pdf/lib/pdf-engine.ts` (cree)
+- ➕ `src/features/pdf/lib/logo-base64.ts` (cree)
+- ✏️ `src/features/pdf/templates/quote-pdf.ts` (reecrit)
+- ✏️ `src/features/pdf/templates/invoice-pdf.ts` (reecrit)
+- ➕ `src/features/pdf/templates/deposit-invoice-pdf.ts` (cree)
+- ➕ `src/features/pdf/templates/credit-note-pdf.ts` (cree)
+- ✏️ `src/pages/CartPage.tsx` (modifie)
+
+### Design reproduit
+- Couleurs : titre rose/saumon #C87F6B, en-tetes tableau violet #7B80B5 texte blanc
+- Logo : LUXENT LIMITED (globe dore) en haut a droite
+- Layout : emetteur/destinataire 2 colonnes, IBAN, tableau produits, total, conditions, footer
+- 4 types de documents : Devis, Facture, Facture d'acompte, Avoir
+
+### Statut
+- ✅ Build OK — npm run build sans erreur
+- ✅ Committe — tag v5.16-pdf-production
+
+---
+
 ## [2026-04-06 11:45] — v1.5 (non committé)
 ### Modifications
 - `scripts/update-firestore-images.mjs` : Script Admin SDK — mise à jour images[] Firestore (18 produits)
