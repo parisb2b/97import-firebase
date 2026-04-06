@@ -20,12 +20,12 @@ const C = {
 }
 
 const GALLERY = [
-  '/images/camping-car/exterior_1.webp',
-  '/images/camping-car/exterior_2.webp',
-  '/images/camping-car/interior_living.webp',
-  '/images/camping-car/interior_bedroom.webp',
-  '/images/camping-car/interior_kitchen.webp',
-  '/images/camping-car/interior_bathroom.webp',
+  '/images/products/camping_car/exterior_main.webp',
+  '/images/products/camping_car/exterior_front_side.jpg',
+  '/images/products/camping_car/interior_living.jpg',
+  '/images/products/camping_car/bedroom.jpg',
+  '/images/products/camping_car/kitchen.jpg',
+  '/images/products/camping_car/bathroom.jpg',
 ]
 
 const GALLERY_LABELS = [

@@ -70,12 +70,11 @@ export default function ModularStandardPage() {
 
   const prix = calculerPrix(totalPrixAchat, role)
 
-  // Placeholder gallery images
   const galleryImages = [
-    `/images/maisons/standard_${size.id}_1.webp`,
-    `/images/maisons/standard_${size.id}_2.webp`,
-    `/images/maisons/standard_${size.id}_3.webp`,
-    `/images/maisons/standard_${size.id}_4.webp`,
+    '/images/products/modular_standard/exterior_1.jpeg',
+    '/images/products/modular_standard/exterior_2.jpeg',
+    '/images/products/modular_standard/exterior_3.jpeg',
+    '/images/products/modular_standard/exterior_4.jpeg',
   ]
 
   function toggleOption(key: string) {

@@ -31,7 +31,7 @@ const KITS = [
     panels: '18 panneaux Jinko Tiger Neo 580W',
     inverter: 'Onduleur Deye SUN-10K-SG04LP3',
     battery: 'Batterie LiFePO4 10.24 kWh',
-    image: '/images/solaire/kit_10kw.webp',
+    image: '/images/solar/kit_overview.webp',
     highlight: false,
   },
   {
@@ -43,7 +43,7 @@ const KITS = [
     panels: '21 panneaux Jinko Tiger Neo 580W',
     inverter: 'Onduleur Deye SUN-12K-SG04LP3',
     battery: 'Batterie LiFePO4 10.24 kWh',
-    image: '/images/solaire/kit_12kw.webp',
+    image: '/images/solar/panel_detail.webp',
     highlight: true,
   },
   {
@@ -55,7 +55,7 @@ const KITS = [
     panels: '35 panneaux Jinko Tiger Neo 580W',
     inverter: 'Onduleur Deye SUN-20K-SG01HP3',
     battery: 'Batterie LiFePO4 20.48 kWh',
-    image: '/images/solaire/kit_20kw.webp',
+    image: '/images/solar/deye_inverter.webp',
     highlight: false,
   },
 ]

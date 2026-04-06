@@ -74,10 +74,10 @@ export default function ModularPremiumPage() {
   const prix = calculerPrix(totalPrixAchat, role)
 
   const galleryImages = [
-    `/images/maisons/premium_${size.id}_1.webp`,
-    `/images/maisons/premium_${size.id}_2.webp`,
-    `/images/maisons/premium_${size.id}_3.webp`,
-    `/images/maisons/premium_${size.id}_4.webp`,
+    '/images/products/modular_premium/exterior_1.jpg',
+    '/images/products/modular_premium/exterior_2.jpg',
+    '/images/products/modular_premium/exterior_3.jpg',
+    '/images/products/modular_premium/exterior_4.jpg',
   ]
 
   function toggleOption(key: string) {

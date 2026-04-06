@@ -67,7 +67,7 @@ const KITS_DATA: Record<string, KitData> = {
     },
     cables: 'Cables solaires 6mm2 + connecteurs MC4 + cable AC',
     mounting: 'Structure aluminium pour toiture (inclinee ou plate)',
-    image: '/images/solaire/kit_10kw.webp',
+    image: '/images/solar/kit_overview.webp',
   },
   'kit-solaire-12kw': {
     slug: 'kit-solaire-12kw',
@@ -97,7 +97,7 @@ const KITS_DATA: Record<string, KitData> = {
     },
     cables: 'Cables solaires 6mm2 + connecteurs MC4 + cable AC',
     mounting: 'Structure aluminium pour toiture (inclinee ou plate)',
-    image: '/images/solaire/kit_12kw.webp',
+    image: '/images/solar/panel_detail.webp',
   },
   'kit-solaire-20kw': {
     slug: 'kit-solaire-20kw',
@@ -127,7 +127,7 @@ const KITS_DATA: Record<string, KitData> = {
     },
     cables: 'Cables solaires 10mm2 + connecteurs MC4 + cable AC 3 phases',
     mounting: 'Structure aluminium renforcee pour toiture (inclinee ou plate)',
-    image: '/images/solaire/kit_20kw.webp',
+    image: '/images/solar/deye_inverter.webp',
   },
 }
 

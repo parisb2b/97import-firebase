@@ -3,6 +3,81 @@ Journal des modifications — Format v1.0
 
 ---
 
+## [2026-04-06 11:45] — v1.5 (non committé)
+### Modifications
+- `scripts/update-firestore-images.mjs` : Script Admin SDK — mise à jour images[] Firestore (18 produits)
+- `scripts/update-firestore-images.ts` : Idem via client SDK (abandonné — PERMISSION_DENIED sans auth)
+- `src/pages/AccessoiresPage.tsx` : Correction chemins fallback (`/images/accessoires/` → `/images/accessories/`, tirets → underscores)
+- `src/pages/CampingCarPage.tsx` : Correction GALLERY (`/images/camping-car/` → `/images/products/camping_car/`)
+- `src/pages/SolarPage.tsx` : Correction image KITS (`/images/solaire/` → `/images/solar/`)
+- `src/pages/SolarKitDetailPage.tsx` : Correction image KITS_DATA (`/images/solaire/` → `/images/solar/`)
+- `src/pages/ModularHomesPage.tsx` : Correction 3 cartes produits (portail → vraies images)
+- `src/pages/ModularPremiumPage.tsx` : Remplacement galleryImages dynamique par chemins statiques réels
+- `src/pages/ModularStandardPage.tsx` : Idem
+
+### Fichiers touchés
+- ➕ `scripts/update-firestore-images.mjs` (ajouté)
+- ➕ `scripts/update-firestore-images.ts` (ajouté)
+- ✏️ `src/pages/AccessoiresPage.tsx`
+- ✏️ `src/pages/CampingCarPage.tsx`
+- ✏️ `src/pages/SolarPage.tsx`
+- ✏️ `src/pages/SolarKitDetailPage.tsx`
+- ✏️ `src/pages/ModularHomesPage.tsx`
+- ✏️ `src/pages/ModularPremiumPage.tsx`
+- ✏️ `src/pages/ModularStandardPage.tsx`
+
+### Résultat Firestore
+- 18/20 produits mis à jour avec images[] réelles (attache-rapide, pince-pouce sans image disponible)
+- Mini-pelles R18/R22/R32 : 4 vues chacune | R57 : 1 vue
+- Camping-car : 7 photos | Modulaires : 4 photos chacune | Kits solaires : 5 photos chacun
+- Accessoires : 1 photo chacun
+
+### Statut
+- ⏳ En attente de commit
+
+---
+
+## [2026-04-06 11:00] — v1.4 (non committé)
+### Modifications
+- `scripts/export-products-json.ts` : Export Firestore products → JSON (lecture seule)
+- `scripts/prompt-step1-scan-images.py` : Scan local `97import2026_siteweb/vercel/images/` → `images-inventory.json`
+- `scripts/prompt-step2-generate-excel.py` : Génère `CATALOGUE-MAPPING-IMAGES.xlsx` (4 onglets, matching par mots-clés, couleurs)
+
+### Fichiers touchés
+- ➕ `scripts/export-products-json.ts` (ajouté)
+- ➕ `scripts/prompt-step1-scan-images.py` (ajouté)
+- ➕ `scripts/prompt-step2-generate-excel.py` (ajouté)
+- ➕ `scripts/images-inventory.json` (généré localement, non committé)
+- ➕ `scripts/firestore-products.json` (généré localement, non committé)
+- ➕ `CATALOGUE-MAPPING-IMAGES.xlsx` (généré localement, non committé)
+
+### Résultat
+- 132 images scannées (products, accessories, solar, logo, portal, root)
+- 20 produits Firestore chargés (projet `import-412d0`)
+- **19/20 produits avec ≥2 images** — 1 produit avec 1 seule image — 0 sans image
+
+### Statut
+- Scripts créés — non committés (fichiers de travail)
+
+---
+
+## [2026-04-06 10:19] — v1.3 (1494a98)
+### Modifications
+- `scripts/export-catalogue-excel.ts` : Script export catalogue Firestore → Excel (lecture seule)
+
+### Fichiers touchés
+- ➕ `scripts/export-catalogue-excel.ts` (ajouté)
+- ➕ `CATALOGUE-AUDIT-IMAGES.xlsx` (généré localement, non committé)
+
+### Résultat
+- 20 produits exportés depuis Firestore (`import-412d0`)
+- **20/20 sans image** — champ `images[]` vide sur tous les produits
+
+### Statut
+- ✅ Committé — branche `main`
+
+---
+
 ## [2026-04-05 07:52] — v1.1 (b284da7)
 ### Modifications
 - `majall/parcours_client_97import.svg` : Schéma workflow parcours client 6 phases (SVG)
