@@ -1,0 +1,1806 @@
+{
+  "meta": {
+    "source": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images",
+    "date_scan": "2026-04-06T11:12:47"
+  },
+  "statistiques": {
+    "total": 132,
+    "par_sous_dossier": {
+      "accessories": 32,
+      "root": 7,
+      "logo": 3,
+      "portal": 10,
+      "products": 70,
+      "solar": 10
+    },
+    "par_extension": {
+      ".jpeg": 21,
+      ".webp": 49,
+      ".png": 39,
+      ".svg": 1,
+      ".jpg": 22
+    }
+  },
+  "images": [
+    {
+      "nom": "auger_r18.jpeg",
+      "nom_sans_ext": "auger_r18",
+      "extension": ".jpeg",
+      "sous_dossier": "accessories",
+      "chemin_relatif": "accessories/auger_r18.jpeg",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\accessories\\auger_r18.jpeg",
+      "taille_ko": 14.9,
+      "mots_cles": [
+        "auger",
+        "r18"
+      ]
+    },
+    {
+      "nom": "auger_r18.webp",
+      "nom_sans_ext": "auger_r18",
+      "extension": ".webp",
+      "sous_dossier": "accessories",
+      "chemin_relatif": "accessories/auger_r18.webp",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\accessories\\auger_r18.webp",
+      "taille_ko": 38.3,
+      "mots_cles": [
+        "auger",
+        "r18"
+      ]
+    },
+    {
+      "nom": "flat_bucket_r18.jpeg",
+      "nom_sans_ext": "flat_bucket_r18",
+      "extension": ".jpeg",
+      "sous_dossier": "accessories",
+      "chemin_relatif": "accessories/flat_bucket_r18.jpeg",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\accessories\\flat_bucket_r18.jpeg",
+      "taille_ko": 12.3,
+      "mots_cles": [
+        "flat",
+        "bucket",
+        "r18"
+      ]
+    },
+    {
+      "nom": "flat_bucket_r18.webp",
+      "nom_sans_ext": "flat_bucket_r18",
+      "extension": ".webp",
+      "sous_dossier": "accessories",
+      "chemin_relatif": "accessories/flat_bucket_r18.webp",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\accessories\\flat_bucket_r18.webp",
+      "taille_ko": 34.7,
+      "mots_cles": [
+        "flat",
+        "bucket",
+        "r18"
+      ]
+    },
+    {
+      "nom": "fourche.jpeg",
+      "nom_sans_ext": "fourche",
+      "extension": ".jpeg",
+      "sous_dossier": "accessories",
+      "chemin_relatif": "accessories/fourche.jpeg",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\accessories\\fourche.jpeg",
+      "taille_ko": 14.9,
+      "mots_cles": [
+        "fourche"
+      ]
+    },
+    {
+      "nom": "fourche.webp",
+      "nom_sans_ext": "fourche",
+      "extension": ".webp",
+      "sous_dossier": "accessories",
+      "chemin_relatif": "accessories/fourche.webp",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\accessories\\fourche.webp",
+      "taille_ko": 38.3,
+      "mots_cles": [
+        "fourche"
+      ]
+    },
+    {
+      "nom": "godet_cribleur.png",
+      "nom_sans_ext": "godet_cribleur",
+      "extension": ".png",
+      "sous_dossier": "accessories",
+      "chemin_relatif": "accessories/godet_cribleur.png",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\accessories\\godet_cribleur.png",
+      "taille_ko": 19.2,
+      "mots_cles": [
+        "godet",
+        "cribleur"
+      ]
+    },
+    {
+      "nom": "godet_cribleur.webp",
+      "nom_sans_ext": "godet_cribleur",
+      "extension": ".webp",
+      "sous_dossier": "accessories",
+      "chemin_relatif": "accessories/godet_cribleur.webp",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\accessories\\godet_cribleur.webp",
+      "taille_ko": 11.6,
+      "mots_cles": [
+        "godet",
+        "cribleur"
+      ]
+    },
+    {
+      "nom": "godet_dents.png",
+      "nom_sans_ext": "godet_dents",
+      "extension": ".png",
+      "sous_dossier": "accessories",
+      "chemin_relatif": "accessories/godet_dents.png",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\accessories\\godet_dents.png",
+      "taille_ko": 22.1,
+      "mots_cles": [
+        "godet",
+        "dents"
+      ]
+    },
+    {
+      "nom": "godet_dents.webp",
+      "nom_sans_ext": "godet_dents",
+      "extension": ".webp",
+      "sous_dossier": "accessories",
+      "chemin_relatif": "accessories/godet_dents.webp",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\accessories\\godet_dents.webp",
+      "taille_ko": 13.2,
+      "mots_cles": [
+        "godet",
+        "dents"
+      ]
+    },
+    {
+      "nom": "godet_inclinable.jpeg",
+      "nom_sans_ext": "godet_inclinable",
+      "extension": ".jpeg",
+      "sous_dossier": "accessories",
+      "chemin_relatif": "accessories/godet_inclinable.jpeg",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\accessories\\godet_inclinable.jpeg",
+      "taille_ko": 14.9,
+      "mots_cles": [
+        "godet",
+        "inclinable"
+      ]
+    },
+    {
+      "nom": "godet_inclinable.webp",
+      "nom_sans_ext": "godet_inclinable",
+      "extension": ".webp",
+      "sous_dossier": "accessories",
+      "chemin_relatif": "accessories/godet_inclinable.webp",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\accessories\\godet_inclinable.webp",
+      "taille_ko": 38.3,
+      "mots_cles": [
+        "godet",
+        "inclinable"
+      ]
+    },
+    {
+      "nom": "godet_lisse.jpeg",
+      "nom_sans_ext": "godet_lisse",
+      "extension": ".jpeg",
+      "sous_dossier": "accessories",
+      "chemin_relatif": "accessories/godet_lisse.jpeg",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\accessories\\godet_lisse.jpeg",
+      "taille_ko": 14.9,
+      "mots_cles": [
+        "godet",
+        "lisse"
+      ]
+    },
+    {
+      "nom": "godet_lisse.webp",
+      "nom_sans_ext": "godet_lisse",
+      "extension": ".webp",
+      "sous_dossier": "accessories",
+      "chemin_relatif": "accessories/godet_lisse.webp",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\accessories\\godet_lisse.webp",
+      "taille_ko": 38.3,
+      "mots_cles": [
+        "godet",
+        "lisse"
+      ]
+    },
+    {
+      "nom": "grappin.jpeg",
+      "nom_sans_ext": "grappin",
+      "extension": ".jpeg",
+      "sous_dossier": "accessories",
+      "chemin_relatif": "accessories/grappin.jpeg",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\accessories\\grappin.jpeg",
+      "taille_ko": 14.9,
+      "mots_cles": [
+        "grappin"
+      ]
+    },
+    {
+      "nom": "grappin.webp",
+      "nom_sans_ext": "grappin",
+      "extension": ".webp",
+      "sous_dossier": "accessories",
+      "chemin_relatif": "accessories/grappin.webp",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\accessories\\grappin.webp",
+      "taille_ko": 38.3,
+      "mots_cles": [
+        "grappin"
+      ]
+    },
+    {
+      "nom": "grapple_r18.jpeg",
+      "nom_sans_ext": "grapple_r18",
+      "extension": ".jpeg",
+      "sous_dossier": "accessories",
+      "chemin_relatif": "accessories/grapple_r18.jpeg",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\accessories\\grapple_r18.jpeg",
+      "taille_ko": 14.4,
+      "mots_cles": [
+        "grapple",
+        "r18"
+      ]
+    },
+    {
+      "nom": "grapple_r18.webp",
+      "nom_sans_ext": "grapple_r18",
+      "extension": ".webp",
+      "sous_dossier": "accessories",
+      "chemin_relatif": "accessories/grapple_r18.webp",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\accessories\\grapple_r18.webp",
+      "taille_ko": 43.2,
+      "mots_cles": [
+        "grapple",
+        "r18"
+      ]
+    },
+    {
+      "nom": "hydraulic_hammer_r18.jpeg",
+      "nom_sans_ext": "hydraulic_hammer_r18",
+      "extension": ".jpeg",
+      "sous_dossier": "accessories",
+      "chemin_relatif": "accessories/hydraulic_hammer_r18.jpeg",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\accessories\\hydraulic_hammer_r18.jpeg",
+      "taille_ko": 14.7,
+      "mots_cles": [
+        "hydraulic",
+        "hammer",
+        "r18"
+      ]
+    },
+    {
+      "nom": "hydraulic_hammer_r18.webp",
+      "nom_sans_ext": "hydraulic_hammer_r18",
+      "extension": ".webp",
+      "sous_dossier": "accessories",
+      "chemin_relatif": "accessories/hydraulic_hammer_r18.webp",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\accessories\\hydraulic_hammer_r18.webp",
+      "taille_ko": 37.9,
+      "mots_cles": [
+        "hydraulic",
+        "hammer",
+        "r18"
+      ]
+    },
+    {
+      "nom": "marteau_hydraulique.png",
+      "nom_sans_ext": "marteau_hydraulique",
+      "extension": ".png",
+      "sous_dossier": "accessories",
+      "chemin_relatif": "accessories/marteau_hydraulique.png",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\accessories\\marteau_hydraulique.png",
+      "taille_ko": 19.0,
+      "mots_cles": [
+        "marteau",
+        "hydraulique"
+      ]
+    },
+    {
+      "nom": "marteau_hydraulique.webp",
+      "nom_sans_ext": "marteau_hydraulique",
+      "extension": ".webp",
+      "sous_dossier": "accessories",
+      "chemin_relatif": "accessories/marteau_hydraulique.webp",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\accessories\\marteau_hydraulique.webp",
+      "taille_ko": 11.4,
+      "mots_cles": [
+        "marteau",
+        "hydraulique"
+      ]
+    },
+    {
+      "nom": "rake_r18.jpeg",
+      "nom_sans_ext": "rake_r18",
+      "extension": ".jpeg",
+      "sous_dossier": "accessories",
+      "chemin_relatif": "accessories/rake_r18.jpeg",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\accessories\\rake_r18.jpeg",
+      "taille_ko": 15.2,
+      "mots_cles": [
+        "rake",
+        "r18"
+      ]
+    },
+    {
+      "nom": "rake_r18.webp",
+      "nom_sans_ext": "rake_r18",
+      "extension": ".webp",
+      "sous_dossier": "accessories",
+      "chemin_relatif": "accessories/rake_r18.webp",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\accessories\\rake_r18.webp",
+      "taille_ko": 39.4,
+      "mots_cles": [
+        "rake",
+        "r18"
+      ]
+    },
+    {
+      "nom": "ripper_r18.jpeg",
+      "nom_sans_ext": "ripper_r18",
+      "extension": ".jpeg",
+      "sous_dossier": "accessories",
+      "chemin_relatif": "accessories/ripper_r18.jpeg",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\accessories\\ripper_r18.jpeg",
+      "taille_ko": 9.2,
+      "mots_cles": [
+        "ripper",
+        "r18"
+      ]
+    },
+    {
+      "nom": "ripper_r18.webp",
+      "nom_sans_ext": "ripper_r18",
+      "extension": ".webp",
+      "sous_dossier": "accessories",
+      "chemin_relatif": "accessories/ripper_r18.webp",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\accessories\\ripper_r18.webp",
+      "taille_ko": 23.4,
+      "mots_cles": [
+        "ripper",
+        "r18"
+      ]
+    },
+    {
+      "nom": "tariere.jpeg",
+      "nom_sans_ext": "tariere",
+      "extension": ".jpeg",
+      "sous_dossier": "accessories",
+      "chemin_relatif": "accessories/tariere.jpeg",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\accessories\\tariere.jpeg",
+      "taille_ko": 14.9,
+      "mots_cles": [
+        "tariere"
+      ]
+    },
+    {
+      "nom": "tariere.webp",
+      "nom_sans_ext": "tariere",
+      "extension": ".webp",
+      "sous_dossier": "accessories",
+      "chemin_relatif": "accessories/tariere.webp",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\accessories\\tariere.webp",
+      "taille_ko": 38.3,
+      "mots_cles": [
+        "tariere"
+      ]
+    },
+    {
+      "nom": "tilt_bucket_r18.jpeg",
+      "nom_sans_ext": "tilt_bucket_r18",
+      "extension": ".jpeg",
+      "sous_dossier": "accessories",
+      "chemin_relatif": "accessories/tilt_bucket_r18.jpeg",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\accessories\\tilt_bucket_r18.jpeg",
+      "taille_ko": 14.9,
+      "mots_cles": [
+        "tilt",
+        "bucket",
+        "r18"
+      ]
+    },
+    {
+      "nom": "tilt_bucket_r18.webp",
+      "nom_sans_ext": "tilt_bucket_r18",
+      "extension": ".webp",
+      "sous_dossier": "accessories",
+      "chemin_relatif": "accessories/tilt_bucket_r18.webp",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\accessories\\tilt_bucket_r18.webp",
+      "taille_ko": 45.6,
+      "mots_cles": [
+        "tilt",
+        "bucket",
+        "r18"
+      ]
+    },
+    {
+      "nom": "tooth_bucket_r18.jpeg",
+      "nom_sans_ext": "tooth_bucket_r18",
+      "extension": ".jpeg",
+      "sous_dossier": "accessories",
+      "chemin_relatif": "accessories/tooth_bucket_r18.jpeg",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\accessories\\tooth_bucket_r18.jpeg",
+      "taille_ko": 13.3,
+      "mots_cles": [
+        "tooth",
+        "bucket",
+        "r18"
+      ]
+    },
+    {
+      "nom": "tooth_bucket_r18.webp",
+      "nom_sans_ext": "tooth_bucket_r18",
+      "extension": ".webp",
+      "sous_dossier": "accessories",
+      "chemin_relatif": "accessories/tooth_bucket_r18.webp",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\accessories\\tooth_bucket_r18.webp",
+      "taille_ko": 37.3,
+      "mots_cles": [
+        "tooth",
+        "bucket",
+        "r18"
+      ]
+    },
+    {
+      "nom": "direxport_logo_blue.png",
+      "nom_sans_ext": "direxport_logo_blue",
+      "extension": ".png",
+      "sous_dossier": "root",
+      "chemin_relatif": "direxport_logo_blue.png",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\direxport_logo_blue.png",
+      "taille_ko": 1.5,
+      "mots_cles": [
+        "direxport",
+        "logo",
+        "blue"
+      ]
+    },
+    {
+      "nom": "logo_import97_footer.png",
+      "nom_sans_ext": "logo_import97_footer",
+      "extension": ".png",
+      "sous_dossier": "logo",
+      "chemin_relatif": "logo/logo_import97_footer.png",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\logo\\logo_import97_footer.png",
+      "taille_ko": 82.1,
+      "mots_cles": [
+        "logo",
+        "import97",
+        "footer"
+      ]
+    },
+    {
+      "nom": "rippa_dom_tom.svg",
+      "nom_sans_ext": "rippa_dom_tom",
+      "extension": ".svg",
+      "sous_dossier": "logo",
+      "chemin_relatif": "logo/rippa_dom_tom.svg",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\logo\\rippa_dom_tom.svg",
+      "taille_ko": 3.2,
+      "mots_cles": [
+        "rippa",
+        "dom",
+        "tom"
+      ]
+    },
+    {
+      "nom": "rippa_logo.webp",
+      "nom_sans_ext": "rippa_logo",
+      "extension": ".webp",
+      "sous_dossier": "logo",
+      "chemin_relatif": "logo/rippa_logo.webp",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\logo\\rippa_logo.webp",
+      "taille_ko": 47.4,
+      "mots_cles": [
+        "rippa",
+        "logo"
+      ]
+    },
+    {
+      "nom": "logo_import97.png",
+      "nom_sans_ext": "logo_import97",
+      "extension": ".png",
+      "sous_dossier": "root",
+      "chemin_relatif": "logo_import97.png",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\logo_import97.png",
+      "taille_ko": 97.8,
+      "mots_cles": [
+        "logo",
+        "import97"
+      ]
+    },
+    {
+      "nom": "logo_import97_footer_transparent.png",
+      "nom_sans_ext": "logo_import97_footer_transparent",
+      "extension": ".png",
+      "sous_dossier": "root",
+      "chemin_relatif": "logo_import97_footer_transparent.png",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\logo_import97_footer_transparent.png",
+      "taille_ko": 119.9,
+      "mots_cles": [
+        "logo",
+        "import97",
+        "footer",
+        "transparent"
+      ]
+    },
+    {
+      "nom": "logo_import97_large.png",
+      "nom_sans_ext": "logo_import97_large",
+      "extension": ".png",
+      "sous_dossier": "root",
+      "chemin_relatif": "logo_import97_large.png",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\logo_import97_large.png",
+      "taille_ko": 146.7,
+      "mots_cles": [
+        "logo",
+        "import97",
+        "large"
+      ]
+    },
+    {
+      "nom": "logo_rippa_domtom_transparent.png",
+      "nom_sans_ext": "logo_rippa_domtom_transparent",
+      "extension": ".png",
+      "sous_dossier": "root",
+      "chemin_relatif": "logo_rippa_domtom_transparent.png",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\logo_rippa_domtom_transparent.png",
+      "taille_ko": 18.5,
+      "mots_cles": [
+        "logo",
+        "rippa",
+        "domtom",
+        "transparent"
+      ]
+    },
+    {
+      "nom": "logo_rippa_new.png",
+      "nom_sans_ext": "logo_rippa_new",
+      "extension": ".png",
+      "sous_dossier": "root",
+      "chemin_relatif": "logo_rippa_new.png",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\logo_rippa_new.png",
+      "taille_ko": 104.8,
+      "mots_cles": [
+        "logo",
+        "rippa",
+        "new"
+      ]
+    },
+    {
+      "nom": "agri_tractor.jpeg",
+      "nom_sans_ext": "agri_tractor",
+      "extension": ".jpeg",
+      "sous_dossier": "portal",
+      "chemin_relatif": "portal/agri_tractor.jpeg",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\portal\\agri_tractor.jpeg",
+      "taille_ko": 189.3,
+      "mots_cles": [
+        "agri",
+        "tractor"
+      ]
+    },
+    {
+      "nom": "agri_tractor.jpg",
+      "nom_sans_ext": "agri_tractor",
+      "extension": ".jpg",
+      "sous_dossier": "portal",
+      "chemin_relatif": "portal/agri_tractor.jpg",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\portal\\agri_tractor.jpg",
+      "taille_ko": 53.3,
+      "mots_cles": [
+        "agri",
+        "tractor"
+      ]
+    },
+    {
+      "nom": "camping_car.jpg",
+      "nom_sans_ext": "camping_car",
+      "extension": ".jpg",
+      "sous_dossier": "portal",
+      "chemin_relatif": "portal/camping_car.jpg",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\portal\\camping_car.jpg",
+      "taille_ko": 303.9,
+      "mots_cles": [
+        "camping",
+        "car"
+      ]
+    },
+    {
+      "nom": "camping_car.png",
+      "nom_sans_ext": "camping_car",
+      "extension": ".png",
+      "sous_dossier": "portal",
+      "chemin_relatif": "portal/camping_car.png",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\portal\\camping_car.png",
+      "taille_ko": 640.2,
+      "mots_cles": [
+        "camping",
+        "car"
+      ]
+    },
+    {
+      "nom": "hero_ship.png",
+      "nom_sans_ext": "hero_ship",
+      "extension": ".png",
+      "sous_dossier": "portal",
+      "chemin_relatif": "portal/hero_ship.png",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\portal\\hero_ship.png",
+      "taille_ko": 1061.8,
+      "mots_cles": [
+        "hero",
+        "ship"
+      ]
+    },
+    {
+      "nom": "modular_home.png",
+      "nom_sans_ext": "modular_home",
+      "extension": ".png",
+      "sous_dossier": "portal",
+      "chemin_relatif": "portal/modular_home.png",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\portal\\modular_home.png",
+      "taille_ko": 1395.9,
+      "mots_cles": [
+        "modular",
+        "home"
+      ]
+    },
+    {
+      "nom": "modular_home.webp",
+      "nom_sans_ext": "modular_home",
+      "extension": ".webp",
+      "sous_dossier": "portal",
+      "chemin_relatif": "portal/modular_home.webp",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\portal\\modular_home.webp",
+      "taille_ko": 307.6,
+      "mots_cles": [
+        "modular",
+        "home"
+      ]
+    },
+    {
+      "nom": "solar_panel.jpg",
+      "nom_sans_ext": "solar_panel",
+      "extension": ".jpg",
+      "sous_dossier": "portal",
+      "chemin_relatif": "portal/solar_panel.jpg",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\portal\\solar_panel.jpg",
+      "taille_ko": 401.7,
+      "mots_cles": [
+        "solar",
+        "panel"
+      ]
+    },
+    {
+      "nom": "solar_panel_jinko.png",
+      "nom_sans_ext": "solar_panel_jinko",
+      "extension": ".png",
+      "sous_dossier": "portal",
+      "chemin_relatif": "portal/solar_panel_jinko.png",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\portal\\solar_panel_jinko.png",
+      "taille_ko": 328.9,
+      "mots_cles": [
+        "solar",
+        "panel",
+        "jinko"
+      ]
+    },
+    {
+      "nom": "solar_roof.jpg",
+      "nom_sans_ext": "solar_roof",
+      "extension": ".jpg",
+      "sous_dossier": "portal",
+      "chemin_relatif": "portal/solar_roof.jpg",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\portal\\solar_roof.jpg",
+      "taille_ko": 126.8,
+      "mots_cles": [
+        "solar",
+        "roof"
+      ]
+    },
+    {
+      "nom": "bathroom.jpg",
+      "nom_sans_ext": "bathroom",
+      "extension": ".jpg",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/camping_car/bathroom.jpg",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\camping_car\\bathroom.jpg",
+      "taille_ko": 165.1,
+      "mots_cles": [
+        "bathroom"
+      ]
+    },
+    {
+      "nom": "bedroom.jpg",
+      "nom_sans_ext": "bedroom",
+      "extension": ".jpg",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/camping_car/bedroom.jpg",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\camping_car\\bedroom.jpg",
+      "taille_ko": 275.5,
+      "mots_cles": [
+        "bedroom"
+      ]
+    },
+    {
+      "nom": "dining_area.jpg",
+      "nom_sans_ext": "dining_area",
+      "extension": ".jpg",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/camping_car/dining_area.jpg",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\camping_car\\dining_area.jpg",
+      "taille_ko": 290.2,
+      "mots_cles": [
+        "dining",
+        "area"
+      ]
+    },
+    {
+      "nom": "exterior_back.jpg",
+      "nom_sans_ext": "exterior_back",
+      "extension": ".jpg",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/camping_car/exterior_back.jpg",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\camping_car\\exterior_back.jpg",
+      "taille_ko": 260.0,
+      "mots_cles": [
+        "exterior",
+        "back"
+      ]
+    },
+    {
+      "nom": "exterior_front_side.jpg",
+      "nom_sans_ext": "exterior_front_side",
+      "extension": ".jpg",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/camping_car/exterior_front_side.jpg",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\camping_car\\exterior_front_side.jpg",
+      "taille_ko": 264.5,
+      "mots_cles": [
+        "exterior",
+        "front",
+        "side"
+      ]
+    },
+    {
+      "nom": "exterior_main.webp",
+      "nom_sans_ext": "exterior_main",
+      "extension": ".webp",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/camping_car/exterior_main.webp",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\camping_car\\exterior_main.webp",
+      "taille_ko": 23.2,
+      "mots_cles": [
+        "exterior",
+        "main"
+      ]
+    },
+    {
+      "nom": "exterior_side.jpg",
+      "nom_sans_ext": "exterior_side",
+      "extension": ".jpg",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/camping_car/exterior_side.jpg",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\camping_car\\exterior_side.jpg",
+      "taille_ko": 198.8,
+      "mots_cles": [
+        "exterior",
+        "side"
+      ]
+    },
+    {
+      "nom": "interior_living.jpg",
+      "nom_sans_ext": "interior_living",
+      "extension": ".jpg",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/camping_car/interior_living.jpg",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\camping_car\\interior_living.jpg",
+      "taille_ko": 244.3,
+      "mots_cles": [
+        "interior",
+        "living"
+      ]
+    },
+    {
+      "nom": "interior_overview.jpg",
+      "nom_sans_ext": "interior_overview",
+      "extension": ".jpg",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/camping_car/interior_overview.jpg",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\camping_car\\interior_overview.jpg",
+      "taille_ko": 283.3,
+      "mots_cles": [
+        "interior",
+        "overview"
+      ]
+    },
+    {
+      "nom": "kitchen.jpg",
+      "nom_sans_ext": "kitchen",
+      "extension": ".jpg",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/camping_car/kitchen.jpg",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\camping_car\\kitchen.jpg",
+      "taille_ko": 246.7,
+      "mots_cles": [
+        "kitchen"
+      ]
+    },
+    {
+      "nom": "laundry.jpg",
+      "nom_sans_ext": "laundry",
+      "extension": ".jpg",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/camping_car/laundry.jpg",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\camping_car\\laundry.jpg",
+      "taille_ko": 238.4,
+      "mots_cles": [
+        "laundry"
+      ]
+    },
+    {
+      "nom": "exterior_1.jpg",
+      "nom_sans_ext": "exterior_1",
+      "extension": ".jpg",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/modular_premium/exterior_1.jpg",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\modular_premium\\exterior_1.jpg",
+      "taille_ko": 243.8,
+      "mots_cles": [
+        "exterior"
+      ]
+    },
+    {
+      "nom": "exterior_2.jpg",
+      "nom_sans_ext": "exterior_2",
+      "extension": ".jpg",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/modular_premium/exterior_2.jpg",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\modular_premium\\exterior_2.jpg",
+      "taille_ko": 191.6,
+      "mots_cles": [
+        "exterior"
+      ]
+    },
+    {
+      "nom": "exterior_3.jpg",
+      "nom_sans_ext": "exterior_3",
+      "extension": ".jpg",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/modular_premium/exterior_3.jpg",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\modular_premium\\exterior_3.jpg",
+      "taille_ko": 2642.6,
+      "mots_cles": [
+        "exterior"
+      ]
+    },
+    {
+      "nom": "exterior_4.jpg",
+      "nom_sans_ext": "exterior_4",
+      "extension": ".jpg",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/modular_premium/exterior_4.jpg",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\modular_premium\\exterior_4.jpg",
+      "taille_ko": 303.2,
+      "mots_cles": [
+        "exterior"
+      ]
+    },
+    {
+      "nom": "exterior_1.jpeg",
+      "nom_sans_ext": "exterior_1",
+      "extension": ".jpeg",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/modular_standard/exterior_1.jpeg",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\modular_standard\\exterior_1.jpeg",
+      "taille_ko": 110.5,
+      "mots_cles": [
+        "exterior"
+      ]
+    },
+    {
+      "nom": "exterior_2.jpeg",
+      "nom_sans_ext": "exterior_2",
+      "extension": ".jpeg",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/modular_standard/exterior_2.jpeg",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\modular_standard\\exterior_2.jpeg",
+      "taille_ko": 93.6,
+      "mots_cles": [
+        "exterior"
+      ]
+    },
+    {
+      "nom": "exterior_3.jpeg",
+      "nom_sans_ext": "exterior_3",
+      "extension": ".jpeg",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/modular_standard/exterior_3.jpeg",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\modular_standard\\exterior_3.jpeg",
+      "taille_ko": 216.6,
+      "mots_cles": [
+        "exterior"
+      ]
+    },
+    {
+      "nom": "exterior_4.jpeg",
+      "nom_sans_ext": "exterior_4",
+      "extension": ".jpeg",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/modular_standard/exterior_4.jpeg",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\modular_standard\\exterior_4.jpeg",
+      "taille_ko": 75.2,
+      "mots_cles": [
+        "exterior"
+      ]
+    },
+    {
+      "nom": "exterior_5.jpeg",
+      "nom_sans_ext": "exterior_5",
+      "extension": ".jpeg",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/modular_standard/exterior_5.jpeg",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\modular_standard\\exterior_5.jpeg",
+      "taille_ko": 195.2,
+      "mots_cles": [
+        "exterior"
+      ]
+    },
+    {
+      "nom": "exterior_6.jpeg",
+      "nom_sans_ext": "exterior_6",
+      "extension": ".jpeg",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/modular_standard/exterior_6.jpeg",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\modular_standard\\exterior_6.jpeg",
+      "taille_ko": 186.6,
+      "mots_cles": [
+        "exterior"
+      ]
+    },
+    {
+      "nom": "exterior_7.jpeg",
+      "nom_sans_ext": "exterior_7",
+      "extension": ".jpeg",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/modular_standard/exterior_7.jpeg",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\modular_standard\\exterior_7.jpeg",
+      "taille_ko": 189.3,
+      "mots_cles": [
+        "exterior"
+      ]
+    },
+    {
+      "nom": "r10_eco_main.png",
+      "nom_sans_ext": "r10_eco_main",
+      "extension": ".png",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/r10_eco_main.png",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\r10_eco_main.png",
+      "taille_ko": 494.1,
+      "mots_cles": [
+        "r10",
+        "eco",
+        "main"
+      ]
+    },
+    {
+      "nom": "r10_eco_main.webp",
+      "nom_sans_ext": "r10_eco_main",
+      "extension": ".webp",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/r10_eco_main.webp",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\r10_eco_main.webp",
+      "taille_ko": 308.0,
+      "mots_cles": [
+        "r10",
+        "eco",
+        "main"
+      ]
+    },
+    {
+      "nom": "r13_pro.png",
+      "nom_sans_ext": "r13_pro",
+      "extension": ".png",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/r13_pro.png",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\r13_pro.png",
+      "taille_ko": 19.5,
+      "mots_cles": [
+        "r13",
+        "pro"
+      ]
+    },
+    {
+      "nom": "r13_pro.webp",
+      "nom_sans_ext": "r13_pro",
+      "extension": ".webp",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/r13_pro.webp",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\r13_pro.webp",
+      "taille_ko": 11.1,
+      "mots_cles": [
+        "r13",
+        "pro"
+      ]
+    },
+    {
+      "nom": "r15_eco.png",
+      "nom_sans_ext": "r15_eco",
+      "extension": ".png",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/r15_eco.png",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\r15_eco.png",
+      "taille_ko": 19.5,
+      "mots_cles": [
+        "r15",
+        "eco"
+      ]
+    },
+    {
+      "nom": "r15_eco.webp",
+      "nom_sans_ext": "r15_eco",
+      "extension": ".webp",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/r15_eco.webp",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\r15_eco.webp",
+      "taille_ko": 11.1,
+      "mots_cles": [
+        "r15",
+        "eco"
+      ]
+    },
+    {
+      "nom": "r18_pro_cab_view.png",
+      "nom_sans_ext": "r18_pro_cab_view",
+      "extension": ".png",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/r18_pro/r18_pro_cab_view.png",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\r18_pro\\r18_pro_cab_view.png",
+      "taille_ko": 260.8,
+      "mots_cles": [
+        "r18",
+        "pro",
+        "cab",
+        "view"
+      ]
+    },
+    {
+      "nom": "r18_pro_cab_view.webp",
+      "nom_sans_ext": "r18_pro_cab_view",
+      "extension": ".webp",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/r18_pro/r18_pro_cab_view.webp",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\r18_pro\\r18_pro_cab_view.webp",
+      "taille_ko": 161.7,
+      "mots_cles": [
+        "r18",
+        "pro",
+        "cab",
+        "view"
+      ]
+    },
+    {
+      "nom": "r18_pro_main_view.png",
+      "nom_sans_ext": "r18_pro_main_view",
+      "extension": ".png",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/r18_pro/r18_pro_main_view.png",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\r18_pro\\r18_pro_main_view.png",
+      "taille_ko": 469.9,
+      "mots_cles": [
+        "r18",
+        "pro",
+        "main",
+        "view"
+      ]
+    },
+    {
+      "nom": "r18_pro_main_view.webp",
+      "nom_sans_ext": "r18_pro_main_view",
+      "extension": ".webp",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/r18_pro/r18_pro_main_view.webp",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\r18_pro\\r18_pro_main_view.webp",
+      "taille_ko": 289.5,
+      "mots_cles": [
+        "r18",
+        "pro",
+        "main",
+        "view"
+      ]
+    },
+    {
+      "nom": "r18_pro_rear_view.png",
+      "nom_sans_ext": "r18_pro_rear_view",
+      "extension": ".png",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/r18_pro/r18_pro_rear_view.png",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\r18_pro\\r18_pro_rear_view.png",
+      "taille_ko": 1011.7,
+      "mots_cles": [
+        "r18",
+        "pro",
+        "rear",
+        "view"
+      ]
+    },
+    {
+      "nom": "r18_pro_rear_view.webp",
+      "nom_sans_ext": "r18_pro_rear_view",
+      "extension": ".webp",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/r18_pro/r18_pro_rear_view.webp",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\r18_pro\\r18_pro_rear_view.webp",
+      "taille_ko": 573.9,
+      "mots_cles": [
+        "r18",
+        "pro",
+        "rear",
+        "view"
+      ]
+    },
+    {
+      "nom": "r18_pro_side_view.png",
+      "nom_sans_ext": "r18_pro_side_view",
+      "extension": ".png",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/r18_pro/r18_pro_side_view.png",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\r18_pro\\r18_pro_side_view.png",
+      "taille_ko": 1029.6,
+      "mots_cles": [
+        "r18",
+        "pro",
+        "side",
+        "view"
+      ]
+    },
+    {
+      "nom": "r18_pro_side_view.webp",
+      "nom_sans_ext": "r18_pro_side_view",
+      "extension": ".webp",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/r18_pro/r18_pro_side_view.webp",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\r18_pro\\r18_pro_side_view.webp",
+      "taille_ko": 581.5,
+      "mots_cles": [
+        "r18",
+        "pro",
+        "side",
+        "view"
+      ]
+    },
+    {
+      "nom": "r18_pro.png",
+      "nom_sans_ext": "r18_pro",
+      "extension": ".png",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/r18_pro.png",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\r18_pro.png",
+      "taille_ko": 148.6,
+      "mots_cles": [
+        "r18",
+        "pro"
+      ]
+    },
+    {
+      "nom": "r18_pro.webp",
+      "nom_sans_ext": "r18_pro",
+      "extension": ".webp",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/r18_pro.webp",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\r18_pro.webp",
+      "taille_ko": 91.9,
+      "mots_cles": [
+        "r18",
+        "pro"
+      ]
+    },
+    {
+      "nom": "r22_pro_cab_view.png",
+      "nom_sans_ext": "r22_pro_cab_view",
+      "extension": ".png",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/r22_pro/r22_pro_cab_view.png",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\r22_pro\\r22_pro_cab_view.png",
+      "taille_ko": 236.0,
+      "mots_cles": [
+        "r22",
+        "pro",
+        "cab",
+        "view"
+      ]
+    },
+    {
+      "nom": "r22_pro_cab_view.webp",
+      "nom_sans_ext": "r22_pro_cab_view",
+      "extension": ".webp",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/r22_pro/r22_pro_cab_view.webp",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\r22_pro\\r22_pro_cab_view.webp",
+      "taille_ko": 147.9,
+      "mots_cles": [
+        "r22",
+        "pro",
+        "cab",
+        "view"
+      ]
+    },
+    {
+      "nom": "r22_pro_main_view.png",
+      "nom_sans_ext": "r22_pro_main_view",
+      "extension": ".png",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/r22_pro/r22_pro_main_view.png",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\r22_pro\\r22_pro_main_view.png",
+      "taille_ko": 470.1,
+      "mots_cles": [
+        "r22",
+        "pro",
+        "main",
+        "view"
+      ]
+    },
+    {
+      "nom": "r22_pro_main_view.webp",
+      "nom_sans_ext": "r22_pro_main_view",
+      "extension": ".webp",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/r22_pro/r22_pro_main_view.webp",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\r22_pro\\r22_pro_main_view.webp",
+      "taille_ko": 300.4,
+      "mots_cles": [
+        "r22",
+        "pro",
+        "main",
+        "view"
+      ]
+    },
+    {
+      "nom": "r22_pro_rear_view.png",
+      "nom_sans_ext": "r22_pro_rear_view",
+      "extension": ".png",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/r22_pro/r22_pro_rear_view.png",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\r22_pro\\r22_pro_rear_view.png",
+      "taille_ko": 1023.6,
+      "mots_cles": [
+        "r22",
+        "pro",
+        "rear",
+        "view"
+      ]
+    },
+    {
+      "nom": "r22_pro_rear_view.webp",
+      "nom_sans_ext": "r22_pro_rear_view",
+      "extension": ".webp",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/r22_pro/r22_pro_rear_view.webp",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\r22_pro\\r22_pro_rear_view.webp",
+      "taille_ko": 601.6,
+      "mots_cles": [
+        "r22",
+        "pro",
+        "rear",
+        "view"
+      ]
+    },
+    {
+      "nom": "r22_pro_side_view.png",
+      "nom_sans_ext": "r22_pro_side_view",
+      "extension": ".png",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/r22_pro/r22_pro_side_view.png",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\r22_pro\\r22_pro_side_view.png",
+      "taille_ko": 1034.2,
+      "mots_cles": [
+        "r22",
+        "pro",
+        "side",
+        "view"
+      ]
+    },
+    {
+      "nom": "r22_pro_side_view.webp",
+      "nom_sans_ext": "r22_pro_side_view",
+      "extension": ".webp",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/r22_pro/r22_pro_side_view.webp",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\r22_pro\\r22_pro_side_view.webp",
+      "taille_ko": 606.6,
+      "mots_cles": [
+        "r22",
+        "pro",
+        "side",
+        "view"
+      ]
+    },
+    {
+      "nom": "r22_pro.png",
+      "nom_sans_ext": "r22_pro",
+      "extension": ".png",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/r22_pro.png",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\r22_pro.png",
+      "taille_ko": 150.8,
+      "mots_cles": [
+        "r22",
+        "pro"
+      ]
+    },
+    {
+      "nom": "r22_pro.webp",
+      "nom_sans_ext": "r22_pro",
+      "extension": ".webp",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/r22_pro.webp",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\r22_pro.webp",
+      "taille_ko": 93.6,
+      "mots_cles": [
+        "r22",
+        "pro"
+      ]
+    },
+    {
+      "nom": "r22_pro_main.png",
+      "nom_sans_ext": "r22_pro_main",
+      "extension": ".png",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/r22_pro_main.png",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\r22_pro_main.png",
+      "taille_ko": 470.1,
+      "mots_cles": [
+        "r22",
+        "pro",
+        "main"
+      ]
+    },
+    {
+      "nom": "r22_pro_main.webp",
+      "nom_sans_ext": "r22_pro_main",
+      "extension": ".webp",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/r22_pro_main.webp",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\r22_pro_main.webp",
+      "taille_ko": 300.4,
+      "mots_cles": [
+        "r22",
+        "pro",
+        "main"
+      ]
+    },
+    {
+      "nom": "r32_pro_cab_view.png",
+      "nom_sans_ext": "r32_pro_cab_view",
+      "extension": ".png",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/r32_pro/r32_pro_cab_view.png",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\r32_pro\\r32_pro_cab_view.png",
+      "taille_ko": 214.6,
+      "mots_cles": [
+        "r32",
+        "pro",
+        "cab",
+        "view"
+      ]
+    },
+    {
+      "nom": "r32_pro_cab_view.webp",
+      "nom_sans_ext": "r32_pro_cab_view",
+      "extension": ".webp",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/r32_pro/r32_pro_cab_view.webp",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\r32_pro\\r32_pro_cab_view.webp",
+      "taille_ko": 132.8,
+      "mots_cles": [
+        "r32",
+        "pro",
+        "cab",
+        "view"
+      ]
+    },
+    {
+      "nom": "r32_pro_main_view.png",
+      "nom_sans_ext": "r32_pro_main_view",
+      "extension": ".png",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/r32_pro/r32_pro_main_view.png",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\r32_pro\\r32_pro_main_view.png",
+      "taille_ko": 461.9,
+      "mots_cles": [
+        "r32",
+        "pro",
+        "main",
+        "view"
+      ]
+    },
+    {
+      "nom": "r32_pro_main_view.webp",
+      "nom_sans_ext": "r32_pro_main_view",
+      "extension": ".webp",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/r32_pro/r32_pro_main_view.webp",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\r32_pro\\r32_pro_main_view.webp",
+      "taille_ko": 303.3,
+      "mots_cles": [
+        "r32",
+        "pro",
+        "main",
+        "view"
+      ]
+    },
+    {
+      "nom": "r32_pro_rear_view.png",
+      "nom_sans_ext": "r32_pro_rear_view",
+      "extension": ".png",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/r32_pro/r32_pro_rear_view.png",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\r32_pro\\r32_pro_rear_view.png",
+      "taille_ko": 913.4,
+      "mots_cles": [
+        "r32",
+        "pro",
+        "rear",
+        "view"
+      ]
+    },
+    {
+      "nom": "r32_pro_rear_view.webp",
+      "nom_sans_ext": "r32_pro_rear_view",
+      "extension": ".webp",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/r32_pro/r32_pro_rear_view.webp",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\r32_pro\\r32_pro_rear_view.webp",
+      "taille_ko": 537.8,
+      "mots_cles": [
+        "r32",
+        "pro",
+        "rear",
+        "view"
+      ]
+    },
+    {
+      "nom": "r32_pro_side_view.png",
+      "nom_sans_ext": "r32_pro_side_view",
+      "extension": ".png",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/r32_pro/r32_pro_side_view.png",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\r32_pro\\r32_pro_side_view.png",
+      "taille_ko": 1022.2,
+      "mots_cles": [
+        "r32",
+        "pro",
+        "side",
+        "view"
+      ]
+    },
+    {
+      "nom": "r32_pro_side_view.webp",
+      "nom_sans_ext": "r32_pro_side_view",
+      "extension": ".webp",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/r32_pro/r32_pro_side_view.webp",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\r32_pro\\r32_pro_side_view.webp",
+      "taille_ko": 595.1,
+      "mots_cles": [
+        "r32",
+        "pro",
+        "side",
+        "view"
+      ]
+    },
+    {
+      "nom": "r32_pro.png",
+      "nom_sans_ext": "r32_pro",
+      "extension": ".png",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/r32_pro.png",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\r32_pro.png",
+      "taille_ko": 144.4,
+      "mots_cles": [
+        "r32",
+        "pro"
+      ]
+    },
+    {
+      "nom": "r32_pro.webp",
+      "nom_sans_ext": "r32_pro",
+      "extension": ".webp",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/r32_pro.webp",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\r32_pro.webp",
+      "taille_ko": 91.9,
+      "mots_cles": [
+        "r32",
+        "pro"
+      ]
+    },
+    {
+      "nom": "r57_pro_main_view.png",
+      "nom_sans_ext": "r57_pro_main_view",
+      "extension": ".png",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/r57_pro/r57_pro_main_view.png",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\r57_pro\\r57_pro_main_view.png",
+      "taille_ko": 206.8,
+      "mots_cles": [
+        "r57",
+        "pro",
+        "main",
+        "view"
+      ]
+    },
+    {
+      "nom": "battery_lifepo4.png",
+      "nom_sans_ext": "battery_lifepo4",
+      "extension": ".png",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/solar_kits/battery_lifepo4.png",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\solar_kits\\battery_lifepo4.png",
+      "taille_ko": 183.4,
+      "mots_cles": [
+        "battery",
+        "lifepo4"
+      ]
+    },
+    {
+      "nom": "deye_inverter.png",
+      "nom_sans_ext": "deye_inverter",
+      "extension": ".png",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/solar_kits/deye_inverter.png",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\solar_kits\\deye_inverter.png",
+      "taille_ko": 50.8,
+      "mots_cles": [
+        "deye",
+        "inverter"
+      ]
+    },
+    {
+      "nom": "jinko_600w_bifacial.webp",
+      "nom_sans_ext": "jinko_600w_bifacial",
+      "extension": ".webp",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/solar_kits/jinko_600w_bifacial.webp",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\solar_kits\\jinko_600w_bifacial.webp",
+      "taille_ko": 22.1,
+      "mots_cles": [
+        "jinko",
+        "600w",
+        "bifacial"
+      ]
+    },
+    {
+      "nom": "jinko_installation_toiture.webp",
+      "nom_sans_ext": "jinko_installation_toiture",
+      "extension": ".webp",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/solar_kits/jinko_installation_toiture.webp",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\solar_kits\\jinko_installation_toiture.webp",
+      "taille_ko": 59.3,
+      "mots_cles": [
+        "jinko",
+        "installation",
+        "toiture"
+      ]
+    },
+    {
+      "nom": "jinko_panel_layers.png",
+      "nom_sans_ext": "jinko_panel_layers",
+      "extension": ".png",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/solar_kits/jinko_panel_layers.png",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\solar_kits\\jinko_panel_layers.png",
+      "taille_ko": 235.3,
+      "mots_cles": [
+        "jinko",
+        "panel",
+        "layers"
+      ]
+    },
+    {
+      "nom": "jinko_panels_pair.webp",
+      "nom_sans_ext": "jinko_panels_pair",
+      "extension": ".webp",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/solar_kits/jinko_panels_pair.webp",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\solar_kits\\jinko_panels_pair.webp",
+      "taille_ko": 19.8,
+      "mots_cles": [
+        "jinko",
+        "panels",
+        "pair"
+      ]
+    },
+    {
+      "nom": "jinko_tiger_neo_fiche.webp",
+      "nom_sans_ext": "jinko_tiger_neo_fiche",
+      "extension": ".webp",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/solar_kits/jinko_tiger_neo_fiche.webp",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\solar_kits\\jinko_tiger_neo_fiche.webp",
+      "taille_ko": 17.1,
+      "mots_cles": [
+        "jinko",
+        "tiger",
+        "neo",
+        "fiche"
+      ]
+    },
+    {
+      "nom": "jinko_warehouse_stock.webp",
+      "nom_sans_ext": "jinko_warehouse_stock",
+      "extension": ".webp",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/solar_kits/jinko_warehouse_stock.webp",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\solar_kits\\jinko_warehouse_stock.webp",
+      "taille_ko": 70.1,
+      "mots_cles": [
+        "jinko",
+        "warehouse",
+        "stock"
+      ]
+    },
+    {
+      "nom": "solar_cables.png",
+      "nom_sans_ext": "solar_cables",
+      "extension": ".png",
+      "sous_dossier": "products",
+      "chemin_relatif": "products/solar_kits/solar_cables.png",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\products\\solar_kits\\solar_cables.png",
+      "taille_ko": 489.5,
+      "mots_cles": [
+        "solar",
+        "cables"
+      ]
+    },
+    {
+      "nom": "rippa-dom-tom-white.png",
+      "nom_sans_ext": "rippa-dom-tom-white",
+      "extension": ".png",
+      "sous_dossier": "root",
+      "chemin_relatif": "rippa-dom-tom-white.png",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\rippa-dom-tom-white.png",
+      "taille_ko": 113.5,
+      "mots_cles": [
+        "rippa",
+        "dom",
+        "tom",
+        "white"
+      ]
+    },
+    {
+      "nom": "battery_6fm250.webp",
+      "nom_sans_ext": "battery_6fm250",
+      "extension": ".webp",
+      "sous_dossier": "solar",
+      "chemin_relatif": "solar/battery_6fm250.webp",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\solar\\battery_6fm250.webp",
+      "taille_ko": 205.0,
+      "mots_cles": [
+        "battery",
+        "6fm250"
+      ]
+    },
+    {
+      "nom": "deye_inverter.webp",
+      "nom_sans_ext": "deye_inverter",
+      "extension": ".webp",
+      "sous_dossier": "solar",
+      "chemin_relatif": "solar/deye_inverter.webp",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\solar\\deye_inverter.webp",
+      "taille_ko": 25.4,
+      "mots_cles": [
+        "deye",
+        "inverter"
+      ]
+    },
+    {
+      "nom": "jinko_600w_tiger_neo.jpg",
+      "nom_sans_ext": "jinko_600w_tiger_neo",
+      "extension": ".jpg",
+      "sous_dossier": "solar",
+      "chemin_relatif": "solar/jinko_600w_tiger_neo.jpg",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\solar\\jinko_600w_tiger_neo.jpg",
+      "taille_ko": 22.1,
+      "mots_cles": [
+        "jinko",
+        "600w",
+        "tiger",
+        "neo"
+      ]
+    },
+    {
+      "nom": "jinko_truck_delivery.jpg",
+      "nom_sans_ext": "jinko_truck_delivery",
+      "extension": ".jpg",
+      "sous_dossier": "solar",
+      "chemin_relatif": "solar/jinko_truck_delivery.jpg",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\solar\\jinko_truck_delivery.jpg",
+      "taille_ko": 110.6,
+      "mots_cles": [
+        "jinko",
+        "truck",
+        "delivery"
+      ]
+    },
+    {
+      "nom": "jinko_warehouse.jpg",
+      "nom_sans_ext": "jinko_warehouse",
+      "extension": ".jpg",
+      "sous_dossier": "solar",
+      "chemin_relatif": "solar/jinko_warehouse.jpg",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\solar\\jinko_warehouse.jpg",
+      "taille_ko": 70.1,
+      "mots_cles": [
+        "jinko",
+        "warehouse"
+      ]
+    },
+    {
+      "nom": "kit_overview.webp",
+      "nom_sans_ext": "kit_overview",
+      "extension": ".webp",
+      "sous_dossier": "solar",
+      "chemin_relatif": "solar/kit_overview.webp",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\solar\\kit_overview.webp",
+      "taille_ko": 41.4,
+      "mots_cles": [
+        "kit",
+        "overview"
+      ]
+    },
+    {
+      "nom": "mounting_structure.webp",
+      "nom_sans_ext": "mounting_structure",
+      "extension": ".webp",
+      "sous_dossier": "solar",
+      "chemin_relatif": "solar/mounting_structure.webp",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\solar\\mounting_structure.webp",
+      "taille_ko": 58.0,
+      "mots_cles": [
+        "mounting",
+        "structure"
+      ]
+    },
+    {
+      "nom": "panel_detail.webp",
+      "nom_sans_ext": "panel_detail",
+      "extension": ".webp",
+      "sous_dossier": "solar",
+      "chemin_relatif": "solar/panel_detail.webp",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\solar\\panel_detail.webp",
+      "taille_ko": 99.7,
+      "mots_cles": [
+        "panel",
+        "detail"
+      ]
+    },
+    {
+      "nom": "solar_cables.webp",
+      "nom_sans_ext": "solar_cables",
+      "extension": ".webp",
+      "sous_dossier": "solar",
+      "chemin_relatif": "solar/solar_cables.webp",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\solar\\solar_cables.webp",
+      "taille_ko": 299.2,
+      "mots_cles": [
+        "solar",
+        "cables"
+      ]
+    },
+    {
+      "nom": "solar_installations.jpg",
+      "nom_sans_ext": "solar_installations",
+      "extension": ".jpg",
+      "sous_dossier": "solar",
+      "chemin_relatif": "solar/solar_installations.jpg",
+      "chemin_absolu": "C:\\DATA-MC-2030\\97IMPORT\\97import2026_siteweb\\vercel\\images\\solar\\solar_installations.jpg",
+      "taille_ko": 59.3,
+      "mots_cles": [
+        "solar",
+        "installations"
+      ]
+    }
+  ]
+}

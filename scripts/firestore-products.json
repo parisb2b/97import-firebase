@@ -1,0 +1,202 @@
+[
+  {
+    "id": "attache-rapide",
+    "nom": "Attache rapide Hydraulique",
+    "nom_chinois": "",
+    "numero_interne": "ACC-AR-001",
+    "categorie": "accessoires",
+    "prix_achat": 0,
+    "actif": true,
+    "images": []
+  },
+  {
+    "id": "camping-car-deluxe-hybride",
+    "nom": "Camping Car Deluxe Hybride",
+    "nom_chinois": "",
+    "numero_interne": "CC-BYD-001",
+    "categorie": "maisons",
+    "prix_achat": 41269,
+    "actif": true,
+    "images": []
+  },
+  {
+    "id": "godet-plat",
+    "nom": "Godet de curage",
+    "nom_chinois": "",
+    "numero_interne": "ACC-GC-001",
+    "categorie": "accessoires",
+    "prix_achat": 0,
+    "actif": true,
+    "images": []
+  },
+  {
+    "id": "godet-inclinable",
+    "nom": "Godet inclinable",
+    "nom_chinois": "",
+    "numero_interne": "ACC-GI-001",
+    "categorie": "accessoires",
+    "prix_achat": 0,
+    "actif": true,
+    "images": []
+  },
+  {
+    "id": "godet-dents",
+    "nom": "Godet à dents",
+    "nom_chinois": "",
+    "numero_interne": "ACC-GD-001",
+    "categorie": "accessoires",
+    "prix_achat": 0,
+    "actif": true,
+    "images": []
+  },
+  {
+    "id": "grappin",
+    "nom": "Grappin",
+    "nom_chinois": "",
+    "numero_interne": "ACC-GP-001",
+    "categorie": "accessoires",
+    "prix_achat": 0,
+    "actif": true,
+    "images": []
+  },
+  {
+    "id": "kit-solaire-10kw",
+    "nom": "Kit Solaire 10 kW",
+    "nom_chinois": "",
+    "numero_interne": "KS-10K-001",
+    "categorie": "solaire",
+    "prix_achat": 6146,
+    "actif": true,
+    "images": []
+  },
+  {
+    "id": "kit-solaire-12kw",
+    "nom": "Kit Solaire 12 kW",
+    "nom_chinois": "",
+    "numero_interne": "KS-12K-001",
+    "categorie": "solaire",
+    "prix_achat": 6915,
+    "actif": true,
+    "images": []
+  },
+  {
+    "id": "kit-solaire-20kw",
+    "nom": "Kit Solaire 20 kW",
+    "nom_chinois": "",
+    "numero_interne": "KS-20K-001",
+    "categorie": "solaire",
+    "prix_achat": 14608,
+    "actif": true,
+    "images": []
+  },
+  {
+    "id": "maison-modulaire-premium",
+    "nom": "Maison Modulaire Premium",
+    "nom_chinois": "",
+    "numero_interne": "MP-20-001",
+    "categorie": "maisons",
+    "prix_achat": 7631,
+    "actif": true,
+    "images": []
+  },
+  {
+    "id": "maison-modulaire-standard",
+    "nom": "Maison Modulaire Standard",
+    "nom_chinois": "",
+    "numero_interne": "MS-20-001",
+    "categorie": "maisons",
+    "prix_achat": 4308,
+    "actif": true,
+    "images": []
+  },
+  {
+    "id": "marteau-hydraulique",
+    "nom": "Marteau hydraulique (Destructeur)",
+    "nom_chinois": "",
+    "numero_interne": "ACC-MH-001",
+    "categorie": "accessoires",
+    "prix_achat": 0,
+    "actif": true,
+    "images": []
+  },
+  {
+    "id": "pince-pouce",
+    "nom": "Pince-pouce Hydraulique",
+    "nom_chinois": "",
+    "numero_interne": "ACC-PP-001",
+    "categorie": "accessoires",
+    "prix_achat": 0,
+    "actif": true,
+    "images": []
+  },
+  {
+    "id": "r18-pro",
+    "nom": "R18 PRO",
+    "nom_chinois": "",
+    "numero_interne": "MP-R18-001",
+    "categorie": "mini-pelles",
+    "prix_achat": 9538,
+    "actif": true,
+    "images": []
+  },
+  {
+    "id": "r22-pro",
+    "nom": "R22 PRO",
+    "nom_chinois": "",
+    "numero_interne": "MP-R22-001",
+    "categorie": "mini-pelles",
+    "prix_achat": 12150,
+    "actif": true,
+    "images": []
+  },
+  {
+    "id": "r32-pro",
+    "nom": "R32 PRO",
+    "nom_chinois": "",
+    "numero_interne": "MP-R32-001",
+    "categorie": "mini-pelles",
+    "prix_achat": 14296,
+    "actif": true,
+    "images": []
+  },
+  {
+    "id": "r57-pro",
+    "nom": "R57 PRO",
+    "nom_chinois": "",
+    "numero_interne": "MP-R57-001",
+    "categorie": "mini-pelles",
+    "prix_achat": 19923,
+    "actif": true,
+    "images": []
+  },
+  {
+    "id": "ripper",
+    "nom": "Ripper",
+    "nom_chinois": "",
+    "numero_interne": "ACC-RP-001",
+    "categorie": "accessoires",
+    "prix_achat": 0,
+    "actif": true,
+    "images": []
+  },
+  {
+    "id": "rateau",
+    "nom": "Râteau",
+    "nom_chinois": "",
+    "numero_interne": "ACC-RT-001",
+    "categorie": "accessoires",
+    "prix_achat": 0,
+    "actif": true,
+    "images": []
+  },
+  {
+    "id": "tariere",
+    "nom": "Tarière (Foret à terre)",
+    "nom_chinois": "",
+    "numero_interne": "ACC-TA-001",
+    "categorie": "accessoires",
+    "prix_achat": 0,
+    "actif": true,
+    "images": []
+  }
+]

@@ -1,0 +1,50 @@
+Les images sont référencées de deux façons différentes selon le type de page. Voici la situation exacte :
+
+
+Code recherché
+Code recherché
+
+Réponse claire avec les deux patterns :
+
+Deux mécanismes, pas Firebase Storage
+Pattern A — Pages qui lisent Firestore (MiniPellesPage, AccessoiresPage, CataloguePage, ProductPage)
+Le composant lit p.images[] depuis Firestore. Le champ contient des chemins relatifs vers public/images/ :
+
+// MiniPellesPage.tsx:208
+<img
+  src={p.images?.[0] || PLACEHOLDER}
+  onError={(e) => { (e.target as HTMLImageElement).src = PLACEHOLDER }}
+/>
+
+Dans Firestore, après le script d'hier, le champ images de r18-pro vaut :
+
+[
+  "/images/products/r18_pro/r18_pro_main_view.webp",
+  "/images/products/r18_pro/r18_pro_side_view.webp",
+  ...
+]
+
+Le navigateur résout /images/products/... → public/images/products/... — servi statiquement par Vite/IONOS.
+
+Pattern B — Pages avec galerie codée en dur (CampingCarPage, SolarPage, ModularPremiumPage)
+// CampingCarPage.tsx:22
+const GALLERY = [
+  '/images/products/camping_car/exterior_main.webp',
+  '/images/products/camping_car/exterior_front_side.jpg',
+  '/images/products/camping_car/interior_living.jpg',
+  ...
+]
+
+// utilisé directement :
+<img src={GALLERY[selectedImage]} />
+
+Pas de Firestore — les chemins sont dans le code source.
+
+Ce que ce N'EST PAS
+Il n'y a aucune URL Firebase Storage (firebasestorage.googleapis.com) dans le projet. Les images ne sont pas uploadées dans Firebase Storage — elles sont dans public/images/ et déployées comme assets statiques avec le reste du site.
+
+Résumé
+Source image	Mécanisme	Fichiers concernés
+public/images/ via Firestore	p.images?.[0] lu en BDD	MiniPelles, Accessoires, Catalogue, ProductPage
+public/images/ codé en dur	constante dans le composant	CampingCar, Solar, Modulaires
+Firebase Storage	—	Non utilisé

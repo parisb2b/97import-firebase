@@ -122,11 +122,11 @@ export function generateQuotePDF(data: DevisData): ReturnType<typeof createDoc> 
     : 'TVA non applicable, art. 293 B du CGI'
   y = addTotal(doc, data.total_ht, y, tvaText, lang)
 
-  // 7. Conditions — colonne gauche
-  // 8. Signature — colonne droite (sur la meme ligne Y)
-  const conditionsY = y
-  y = addConditions(doc, conditionsY, lang)
-  addSignature(doc, conditionsY, lang)
+  // 7. Conditions (page 2 si necessaire)
+  y = addConditions(doc, y, lang)
+
+  // 8. Signature — sous les conditions (pas de chevauchement)
+  y = addSignature(doc, y, lang)
 
   // 9. Pied de page
   addFooter(doc, `${titlePrefix} ${data.numero_devis}`, 1, 1, lang)

@@ -12,30 +12,41 @@ import { LUXENT_LOGO_BASE64 } from './logo-base64'
 // COULEURS — EXTRAITES DES PDFs DE REFERENCE
 // ═══════════════════════════════════════════════════════
 export const PDF_COLORS = {
-  // Titre & sous-titres : rose/saumon
-  title: [200, 127, 107] as [number, number, number],       // #C87F6B
+  // Accent principal : Navy (ancien site 97import)
+  accent: [30, 58, 95] as [number, number, number],         // #1E3A5F
+  title: [30, 58, 95] as [number, number, number],          // #1E3A5F
 
   // Texte
   black: [0, 0, 0] as [number, number, number],
-  darkGray: [74, 74, 74] as [number, number, number],       // #4A4A4A
-  gray: [128, 128, 128] as [number, number, number],        // #808080
-  lightGray: [229, 229, 229] as [number, number, number],   // #E5E5E5
+  darkGray: [55, 65, 81] as [number, number, number],       // #374151
+  gray: [107, 114, 128] as [number, number, number],        // #6B7280
+  lightGray: [191, 219, 254] as [number, number, number],   // #BFDBFE
   white: [255, 255, 255] as [number, number, number],
 
-  // Tableau — en-tetes violet/lavande (tel que dans les PDFs de reference)
-  headerBg: [123, 128, 181] as [number, number, number],    // #7B80B5
-  headerText: [255, 255, 255] as [number, number, number],  // blanc
+  // Tableau — en-tetes Navy fond blanc, bordures bleu clair
+  headerBg: [255, 255, 255] as [number, number, number],    // blanc
+  headerText: [30, 58, 95] as [number, number, number],     // #1E3A5F Navy
+
+  // Couleurs specifiques par type de document
+  green: [4, 120, 87] as [number, number, number],          // #047857 Facture
+  deliveryGreen: [22, 163, 74] as [number, number, number], // #16A34A BL
+  amber: [180, 83, 9] as [number, number, number],          // #B45309 Commission
+  maritime: [2, 132, 199] as [number, number, number],      // #0284C7 Maritime
+  customs: [124, 58, 237] as [number, number, number],      // #7C3AED Dedouanement
+
+  // Fond sections
+  sectionBg: [239, 246, 255] as [number, number, number],   // #EFF6FF
 }
 
 // ═══════════════════════════════════════════════════════
 // CONSTANTES MISE EN PAGE A4
 // ═══════════════════════════════════════════════════════
 export const PAGE = {
-  marginL: 20,
-  marginR: 190,       // 210 - 20
+  marginL: 15,
+  marginR: 195,       // 210 - 15
   width: 210,
   height: 297,
-  contentWidth: 170,   // marginR - marginL
+  contentWidth: 180,   // marginR - marginL
 }
 
 // ═══════════════════════════════════════════════════════
@@ -71,30 +82,43 @@ export function addHeader(
   doc: jsPDF,
   title: string,       // ex: "Facture F2600031"
   date: string,        // ex: "31 mars 2026"
+  accentColor?: [number, number, number],
 ): number {
+  const accent = accentColor || PDF_COLORS.accent
+
   // Logo en haut a droite
   try {
-    doc.addImage(LUXENT_LOGO_BASE64, 'JPEG', 140, 12, 50, 16)
+    doc.addImage(LUXENT_LOGO_BASE64, 'JPEG', 145, 10, 45, 14)
   } catch {
+    // Fallback texte
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(16)
+    doc.setTextColor(...accent)
+    doc.text('97import.com', PAGE.marginR, 20, { align: 'right' })
     doc.setFont('helvetica', 'normal')
-    doc.setFontSize(12)
+    doc.setFontSize(8.5)
     doc.setTextColor(...PDF_COLORS.gray)
-    doc.text('LUXENT LIMITED', PAGE.marginR, 20, { align: 'right' })
+    doc.text('Importation & Distribution', PAGE.marginR, 26, { align: 'right' })
   }
 
-  // Titre du document — rose/saumon, grande taille, leger
-  doc.setFont('helvetica', 'normal')
-  doc.setFontSize(28)
-  doc.setTextColor(...PDF_COLORS.title)
-  doc.text(title, PAGE.marginL, 30)
+  // Titre du document — Bold 20pt couleur accent
+  doc.setFont('helvetica', 'bold')
+  doc.setFontSize(20)
+  doc.setTextColor(...accent)
+  doc.text(title, PAGE.marginL, 24)
 
   // Date sous le titre
   doc.setFont('helvetica', 'normal')
-  doc.setFontSize(11)
-  doc.setTextColor(...PDF_COLORS.darkGray)
-  doc.text(date, PAGE.marginL, 38)
+  doc.setFontSize(9)
+  doc.setTextColor(...PDF_COLORS.gray)
+  doc.text(`Date : ${date}`, PAGE.marginL, 30)
 
-  return 55
+  // Ligne separateur
+  doc.setDrawColor(...PDF_COLORS.lightGray)
+  doc.setLineWidth(0.8)
+  doc.line(PAGE.marginL, 34, PAGE.marginR, 34)
+
+  return 42
 }
 
 // ═══════════════════════════════════════════════════════
@@ -127,93 +151,70 @@ export interface PartyInfo {
 export function addParties(doc: jsPDF, info: PartyInfo, startY: number): number {
   const { emetteur: em, destinataire: dest, lang = 'fr' } = info
   const colL = PAGE.marginL
-  const colR = 115
-  const valueX = colL + 38
-  const valueXR = colR + 35
+  const colR = 105
   let y = startY
 
-  // Titres de section
-  doc.setFont('helvetica', 'normal')
-  doc.setFontSize(16)
-  doc.setTextColor(...PDF_COLORS.title)
-  doc.text(lang === 'en' ? 'From' : '\u00C9metteur', colL, y)
-  const destTitle = info.destTitle || (lang === 'en' ? 'Invoice to' : 'Destinataire')
+  // Labels de section — Bold 7.5pt #4A90D9
+  doc.setFont('helvetica', 'bold')
+  doc.setFontSize(7.5)
+  doc.setTextColor(74, 144, 217)  // #4A90D9
+  doc.text(lang === 'en' ? 'FROM' : '\u00C9METTEUR', colL, y)
+  const destTitle = info.destTitle || (lang === 'en' ? 'INVOICE TO' : 'DESTINATAIRE')
   doc.text(destTitle, colR, y)
-  y += 10
-
-  const labelStyle = () => {
-    doc.setFont('helvetica', 'normal')
-    doc.setFontSize(9)
-    doc.setTextColor(...PDF_COLORS.gray)
-  }
-  const valueStyle = (bold = false) => {
-    doc.setFont('helvetica', bold ? 'bold' : 'normal')
-    doc.setFontSize(9)
-    doc.setTextColor(...PDF_COLORS.black)
-  }
-
-  const addField = (label: string, value: string, x: number, vx: number, yPos: number, bold = false): number => {
-    labelStyle()
-    doc.text(label, x, yPos)
-    valueStyle(bold)
-    const lines = doc.splitTextToSize(value, 55)
-    doc.text(lines, vx, yPos)
-    return yPos + (lines.length * 4.5)
-  }
+  y += 5
 
   let yL = y
   let yR = y
 
-  // ── Emetteur (gauche) ──
-  yL = addField(lang === 'en' ? 'Company :' : 'Soci\u00E9t\u00E9 :', em.societe, colL, valueX, yL, true)
+  // ── Emetteur (gauche, largeur 85mm) ──
+  doc.setFont('helvetica', 'bold')
+  doc.setFontSize(10)
+  doc.setTextColor(...PDF_COLORS.accent)
+  doc.text(em.societe, colL, yL)
+  yL += 5
+
   if (em.contact) {
-    yL = addField(lang === 'en' ? 'Your contact :' : 'Votre contact :', em.contact, colL, valueX, yL)
-  }
-  yL = addField(lang === 'en' ? 'Address :' : 'Adresse :', em.adresse, colL, valueX, yL)
-  if (em.adresse2) {
-    valueStyle()
-    doc.text(em.adresse2, valueX, yL)
-    yL += 4.5
-  }
-  if (em.adresse3) {
-    valueStyle()
-    doc.text(em.adresse3, valueX, yL)
-    yL += 4.5
-  }
-  yL = addField(lang === 'en' ? 'Country :' : 'Pays :', em.pays, colL, valueX, yL)
-  yL = addField(
-    lang === 'en' ? 'Company number :' : "Num\u00E9ro d'entreprise :",
-    em.numero_entreprise, colL, valueX, yL,
-  )
-  yL = addField(
-    lang === 'en' ? 'Email :' : 'Adresse email :',
-    em.email, colL, valueX, yL,
-  )
-
-  // ── Destinataire (droite) ──
-  const destLabel = dest.type === 'societe'
-    ? (lang === 'en' ? 'Company :' : 'Soci\u00E9t\u00E9 :')
-    : (lang === 'en' ? 'Name :' : 'Nom :')
-  yR = addField(destLabel, dest.nom, colR, valueXR, yR, true)
-  if (dest.adresse) {
-    yR = addField(lang === 'en' ? 'Address :' : 'Adresse :', dest.adresse, colR, valueXR, yR)
-  }
-  if (dest.adresse2) {
-    valueStyle()
-    doc.text(dest.adresse2, valueXR, yR)
-    yR += 4.5
-  }
-  if (dest.pays) {
-    yR = addField(lang === 'en' ? 'Country :' : 'Pays :', dest.pays, colR, valueXR, yR)
-  }
-  if (dest.email) {
-    yR = addField(lang === 'en' ? 'Email :' : 'Adresse email :', dest.email, colR, valueXR, yR)
-  }
-  if (dest.telephone) {
-    yR = addField(lang === 'en' ? 'Phone :' : 'T\u00E9l :', dest.telephone, colR, valueXR, yR)
+    doc.setFont('helvetica', 'normal')
+    doc.setFontSize(8.5)
+    doc.setTextColor(...PDF_COLORS.darkGray)
+    doc.text(`Contact : ${em.contact}`, colL, yL)
+    yL += 4
   }
 
-  return Math.max(yL, yR) + 5
+  doc.setFont('helvetica', 'normal')
+  doc.setFontSize(8.5)
+  doc.setTextColor(...PDF_COLORS.darkGray)
+  doc.text(em.adresse, colL, yL); yL += 4
+  if (em.adresse2) { doc.text(em.adresse2, colL, yL); yL += 4 }
+  if (em.adresse3) { doc.text(em.adresse3, colL, yL); yL += 4 }
+  doc.text(lang === 'en' ? em.pays : em.pays, colL, yL); yL += 4
+  doc.text(`${lang === 'en' ? 'Company No' : "N\u00B0 entreprise"} : ${em.numero_entreprise}`, colL, yL); yL += 4
+  doc.text(`Email : ${em.email}`, colL, yL); yL += 4
+
+  // ── Destinataire (droite, largeur 85mm) ──
+  doc.setFont('helvetica', 'bold')
+  doc.setFontSize(10)
+  doc.setTextColor(...PDF_COLORS.accent)
+  doc.text(dest.nom, colR, yR)
+  yR += 5
+
+  doc.setFont('helvetica', 'normal')
+  doc.setFontSize(8.5)
+  doc.setTextColor(...PDF_COLORS.darkGray)
+  if (dest.adresse) { doc.text(dest.adresse, colR, yR); yR += 4 }
+  if (dest.adresse2) { doc.text(dest.adresse2, colR, yR); yR += 4 }
+  if (dest.pays) { doc.text(dest.pays, colR, yR); yR += 4 }
+  if (dest.email) { doc.text(`Email : ${dest.email}`, colR, yR); yR += 4 }
+  if (dest.telephone) { doc.text(`${lang === 'en' ? 'Phone' : 'T\u00E9l'} : ${dest.telephone}`, colR, yR); yR += 4 }
+
+  const maxY = Math.max(yL, yR) + 2
+
+  // Ligne separateur
+  doc.setDrawColor(...PDF_COLORS.lightGray)
+  doc.setLineWidth(0.5)
+  doc.line(PAGE.marginL, maxY, PAGE.marginR, maxY)
+
+  return maxY + 4
 }
 
 // ═══════════════════════════════════════════════════════
@@ -279,24 +280,27 @@ export function addProductTable(
 
     styles: {
       font: 'helvetica',
-      fontSize: 8.5,
+      fontSize: 9,
       cellPadding: { top: 4, bottom: 4, left: 3, right: 3 },
-      textColor: PDF_COLORS.black,
+      textColor: PDF_COLORS.darkGray,
       lineColor: PDF_COLORS.lightGray,
-      lineWidth: 0.2,
+      lineWidth: 0.3,
       overflow: 'linebreak',
+      minCellHeight: 10,
     },
 
     headStyles: {
-      fillColor: PDF_COLORS.headerBg,
-      textColor: PDF_COLORS.headerText,
-      fontStyle: 'normal',
-      fontSize: 8.5,
+      fillColor: PDF_COLORS.white,
+      textColor: PDF_COLORS.accent,
+      fontStyle: 'bold',
+      fontSize: 9,
+      lineColor: PDF_COLORS.lightGray,
+      lineWidth: 0.4,
     },
 
     bodyStyles: {
       fillColor: PDF_COLORS.white,
-      textColor: PDF_COLORS.black,
+      textColor: PDF_COLORS.darkGray,
     },
 
     alternateRowStyles: {
@@ -340,34 +344,50 @@ export function addTotal(
   startY: number,
   tvaText?: string,
   lang: 'fr' | 'en' = 'fr',
+  accentColor?: [number, number, number],
 ): number {
-  let y = startY + 8
+  const accent = accentColor || PDF_COLORS.accent
+  let y = startY + 6
 
-  // TVA mention
-  if (tvaText) {
-    doc.setFont('helvetica', 'normal')
-    doc.setFontSize(8)
-    doc.setTextColor(...PDF_COLORS.gray)
-    doc.text(tvaText, PAGE.marginR, y, { align: 'right' })
-    y += 6
-  }
+  // Boite arrondie pour le total
+  const boxX = 113
+  const boxW = 82
+  const boxH = 14
+  doc.setDrawColor(...accent)
+  doc.setLineWidth(0.8)
+  doc.roundedRect(boxX, y, boxW, boxH, 2, 2, 'S')
 
-  // Total
+  // Label "TOTAL HT"
   doc.setFont('helvetica', 'bold')
   doc.setFontSize(10)
-  doc.setTextColor(...PDF_COLORS.title)  // rose/saumon comme dans les refs
-  doc.text('Total', PAGE.marginR - 45, y)
+  doc.setTextColor(...accent)
+  doc.text(lang === 'en' ? 'TOTAL excl. tax :' : 'TOTAL HT :', boxX + 4, y + 9)
 
-  doc.setFont('helvetica', 'normal')
-  doc.setTextColor(...PDF_COLORS.black)
+  // Montant
   doc.text(
     lang === 'en' ? fmtEurEN(total) : fmtEur(total),
-    PAGE.marginR,
-    y,
+    boxX + boxW - 4,
+    y + 9,
     { align: 'right' },
   )
 
-  return y + 10
+  y += boxH + 3
+
+  // TVA mention — boite fond gris clair
+  if (tvaText) {
+    doc.setFillColor(249, 250, 251) // #F9FAFB
+    doc.setDrawColor(...PDF_COLORS.lightGray)
+    doc.setLineWidth(0.3)
+    doc.roundedRect(boxX, y, boxW, 8, 1.5, 1.5, 'FD')
+
+    doc.setFont('helvetica', 'italic')
+    doc.setFontSize(8)
+    doc.setTextColor(...PDF_COLORS.gray)
+    doc.text(tvaText, boxX + boxW / 2, y + 5.5, { align: 'center' })
+    y += 10
+  }
+
+  return y + 4
 }
 
 // ═══════════════════════════════════════════════════════
@@ -385,39 +405,56 @@ export function addConditions(
     y = 25
   }
 
-  y = addSectionTitle(doc, lang === 'en' ? 'Terms' : 'Conditions', y)
-  y += 3
-
-  doc.setFontSize(9)
-
-  // Payment terms
+  // Titre section — Bold 13pt Navy
   doc.setFont('helvetica', 'bold')
-  doc.setTextColor(...PDF_COLORS.black)
-  const termLabel = lang === 'en' ? 'Payment terms : ' : 'Conditions de r\u00E8glement : '
-  doc.text(termLabel, PAGE.marginL, y)
-  doc.setFont('helvetica', 'normal')
-  const termW = doc.getTextWidth(termLabel)
+  doc.setFontSize(13)
+  doc.setTextColor(...PDF_COLORS.accent)
   doc.text(
-    lang === 'en' ? 'Upon receipt' : '\u00C0 r\u00E9ception',
-    PAGE.marginL + termW,
-    y,
+    lang === 'en' ? 'General terms & Acceptance' : 'Conditions g\u00E9n\u00E9rales & Bon pour accord',
+    PAGE.marginL, y,
   )
+  y += 8
 
-  y += 5
+  // Section boxes — fond #EFF6FF, bordure #BFDBFE
+  const sections = lang === 'en' ? [
+    ['Payment terms', 'Upon receipt of invoice.'],
+    ['Payment method', 'Bank transfer \u2014 details provided on the invoice.'],
+    ['Delivery', 'Delivery times are indicative.\nShipping and customs fees not included.'],
+    ['Validity', `This quotation is valid for 30 days.`],
+  ] : [
+    ['Conditions de r\u00E8glement', '\u00C0 r\u00E9ception de la facture.'],
+    ['Mode de r\u00E8glement', 'Virement bancaire \u2014 coordonn\u00E9es fournies sur la facture.'],
+    ['Livraison', 'Les d\u00E9lais sont donn\u00E9s \u00E0 titre indicatif.\nFrais de livraison et d\u00E9douanement non inclus.'],
+    ['Validit\u00E9', 'Ce devis est valable 30 jours.'],
+  ]
 
-  // Payment method
-  doc.setFont('helvetica', 'bold')
-  const methLabel = lang === 'en' ? 'Payment method : ' : 'Mode de r\u00E8glement : '
-  doc.text(methLabel, PAGE.marginL, y)
-  doc.setFont('helvetica', 'normal')
-  const methW = doc.getTextWidth(methLabel)
-  doc.text(
-    lang === 'en' ? 'Bank transfer' : 'Virement bancaire',
-    PAGE.marginL + methW,
-    y,
-  )
+  for (const [label, value] of sections) {
+    // Boite fond bleu clair
+    const lines = doc.splitTextToSize(value, 160)
+    const boxH = 6 + lines.length * 4
+    doc.setFillColor(...PDF_COLORS.sectionBg)
+    doc.setDrawColor(...PDF_COLORS.lightGray)
+    doc.setLineWidth(0.3)
+    doc.roundedRect(PAGE.marginL, y - 3, PAGE.contentWidth, boxH, 1, 1, 'FD')
 
-  return y + 10
+    // Label bold
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(8.5)
+    doc.setTextColor(...PDF_COLORS.accent)
+    const labelText = `${label} : `
+    doc.text(labelText, PAGE.marginL + 3, y + 1)
+    const labelW = doc.getTextWidth(labelText)
+
+    // Value normal
+    doc.setFont('helvetica', 'normal')
+    doc.setFontSize(8.5)
+    doc.setTextColor(...PDF_COLORS.darkGray)
+    doc.text(lines, PAGE.marginL + 3 + labelW, y + 1)
+
+    y += boxH + 2
+  }
+
+  return y + 2
 }
 
 // ═══════════════════════════════════════════════════════
@@ -428,54 +465,53 @@ export function addSignature(
   startY: number,
   lang: 'fr' | 'en' = 'fr',
 ): number {
-  const colR = PAGE.marginL + 100  // colonne droite
-  let y = startY + 5
+  let y = startY
 
-  if (y > 230) {
+  if (y > 210) {
     doc.addPage()
     y = 25
   }
 
-  // Titre "Acceptation du client" — colonne DROITE (meme hauteur que Conditions)
-  doc.setFont('helvetica', 'normal')
-  doc.setFontSize(16)
-  doc.setTextColor(...PDF_COLORS.title)
+  // ── Zone signature (pleine largeur, sous les conditions) ──
+  // Titre
+  doc.setFont('helvetica', 'bold')
+  doc.setFontSize(11)
+  doc.setTextColor(...PDF_COLORS.accent)
   doc.text(
-    lang === 'en' ? 'Customer acceptance' : 'Acceptation du client',
-    colR,
+    lang === 'en' ? 'Acceptance' : 'Bon pour accord',
+    PAGE.width / 2,
     y,
+    { align: 'center' },
   )
-  y += 13
+  y += 8
+
+  // 2 colonnes : gauche "Fait a" / droite "Le"
+  const colL = PAGE.marginL
+  const colR = PAGE.marginL + 95
 
   doc.setFont('helvetica', 'normal')
   doc.setFontSize(9)
   doc.setTextColor(...PDF_COLORS.darkGray)
 
-  doc.text(
-    lang === 'en'
-      ? 'At ______________, the ____/____/____'
-      : '\u00C0 ______________, le ____/____/____',
-    colR,
-    y,
-  )
+  // Gauche
+  doc.text(lang === 'en' ? 'At :' : 'Fait \u00E0 :', colL, y)
+  doc.setDrawColor(...PDF_COLORS.lightGray)
+  doc.setLineWidth(0.3)
+  doc.roundedRect(colL, y + 2, 80, 22, 1, 1, 'S')
 
-  y += 20
+  // Droite
+  doc.text(lang === 'en' ? 'Date :' : 'Le :', colR, y)
   doc.text(
-    lang === 'en' ? 'Signature' : 'Signature',
-    colR,
-    y,
+    lang === 'en' ? 'Title of signatory :' : 'Qualit\u00E9 du signataire :',
+    colR, y + 10,
   )
+  y += 28
 
-  y += 15
-  doc.text(
-    lang === 'en'
-      ? 'Name and position of signatory'
-      : 'Nom et qualit\u00E9 du signataire',
-    colR,
-    y,
-  )
+  // Signature
+  doc.text(lang === 'en' ? 'Signature :' : 'Signature :', colL, y)
+  doc.roundedRect(colL, y + 2, 80, 28, 1, 1, 'S')
 
-  return y + 10
+  return y + 35
 }
 
 // ═══════════════════════════════════════════════════════
@@ -491,20 +527,28 @@ export function addFooter(
   const pageCount = doc.getNumberOfPages()
   for (let i = 1; i <= pageCount; i++) {
     doc.setPage(i)
+
+    // Ligne separateur
+    doc.setDrawColor(...PDF_COLORS.lightGray)
+    doc.setLineWidth(0.3)
+    doc.line(PAGE.marginL, 285, PAGE.marginR, 285)
+
+    // Centre : "NumDoc — 97import.com / LUXENT LIMITED"
     doc.setFont('helvetica', 'normal')
-    doc.setFontSize(7)
+    doc.setFontSize(7.5)
     doc.setTextColor(...PDF_COLORS.gray)
+    doc.text(
+      `${docNumber} \u2014 97import.com / LUXENT LIMITED`,
+      PAGE.width / 2,
+      289,
+      { align: 'center' },
+    )
 
+    // Droite : "Page n / total"
     const pageText = lang === 'en'
-      ? `Page ${i} of ${pageCount}`
-      : `Page ${i} sur ${pageCount}`
-
-    doc.text(pageText, PAGE.marginR, 288, { align: 'right' })
-
-    // Numero de document en bas a gauche
-    doc.setFontSize(8)
-    doc.setTextColor(...PDF_COLORS.gray)
-    doc.text(docNumber, PAGE.marginL, 288)
+      ? `Page ${i} / ${pageCount}`
+      : `Page ${i} / ${pageCount}`
+    doc.text(pageText, PAGE.marginR, 289, { align: 'right' })
   }
 }
 

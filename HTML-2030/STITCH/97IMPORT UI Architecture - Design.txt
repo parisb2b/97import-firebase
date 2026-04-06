@@ -1,0 +1,57 @@
+# 97IMPORT UI Architecture & Design System Specification
+
+## 1. Color Palette (Pixel-Level Precision)
+
+| Element | HEX / Value | Description |
+| :--- | :--- | :--- |
+| **Primary Brand Blue** | `#004C99` | Navigation icons, primary headings, 'RECHERCHER' button. |
+| **Secondary Light Blue** | `#00A3E0` | Hero section background (solid blue area). |
+| **Hero Gradient** | `linear-gradient(to bottom, #74C6F4 0%, #FFFFFF 100%)` | Main background behind the ship and cabin. |
+| **Action Orange** | `#FFB084` | 'PRIX-50%' buttons, contact email button. |
+| **Success/Contact Green**| `#25D366` | WhatsApp button. |
+| **Card Background** | `#FFFFFF` | Product category cards and content areas. |
+| **Main Text (Dark Blue)**| `#003366` | Product titles and key information. |
+| **Secondary Text (Grey)**| `#4A4A4A` | Descriptions and legal mentions. |
+
+---
+
+## 2. Iconography & UI Elements
+
+### Header Navigation Icons (Size: ~32px, Color: #004C99)
+- **icon_home:** House outline (Home).
+- **icon_mini_pelle:** Excavator silhouette (Mini-Pelle).
+- **icon_maisons:** Cabin outline (Maisons Modulaires).
+- **icon_solaire:** Sun with rays (Solaire).
+- **icon_machines:** Tractor outline (Machines Agricoles).
+- **icon_divers:** Box/Package outline (Divers).
+- **icon_services:** Wrench & Hammer crossed (Services).
+- **icon_phone:** Telephone handset outline (Contact).
+- **icon_cart:** Shopping cart outline (Panier).
+- **icon_user:** Person silhouette outline (Connexion).
+
+### Card Specific Icons (Size: ~40px, Position: Centered above Title)
+- Identical styles to header navigation, reinforcing visual hierarchy within the category blocks.
+
+### UI Shape & Component Geometry
+- **Border Radius:** `8px` (Standard for cards, search input, and action buttons).
+- **Hero Search Bar:** White background, blue border, rounded corners. 'RECHERCHER' button integrated on the right with matching radius.
+- **Product Cards:** Fixed width grid (approx 19% each with spacing), white background, subtle 1px border.
+
+---
+
+## 3. Typography Hierarchy
+
+| Level | Size | Weight | Color |
+| :--- | :--- | :--- | :--- |
+| **Main Hero Title** | 48px | Bold | `#004C99` |
+| **Category Title** | 24px | Bold | `#004C99` |
+| **Description Text** | 14px | Regular | `#4A4A4A` |
+| **Button Text** | 16px | Bold | `#FFFFFF` |
+
+---
+
+## 4. Layout & Spacing
+- **Icon-to-Text Spacing:** 8px vertical gap between navigation icons and their labels.
+- **Card Padding:** 16px internal padding for all product category cards.
+- **Button Dimensions:** 100% card width for 'PRIX-50%' buttons, height approx 40px.
+- **Logo Position:** Top-left corner, integrated with the header navigation bar.

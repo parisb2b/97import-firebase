@@ -3,6 +3,10 @@
 claude --dangerously-skip-permissions --auto-execute
 
 
+cd C:\DATA-MC-2030\97IMPORT
+claude --dangerously-skip-permissions "Lis attentivement le fichier C:\DATA-MC-2030\97IMPORT\1MAJALL\prompt-recuperation-ancien-site.md et exécute TOUTES les étapes de la Phase A, Phase B et Phase C dans l'ordre. Ne pose aucune question. Ne saute aucune étape. Commence par git fetch origin && git reset --hard origin/main. À la fin, fais npm run build, git add -A, git commit et git push origin main. Écris le rapport final complet dans C:\DATA-MC-2030\97IMPORT\1MAJALL\RAPPORT-NUIT.md"
+
+
 
 
 CD C:\DATA-MC-2030\97IMPORT
