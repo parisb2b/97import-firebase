@@ -42,12 +42,11 @@ export const PAGE = {
 // FORMATAGE PRIX
 // ═══════════════════════════════════════════════════════
 
-/** Format FR : "12 500,00 E" */
+/** Format FR : "12 500,00 E" — espace normal U+0020 (pas narrow no-break space) */
 export function fmtEur(n: number): string {
-  return new Intl.NumberFormat('fr-FR', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(n) + ' \u20AC'
+  const parts = n.toFixed(2).split('.')
+  const intPart = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ' ')  // espace normal U+0020
+  return `${intPart},${parts[1]} \u20AC`
 }
 
 /** Format EN : "E12,500.00" */
@@ -429,6 +428,7 @@ export function addSignature(
   startY: number,
   lang: 'fr' | 'en' = 'fr',
 ): number {
+  const colR = PAGE.marginL + 100  // colonne droite
   let y = startY + 5
 
   if (y > 230) {
@@ -436,12 +436,16 @@ export function addSignature(
     y = 25
   }
 
-  y = addSectionTitle(
-    doc,
+  // Titre "Acceptation du client" — colonne DROITE (meme hauteur que Conditions)
+  doc.setFont('helvetica', 'normal')
+  doc.setFontSize(16)
+  doc.setTextColor(...PDF_COLORS.title)
+  doc.text(
     lang === 'en' ? 'Customer acceptance' : 'Acceptation du client',
+    colR,
     y,
   )
-  y += 5
+  y += 13
 
   doc.setFont('helvetica', 'normal')
   doc.setFontSize(9)
@@ -451,14 +455,14 @@ export function addSignature(
     lang === 'en'
       ? 'At ______________, the ____/____/____'
       : '\u00C0 ______________, le ____/____/____',
-    PAGE.marginL + 100,  // colonne droite (comme dans le PDF ref)
+    colR,
     y,
   )
 
   y += 20
   doc.text(
     lang === 'en' ? 'Signature' : 'Signature',
-    PAGE.marginL + 100,
+    colR,
     y,
   )
 
@@ -467,7 +471,7 @@ export function addSignature(
     lang === 'en'
       ? 'Name and position of signatory'
       : 'Nom et qualit\u00E9 du signataire',
-    PAGE.marginL + 100,
+    colR,
     y,
   )
 

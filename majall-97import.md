@@ -3,6 +3,41 @@ Journal des modifications — Format v1.0
 
 ---
 
+## [2026-04-06 21:30] — v5.17-scan-fix-complet
+### Modifications
+- `src/features/pdf/lib/pdf-engine.ts` : fmtEur corrige (narrow no-break space → espace normal U+0020), section Acceptation titre en colonne droite
+- `src/lib/firebaseHelpers.ts` : Nouvelle numerotation D2604001 (PREFIX+AA+MM+NNN), compteurs mensuels Firestore, 8 raccourcis (D, F, FA, A, NC, FM, DD, BL)
+- `src/pages/ProductPage.tsx` : Bascule vers generateQuotePDF (design LUXENT), fix WhatsApp 33663284908, sauvegarde Firestore + Storage
+- `src/pages/ModularStandardPage.tsx` : 3 boutons uniformes (Panier + Devis PDF + WhatsApp)
+- `src/pages/ModularPremiumPage.tsx` : 3 boutons uniformes
+- `src/pages/CampingCarPage.tsx` : 3 boutons uniformes
+- `src/pages/SolarKitDetailPage.tsx` : 3 boutons uniformes
+- `src/pages/CartPage.tsx` : Ajout lang: 'fr' (commit precedent)
+
+### Fichiers touches
+- ✏️ `src/features/pdf/lib/pdf-engine.ts`
+- ✏️ `src/lib/firebaseHelpers.ts`
+- ✏️ `src/pages/ProductPage.tsx`
+- ✏️ `src/pages/ModularStandardPage.tsx`
+- ✏️ `src/pages/ModularPremiumPage.tsx`
+- ✏️ `src/pages/CampingCarPage.tsx`
+- ✏️ `src/pages/SolarKitDetailPage.tsx`
+
+### Scan boutons par page (apres correction)
+- `/produit/:id` : Panier[OK] DevisPDF[OK] Fiche[OK] WhatsApp[OK]
+- `/maisons/standard` : Panier[OK] DevisPDF[OK] WhatsApp[OK]
+- `/maisons/premium` : Panier[OK] DevisPDF[OK] WhatsApp[OK]
+- `/maisons/camping-car` : Panier[OK] DevisPDF[OK] WhatsApp[OK]
+- `/solaire/:slug` : Panier[OK] DevisPDF[OK] WhatsApp[OK]
+- `/accessoires` : Panier[OK] (listing → /produit/:id pour PDF)
+- `/panier` : DemanderDevis[OK] (flux complet Firestore)
+
+### Statut
+- ✅ Build OK
+- ✅ Committe — tag v5.17-scan-fix-complet
+
+---
+
 ## [2026-04-06 14:30] — v5.16-pdf-production
 ### Modifications
 - `src/features/pdf/lib/pdf-engine.ts` : Moteur PDF mutualise LUXENT — couleurs, layout, helpers (addHeader, addParties, addIBAN, addSectionTitle, addProductTable, addTotal, addConditions, addSignature, addFooter)

@@ -4,8 +4,14 @@
  */
 import { useState } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
+import { useCart } from '@/features/cart/CartContext'
 import { calculerPrix, formatPrix, eurToYuan, formatYuan } from '@/utils/calculPrix'
 import { MODULAR_STANDARD_SIZES, MODULAR_OPTIONS_PRIX } from '@/data/pricing'
+import { generateQuotePDF } from '@/features/pdf/templates/quote-pdf'
+import { getNextDevisNumber } from '@/lib/firebaseHelpers'
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore'
+import { db, storage } from '@/lib/firebase'
+import { ref, uploadBytes } from 'firebase/storage'
 
 const C = {
   navy: '#1B2A4A',
@@ -55,10 +61,13 @@ const SHIPPING_DESTINATIONS = [
 ]
 
 export default function ModularStandardPage() {
-  const { role } = useAuth()
+  const { role, user, profile } = useAuth()
+  const { addToCart } = useCart()
   const [selectedSize, setSelectedSize] = useState(0)
   const [selectedOptions, setSelectedOptions] = useState<Record<string, boolean>>({})
   const [selectedImage, setSelectedImage] = useState(0)
+  const [pdfLoading, setPdfLoading] = useState(false)
+  const [addedToCart, setAddedToCart] = useState<string | null>(null)
 
   const size = MODULAR_STANDARD_SIZES[selectedSize]
 
@@ -79,6 +88,68 @@ export default function ModularStandardPage() {
 
   function toggleOption(key: string) {
     setSelectedOptions(prev => ({ ...prev, [key]: !prev[key] }))
+  }
+
+  function handleAddToCart(sz: typeof size, prixVal: number) {
+    addToCart({
+      id: `modular-standard-${sz.name}`,
+      name: `Maison Modulaire Standard ${sz.name}`,
+      prixAchat: sz.prixAchat,
+      prixUnitaire: prixVal,
+      image: '/images/products/modular_standard/exterior_1.jpeg',
+      type: 'house',
+    })
+    setAddedToCart(sz.name)
+    setTimeout(() => setAddedToCart(null), 2500)
+  }
+
+  async function handleGeneratePdf(sz: typeof size, prixVal: number) {
+    if (!user) {
+      alert('Connectez-vous pour generer un devis')
+      return
+    }
+    setPdfLoading(true)
+    try {
+      const numeroDevis = await getNextDevisNumber()
+      const dateStr = new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
+      const pdfDoc = generateQuotePDF({
+        numero_devis: numeroDevis,
+        date: dateStr,
+        client: {
+          nom: (profile as any)?.last_name || '',
+          prenom: (profile as any)?.first_name || '',
+          email: (profile as any)?.email || (user as any)?.email || '',
+          telephone: (profile as any)?.phone || '',
+        },
+        produits: [{
+          nom: `Maison Modulaire Standard ${sz.name}`,
+          quantite: 1,
+          prixUnitaire: prixVal,
+        }],
+        total_ht: prixVal,
+        lang: 'fr',
+      })
+      await addDoc(collection(db, 'quotes'), {
+        numero: numeroDevis,
+        client_email: (profile as any)?.email || (user as any)?.email || '',
+        user_id: (user as any).uid,
+        total_ht: prixVal,
+        produits: [{ nom: `Maison Modulaire Standard ${sz.name}`, quantite: 1, prixUnitaire: prixVal }],
+        statut: 'brouillon',
+        created_at: serverTimestamp(),
+      })
+      try {
+        const pdfBlob = pdfDoc.output('blob')
+        const storageRef = ref(storage, `devis/${numeroDevis}.pdf`)
+        await uploadBytes(storageRef, pdfBlob, { contentType: 'application/pdf' })
+      } catch { /* non-bloquant */ }
+      pdfDoc.save(`${numeroDevis}.pdf`)
+    } catch (err) {
+      console.error('Erreur PDF:', err)
+      alert('Erreur lors de la generation du PDF.')
+    } finally {
+      setPdfLoading(false)
+    }
   }
 
   return (
@@ -331,18 +402,27 @@ export default function ModularStandardPage() {
               <div style={{ fontSize: '11px', opacity: 0.6, marginBottom: '16px' }}>
                 {prix.label} — Hors transport
               </div>
-              <a
-                href={`https://wa.me/33663284908?text=Bonjour, je souhaite un devis pour une maison modulaire Standard ${size.name}.`}
-                target="_blank" rel="noopener noreferrer"
-                style={{
-                  display: 'block', textAlign: 'center',
-                  padding: '14px', background: C.green, color: C.white,
-                  borderRadius: '10px', fontWeight: '700', fontSize: '15px',
-                  textDecoration: 'none',
-                }}
-              >
-                Demander un devis
-              </a>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '12px' }}>
+                <button
+                  onClick={() => prix.montant !== null && handleAddToCart(size, prix.montant)}
+                  disabled={prix.montant === null}
+                  style={{ padding: '10px', background: addedToCart === size.name ? '#16A34A' : '#1E3A5F', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '13px', fontWeight: '700', cursor: prix.montant === null ? 'not-allowed' : 'pointer' }}
+                >
+                  {addedToCart === size.name ? '✅ Ajouté !' : '🛒 Ajouter au panier'}
+                </button>
+                <button
+                  onClick={() => prix.montant !== null && handleGeneratePdf(size, prix.montant)}
+                  disabled={pdfLoading || prix.montant === null}
+                  style={{ padding: '10px', background: pdfLoading ? '#6B7280' : '#EA580C', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '13px', fontWeight: '600', cursor: pdfLoading ? 'not-allowed' : 'pointer' }}
+                >
+                  {pdfLoading ? '⏳ Génération...' : '📄 Générer Devis PDF'}
+                </button>
+                <a href={`https://wa.me/33663284908?text=${encodeURIComponent(`Bonjour, je souhaite un devis pour une maison modulaire Standard ${size.name}.`)}`} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
+                  <button style={{ width: '100%', padding: '10px', background: '#25D366', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '13px', fontWeight: '600', cursor: 'pointer' }}>
+                    💬 Contacter via WhatsApp
+                  </button>
+                </a>
+              </div>
             </div>
           </div>
         </div>

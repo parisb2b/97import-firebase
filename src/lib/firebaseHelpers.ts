@@ -4,11 +4,22 @@ import {
 } from 'firebase/firestore'
 import { db } from './firebase'
 
-// Générateur numéro devis atomique
-export async function getNextDevisNumber(
-  partenaireCode?: string
+/**
+ * Generateur de numeros de documents — Format PREFIX + AA + MM + NNN
+ * Exemple : D2604001, F2604002, FA2604001
+ * Le compteur repart a 001 chaque nouveau mois.
+ * Collection Firestore : counters/{prefix}_{AAMM}
+ */
+export async function getNextDocNumber(
+  prefix: string,
+  partenaireCode?: string,
 ): Promise<string> {
-  const counterRef = doc(db, 'counters', 'devis')
+  const now = new Date()
+  const yy = now.getFullYear().toString().slice(2)
+  const mm = String(now.getMonth() + 1).padStart(2, '0')
+  const counterKey = `${prefix}_${yy}${mm}`
+
+  const counterRef = doc(db, 'counters', counterKey)
   const num = await runTransaction(db, async (t) => {
     const snap = await t.get(counterRef)
     const current = snap.exists()
@@ -16,13 +27,22 @@ export async function getNextDevisNumber(
     t.set(counterRef, { value: current + 1 })
     return current + 1
   })
-  const yy = new Date().getFullYear()
-    .toString().slice(2)
-  const base = `D${yy}${String(num).padStart(5, '0')}`
+
+  const base = `${prefix}${yy}${mm}${String(num).padStart(3, '0')}`
   return partenaireCode
     ? `${base}-${partenaireCode}`
     : base
 }
+
+// Raccourcis par type de document
+export const getNextDevisNumber = (code?: string) => getNextDocNumber('D', code)
+export const getNextFactureNumber = () => getNextDocNumber('F')
+export const getNextFactureAcompteNumber = () => getNextDocNumber('FA')
+export const getNextAvoirNumber = () => getNextDocNumber('A')
+export const getNextCommissionNumber = () => getNextDocNumber('NC')
+export const getNextMaritimeNumber = () => getNextDocNumber('FM')
+export const getNextDouaneNumber = () => getNextDocNumber('DD')
+export const getNextBLNumber = () => getNextDocNumber('BL')
 
 // Enrichir les produits avec numero_interne et prix_achat
 export async function enrichProduits(

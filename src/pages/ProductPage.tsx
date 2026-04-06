@@ -11,7 +11,11 @@ import { useAuth } from '../contexts/AuthContext'
 import { useCart } from '../features/cart/CartContext'
 import { calculerPrix, formatPrix, eurToYuan, formatYuan } from '../utils/calculPrix'
 import { useLang, LangToggle } from '../contexts/LanguageContext'
-import { generateDevisPdf } from '../utils/generateDevisPdf'
+import { generateQuotePDF } from '../features/pdf/templates/quote-pdf'
+import { getNextDevisNumber } from '../lib/firebaseHelpers'
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore'
+import { ref, uploadBytes } from 'firebase/storage'
+import { storage } from '../lib/firebase'
 
 const PLACEHOLDER = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQwIiBoZWlnaHQ9IjQ4MCIgdmlld0JveD0iMCAwIDY0MCA0ODAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjY0MCIgaGVpZ2h0PSI0ODAiIGZpbGw9IiNFNUU3RUIiLz48dGV4dCB4PSIzMjAiIHk9IjI0MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjAiIGZpbGw9IiM5Q0EzQUYiPkltYWdlIG5vbiBkaXNwb25pYmxlPC90ZXh0Pjwvc3ZnPg=='
 
@@ -80,23 +84,78 @@ export default function ProductPage() {
 
   async function handleGeneratePdf() {
     if (!product) return
+    if (!user) {
+      alert(lang === 'fr' ? 'Connectez-vous pour generer un devis' : '请登录以生成报价单')
+      return
+    }
     setPdfLoading(true)
     try {
-      const d = new Date()
-      const numDevis = `D${d.getFullYear().toString().slice(2)}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}-${product.reference?.toUpperCase() || product.id.toUpperCase()}`
-      await generateDevisPdf({
-        product,
-        role,
-        clientNom: profile ? `${profile.first_name} ${profile.last_name}`.trim() : '',
-        clientEmail: profile?.email || user?.email || '',
-        clientTel: profile?.phone || '',
-        clientAdresse: profile ? `${profile.adresse_facturation} ${profile.cp_facturation} ${profile.ville_facturation}`.trim() : '',
-        numeroDevis: numDevis,
-        quantite: qty,
+      const prixCalc = calculerPrix(product.prix_achat, role)
+      const prixUnit = prixCalc.montant ?? product.prix_achat * 2
+      const totalHT = prixUnit * qty
+
+      // Numero de devis atomique Firestore
+      const numeroDevis = await getNextDevisNumber()
+
+      // Date formatee
+      const dateStr = new Date().toLocaleDateString('fr-FR', {
+        day: 'numeric', month: 'long', year: 'numeric',
       })
+
+      // Generer PDF LUXENT
+      const pdfDoc = generateQuotePDF({
+        numero_devis: numeroDevis,
+        date: dateStr,
+        client: {
+          nom: profile?.last_name || '',
+          prenom: profile?.first_name || '',
+          email: profile?.email || user?.email || '',
+          telephone: profile?.phone || '',
+          adresse: profile?.adresse_facturation || '',
+          ville: profile?.ville_facturation || '',
+          cp: profile?.cp_facturation || '',
+          pays: 'France',
+        },
+        produits: [{
+          nom: product.nom,
+          numero_interne: product.numero_interne,
+          quantite: qty,
+          prixUnitaire: prixUnit,
+        }],
+        total_ht: totalHT,
+        lang: 'fr',
+      })
+
+      // Sauvegarder dans Firestore
+      await addDoc(collection(db, 'quotes'), {
+        numero: numeroDevis,
+        client_nom: profile?.last_name || '',
+        client_prenom: profile?.first_name || '',
+        client_email: profile?.email || user?.email || '',
+        user_id: user.uid,
+        total_ht: totalHT,
+        produits: [{
+          nom: product.nom,
+          numero_interne: product.numero_interne || '',
+          quantite: qty,
+          prixUnitaire: prixUnit,
+        }],
+        statut: 'brouillon',
+        created_at: serverTimestamp(),
+      })
+
+      // Upload PDF dans Storage (non-bloquant)
+      try {
+        const pdfBlob = pdfDoc.output('blob')
+        const storageRef = ref(storage, `devis/${numeroDevis}.pdf`)
+        await uploadBytes(storageRef, pdfBlob, { contentType: 'application/pdf' })
+      } catch { /* non-bloquant */ }
+
+      // Telecharger
+      pdfDoc.save(`${numeroDevis}.pdf`)
     } catch (err) {
       console.error('Erreur PDF:', err)
-      alert('Erreur lors de la génération du PDF.')
+      alert('Erreur lors de la generation du PDF.')
     } finally {
       setPdfLoading(false)
     }
@@ -471,7 +530,7 @@ export default function ProductPage() {
 
                 {/* WhatsApp */}
                 <a
-                  href={`https://wa.me/596696000000?text=${encodeURIComponent(`Bonjour, je suis intéressé par : ${product.nom} (${product.numero_interne || product.id})`)}`}
+                  href={`https://wa.me/33663284908?text=${encodeURIComponent(`Bonjour, je suis intéressé par : ${product.nom} (${product.numero_interne || product.id})`)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{ textDecoration: 'none' }}

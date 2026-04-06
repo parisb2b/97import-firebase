@@ -4,10 +4,15 @@
  */
 import { useState, useEffect } from 'react'
 import { useParams } from 'wouter'
-import { collection, query, where, getDocs } from 'firebase/firestore'
+import { collection, query, where, getDocs, addDoc, serverTimestamp } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
+import { storage } from '@/lib/firebase'
+import { ref, uploadBytes } from 'firebase/storage'
 import { Product } from '@/types'
 import { useAuth } from '@/contexts/AuthContext'
+import { useCart } from '../features/cart/CartContext'
+import { generateQuotePDF } from '../features/pdf/templates/quote-pdf'
+import { getNextDevisNumber } from '../lib/firebaseHelpers'
 import { calculerPrix, formatPrix, eurToYuan, formatYuan } from '@/utils/calculPrix'
 import { SOLAIRE_PRIX } from '@/data/pricing'
 import { Link } from 'wouter'
@@ -134,9 +139,12 @@ const KITS_DATA: Record<string, KitData> = {
 export default function SolarKitDetailPage() {
   const params = useParams<{ slug: string }>()
   const slug = params.slug || ''
-  const { role } = useAuth()
+  const { user, profile, role } = useAuth()
+  const { addToCart } = useCart()
   const [firestoreProduct, setFirestoreProduct] = useState<Product | null>(null)
   const [loading, setLoading] = useState(true)
+  const [pdfLoading, setPdfLoading] = useState(false)
+  const [addedToCart, setAddedToCart] = useState(false)
 
   const kit = KITS_DATA[slug]
 
@@ -160,6 +168,68 @@ export default function SolarKitDetailPage() {
     }
     fetch()
   }, [slug])
+
+  function handleAddToCart(kitName: string, prixAchat: number, prix: number) {
+    addToCart({
+      id: `solar-kit-${slug}`,
+      name: kitName,
+      prixAchat: prixAchat,
+      prixUnitaire: prix,
+      image: '/images/solar/kit_overview.webp',
+      type: 'solar',
+    })
+    setAddedToCart(true)
+    setTimeout(() => setAddedToCart(false), 2500)
+  }
+
+  async function handleGeneratePdf(kitName: string, prix: number) {
+    if (!user) {
+      alert('Connectez-vous pour generer un devis')
+      return
+    }
+    setPdfLoading(true)
+    try {
+      const numeroDevis = await getNextDevisNumber()
+      const dateStr = new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
+      const pdfDoc = generateQuotePDF({
+        numero_devis: numeroDevis,
+        date: dateStr,
+        client: {
+          nom: (profile as any)?.last_name || '',
+          prenom: (profile as any)?.first_name || '',
+          email: (profile as any)?.email || (user as any)?.email || '',
+          telephone: (profile as any)?.phone || '',
+        },
+        produits: [{
+          nom: kitName,
+          quantite: 1,
+          prixUnitaire: prix,
+        }],
+        total_ht: prix,
+        lang: 'fr',
+      })
+      await addDoc(collection(db, 'quotes'), {
+        numero: numeroDevis,
+        client_email: (profile as any)?.email || (user as any)?.email || '',
+        user_id: (user as any).uid,
+        total_ht: prix,
+        produits: [{ nom: kitName, quantite: 1, prixUnitaire: prix }],
+        statut: 'brouillon',
+        created_at: serverTimestamp(),
+      })
+      try {
+        const pdfBlob = pdfDoc.output('blob')
+        const storageRef = ref(storage, `devis/${numeroDevis}.pdf`)
+        await uploadBytes(storageRef, pdfBlob, { contentType: 'application/pdf' })
+      } catch { /* non-bloquant */ }
+      pdfDoc.save(`${numeroDevis}.pdf`)
+    } catch (err) {
+      console.error('Erreur PDF:', err)
+      alert('Erreur lors de la generation du PDF.')
+    } finally {
+      setPdfLoading(false)
+    }
+  }
 
   if (!kit) {
     return (
@@ -405,18 +475,45 @@ export default function SolarKitDetailPage() {
               </p>
             </div>
 
-            {/* CTA */}
+            {/* CTA Buttons */}
+            <button
+              onClick={() => prix.montant !== null && handleAddToCart(kit.name, prixAchat, prix.montant)}
+              disabled={prix.montant === null}
+              style={{
+                display: 'block', width: '100%', textAlign: 'center',
+                padding: '16px', background: addedToCart ? '#166534' : '#1E3A5F', color: C.white,
+                borderRadius: '12px', fontWeight: '700', fontSize: '16px',
+                border: 'none', cursor: prix.montant !== null ? 'pointer' : 'not-allowed',
+                marginBottom: '12px', opacity: prix.montant === null ? 0.5 : 1,
+                transition: 'background 0.3s',
+              }}
+            >
+              {addedToCart ? 'Ajoute au panier !' : 'Ajouter au panier'}
+            </button>
+            <button
+              onClick={() => prix.montant !== null && handleGeneratePdf(kit.name, prix.montant)}
+              disabled={pdfLoading || prix.montant === null}
+              style={{
+                display: 'block', width: '100%', textAlign: 'center',
+                padding: '16px', background: '#EA580C', color: C.white,
+                borderRadius: '12px', fontWeight: '700', fontSize: '16px',
+                border: 'none', cursor: (pdfLoading || prix.montant === null) ? 'not-allowed' : 'pointer',
+                marginBottom: '12px', opacity: (pdfLoading || prix.montant === null) ? 0.6 : 1,
+              }}
+            >
+              {pdfLoading ? 'Generation en cours...' : 'Generer Devis PDF'}
+            </button>
             <a
               href={`https://wa.me/33663284908?text=Bonjour, je suis interesse par le ${kit.name}. Pouvez-vous me faire un devis ?`}
               target="_blank" rel="noopener noreferrer"
               style={{
                 display: 'block', textAlign: 'center',
-                padding: '16px', background: C.green, color: C.white,
+                padding: '16px', background: '#25D366', color: C.white,
                 borderRadius: '12px', fontWeight: '700', fontSize: '16px',
                 textDecoration: 'none', marginBottom: '12px',
               }}
             >
-              Demander un devis
+              Contacter via WhatsApp
             </a>
             <Link href="/solaire" style={{
               display: 'block', textAlign: 'center',

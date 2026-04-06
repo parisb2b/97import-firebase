@@ -6,6 +6,12 @@ import { useState } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { calculerPrix, formatPrix, eurToYuan, formatYuan } from '@/utils/calculPrix'
 import { CAMPING_CAR_PRIX_ACHAT, CAMPING_CAR_SHIPPING } from '@/data/pricing'
+import { useCart } from '../features/cart/CartContext'
+import { generateQuotePDF } from '../features/pdf/templates/quote-pdf'
+import { getNextDevisNumber } from '../lib/firebaseHelpers'
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore'
+import { db, storage } from '../lib/firebase'
+import { ref, uploadBytes } from 'firebase/storage'
 
 const C = {
   navy: '#1B2A4A',
@@ -76,10 +82,75 @@ const SHIPPING_LABELS: Record<string, string> = {
 }
 
 export default function CampingCarPage() {
-  const { role } = useAuth()
+  const { role, user, profile } = useAuth()
+  const { addToCart } = useCart()
   const [selectedImage, setSelectedImage] = useState(0)
+  const [pdfLoading, setPdfLoading] = useState(false)
+  const [addedToCart, setAddedToCart] = useState(false)
 
   const prix = calculerPrix(CAMPING_CAR_PRIX_ACHAT, role)
+
+  function handleAddToCart(prixMontant: number) {
+    addToCart({
+      id: 'camping-car-deluxe',
+      name: 'Camping-Car Deluxe',
+      prixAchat: CAMPING_CAR_PRIX_ACHAT,
+      prixUnitaire: prixMontant,
+      image: '/images/products/camping_car/camping_car_1.jpg',
+      type: 'house',
+    })
+    setAddedToCart(true)
+    setTimeout(() => setAddedToCart(false), 2500)
+  }
+
+  async function handleGeneratePdf(prixMontant: number) {
+    if (!user) {
+      alert('Connectez-vous pour generer un devis')
+      return
+    }
+    setPdfLoading(true)
+    try {
+      const numeroDevis = await getNextDevisNumber()
+      const dateStr = new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
+      const pdfDoc = generateQuotePDF({
+        numero_devis: numeroDevis,
+        date: dateStr,
+        client: {
+          nom: (profile as any)?.last_name || '',
+          prenom: (profile as any)?.first_name || '',
+          email: (profile as any)?.email || (user as any)?.email || '',
+          telephone: (profile as any)?.phone || '',
+        },
+        produits: [{
+          nom: 'Camping-Car Deluxe',
+          quantite: 1,
+          prixUnitaire: prixMontant,
+        }],
+        total_ht: prixMontant,
+        lang: 'fr',
+      })
+      await addDoc(collection(db, 'quotes'), {
+        numero: numeroDevis,
+        client_email: (profile as any)?.email || (user as any)?.email || '',
+        user_id: (user as any).uid,
+        total_ht: prixMontant,
+        produits: [{ nom: 'Camping-Car Deluxe', quantite: 1, prixUnitaire: prixMontant }],
+        statut: 'brouillon',
+        created_at: serverTimestamp(),
+      })
+      try {
+        const pdfBlob = pdfDoc.output('blob')
+        const storageRef = ref(storage, `devis/${numeroDevis}.pdf`)
+        await uploadBytes(storageRef, pdfBlob, { contentType: 'application/pdf' })
+      } catch { /* non-bloquant */ }
+      pdfDoc.save(`${numeroDevis}.pdf`)
+    } catch (err) {
+      console.error('Erreur PDF:', err)
+      alert('Erreur lors de la generation du PDF.')
+    } finally {
+      setPdfLoading(false)
+    }
+  }
 
   return (
     <div style={{ minHeight: '100vh', background: C.gray50, fontFamily: "'Inter', -apple-system, sans-serif" }}>
@@ -312,19 +383,48 @@ export default function CampingCarPage() {
               ))}
             </div>
 
-            {/* CTA */}
-            <a
-              href="https://wa.me/33663284908?text=Bonjour, je suis interesse par le Camping-Car Deluxe."
-              target="_blank" rel="noopener noreferrer"
-              style={{
-                display: 'block', textAlign: 'center',
-                padding: '16px', background: C.green, color: C.white,
-                borderRadius: '12px', fontWeight: '700', fontSize: '16px',
-                textDecoration: 'none',
-              }}
-            >
-              Demander un devis
-            </a>
+            {/* CTA Buttons */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <button
+                onClick={() => prix.montant && handleAddToCart(prix.montant)}
+                disabled={!prix.montant}
+                style={{
+                  display: 'block', width: '100%', textAlign: 'center',
+                  padding: '16px', background: addedToCart ? '#16a34a' : '#1E3A5F', color: C.white,
+                  borderRadius: '12px', fontWeight: '700', fontSize: '16px',
+                  border: 'none', cursor: prix.montant ? 'pointer' : 'not-allowed',
+                  opacity: prix.montant ? 1 : 0.5,
+                  transition: 'background 0.3s',
+                }}
+              >
+                {addedToCart ? 'Ajoute au panier ✓' : 'Ajouter au panier'}
+              </button>
+              <button
+                onClick={() => prix.montant && handleGeneratePdf(prix.montant)}
+                disabled={!prix.montant || pdfLoading}
+                style={{
+                  display: 'block', width: '100%', textAlign: 'center',
+                  padding: '16px', background: '#EA580C', color: C.white,
+                  borderRadius: '12px', fontWeight: '700', fontSize: '16px',
+                  border: 'none', cursor: (prix.montant && !pdfLoading) ? 'pointer' : 'not-allowed',
+                  opacity: (prix.montant && !pdfLoading) ? 1 : 0.5,
+                }}
+              >
+                {pdfLoading ? 'Generation en cours...' : 'Generer Devis PDF'}
+              </button>
+              <a
+                href="https://wa.me/33663284908?text=Bonjour, je suis interesse par le Camping-Car Deluxe."
+                target="_blank" rel="noopener noreferrer"
+                style={{
+                  display: 'block', textAlign: 'center',
+                  padding: '16px', background: '#25D366', color: C.white,
+                  borderRadius: '12px', fontWeight: '700', fontSize: '16px',
+                  textDecoration: 'none',
+                }}
+              >
+                Contacter via WhatsApp
+              </a>
+            </div>
           </div>
         </div>
       </div>
