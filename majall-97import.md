@@ -210,3 +210,24 @@ Journal des modifications — Format v1.0
 - ✅ Committé — branche `feat/firebase-migration`
 
 ---
+
+## [2026-04-06 23:20] — v5.19
+### Modifications
+- Back-office complet reconstruit : 7 pages admin stubs implémentées (Dashboard, Quotes, Users, Partenaires, Parametres, Contenu, SuiviAchats, Media)
+- 4 comptes test créés dans Firebase Auth + Firestore profiles
+- Rapport comparaison ancien vs nouveau back-office
+### Fichiers touchés
+- src/pages/admin/AdminDashboard.tsx (réécrit)
+- src/pages/admin/AdminQuotes.tsx (réécrit)
+- src/pages/admin/AdminUsers.tsx (réécrit)
+- src/pages/admin/AdminPartenaires.tsx (réécrit)
+- src/pages/admin/AdminParametres.tsx (réécrit)
+- src/pages/admin/AdminContenu.tsx (réécrit)
+- src/pages/admin/AdminSuiviAchats.tsx (réécrit)
+- src/pages/admin/AdminMedia.tsx (réécrit)
+- src/scripts/createTestUsers.ts (ajouté)
+- 1MAJALL/RAPPORT-COMPARAISON.md (ajouté)
+- 1MAJALL/RAPPORT-NUIT-BACKOFFICE.md (ajouté)
+### Statut
+- ✅ Committé + poussé (6427e61) — tag v5.19-backoffice-complet
+---
