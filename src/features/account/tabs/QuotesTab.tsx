@@ -70,14 +70,36 @@ export default function QuotesTab() {
   }, [user])
 
   const handleDownloadPDF = (quote: Quote) => {
+    const client = quote.client || { name: '', email: '', phone: '', address: '' }
+    // Extraire prenom / nom depuis client.name
+    const parts = (client.name || '').split(' ')
+    const prenom = parts.shift() || ''
+    const nom = parts.join(' ') || ''
+
+    const produits = (quote.products || []).map(p => ({
+      nom: p.name,
+      numero_interne: '',
+      quantite: p.quantity,
+      prixUnitaire: p.prixHT,
+    }))
+
+    const totalHT = produits.reduce((s, p) => s + p.prixUnitaire * p.quantite, 0)
+
     const pdf = generateQuotePDF({
-      reference: quote.reference,
+      numero_devis: quote.reference,
       date: quote.date,
-      client: quote.client || { name: '', email: '', phone: '', address: '' },
-      products: quote.products,
-      destination: quote.destination || '',
-      shippingCost: quote.shippingCost || 0,
-      notes: quote.notes,
+      client: {
+        nom,
+        prenom,
+        email: client.email || '',
+        telephone: client.phone || '',
+        adresse: client.address || '',
+        ville: '',
+        cp: '',
+        pays: '',
+      },
+      produits,
+      total_ht: totalHT,
     })
     pdf.save(`devis-${quote.reference}.pdf`)
   }
