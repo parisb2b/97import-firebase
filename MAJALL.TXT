@@ -97,3 +97,10 @@
 [2026-04-11 12:35] — ✅ npm run build réussi
 [2026-04-11 12:35] — CSS: 71KB, JS: 827KB
 [2026-04-11 12:35] STATUT: ✅ Back-office v4 design appliqué
+
+=== PHASE 1 — 2026-04-11 23:40 ===
+- Purge références import2050-59f11 et import-412d0 : aucune trouvée
+- Config Firebase mise à jour : importok-6ef77 (via env vars)
+- initializeFirestore avec experimentalForceLongPolling: true
+- Build OK
+- Commit pushé sur v2

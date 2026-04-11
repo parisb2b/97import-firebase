@@ -4,16 +4,16 @@ import { initializeFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyD07lt6roFD8zTbSFivLw2BUVKJVVUf8Lo",
-  authDomain: "importok-6ef77.firebaseapp.com",
-  projectId: "importok-6ef77",
-  storageBucket: "importok-6ef77.firebasestorage.app",
-  messagingSenderId: "694030851164",
-  appId: "1:694030851164:web:1a534b65a93f8d816f1a99"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
 // Instance FRONT (clients)
-const clientApp = initializeApp(firebaseConfig, 'client');
+export const clientApp = initializeApp(firebaseConfig, 'client');
 export const clientAuth = getAuth(clientApp);
 export const db = initializeFirestore(clientApp, {
   experimentalForceLongPolling: true

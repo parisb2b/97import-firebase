@@ -21,3 +21,4 @@ npm-debug.log*
 service-account.json
 Thumbs.db
 .vercel
+scripts/serviceAccountKey.json
