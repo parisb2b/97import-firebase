@@ -20,6 +20,7 @@ export default function Stock() {
   const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
 
   useEffect(() => {
+    const timeout = setTimeout(() => setLoading(false), 3000);
     const load = async () => {
       setLoading(true);
       try {
@@ -29,10 +30,12 @@ export default function Stock() {
       } catch (err) {
         console.error('Error loading stock:', err);
       } finally {
+        clearTimeout(timeout);
         setLoading(false);
       }
     };
     load();
+    return () => clearTimeout(timeout);
   }, [sortOrder]);
 
   return (

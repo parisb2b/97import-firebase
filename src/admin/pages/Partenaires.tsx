@@ -34,7 +34,9 @@ export default function Partenaires() {
   };
 
   useEffect(() => {
+    const timeout = setTimeout(() => setLoading(false), 3000);
     load();
+    return () => clearTimeout(timeout);
   }, [sortOrder]);
 
   const toggleActif = async (partner: Partner) => {

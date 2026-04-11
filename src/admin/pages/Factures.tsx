@@ -21,6 +21,7 @@ export default function Factures() {
   const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
 
   useEffect(() => {
+    const timeout = setTimeout(() => setLoading(false), 3000);
     const loadInvoices = async () => {
       setLoading(true);
       try {
@@ -33,10 +34,12 @@ export default function Factures() {
       } catch (err) {
         console.error('Error loading invoices:', err);
       } finally {
+        clearTimeout(timeout);
         setLoading(false);
       }
     };
     loadInvoices();
+    return () => clearTimeout(timeout);
   }, [sortOrder]);
 
   return (
