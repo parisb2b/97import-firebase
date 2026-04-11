@@ -5,7 +5,7 @@ import { getStorage } from 'firebase/storage';
 
 // Hardcoded config for debug
 const firebaseConfig = {
-  apiKey: "AIzaSyCeKBBsSgC8PQK40ETlsjNRwhYCmAKz6cwA",
+  apiKey: "AIzaSyCeKBbSgC8PQK4OETlsjnRwhYCmAKz6cwA",
   authDomain: "import2050-59f11.firebaseapp.com",
   projectId: "import2050-59f11",
   storageBucket: "import2050-59f11.firebasestorage.app",
