@@ -143,3 +143,24 @@ Statut : PRODUCTION READY ✅
 - Page détail produit existante avec carrousel
 - Bouton WhatsApp ajouté sur page produit
 - Build OK
+
+=== v12 CORRECTIF PAGES BLANCHES — 2026-04-12 00:05 ===
+
+BUG CORRIGÉ :
+- /admin/devis/:id : page blanche → manque try/catch + fallbacks → CORRIGÉ
+
+AUDIT PAGES ADMIN :
+- DetailDevis : CORRIGÉ (ajout try/catch, error state, fallbacks tous champs)
+
+AJOUTS :
+- ErrorBoundary global (src/components/ErrorBoundary.tsx)
+- ErrorBoundary wrappé autour de toutes les routes admin
+- États loading avec animation pulse
+- État erreur avec message et lien retour
+
+TEMPLATES PDF :
+- Devis : fonctionnel
+- Facture : fonctionnel  
+- Commission : fonctionnel
+
+Build OK — Commit pushé sur v2

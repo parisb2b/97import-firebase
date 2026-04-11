@@ -66,6 +66,7 @@ export default function DetailDevis() {
   const [, setLocation] = useLocation();
   const [devis, setDevis] = useState<Devis>(emptyDevis);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [showAcompteModal, setShowAcompteModal] = useState(false);
   const [acompteMontant, setAcompteMontant] = useState(0);
@@ -74,21 +75,48 @@ export default function DetailDevis() {
 
   useEffect(() => {
     const load = async () => {
-      if (isNew) {
-        const numero = await getNextNumber('DVS');
-        setDevis({ ...emptyDevis, numero });
-        setLoading(false);
-        return;
-      }
-
-      if (params?.id) {
-        const docRef = doc(db, 'quotes', params.id);
-        const snap = await getDoc(docRef);
-        if (snap.exists()) {
-          setDevis({ id: snap.id, ...snap.data() } as Devis);
+      try {
+        if (isNew) {
+          const numero = await getNextNumber('DVS');
+          setDevis({ ...emptyDevis, numero });
+          setLoading(false);
+          return;
         }
+
+        if (params?.id) {
+          const docRef = doc(db, 'quotes', params.id);
+          const snap = await getDoc(docRef);
+          if (snap.exists()) {
+            const data = snap.data();
+            setDevis({
+              id: snap.id,
+              numero: data.numero || snap.id,
+              client_id: data.client_id || '',
+              client_nom: data.client_nom || '',
+              client_email: data.client_email || '',
+              client_tel: data.client_tel || '',
+              client_adresse: data.client_adresse || '',
+              client_siret: data.client_siret || '',
+              partenaire_id: data.partenaire_id || null,
+              statut: data.statut || 'brouillon',
+              lignes: data.lignes || [],
+              total_ht: data.total_ht || 0,
+              acompte_pct: data.acompte_pct || 30,
+              acomptes: data.acomptes || [],
+              total_encaisse: data.total_encaisse || 0,
+              solde_restant: data.solde_restant || 0,
+              destination: data.destination || 'MQ',
+            });
+          } else {
+            setError(`Devis ${params.id} introuvable`);
+          }
+        }
+      } catch (err: any) {
+        console.error('Erreur chargement devis:', err);
+        setError(err.message || 'Erreur de chargement');
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
     load();
   }, [params?.id, isNew]);
@@ -191,7 +219,29 @@ export default function DetailDevis() {
   };
 
   if (loading) {
-    return <div className="text-center py-8">{t('loading')}</div>;
+    return (
+      <div className="p-6">
+        <div className="animate-pulse">
+          <div className="h-8 bg-gray-200 rounded w-1/3 mb-4"></div>
+          <div className="h-4 bg-gray-200 rounded w-2/3 mb-2"></div>
+          <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-6">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <h2 className="text-red-800 text-lg font-bold">Erreur</h2>
+          <p className="text-red-600 mt-2">{error}</p>
+          <a href="/admin/devis" className="mt-4 inline-block text-blue-600 underline">
+            Retour à la liste des devis
+          </a>
+        </div>
+      </div>
+    );
   }
 
   return (

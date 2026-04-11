@@ -3,6 +3,7 @@ import { Route, Switch, Link, useLocation } from 'wouter';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { adminAuth, db } from '../lib/firebase';
+import { ErrorBoundary } from '../components/ErrorBoundary';
 import AdminLogin from './AdminLogin';
 import './styles/admin.css';
 
@@ -283,34 +284,36 @@ export default function AdminApp() {
 
         {/* Content */}
         <div className="content">
-          <Switch>
-            <Route path="/admin" component={Dashboard} />
-            <Route path="/admin/devis" component={ListeDevis} />
-            <Route path="/admin/devis/nouveau" component={DetailDevis} />
-            <Route path="/admin/devis/:id" component={DetailDevis} />
-            <Route path="/admin/factures" component={Factures} />
-            <Route path="/admin/commissions" component={NotesCommission} />
-            <Route path="/admin/frais" component={FraisLogistique} />
-            <Route path="/admin/achats" component={ListesAchat} />
-            <Route path="/admin/conteneurs" component={ListeConteneurs} />
-            <Route path="/admin/conteneurs/nouveau" component={NouveauConteneur} />
-            <Route path="/admin/conteneurs/:id" component={DetailConteneur} />
-            <Route path="/admin/sav" component={SAVListe} />
-            <Route path="/admin/sav/:id" component={SAVDetail} />
-            <Route path="/admin/stock" component={Stock} />
-            <Route path="/admin/produits" component={CatalogueProduits} />
-            <Route path="/admin/produits/nouveau" component={NouveauProduit} />
-            <Route path="/admin/produits/:id" component={EditProduit} />
-            <Route path="/admin/clients" component={Clients} />
-            <Route path="/admin/partenaires" component={Partenaires} />
-            <Route path="/admin/taux" component={TauxRMB} />
-            <Route path="/admin/site" component={GestionSite} />
-            <Route path="/admin/logs" component={Logs} />
-            <Route path="/admin/parametres" component={Parametres} />
-            <Route>
-              <Dashboard />
-            </Route>
-          </Switch>
+          <ErrorBoundary>
+            <Switch>
+              <Route path="/admin" component={Dashboard} />
+              <Route path="/admin/devis" component={ListeDevis} />
+              <Route path="/admin/devis/nouveau" component={DetailDevis} />
+              <Route path="/admin/devis/:id" component={DetailDevis} />
+              <Route path="/admin/factures" component={Factures} />
+              <Route path="/admin/commissions" component={NotesCommission} />
+              <Route path="/admin/frais" component={FraisLogistique} />
+              <Route path="/admin/achats" component={ListesAchat} />
+              <Route path="/admin/conteneurs" component={ListeConteneurs} />
+              <Route path="/admin/conteneurs/nouveau" component={NouveauConteneur} />
+              <Route path="/admin/conteneurs/:id" component={DetailConteneur} />
+              <Route path="/admin/sav" component={SAVListe} />
+              <Route path="/admin/sav/:id" component={SAVDetail} />
+              <Route path="/admin/stock" component={Stock} />
+              <Route path="/admin/produits" component={CatalogueProduits} />
+              <Route path="/admin/produits/nouveau" component={NouveauProduit} />
+              <Route path="/admin/produits/:id" component={EditProduit} />
+              <Route path="/admin/clients" component={Clients} />
+              <Route path="/admin/partenaires" component={Partenaires} />
+              <Route path="/admin/taux" component={TauxRMB} />
+              <Route path="/admin/site" component={GestionSite} />
+              <Route path="/admin/logs" component={Logs} />
+              <Route path="/admin/parametres" component={Parametres} />
+              <Route>
+                <Dashboard />
+              </Route>
+            </Switch>
+          </ErrorBoundary>
         </div>
       </div>
     </div>
