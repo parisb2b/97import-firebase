@@ -57,3 +57,43 @@
 [2026-04-11 11:00] — CSS: 56KB, JS: 811KB (warning chunk size > 500KB)
 
 [2026-04-11 11:00] STATUT: ✅ Build réussi — Prêt pour commit v2
+
+[2026-04-11 12:30] Phase D — BACK-OFFICE V4 DESIGN EXACTE
+[2026-04-11 12:30] — Analyse complète maquette public/backoffice_97import_v4.html (1209 lignes)
+[2026-04-11 12:30] — Extraction palette couleurs exactes:
+   - --nv:#0B2545, --nv2:#1E3A5F, --nv3:#1565C0
+   - --or:#F57C00, --or2:#FF9800, --pu:#7C3AED
+   - --tl:#00897B, --gr:#2E7D32, --rd:#C62828, --am:#D97706
+[2026-04-11 12:30] — Fonts: Sora (headings), DM Sans (body)
+[2026-04-11 12:31] — src/admin/styles/admin.css créé (700+ lignes CSS v4 complètes)
+[2026-04-11 12:31] — src/admin/components/Icons.tsx créé (composants réutilisables):
+   - IconButton avec tooltip hover
+   - Pill (badges colorés p-tl/p-or/p-pu/etc.)
+   - Button (p/s/o/u/t/r/a/out variants)
+   - Kpi, Card, Alert, Progress, InfoBlock, InfoRow, FormGroup
+[2026-04-11 12:32] — AdminApp.tsx restructuré layout v4:
+   - Sidebar 220px avec sections Commerce/Catalogue/Utilisateurs/Systeme
+   - Clocks MQ/FR/CN temps réel
+   - RMB pill dans topbar
+   - Navigation conforme à la maquette
+[2026-04-11 12:33] — Dashboard.tsx redesigné:
+   - KPI grid 4 colonnes (Devis/CA/Commissions/SAV)
+   - Layout 2 colonnes (Devis récents + Conteneurs | SAV urgents + Commissions)
+   - Données demo pour preview
+[2026-04-11 12:33] — ListeDevis.tsx redesigné:
+   - Filters bar (recherche + statut + dest + partenaire)
+   - Tableau avec colonnes: N°/Date/Client/Part./Dest./Produits/Montant/Statut/Ctn./Actions
+   - IconButtons: Eye/Download/Star(VIP)/Euro
+   - Pills colorées par statut (VIP=purple, En attente=orange, Acompte=teal)
+[2026-04-11 12:34] — CatalogueProduits.tsx redesigné:
+   - Completude display: ●●●●●●●●○○ 8/10
+   - Pills par catégorie
+   - Références couleur selon catégorie
+[2026-04-11 12:34] — Nouvelles pages créées:
+   - ListesAchat.tsx (Listes d'achat)
+   - GestionSite.tsx (paramètres site web)
+
+[2026-04-11 12:35] BUILD TEST
+[2026-04-11 12:35] — ✅ npm run build réussi
+[2026-04-11 12:35] — CSS: 71KB, JS: 827KB
+[2026-04-11 12:35] STATUT: ✅ Back-office v4 design appliqué

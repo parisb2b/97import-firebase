@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>97import — Back-office Admin v4</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --nv:#0B2545;--nv2:#1E3A5F;--nv3:#1565C0;
+  --or:#F57C00;--or2:#FF9800;--orl:#FFF3E0;
+  --tl:#00897B;--tll:#E0F2F1;
+  --pu:#7C3AED;--pul:#EDE9FE;
+  --gr:#2E7D32;--grl:#E8F5E9;
+  --rd:#C62828;--rdl:#FFEBEE;
+  --am:#D97706;--aml:#FFFBEB;
+  --gy:#F5F7FA;--gy2:#E8ECF4;--gy3:#94A3B8;--gy4:#CBD5E1;
+  --tx:#0F172A;--tx2:#374151;--tx3:#6B7280;
+  --fh:'Sora',sans-serif;--fb:'DM Sans',sans-serif;
+  --sh:0 2px 8px rgba(11,37,69,.07);--r:12px;--rl:18px;
+}
+body{font-family:var(--fb);color:var(--tx);background:var(--gy);display:flex;height:100vh;overflow:hidden;}
+/* SIDEBAR */
+.sb{width:220px;flex-shrink:0;background:var(--nv);overflow-y:auto;display:flex;flex-direction:column;}
+.sb-logo{display:flex;align-items:center;gap:10px;padding:13px;border-bottom:1px solid rgba(255,255,255,.07);}
+.sb-lb{width:30px;height:30px;border-radius:7px;background:linear-gradient(135deg,#1565C0,#42A5F5);display:flex;align-items:center;justify-content:center;font-size:13px;}
+.sb-lt{font-family:var(--fh);font-size:13px;font-weight:800;color:#fff;}
+.sb-lt em{color:var(--or2);font-style:normal;}
+.sb-adm{background:rgba(255,152,0,.18);color:var(--or2);font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;}
+.sb-clk{padding:6px 12px;border-bottom:1px solid rgba(255,255,255,.07);}
+.sb-cr{display:flex;justify-content:space-between;padding:2px 0;font-size:10px;}
+.sb-cz{color:rgba(255,255,255,.4);}.sb-ct{color:#fff;font-weight:700;}
+.sb-sec{padding:8px 12px 2px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:rgba(255,255,255,.28);margin-top:3px;}
+.si{display:flex;align-items:center;justify-content:space-between;padding:7px 13px;cursor:pointer;color:rgba(255,255,255,.58);font-size:12px;border-left:3px solid transparent;transition:all .15s;}
+.si:hover{background:rgba(255,255,255,.06);color:#fff;}
+.si.on{background:rgba(255,255,255,.1);color:#fff;border-left-color:var(--or2);}
+.si-l{display:flex;align-items:center;gap:7px;}
+.sb-bdg{background:#EF4444;color:#fff;font-size:9px;padding:1px 5px;border-radius:8px;font-weight:700;}
+.sb-bdg.am{background:rgba(255,152,0,.3);color:var(--or2);}
+.sb-sep{height:1px;background:rgba(255,255,255,.06);margin:4px 0;}
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.topbar{background:#fff;border-bottom:1px solid var(--gy2);padding:0 18px;height:50px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;box-shadow:var(--sh);}
+.tb-t{font-family:var(--fh);font-size:14px;font-weight:700;color:var(--nv);}
+.rmb-pill{display:flex;align-items:center;gap:7px;background:var(--aml);border:1px solid #FCD34D;border-radius:20px;padding:4px 11px;}
+.rmb-lbl{font-size:10px;color:var(--am);font-weight:600;}
+.rmb-val{font-size:12px;font-weight:800;color:var(--am);}
+.content{flex:1;overflow-y:auto;padding:16px 18px;}
+.pg{display:none;}.pg.on{display:block;}
+/* KPI GRID */
+.kgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;}
+.kpi{background:#fff;border-radius:var(--r);padding:12px 14px;box-shadow:var(--sh);}
+.kpi-l{font-size:10px;color:var(--tx3);margin-bottom:3px;}
+.kpi-v{font-family:var(--fh);font-size:20px;font-weight:800;color:var(--nv);}
+.kpi-v.tl{color:var(--tl);}.kpi-v.or{color:var(--or);}.kpi-v.pu{color:var(--pu);}.kpi-v.gr{color:var(--gr);}.kpi-v.rd{color:var(--rd);}
+.kpi-s{font-size:10px;color:var(--tx3);margin-top:2px;}
+/* CARD */
+.card{background:#fff;border-radius:var(--rl);box-shadow:var(--sh);margin-bottom:12px;overflow:hidden;}
+.ch{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid var(--gy2);}
+.ct{font-family:var(--fh);font-size:13px;font-weight:700;color:var(--nv);}
+.ca{display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
+/* TABLE */
+table{width:100%;border-collapse:collapse;}
+th{background:var(--gy);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--tx3);padding:6px 10px;text-align:left;}
+td{padding:8px 10px;font-size:12px;border-bottom:1px solid var(--gy2);}
+tr:last-child td{border:none;}
+tr:hover td{background:#FAFBFD;}
+tr.cl{cursor:pointer;}tr.cl:hover td{background:#EFF6FF;}
+.tda{display:flex;gap:4px;align-items:center;}
+/* PILLS */
+.pl{display:inline-flex;align-items:center;padding:2px 7px;border-radius:12px;font-size:10px;font-weight:600;}
+.p-tl{background:var(--tll);color:var(--tl);}.p-or{background:var(--orl);color:var(--or);}
+.p-bl{background:#EFF6FF;color:var(--nv3);}.p-pu{background:var(--pul);color:var(--pu);}
+.p-gr{background:var(--grl);color:var(--gr);}.p-rd{background:var(--rdl);color:var(--rd);}
+.p-gy{background:var(--gy2);color:var(--tx3);}.p-am{background:var(--aml);color:var(--am);}
+.p-nv{background:#E8ECF4;color:var(--nv2);}
+/* BTN */
+.btn{padding:5px 12px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;border:none;display:inline-flex;align-items:center;gap:5px;font-family:var(--fb);}
+.btn.p{background:var(--nv);color:#fff;}.btn.s{background:var(--gr);color:#fff;}
+.btn.o{background:var(--or);color:#fff;}.btn.u{background:var(--pu);color:#fff;}
+.btn.t{background:var(--tl);color:#fff;}.btn.r{background:var(--rd);color:#fff;}
+.btn.a{background:var(--am);color:#fff;}
+.btn.out{background:transparent;color:var(--nv);border:1.5px solid var(--gy4);}
+/* ICON BUTTONS facture.net style */
+.ico-btn{width:32px;height:32px;border-radius:50%;border:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;position:relative;transition:transform .15s,opacity .15s;flex-shrink:0;}
+.ico-btn:hover{transform:scale(1.12);}
+.ico-btn svg{width:15px;height:15px;pointer-events:none;}
+.tt{position:absolute;bottom:calc(100% + 5px);left:50%;transform:translateX(-50%);background:#1E3A5F;color:#fff;font-size:10px;font-weight:600;padding:3px 7px;border-radius:5px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .15s;z-index:200;}
+.tt::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:4px solid transparent;border-top-color:#1E3A5F;}
+.ico-btn:hover .tt{opacity:1;}
+/* Couleurs icones */
+.ib-eur{background:#E8F5E9;color:#2E7D32;}
+.ib-eur.paid{background:#FFF9C4;color:#F57F17;}
+.ib-dl{background:#E3F2FD;color:#1565C0;}
+.ib-eye{background:#E8ECF4;color:var(--nv2);}
+.ib-send{background:#F3E5F5;color:#7B1FA2;}
+.ib-vip{background:var(--pul);color:var(--pu);}
+.ib-nc{background:var(--grl);color:var(--gr);}
+.ib-edit{background:var(--orl);color:var(--or);}
+.ib-xl{background:#E8F5E9;color:#1B5E20;}
+.ib-rd{background:var(--rdl);color:var(--rd);}
+/* FORMS */
+.fg{display:flex;flex-direction:column;gap:3px;margin-bottom:8px;}
+.fl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--tx3);}
+.fi{padding:7px 10px;border:1.5px solid var(--gy4);border-radius:9px;font-size:12px;outline:none;background:#fff;font-family:var(--fb);}
+.fi:focus{border-color:var(--nv3);}
+.fi.au{background:var(--gy);color:var(--nv3);font-weight:700;}
+.fi.gn{background:#E8F5E9;color:var(--gr);font-style:italic;}
+.fsel{padding:7px 10px;border:1.5px solid var(--gy4);border-radius:9px;font-size:12px;background:#fff;cursor:pointer;outline:none;font-family:var(--fb);}
+.fta{padding:7px 10px;border:1.5px solid var(--gy4);border-radius:9px;font-size:12px;font-family:var(--fb);resize:none;width:100%;outline:none;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+/* ACCORDION */
+.acc{border:1.5px solid var(--gy2);border-radius:var(--r);margin-bottom:7px;overflow:hidden;}
+.acc-h{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;cursor:pointer;background:#fff;user-select:none;}
+.acc-h:hover{background:var(--gy);}
+.acc-t{font-family:var(--fh);font-size:12px;font-weight:700;color:var(--nv);display:flex;align-items:center;gap:8px;}
+.acc-arr{font-size:11px;color:var(--tx3);transition:transform .2s;}
+.acc-arr.op{transform:rotate(180deg);}
+.acc-b{display:none;padding:13px;border-top:1px solid var(--gy2);background:#FAFBFD;}
+.acc-b.op{display:block;}
+/* IBLK */
+.iblk{background:var(--gy);border-radius:var(--r);padding:10px;margin-bottom:9px;}
+.iblk h4{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--tx3);margin-bottom:6px;}
+.ir{display:flex;justify-content:space-between;align-items:center;padding:3px 0;font-size:12px;border-bottom:1px solid rgba(0,0,0,.04);}
+.ir:last-child{border:none;}
+.ir span:first-child{color:var(--tx3);}
+.ir span:last-child{font-weight:600;color:var(--nv);}
+/* FILTERS */
+.filters{display:flex;gap:7px;margin-bottom:12px;flex-wrap:wrap;align-items:center;}
+.si-bar{flex:1;min-width:180px;padding:7px 10px 7px 30px;border:1.5px solid var(--gy4);border-radius:9px;font-size:12px;outline:none;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E") no-repeat 9px center;}
+.si-bar:focus{border-color:var(--nv3);}
+/* TABS */
+.tabs{display:flex;border-bottom:2px solid var(--gy2);margin-bottom:12px;}
+.tab{padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;color:var(--tx3);border-bottom:2px solid transparent;margin-bottom:-2px;}
+.tab:hover{color:var(--nv);}
+.tab.on{color:var(--nv);border-bottom-color:var(--or);}
+.tp{display:none;}.tp.on{display:block;}
+/* DEVIS LAYOUT */
+.dv-layout{display:grid;grid-template-columns:1fr 300px;gap:14px;}
+/* PARCOURS */
+.pstep{display:flex;align-items:flex-start;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--gy2);}
+.pstep:last-child{border:none;}
+.ps-l{display:flex;align-items:flex-start;gap:8px;}
+.sc{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;flex-shrink:0;margin-top:1px;}
+.sc.dn{background:var(--tl);color:#fff;}.sc.ac{background:var(--or);color:#fff;}.sc.pd{background:var(--gy2);color:var(--tx3);}
+.sn{font-size:12px;font-weight:600;color:var(--nv);}
+.ss{font-size:10px;color:var(--tx3);margin-top:1px;}
+/* NOTE ENCAISSEMENT */
+.enc-n{display:inline-flex;align-items:center;gap:4px;background:#FFF9C4;border:1px solid #F9A825;border-radius:8px;padding:2px 7px;font-size:10px;font-weight:700;color:#F57F17;margin-top:3px;}
+/* DOC LIST */
+.doc-item{display:flex;align-items:center;justify-content:space-between;padding:9px 13px;border-bottom:1px solid var(--gy2);}
+.doc-item:last-child{border:none;}
+.doc-item.dis{background:var(--gy);opacity:.7;}
+.doc-nm{font-size:12px;font-weight:600;color:var(--nv);display:flex;align-items:center;gap:6px;}
+.doc-mt{font-size:10px;color:var(--tx3);margin-top:2px;}
+/* PRIX CHAIN */
+.px-blk{background:linear-gradient(135deg,#0B2545,#1565C0);border-radius:var(--r);padding:14px;margin-bottom:9px;}
+.px-t{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:rgba(255,255,255,.5);margin-bottom:9px;}
+.px-row{display:flex;align-items:center;gap:8px;margin-bottom:5px;}
+.px-lbl{font-size:11px;color:rgba(255,255,255,.6);min-width:150px;}
+.px-inp{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:7px;padding:5px 9px;font-size:13px;font-weight:700;color:#fff;width:120px;text-align:right;outline:none;}
+.px-inp.yn{color:#FCA5A5;}.px-inp.eu{color:#93C5FD;}.px-inp.pb{color:#86EFAC;}.px-inp.pt{color:var(--or2);}
+/* PROG */
+.prog-w{height:5px;background:var(--gy2);border-radius:3px;overflow:hidden;}
+.prog-f{height:100%;border-radius:3px;background:var(--tl);}
+/* MODAL */
+.ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center;}
+.ov.on{display:flex;}
+.modal{background:#fff;border-radius:var(--rl);width:660px;max-height:88vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.3);}
+.m-h{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:1px solid var(--gy2);}
+.m-t{font-family:var(--fh);font-size:13px;font-weight:700;color:var(--nv);}
+.m-b{flex:1;overflow-y:auto;padding:16px;}
+.m-f{padding:11px 16px;border-top:1px solid var(--gy2);display:flex;gap:8px;justify-content:flex-end;}
+.m-x{background:none;border:none;font-size:18px;cursor:pointer;color:var(--tx3);}
+/* PDF TEMPLATE */
+.pdf{background:#fff;border:1px solid var(--gy2);border-radius:var(--r);padding:22px;font-family:Arial,sans-serif;}
+.pdf-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;padding-bottom:13px;border-bottom:2px solid var(--gy2);}
+.pdf-title{font-size:20px;font-weight:700;color:var(--nv2);}
+.pdf-date{font-size:11px;color:var(--gy3);margin-top:3px;}
+.pdf-cols{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:13px;}
+.pdf-ct{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--or);margin-bottom:5px;}
+.pdf-cv{font-size:11px;color:var(--tx2);line-height:1.8;}
+.pdf-bk{font-size:10px;color:var(--tx2);background:var(--gy);border-radius:6px;padding:8px;margin-bottom:13px;line-height:1.9;}
+.pdf-tbl{width:100%;border-collapse:collapse;margin-bottom:13px;}
+.pdf-tbl thead tr{background:linear-gradient(135deg,#F57C00,#FF9800);}
+.pdf-tbl th{color:#fff;font-size:10px;font-weight:700;padding:7px 9px;text-align:left;}
+.pdf-tbl td{padding:8px 9px;font-size:11px;border-bottom:1px solid var(--gy2);}
+.pdf-tbl tr:nth-child(even) td{background:#FAFBFD;}
+.pdf-tot{text-align:right;margin-bottom:13px;}
+.pdf-tot table{margin-left:auto;min-width:190px;}
+.pdf-tot td{padding:4px 8px;font-size:11px;}
+.pdf-tot tr.fin td{font-size:13px;font-weight:800;color:var(--nv2);border-top:2px solid var(--gy2);}
+.pdf-foot{border-top:1px solid var(--gy2);padding-top:9px;font-size:10px;color:var(--gy3);text-align:center;}
+/* NC TEMPLATE */
+.nc-hdr{background:linear-gradient(135deg,#0B2545,#1565C0);padding:18px 22px;border-radius:var(--r) var(--r) 0 0;}
+.nc-calc{background:linear-gradient(135deg,#7C3AED,#A855F7);border-radius:var(--r);padding:15px;margin-bottom:14px;color:#fff;}
+.nc-calc-t{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;opacity:.7;margin-bottom:9px;}
+.nc-row{display:flex;justify-content:space-between;padding:5px 0;font-size:12px;border-bottom:1px solid rgba(255,255,255,.15);}
+.nc-row:last-child{border:none;font-weight:800;font-size:15px;margin-top:4px;}
+/* FL TEMPLATE */
+.fl-hdr{background:linear-gradient(135deg,#00897B,#26A69A);padding:16px 20px;border-radius:var(--r) var(--r) 0 0;color:#fff;}
+/* SAV URGENCE */
+.sav-urg{background:linear-gradient(135deg,#C62828,#EF4444);border-radius:var(--r);padding:11px 14px;margin-bottom:12px;color:#fff;}
+/* UPLOAD */
+.upz{border:2px dashed var(--gy4);border-radius:var(--rl);padding:16px;text-align:center;cursor:pointer;background:#fff;}
+.upz:hover{border-color:var(--nv3);background:var(--gy);}
+/* LA card */
+.la-c{border:1.5px solid var(--gy4);border-radius:var(--r);padding:9px;margin-bottom:6px;cursor:pointer;}
+.la-c:hover{border-color:var(--nv3);}
+.la-c.on{border-color:var(--or);background:var(--orl);}
+/* ALERT */
+.alert{border-radius:var(--r);padding:9px 13px;margin-bottom:11px;font-size:12px;}
+.alert.am{background:var(--aml);border:1px solid #FCD34D;color:var(--am);}
+.alert.gr{background:var(--grl);border:1px solid #A5D6A7;color:var(--gr);}
+.alert.pu{background:var(--pul);border:1px solid #C4B5FD;color:var(--pu);}
+/* AB */
+.ab{display:flex;align-items:center;gap:7px;padding:8px 11px;border-radius:9px;border:none;font-size:12px;font-weight:600;cursor:pointer;margin-bottom:5px;width:100%;text-align:left;font-family:var(--fb);}
+.ab.p{background:var(--nv);color:#fff;}.ab.o{background:var(--or);color:#fff;}
+.ab.g{background:var(--gr);color:#fff;}.ab.t{background:var(--tl);color:#fff;}
+</style>
+</head>
+<body>
+<div class="sb">
+  <div class="sb-logo">
+    <div class="sb-lb">&#x1F6A2;</div>
+    <div><div class="sb-lt">97<em>IMPORT</em></div><div class="sb-adm">ADMIN v4</div></div>
+  </div>
+  <div class="sb-clk">
+    <div class="sb-cr"><span class="sb-cz">&#x1F1F2;&#x1F1F6; MQ</span><span class="sb-ct" id="c-mq">--:--</span></div>
+    <div class="sb-cr"><span class="sb-cz">&#x1F1EB;&#x1F1F7; FR</span><span class="sb-ct" id="c-fr">--:--</span></div>
+    <div class="sb-cr"><span class="sb-cz">&#x1F1E8;&#x1F1F3; CN</span><span class="sb-ct" id="c-cn">--:--</span></div>
+  </div>
+  <div class="sb-sec">Commerce</div>
+  <div class="si on" onclick="go('db',this)"><div class="si-l">&#x1F4CA; Tableau de bord</div></div>
+  <div class="si" onclick="go('dv',this)"><div class="si-l">&#x1F4CB; Devis</div></div>
+  <div class="si" onclick="go('fa',this)"><div class="si-l">&#x1F9FE; Factures</div></div>
+  <div class="si" onclick="go('nc',this)"><div class="si-l">&#x1F4B0; Notes de commission</div></div>
+  <div class="si" onclick="go('fl',this)"><div class="si-l">&#x1F6F3; Factures logistiques</div></div>
+  <div class="sb-sep"></div>
+  <div class="si" onclick="go('la',this)"><div class="si-l">&#x1F6D2; Listes d'achat</div></div>
+  <div class="si" onclick="go('cnt',this)"><div class="si-l">&#x1F4E6; Conteneurs</div></div>
+  <div class="si" onclick="go('stk',this)"><div class="si-l">&#x1F4E6; Stock</div></div>
+  <div class="si" onclick="go('sav',this)"><div class="si-l">&#x1F527; SAV</div><span class="sb-bdg">2</span></div>
+  <div class="sb-sec">Catalogue</div>
+  <div class="si" onclick="go('prd',this)"><div class="si-l">&#x1F5C2; Produits</div></div>
+  <div class="si" onclick="go('new-prd',this)"><div class="si-l">&#x2795; Ajouter produit</div></div>
+  <div class="sb-sec">Utilisateurs</div>
+  <div class="si" onclick="go('cli',this)"><div class="si-l">&#x1F465; Clients</div><span class="sb-bdg">3</span></div>
+  <div class="si" onclick="go('part',this)"><div class="si-l">&#x1F91D; Partenaires</div></div>
+  <div class="sb-sec">Systeme</div>
+  <div class="si" onclick="go('rmb',this)"><div class="si-l">&#x1F4B1; Taux RMB</div><span class="sb-bdg am">7.82</span></div>
+  <div class="si" onclick="go('site',this)"><div class="si-l">&#x1F310; Gestion site</div></div>
+  <div class="si" onclick="go('logs',this)"><div class="si-l">&#x1F6A8; Logs</div><span class="sb-bdg">4</span></div>
+  <div class="si" onclick="go('prm',this)"><div class="si-l">&#x2699; Parametres</div></div>
+</div>
+
+<div class="main">
+<div class="topbar">
+  <div class="tb-t" id="ttl">Tableau de bord</div>
+  <div style="display:flex;align-items:center;gap:10px">
+    <div class="rmb-pill">
+      <span>&#x1F1E8;&#x1F1F3;</span>
+      <div><div class="rmb-lbl">Taux RMB</div><span class="rmb-val">1&#x20AC; = <span id="rmb-top">7.82</span> &yen;</span> <span style="font-size:10px;color:var(--gr);font-weight:600">&#x2191;+0.3%</span></div>
+    </div>
+  </div>
+</div>
+<div class="content">
+
+<!-- ===== DASHBOARD ===== -->
+<div id="pg-db" class="pg on">
+  <div class="kgrid">
+    <div class="kpi"><div class="kpi-l">Devis en attente</div><div class="kpi-v">7</div><div class="kpi-s">3 VIP · 4 standard</div></div>
+    <div class="kpi"><div class="kpi-l">CA encaisse avr.</div><div class="kpi-v tl">34 200€</div><div class="kpi-s">+12% vs mars</div></div>
+    <div class="kpi"><div class="kpi-l">Commissions dues</div><div class="kpi-v or">8 320€</div><div class="kpi-s">3 partenaires</div></div>
+    <div class="kpi"><div class="kpi-l">SAV urgents</div><div class="kpi-v rd">2</div><div class="kpi-s">A traiter</div></div>
+  </div>
+  <div class="g2">
+    <div>
+      <div class="card">
+        <div class="ch"><div class="ct">Devis recents</div><button class="btn p" onclick="go('dv',null)">Voir tout</button></div>
+        <table><thead><tr><th>N°</th><th>Client</th><th>Montant</th><th>Statut</th><th></th></tr></thead><tbody>
+          <tr class="cl" onclick="go('dv-det',null)"><td><strong>D2604006</strong></td><td>Dupont MQ</td><td style="font-weight:700;color:var(--pu)">14 200€</td><td><span class="pl p-pu">VIP</span></td>
+            <td><div class="tda"><button class="ico-btn ib-eye" onclick="event.stopPropagation();go('dv-det',null)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><span class="tt">Ouvrir</span></button></div></td></tr>
+          <tr class="cl" onclick="go('dv-det',null)"><td><strong>D2604007</strong></td><td>Martin GP</td><td style="font-weight:700">18 400€</td><td><span class="pl p-or">En attente</span></td>
+            <td><div class="tda"><button class="ico-btn ib-eye" onclick="event.stopPropagation()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><span class="tt">Ouvrir</span></button></div></td></tr>
+        </tbody></table>
+      </div>
+      <div class="card">
+        <div class="ch"><div class="ct">Conteneurs actifs</div><button class="btn out" onclick="go('cnt',null)">Gerer</button></div>
+        <div style="padding:12px">
+          <div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;margin-bottom:3px"><strong style="font-size:12px">CTN-2604-001</strong><span class="pl p-or">En prep.</span></div>
+            <div style="font-size:11px;color:var(--tx3);margin-bottom:3px">40HC · MQ Fort de France · 23/04</div>
+            <div style="display:flex;align-items:center;gap:7px"><div class="prog-w" style="flex:1"><div class="prog-f" style="width:72%"></div></div><span style="font-size:11px;font-weight:700">48/67m³</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="sav-urg"><h3 style="font-family:var(--fh);font-size:13px;font-weight:700;margin-bottom:3px">&#x1F527; 2 SAV urgents</h3><p style="font-size:11px;opacity:.85">Dupont MQ — MP-R22-001 · Carrera — ACC-GD-004</p><button class="btn r" style="margin-top:8px" onclick="go('sav',null)">Traiter →</button></div>
+      <div class="card">
+        <div class="ch"><div class="ct">Commissions dues</div><button class="btn out" onclick="go('nc',null)">Voir tout</button></div>
+        <table><thead><tr><th>Partenaire</th><th>Due</th><th>Statut</th></tr></thead><tbody>
+          <tr><td><span class="pl p-pu">JM</span> Jean-Marc</td><td style="font-weight:700;color:var(--pu)">3 160€</td><td><span class="pl p-or">Due</span></td></tr>
+          <tr><td><span class="pl p-pu">TD</span> Thomas D.</td><td style="font-weight:700;color:var(--pu)">4 900€</td><td><span class="pl p-or">Due</span></td></tr>
+        </tbody></table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== DEVIS LISTE ===== -->
+<div id="pg-dv" class="pg">
+  <div class="filters">
+    <input class="si-bar" placeholder="Rechercher N° devis, client, produit..."/>
+    <select class="fsel" style="padding:7px 9px"><option>Tous statuts</option><option>VIP</option><option>En attente</option><option>Acompte recu</option></select>
+    <select class="fsel" style="padding:7px 9px"><option>Toutes dest.</option><option>MQ</option><option>GP</option><option>RE</option><option>GF</option></select>
+    <select class="fsel" style="padding:7px 9px"><option>Tous partenaires</option><option>JM</option><option>TD</option><option>MC</option></select>
+    <button class="btn o" onclick="simDl('Devis_export.xlsx')">&#x1F4CA; Export Excel</button>
+    <button class="btn p" onclick="openM('m-new-dv')">&#x2795; Nouveau devis</button>
+  </div>
+  <div class="card">
+    <div class="ch"><div class="ct">Tous les devis (7)</div><span style="font-size:11px;color:var(--tx3)">Cliquer sur une ligne pour ouvrir</span></div>
+    <table><thead><tr><th>N°</th><th>Date</th><th>Client</th><th>Part.</th><th>Dest.</th><th>Produits</th><th>Montant</th><th>Statut</th><th>Ctn.</th><th>Actions</th></tr></thead><tbody>
+      <tr class="cl" onclick="go('dv-det',null)">
+        <td><strong>D2604006</strong></td><td>08/04</td><td>Dupont MQ</td><td><span class="pl p-pu">JM</span></td><td>MQ</td><td>MP-R22-001</td><td style="font-weight:700;color:var(--pu)">14 200€</td><td><span class="pl p-pu">VIP</span></td><td><span class="pl p-nv" style="font-size:9px">CTN-2604-001</span></td>
+        <td class="tda">
+          <button class="ico-btn ib-eye" onclick="event.stopPropagation();go('dv-det',null)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><span class="tt">Voir detail</span></button>
+          <button class="ico-btn ib-dl" onclick="event.stopPropagation();openM('m-dv')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg><span class="tt">Devis PDF</span></button>
+          <button class="ico-btn ib-vip" onclick="event.stopPropagation();openM('m-vip')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><span class="tt">Devis VIP PDF</span></button>
+          <button class="ico-btn ib-eur" id="enc-dv6" onclick="event.stopPropagation();toggleEnc('enc-dv6','enote-dv6')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><text x="8.5" y="16.5" font-size="11" fill="currentColor" stroke="none" font-weight="bold">€</text></svg>
+            <span class="tt">Encaisser acompte</span>
+          </button>
+        </td>
+      </tr>
+      <tr class="cl" onclick="go('dv-det',null)">
+        <td><strong>D2604007</strong></td><td>10/04</td><td>Martin GP</td><td><span class="pl p-pu">TD</span></td><td>GP</td><td>MS-20-001</td><td style="font-weight:700">18 400€</td><td><span class="pl p-or">En attente</span></td><td>—</td>
+        <td class="tda">
+          <button class="ico-btn ib-eye" onclick="event.stopPropagation()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><span class="tt">Voir detail</span></button>
+          <button class="ico-btn ib-dl" onclick="event.stopPropagation();openM('m-dv')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg><span class="tt">Devis PDF</span></button>
+          <button class="ico-btn ib-eur" id="enc-dv7" onclick="event.stopPropagation();toggleEnc('enc-dv7','enote-dv7')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><text x="8.5" y="16.5" font-size="11" fill="currentColor" stroke="none" font-weight="bold">€</text></svg>
+            <span class="tt">Encaisser acompte</span>
+          </button>
+        </td>
+      </tr>
+      <tr><td><strong>D2604004</strong></td><td>05/04</td><td>Carrera</td><td><span class="pl p-pu">MC</span></td><td>MQ</td><td>+3 produits</td><td style="font-weight:700">8 800€</td><td><span class="pl p-tl">Acompte 1</span></td><td><span class="pl p-nv" style="font-size:9px">CTN-2604-001</span></td>
+        <td class="tda"><button class="ico-btn ib-eye"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><span class="tt">Voir</span></button></td>
+      </tr>
+    </tbody></table>
+  </div>
+</div>
+
+<!-- ===== DEVIS DETAIL ===== -->
+<div id="pg-dv-det" class="pg">
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+    <button class="btn out" onclick="go('dv',null)">← Retour</button>
+    <strong style="font-family:var(--fh);font-size:14px;color:var(--nv)">D2604006</strong>
+    <span class="pl p-pu">VIP</span><span class="pl p-pu">Partenaire JM</span>
+    <span class="pl p-nv" style="font-size:10px">CTN-2604-001</span>
+    <span id="enote-main" class="enc-n" style="display:none">&#10003; Acompte encaisse</span>
+  </div>
+  <div class="dv-layout">
+    <div>
+      <!-- INFOS -->
+      <div class="card" style="margin-bottom:12px">
+        <div class="ch"><div class="ct">D2604006 — Dupont Michel MQ</div><span style="font-size:11px;color:var(--tx3)">08/04/2026</span></div>
+        <div style="padding:12px">
+          <div class="g2" style="margin-bottom:10px">
+            <div class="iblk"><h4>Client</h4>
+              <div class="ir"><span>Nom</span><span>Dupont Michel</span></div>
+              <div class="ir"><span>Role</span><span><span class="pl p-pu">VIP</span></span></div>
+              <div class="ir"><span>Partenaire</span><span><span class="pl p-pu">JM</span></span></div>
+              <div class="ir"><span>Destination</span><span>MQ Martinique</span></div>
+            </div>
+            <div class="iblk"><h4>Finances</h4>
+              <div class="ir"><span>Total VIP</span><span style="color:var(--pu);font-weight:700">14 200€</span></div>
+              <div class="ir"><span>Acompte 1</span><span style="color:var(--tl);font-weight:700">5 000€ ✓</span></div>
+              <div class="ir"><span>Solde restant</span><span style="color:var(--or);font-weight:700">9 200€</span></div>
+              <div class="ir"><span>Commission JM</span><span style="color:var(--gr);font-weight:700">3 160€</span></div>
+            </div>
+          </div>
+          <div style="border-radius:8px;overflow:hidden">
+            <div style="background:linear-gradient(135deg,var(--or),var(--or2));display:grid;grid-template-columns:3fr 1fr 1fr 1fr">
+              <span style="color:#fff;font-size:10px;font-weight:700;padding:6px 9px">PRODUIT</span>
+              <span style="color:#fff;font-size:10px;font-weight:700;padding:6px 9px">PUBLIC</span>
+              <span style="color:#fff;font-size:10px;font-weight:700;padding:6px 9px">VIP</span>
+              <span style="color:#fff;font-size:10px;font-weight:700;padding:6px 9px">TOTAL</span>
+            </div>
+            <div style="display:grid;grid-template-columns:3fr 1fr 1fr 1fr;border-bottom:1px solid var(--gy2)">
+              <span style="padding:7px 9px;font-weight:600;font-size:12px">Mini-pelle R22 PRO 2.2T</span>
+              <span style="padding:7px 9px;font-size:12px"><s style="color:var(--gy3)">18 800€</s></span>
+              <span style="padding:7px 9px;font-size:12px;color:var(--pu);font-weight:700">14 200€</span>
+              <span style="padding:7px 9px;font-size:12px;font-weight:700">14 200€</span>
+            </div>
+          </div>
+          <div class="alert pu" style="margin-top:9px;margin-bottom:0"><strong>Commission JM :</strong> 14 200€ − 11 040€ (×1.2) = <strong>3 160€</strong></div>
+        </div>
+      </div>
+      <!-- DOCUMENTS DU DOSSIER -->
+      <div class="card">
+        <div class="ch"><div class="ct">&#x1F4C2; Documents du dossier</div><span style="font-size:10px;color:var(--tx3)">Apercu · Telecharger · Envoyer</span></div>
+        <div class="doc-item">
+          <div><div class="doc-nm"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#F57C00" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Devis D2604006</div><div class="doc-mt">08/04/2026 · PDF standard</div></div>
+          <div class="tda">
+            <button class="ico-btn ib-eye" onclick="openM('m-dv')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><span class="tt">Apercu</span></button>
+            <button class="ico-btn ib-dl" onclick="simDl('Devis_D2604006.pdf')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg><span class="tt">Telecharger PDF</span></button>
+            <button class="ico-btn ib-send" onclick="alert('Devis_D2604006.pdf mis a disposition dans espace client + email envoye a dupont@email.com')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><span class="tt">Envoyer au client</span></button>
+          </div>
+        </div>
+        <div class="doc-item">
+          <div><div class="doc-nm"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Devis VIP D2604006</div><div class="doc-mt">08/04/2026 · PDF prix negotie</div></div>
+          <div class="tda">
+            <button class="ico-btn ib-eye" onclick="openM('m-vip')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><span class="tt">Apercu VIP</span></button>
+            <button class="ico-btn ib-dl" onclick="simDl('Devis_VIP_D2604006.pdf')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg><span class="tt">Telecharger PDF VIP</span></button>
+            <button class="ico-btn ib-send" onclick="alert('Devis VIP mis a disposition dans espace client VIP')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><span class="tt">Envoyer au client</span></button>
+          </div>
+        </div>
+        <div class="doc-item">
+          <div><div class="doc-nm"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#00897B" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>Facture acompte FA2604001</div><div class="doc-mt">05/04/2026 · 5 000€ encaisse</div></div>
+          <div class="tda">
+            <button class="ico-btn ib-eye" onclick="openM('m-fa')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><span class="tt">Apercu FA</span></button>
+            <button class="ico-btn ib-dl" onclick="simDl('FA2604001.pdf')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg><span class="tt">Telecharger FA</span></button>
+            <button class="ico-btn ib-send" onclick="alert('FA2604001 mis a disposition dans espace client')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><span class="tt">Envoyer au client</span></button>
+          </div>
+        </div>
+        <div class="doc-item" style="background:var(--grl)">
+          <div><div class="doc-nm"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2E7D32" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>Note commission NC2604001 — JM</div><div class="doc-mt">3 160€ · A envoyer a JM</div></div>
+          <div class="tda">
+            <button class="ico-btn ib-eye" onclick="openM('m-nc')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><span class="tt">Apercu NC</span></button>
+            <button class="ico-btn ib-dl" onclick="simDl('NC2604001_JM.pdf')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg><span class="tt">Telecharger NC</span></button>
+            <button class="ico-btn ib-nc" onclick="alert('NC2604001 envoyee a JM par email')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><span class="tt">Envoyer NC a JM</span></button>
+          </div>
+        </div>
+        <div class="doc-item dis">
+          <div><div class="doc-nm" style="color:var(--gy3)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/></svg>Facture Logistique FL — CTN-2604-001</div><div class="doc-mt">En attente : disponible quand conteneur "Parti du port"</div></div>
+          <span class="pl p-gy">En attente</span>
+        </div>
+        <div class="doc-item dis">
+          <div><div class="doc-nm" style="color:var(--gy3)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2"><path d="M9 17H5a2 2 0 00-2 2 2 2 0 002 2h14a2 2 0 002-2 2 2 0 00-2-2h-4"/><polyline points="12 12 12 19"/><path d="M5 12H2a10 10 0 0020 0h-3"/></svg>BL / Waybill</div><div class="doc-mt">Disponible apres livraison</div></div>
+          <span class="pl p-gy">A venir</span>
+        </div>
+      </div>
+    </div>
+    <!-- SIDEBAR DROITE -->
+    <div>
+      <div class="iblk">
+        <h4>Parcours documents</h4>
+        <div class="pstep"><div class="ps-l"><div class="sc dn">1</div><div><div class="sn">Devis VIP</div><div class="ss">Envoye</div></div></div><span class="pl p-tl">&#10003;</span></div>
+        <div class="pstep"><div class="ps-l"><div class="sc dn">2</div><div><div class="sn">Acompte 1 FA2604001</div><div class="ss">5 000€ encaisse</div></div></div><span class="pl p-tl">&#10003;</span></div>
+        <div class="pstep" id="step3-row">
+          <div class="ps-l"><div class="sc ac">3</div><div><div class="sn">Acompte 2</div><div class="ss">Non genere</div><span id="enote-step3" class="enc-n" style="display:none">&#10003; Encaisse</span></div></div>
+          <button class="ico-btn ib-eur" id="enc-step3" onclick="toggleEnc('enc-step3','enote-step3')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><text x="8.5" y="16.5" font-size="11" fill="currentColor" stroke="none" font-weight="bold">€</text></svg>
+            <span class="tt">Encaisser</span>
+          </button>
+        </div>
+        <div class="pstep"><div class="ps-l"><div class="sc pd">4</div><div><div class="sn">Facture Logistique</div><div class="ss">LOG-CTN-2604-001</div></div></div><button class="btn a" style="font-size:10px;padding:2px 7px">Definir prix</button></div>
+        <div class="pstep"><div class="ps-l"><div class="sc pd">5</div><div><div class="sn">Solde + Facture finale</div></div></div><span class="pl p-gy">Att.</span></div>
+        <div class="pstep"><div class="ps-l"><div class="sc pd">6</div><div><div class="sn">BL livraison</div></div></div><span class="pl p-gy">A venir</span></div>
+        <div class="pstep" style="border:none"><div class="ps-l"><div class="sc pd">7</div><div><div class="sn">Note commission JM</div><div class="ss">3 160€ due</div></div></div>
+          <button class="ico-btn ib-nc" onclick="openM('m-nc')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><span class="tt">Envoyer NC a JM</span></button>
+        </div>
+      </div>
+      <!-- ACTIONS RAPIDES -->
+      <div class="iblk">
+        <h4>Actions rapides</h4>
+        <div style="display:flex;flex-wrap:wrap;gap:9px;justify-content:center;padding:6px 0">
+          <button class="ico-btn ib-eur" id="enc-ar" onclick="toggleEnc('enc-ar','enote-main')" style="width:40px;height:40px">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="9"/><text x="8.5" y="16.5" font-size="11" fill="currentColor" stroke="none" font-weight="bold">€</text></svg>
+            <span class="tt">Encaisser acompte</span>
+          </button>
+          <button class="ico-btn ib-dl" onclick="openM('m-dv')" style="width:40px;height:40px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span class="tt">Devis PDF</span></button>
+          <button class="ico-btn ib-rd" onclick="openM('m-fa')" style="width:40px;height:40px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span class="tt">Facture acompte PDF</span></button>
+          <button class="ico-btn ib-vip" onclick="openM('m-vip')" style="width:40px;height:40px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><span class="tt">Devis VIP PDF</span></button>
+          <button class="ico-btn ib-nc" onclick="openM('m-nc')" style="width:40px;height:40px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg><span class="tt">Note commission JM</span></button>
+          <button class="ico-btn ib-send" onclick="alert('Email envoye a dupont@email.com')" style="width:40px;height:40px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><span class="tt">Envoyer par email</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== FACTURES ===== -->
+<div id="pg-fa" class="pg">
+  <div class="filters">
+    <input class="si-bar" placeholder="Rechercher N° facture, client..."/>
+    <select class="fsel" style="padding:7px 9px"><option>Tous types</option><option>Factures (F)</option><option>Acomptes (FA)</option></select>
+    <select class="fsel" style="padding:7px 9px"><option>Tous statuts</option><option>Finalisee</option><option>Payee</option></select>
+    <button class="btn o" onclick="simDl('Factures_export.xlsx')">&#x1F4CA; Export Excel</button>
+  </div>
+  <div class="card">
+    <div class="ch"><div class="ct">Toutes les factures (12)</div><span style="font-size:11px;color:var(--tx3)">Acces a tous les documents du dossier depuis chaque ligne</span></div>
+    <table><thead><tr><th>N°</th><th>Type</th><th>Date</th><th>Client</th><th>Devis</th><th>Montant</th><th>Statut</th><th>Tous documents</th></tr></thead><tbody>
+      <tr>
+        <td><strong>FA2604001</strong></td><td><span class="pl p-tl">Acompte</span></td><td>05/04/26</td><td>Dupont MQ</td><td>D2604006</td><td style="font-weight:700;color:var(--tl)">5 000€</td><td><span class="pl p-tl">Payee</span></td>
+        <td class="tda">
+          <button class="ico-btn ib-eye" onclick="openM('m-dv')" title=""><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span class="tt">Devis PDF</span></button>
+          <button class="ico-btn ib-vip" onclick="openM('m-vip')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><span class="tt">Devis VIP PDF</span></button>
+          <button class="ico-btn ib-rd" onclick="openM('m-fa')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span class="tt">Facture acompte PDF</span></button>
+          <button class="ico-btn ib-nc" onclick="openM('m-nc')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg><span class="tt">Note commission NC</span></button>
+          <button class="ico-btn ib-dl" onclick="simDl('FA2604001.pdf')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg><span class="tt">DL FA</span></button>
+          <button class="ico-btn ib-send" onclick="alert('FA2604001 mis a disposition dans espace client')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><span class="tt">Envoyer au client</span></button>
+          <button class="ico-btn ib-eur" id="enc-fa1" onclick="toggleEnc('enc-fa1','')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><text x="8.5" y="16.5" font-size="11" fill="currentColor" stroke="none" font-weight="bold">€</text></svg><span class="tt">Marquer payee</span></button>
+        </td>
+      </tr>
+      <tr>
+        <td><strong>F2604001</strong></td><td><span class="pl p-bl">Finale</span></td><td>31/03/26</td><td>Carrera</td><td>D2603011</td><td style="font-weight:700">8 800€</td><td><span class="pl p-or">Finalisee</span></td>
+        <td class="tda">
+          <button class="ico-btn ib-eye" onclick="openM('m-dv')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span class="tt">Devis PDF</span></button>
+          <button class="ico-btn ib-rd" onclick="openM('m-fa')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span class="tt">Facture PDF</span></button>
+          <button class="ico-btn ib-nc" onclick="openM('m-nc')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg><span class="tt">Note commission</span></button>
+          <button class="ico-btn ib-dl" onclick="simDl('F2604001.pdf')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg><span class="tt">Telecharger</span></button>
+          <button class="ico-btn ib-eur" id="enc-f1" onclick="toggleEnc('enc-f1','')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><text x="8.5" y="16.5" font-size="11" fill="currentColor" stroke="none" font-weight="bold">€</text></svg><span class="tt">Marquer payee</span></button>
+        </td>
+      </tr>
+    </tbody></table>
+  </div>
+</div>
+
+<!-- ===== NOTES DE COMMISSION ===== -->
+<div id="pg-nc" class="pg">
+  <div class="filters">
+    <input class="si-bar" placeholder="Rechercher partenaire, N° NC..."/>
+    <select class="fsel" style="padding:7px 9px"><option>Tous partenaires</option><option>JM</option><option>TD</option><option>MC</option></select>
+    <select class="fsel" style="padding:7px 9px"><option>Tous statuts</option><option>Due</option><option>Envoyee</option><option>Payee</option></select>
+    <button class="btn o" onclick="simDl('NC_export_global.xlsx')">&#x1F4CA; Export NC global</button>
+  </div>
+  <div class="kgrid">
+    <div class="kpi"><div class="kpi-l">Dues</div><div class="kpi-v or">8 320€</div></div>
+    <div class="kpi"><div class="kpi-l">Payees</div><div class="kpi-v gr">22 100€</div></div>
+    <div class="kpi"><div class="kpi-l">A envoyer</div><div class="kpi-v rd">3</div></div>
+    <div class="kpi"><div class="kpi-l">Ce mois</div><div class="kpi-v">5</div></div>
+  </div>
+  <div class="card">
+    <div class="ch"><div class="ct">Notes de commission — liste chronologique</div></div>
+    <table><thead><tr><th>N° NC</th><th>Date</th><th>Part.</th><th>Client</th><th>Devis</th><th>Prix VIP</th><th>x1.2</th><th>Commission</th><th>Statut</th><th>Tous documents</th></tr></thead><tbody>
+      <tr>
+        <td><strong>NC2604001</strong></td><td>08/04</td><td><span class="pl p-pu">JM</span></td><td>Dupont MQ</td><td>D2604006</td><td>14 200€</td><td>11 040€</td><td style="font-weight:700;color:var(--pu)">3 160€</td><td><span class="pl p-or">A envoyer</span></td>
+        <td class="tda">
+          <button class="ico-btn ib-eye" onclick="openM('m-dv')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span class="tt">Devis PDF</span></button>
+          <button class="ico-btn ib-vip" onclick="openM('m-vip')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><span class="tt">Devis VIP</span></button>
+          <button class="ico-btn ib-rd" onclick="openM('m-fa')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span class="tt">Facture acompte</span></button>
+          <button class="ico-btn ib-nc" onclick="openM('m-nc')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg><span class="tt">Apercu NC</span></button>
+          <button class="ico-btn ib-dl" onclick="simDl('NC2604001_JM.pdf')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg><span class="tt">DL NC</span></button>
+          <button class="ico-btn ib-send" onclick="alert('NC2604001 envoyee a JM par email')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><span class="tt">Envoyer NC a JM</span></button>
+          <button class="ico-btn ib-eur" id="enc-nc1" onclick="toggleEnc('enc-nc1','')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><text x="8.5" y="16.5" font-size="11" fill="currentColor" stroke="none" font-weight="bold">€</text></svg><span class="tt">Marquer payee</span></button>
+        </td>
+      </tr>
+      <tr>
+        <td><strong>NC2603003</strong></td><td>22/03</td><td><span class="pl p-pu">TD</span></td><td>Bernard MQ</td><td>D2603008</td><td>26 000€</td><td>23 600€</td><td style="font-weight:700;color:var(--pu)">2 400€</td><td><span class="pl p-tl">Envoyee</span></td>
+        <td class="tda">
+          <button class="ico-btn ib-eye" onclick="openM('m-dv')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span class="tt">Devis PDF</span></button>
+          <button class="ico-btn ib-nc" onclick="openM('m-nc')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg><span class="tt">Apercu NC</span></button>
+          <button class="ico-btn ib-dl" onclick="simDl('NC2603003_TD.pdf')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg><span class="tt">DL NC</span></button>
+          <button class="ico-btn ib-eur" id="enc-nc2" onclick="toggleEnc('enc-nc2','')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><text x="8.5" y="16.5" font-size="11" fill="currentColor" stroke="none" font-weight="bold">€</text></svg><span class="tt">Marquer payee</span></button>
+        </td>
+      </tr>
+    </tbody></table>
+  </div>
+</div>
+
+<!-- ===== FACTURES LOGISTIQUES ===== -->
+<div id="pg-fl" class="pg">
+  <div class="alert am">&#x26A0;&#xFE0F; Activees automatiquement quand un conteneur est marque <strong>"Parti du port"</strong>. V1 = mention "Prix a demander a votre partenaire". V2 = prix reel saisi par le partenaire dans son espace.</div>
+  <div class="filters">
+    <input class="si-bar" placeholder="Rechercher N° FL, conteneur, client..."/>
+    <select class="fsel" style="padding:7px 9px"><option>Tous conteneurs</option><option>CTN-2604-001</option></select>
+    <button class="btn t" onclick="alert('Factures logistiques FL2604001 et FL2604002 envoyees a tous les clients CTN-2604-001\nMention : Prix a demander a votre partenaire')">&#x1F4E4; Envoyer a tous les clients</button>
+  </div>
+  <div class="card">
+    <div class="ch"><div class="ct">Factures logistiques (3)</div></div>
+    <table><thead><tr><th>N° FL</th><th>Conteneur</th><th>Client</th><th>Part.</th><th>Prix</th><th>Paiement</th><th>Tous documents</th></tr></thead><tbody>
+      <tr>
+        <td><strong>FL2602001</strong></td><td><span class="pl p-nv" style="font-size:9px">CTN-2602-001</span></td><td>Carrera</td><td><span class="pl p-pu">MC</span></td><td style="font-weight:700">1 200€</td><td><span class="pl p-tl">Payee</span></td>
+        <td class="tda">
+          <button class="ico-btn ib-eye" onclick="openM('m-dv')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span class="tt">Devis PDF</span></button>
+          <button class="ico-btn ib-rd" onclick="openM('m-fl')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l9 4 9-4M3 12l9 4 9-4M3 7l9-4 9 4"/></svg><span class="tt">Facture logistique PDF</span></button>
+          <button class="ico-btn ib-xl" onclick="simDl('BL_CTN2602001.pdf')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 17H5a2 2 0 00-2 2 2 2 0 002 2h14a2 2 0 002-2 2 2 0 00-2-2h-4"/><polyline points="12 12 12 19"/><path d="M5 12H2a10 10 0 0020 0h-3"/></svg><span class="tt">Imprimer BL</span></button>
+          <button class="ico-btn ib-dl" onclick="simDl('FL2602001.pdf')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg><span class="tt">DL FL</span></button>
+        </td>
+      </tr>
+      <tr style="background:#FFF3E0">
+        <td><strong>FL2604001</strong></td><td><span class="pl p-nv" style="font-size:9px">CTN-2604-001</span></td><td>Dupont MQ</td><td><span class="pl p-pu">JM</span></td><td style="color:var(--gy3)">A definir</td><td><span class="pl p-am">V1 En attente</span></td>
+        <td class="tda">
+          <button class="ico-btn ib-eye" onclick="openM('m-dv')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span class="tt">Devis PDF</span></button>
+          <button class="ico-btn ib-rd" onclick="openM('m-fl')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l9 4 9-4M3 12l9 4 9-4M3 7l9-4 9 4"/></svg><span class="tt">Apercu FL V1</span></button>
+          <button class="ico-btn ib-send" onclick="alert('FL2604001 V1 envoyee a Dupont\nMention : Prix a demander a votre partenaire JM')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><span class="tt">Envoyer V1 au client</span></button>
+          <button class="btn a" style="font-size:10px;padding:3px 7px" onclick="alert('JM peut saisir le prix dans son espace partenaire')">Prix JM</button>
+        </td>
+      </tr>
+    </tbody></table>
+  </div>
+</div>
+
+<!-- ===== CONTENEURS ===== -->
+<div id="pg-cnt" class="pg">
+  <div class="filters">
+    <input class="si-bar" placeholder="Rechercher N° conteneur, destination, BL..."/>
+    <select class="fsel" style="padding:7px 9px"><option>Tous statuts</option><option>En preparation</option><option>Parti du port</option><option>Livre</option></select>
+    <button class="btn o" onclick="go('cnt-new',null)">&#x2795; Nouveau conteneur</button>
+  </div>
+  <div class="kgrid">
+    <div class="kpi"><div class="kpi-l">Actifs</div><div class="kpi-v">2</div></div>
+    <div class="kpi"><div class="kpi-l">Vol. CTN-2604-001</div><div class="kpi-v tl">48m³</div><div class="kpi-s">/ 67 capacite</div></div>
+    <div class="kpi"><div class="kpi-l">Devis rattaches</div><div class="kpi-v or">4</div></div>
+    <div class="kpi"><div class="kpi-l">Livres cette annee</div><div class="kpi-v gr">3</div></div>
+  </div>
+  <div class="card">
+    <div class="ch"><div class="ct">Conteneurs</div></div>
+    <table><thead><tr><th>Reference</th><th>Type</th><th>Dest.</th><th>Depart</th><th>Remplissage</th><th>Statut</th><th>BL</th><th>Actions</th></tr></thead><tbody>
+      <tr class="cl" onclick="go('cnt-det',null)">
+        <td><strong>CTN-2604-001</strong></td><td>40HC</td><td>MQ</td><td>23/04/26</td>
+        <td><div style="font-size:10px;margin-bottom:3px">48/67m³</div><div class="prog-w" style="width:100px"><div class="prog-f" style="width:72%"></div></div></td>
+        <td><span class="pl p-or">En preparation</span></td><td>—</td>
+        <td class="tda">
+          <button class="ico-btn ib-eye" onclick="event.stopPropagation();go('cnt-det',null)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><span class="tt">Ouvrir</span></button>
+          <button class="ico-btn ib-tl" onclick="event.stopPropagation();alert('CTN-2604-001 marque PARTI DU PORT.\nFL2604001 + FL2604002 activees dans Factures Logistiques.')" style="background:var(--tll);color:var(--tl)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><span class="tt">Marquer "Parti du port"</span></button>
+          <button class="ico-btn ib-xl" onclick="event.stopPropagation();simDl('BC_CHINE_CTN2604001.xlsx')" style="background:#E8F5E9;color:#1B5E20"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span class="tt">BC CHINE Excel</span></button>
+        </td>
+      </tr>
+      <tr>
+        <td><strong>CTN-2602-001</strong></td><td>40HC</td><td>MQ</td><td>30/01/26</td>
+        <td><div style="font-size:10px;margin-bottom:3px">67/67m³</div><div class="prog-w" style="width:100px"><div class="prog-f" style="width:100%;background:var(--gr)"></div></div></td>
+        <td><span class="pl p-tl">Livre</span></td><td><span class="pl p-tl" style="font-size:10px">ZSN0807356</span></td>
+        <td class="tda"><button class="ico-btn ib-eye"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><span class="tt">Archive</span></button></td>
+      </tr>
+    </tbody></table>
+  </div>
+</div>
+
+<!-- ===== NOUVEAU CONTENEUR ===== -->
+<div id="pg-cnt-new" class="pg">
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><button class="btn out" onclick="go('cnt',null)">← Retour</button><strong style="font-family:var(--fh);font-size:14px;color:var(--nv)">Nouveau conteneur</strong></div>
+  <div class="card"><div class="ch"><div class="ct">Informations</div></div><div style="padding:13px"><div class="g3">
+    <div class="fg"><div class="fl">Type</div><select class="fsel"><option>40HC</option><option>40GP</option><option>20GP</option></select></div>
+    <div class="fg"><div class="fl">Destination</div><select class="fsel"><option>MQ</option><option>GP</option><option>RE</option><option>GF</option></select></div>
+    <div class="fg"><div class="fl">Date depart</div><input class="fi" type="date"/></div>
+    <div class="fg"><div class="fl">Date arrivee est.</div><input class="fi" type="date"/></div>
+    <div class="fg"><div class="fl">Prix interne $</div><input class="fi" type="number" placeholder="8000"/></div>
+    <div class="fg"><div class="fl">Port chargement</div><input class="fi" placeholder="YANTIAN"/></div>
+  </div>
+  <div class="alert gr" style="margin-top:9px;margin-bottom:0">&#10003; Ref. CTN-2604-002 generee auto + LOG-CTN-2604-002 ajoute au catalogue Services</div>
+  <div style="margin-top:11px;display:flex;gap:8px">
+    <button class="btn s" onclick="alert('Conteneur CTN-2604-002 cree !')">&#10003; Creer</button>
+    <button class="btn out" onclick="go('cnt',null)">Annuler</button>
+  </div>
+  </div></div>
+</div>
+
+<!-- ===== CONTENEUR DETAIL ===== -->
+<div id="pg-cnt-det" class="pg">
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+    <button class="btn out" onclick="go('cnt',null)">← Retour</button>
+    <strong style="font-family:var(--fh);font-size:14px;color:var(--nv)">CTN-2604-001</strong>
+    <span class="pl p-or">En preparation</span>
+    <span style="font-size:11px;color:var(--tx3)">40HC · MQ · 23/04 · 48/67m³</span>
+    <button class="btn t" style="margin-left:auto" onclick="alert('CTN-2604-001 : PARTI DU PORT\nFL2604001 + FL2604002 activees !')">&#x1F6F3; Marquer "Parti du port"</button>
+  </div>
+  <div class="tabs">
+    <div class="tab on" onclick="swTab(this,'ctt-cont')">&#x1F4E6; Contenu</div>
+    <div class="tab" onclick="swTab(this,'ctt-docs')">&#x1F4C4; Documents douane</div>
+    <div class="tab" onclick="swTab(this,'ctt-bl')">&#x1F50D; BL &amp; Infos</div>
+  </div>
+  <div id="ctt-cont" class="tp on">
+    <div class="kgrid">
+      <div class="kpi"><div class="kpi-l">Produits</div><div class="kpi-v">3</div></div>
+      <div class="kpi"><div class="kpi-l">Volume</div><div class="kpi-v tl">48m³</div></div>
+      <div class="kpi"><div class="kpi-l">Poids brut</div><div class="kpi-v">6 450kg</div></div>
+      <div class="kpi"><div class="kpi-l">Valeur</div><div class="kpi-v or">¥178 000</div></div>
+    </div>
+    <div class="card"><div class="ch"><div class="ct">Produits inclus</div></div>
+      <table><thead><tr><th>Ref.</th><th>Nom</th><th>Qte</th><th>Vol.</th><th>Devis</th><th>Client</th><th>Type</th></tr></thead><tbody>
+        <tr><td style="font-family:monospace;font-size:11px;color:var(--nv3)">MP-R22-001</td><td>Mini-pelle R22 PRO</td><td>1</td><td>11.2m³</td><td>D2604006</td><td>Dupont MQ</td><td><span class="pl p-pu">VIP</span></td></tr>
+        <tr><td style="font-family:monospace;font-size:11px;color:var(--or)">MP-R18-001</td><td>Mini-pelle R18 x2</td><td>2</td><td>11.2m³</td><td>STOCK</td><td style="color:var(--nv2);font-weight:700">ADMIN-STOCK</td><td><span class="pl p-nv">Stock</span></td></tr>
+        <tr><td style="font-family:monospace;font-size:11px;color:var(--tl)">ACC-GD-004</td><td>Godet R22 60cm x3</td><td>3</td><td>0.8m³</td><td>D2604004</td><td>Carrera</td><td><span class="pl p-tl">Std</span></td></tr>
+      </tbody></table>
+    </div>
+  </div>
+  <div id="ctt-docs" class="tp">
+    <div class="alert am">&#x26A0;&#xFE0F; Modifications prix sans impact devis clients.</div>
+    <div class="card"><div class="ch"><div class="ct">Tableau douane</div><div class="tda">
+      <button class="ico-btn ib-xl" onclick="simDl('BD_INVOICE_CTN2604001.xlsx')" style="width:32px;height:32px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span class="tt">BD-INVOICE Excel</span></button>
+      <button class="ico-btn ib-xl" onclick="simDl('BD_PACKINGLIST_CTN2604001.xlsx')" style="width:32px;height:32px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/></svg><span class="tt">BD-PACKINGLIST Excel</span></button>
+      <button class="ico-btn ib-xl" onclick="simDl('BD_MARITIME_CTN2604001.xlsx')" style="width:32px;height:32px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l9 4 9-4M3 12l9 4 9-4M3 7l9-4 9 4"/></svg><span class="tt">BD-MARITIME Excel</span></button>
+    </div></div>
+      <table><thead><tr><th>Ref.</th><th>Nom FR</th><th>中文</th><th>English</th><th>Qte</th><th>Prix €</th><th>Total</th></tr></thead><tbody>
+        <tr><td style="font-family:monospace;font-size:10px;color:var(--nv3)">MP-R22-001</td><td>Mini-pelle R22</td><td>小型推拔机</td><td>Mini excavator R22</td><td>1</td><td><input type="number" value="14200" style="width:75px;padding:3px;border:1.5px solid var(--gy4);border-radius:6px;font-size:11px"/></td><td style="font-weight:700">14 200€</td></tr>
+      </tbody></table>
+    </div>
+  </div>
+  <div id="ctt-bl" class="tp">
+    <div class="g2">
+      <div><div class="upz" onclick="alert('Upload Waybill PDF - extraction auto BL/Voyage/SEAL')"><div style="font-size:22px;margin-bottom:4px">📄</div><div style="font-size:12px;font-weight:600;color:var(--nv)">Glisser Waybill PDF</div><div style="font-size:11px;color:var(--tx3)">Extraction auto champs verts</div></div></div>
+      <div><div class="g3">
+        <div class="fg"><div class="fl">N° cont. physique</div><input class="fi gn" value="APHU7221859"/></div>
+        <div class="fg"><div class="fl">Voyage Number</div><input class="fi gn" value="1FL2CW1MA"/></div>
+        <div class="fg"><div class="fl">BL / Waybill</div><input class="fi gn" value="ZSN0807356"/></div>
+        <div class="fg"><div class="fl">SEAL</div><input class="fi gn" value="M8764995"/></div>
+        <div class="fg"><div class="fl">Date depart</div><input class="fi" type="date" value="2026-04-23"/></div>
+        <div class="fg"><div class="fl">Prix interne $</div><input class="fi" value="8000"/></div>
+      </div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== STOCK ===== -->
+<div id="pg-stk" class="pg">
+  <div class="filters"><input class="si-bar" placeholder="Rechercher ref., produit..."/><select class="fsel" style="padding:7px 9px"><option>Toutes dest.</option><option>MQ</option><option>GP</option></select></div>
+  <div class="kgrid">
+    <div class="kpi"><div class="kpi-l">References</div><div class="kpi-v">8</div></div>
+    <div class="kpi"><div class="kpi-l">Unites dispo.</div><div class="kpi-v tl">12</div></div>
+    <div class="kpi"><div class="kpi-l">Valeur achat</div><div class="kpi-v or">¥294 000</div></div>
+    <div class="kpi"><div class="kpi-l">Destinations</div><div class="kpi-v">MQ · GP</div></div>
+  </div>
+  <div class="card"><div class="ch"><div class="ct">Stock disponible</div><button class="btn s">+ Entree stock</button></div>
+    <table><thead><tr><th>Ref.</th><th>Produit</th><th>Dest.</th><th>Achete</th><th>Vendu</th><th>Restant</th><th>CTN</th><th>Actions</th></tr></thead><tbody>
+      <tr><td style="font-family:monospace;font-size:11px;color:var(--nv3)">MP-R18-001</td><td>Mini-pelle R18 PRO</td><td><span class="pl p-nv">MQ</span></td><td>3</td><td>1</td><td style="font-weight:800;color:var(--gr);font-size:15px">2</td><td><span class="pl p-nv" style="font-size:9px">CTN-2602-001</span></td><td class="tda"><button class="btn p" style="font-size:10px;padding:4px 8px" onclick="alert('Affecter MP-R18-001 a un devis')">Affecter a devis</button></td></tr>
+      <tr><td style="font-family:monospace;font-size:11px;color:var(--or)">ACC-GD-004</td><td>Godet R22 60cm</td><td><span class="pl p-nv">MQ</span></td><td>5</td><td>3</td><td style="font-weight:800;color:var(--gr);font-size:15px">2</td><td><span class="pl p-nv" style="font-size:9px">CTN-2602-001</span></td><td class="tda"><button class="btn p" style="font-size:10px;padding:4px 8px">Affecter a devis</button></td></tr>
+    </tbody></table>
+  </div>
+</div>
+
+<!-- ===== SAV ===== -->
+<div id="pg-sav" class="pg">
+  <div class="sav-urg"><h3 style="font-family:var(--fh);font-size:13px;font-weight:700;margin-bottom:2px">&#x1F527; 2 SAV urgents</h3><p style="font-size:11px;opacity:.85">Dupont MQ — MP-R22-001 · Carrera — ACC-GD-004</p></div>
+  <div class="filters"><input class="si-bar" placeholder="Rechercher SAV, client, produit..."/><select class="fsel" style="padding:7px 9px"><option>Tous statuts</option><option>Nouveau</option><option>En cours</option><option>Resolu</option></select></div>
+  <div class="card"><div class="ch"><div class="ct">Demandes SAV</div></div>
+    <table><thead><tr><th>N° SAV</th><th>Date</th><th>Client</th><th>Devis</th><th>Produit</th><th>Description</th><th>Medias</th><th>Statut</th><th>Actions</th></tr></thead><tbody>
+      <tr style="background:var(--rdl);cursor:pointer" onclick="go('sav-det',null)">
+        <td><strong>SAV2604002</strong></td><td>10/04</td><td>Dupont MQ</td><td>D2604006</td><td>MP-R22-001</td><td>Piece hydraulique manquante</td><td><span class="pl p-bl">3 photos</span></td><td><span class="pl p-rd">Nouveau</span></td>
+        <td class="tda"><button class="ico-btn ib-eye" onclick="event.stopPropagation();go('sav-det',null)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><span class="tt">Traiter</span></button></td>
+      </tr>
+      <tr><td><strong>SAV2603001</strong></td><td>22/03</td><td>Martin GP</td><td>D2603002</td><td>MS-20-001</td><td>Porte mal alignee</td><td><span class="pl p-bl">2 photos</span></td><td><span class="pl p-tl">Resolu</span></td>
+        <td class="tda"><button class="ico-btn ib-eye"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><span class="tt">Voir</span></button></td>
+      </tr>
+    </tbody></table>
+  </div>
+</div>
+
+<!-- ===== SAV DETAIL ===== -->
+<div id="pg-sav-det" class="pg">
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+    <button class="btn out" onclick="go('sav',null)">← Retour</button>
+    <strong style="font-family:var(--fh);font-size:14px;color:var(--rd)">SAV2604002</strong>
+    <span class="pl p-rd">Nouveau</span>
+    <span style="font-size:11px;color:var(--tx3)">Dupont MQ · D2604006 · MP-R22-001</span>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 250px;gap:13px">
+    <div>
+      <div class="card"><div class="ch"><div class="ct">Demande client</div></div><div style="padding:12px">
+        <div class="g2" style="margin-bottom:10px">
+          <div class="iblk"><h4>Infos</h4>
+            <div class="ir"><span>Client</span><span>Dupont Michel</span></div>
+            <div class="ir"><span>Devis</span><span>D2604006</span></div>
+            <div class="ir"><span>Produit</span><span>MP-R22-001</span></div>
+          </div>
+          <div class="iblk"><h4>Description</h4><p style="font-size:12px;color:var(--tx2);line-height:1.6">Piece hydraulique manquante. La pompe hydraulique est absente alors qu'elle doit etre incluse.</p></div>
+        </div>
+        <div class="fg"><div class="fl">Reponse admin</div><textarea class="fta" rows="3" placeholder="Decrire l'action..."></textarea></div>
+        <div class="fg"><div class="fl">Statut</div><select class="fsel"><option>Nouveau</option><option>En cours</option><option>Piece commandee</option><option>Resolu</option></select></div>
+      </div></div>
+    </div>
+    <div>
+      <div class="iblk"><h4>Actions</h4>
+        <button class="ab o" onclick="alert('Commande creee sous ADMIN-STOCK')">&#x1F6D2; Commander piece</button>
+        <button class="ab g" onclick="alert('SAV marque resolu')">&#x2705; Marquer resolu</button>
+        <button class="ab p" onclick="alert('Notification envoyee')">&#x1F4E7; Notifier client</button>
+        <button class="ab p" onclick="go('dv-det',null)">&#x1F4CB; Voir devis D2604006</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PRODUITS ===== -->
+<div id="pg-prd" class="pg">
+  <div class="filters">
+    <input class="si-bar" placeholder="Rechercher ref., nom produit, categorie..."/>
+    <select class="fsel" style="padding:7px 9px"><option>Toutes cat.</option><option>Mini-Pelle</option><option>Maisons</option><option>Solaire</option><option>Agricole</option><option>Services</option></select>
+    <button class="ico-btn ib-xl" onclick="simDl('Catalogue_97import_v3_69col.xlsx')" style="width:34px;height:34px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span class="tt">Export Excel 69col.</span></button>
+    <button class="btn p" onclick="go('new-prd',null)">&#x2795; Ajouter produit</button>
+  </div>
+  <div class="card"><div class="ch"><div class="ct">Catalogue v3 (108 ref.)</div></div>
+    <table><thead><tr><th>Reference</th><th>Nom FR</th><th>Cat.</th><th>Prix ¥</th><th>Prix public</th><th>Completude</th><th>Statut</th><th>Actions</th></tr></thead><tbody>
+      <tr>
+        <td style="font-family:monospace;font-size:11px;color:var(--nv3);font-weight:700">MP-R22-001</td><td style="font-weight:700">Mini-pelle R22 PRO 2.2T</td><td><span class="pl p-bl">Mini-Pelle</span></td><td style="color:var(--rd);font-weight:600">¥94 800</td><td style="color:var(--nv3);font-weight:700">24 300€</td>
+        <td><span style="font-size:11px;color:var(--tl)">●●●●●●●●○○ 8/10</span></td><td><span class="pl p-tl">Actif</span></td>
+        <td class="tda"><button class="ico-btn ib-edit" onclick="go('edit-prd',null)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg><span class="tt">Editer / Completer</span></button></td>
+      </tr>
+      <tr>
+        <td style="font-family:monospace;font-size:11px;color:var(--tl);font-weight:700">MS-20-001</td><td>Maison Standard 20P</td><td><span class="pl p-tl">Maisons</span></td><td style="color:var(--rd);font-weight:600">¥33 660</td><td style="color:var(--nv3);font-weight:700">8 616€</td>
+        <td><span style="font-size:11px;color:var(--or)">●●●●●○○○○○ 5/10</span></td><td><span class="pl p-tl">Actif</span></td>
+        <td class="tda"><button class="ico-btn ib-edit" onclick="go('edit-prd',null)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg><span class="tt">Editer</span></button></td>
+      </tr>
+      <tr>
+        <td style="font-family:monospace;font-size:11px;color:var(--pu);font-weight:700">LOG-CTN-2604-001</td><td>Frais logistiques 40HC MQ</td><td><span class="pl p-gy">Services</span></td><td>—</td><td>Sur devis</td>
+        <td><span style="font-size:11px;color:var(--tl)">●●●●●●●○○○ 7/10</span></td><td><span class="pl p-gy">Non visible</span></td>
+        <td class="tda"><button class="ico-btn ib-edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg><span class="tt">Editer</span></button></td>
+      </tr>
+    </tbody></table>
+  </div>
+</div>
+
+<!-- ===== AJOUTER PRODUIT ===== -->
+<div id="pg-new-prd" class="pg">
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><button class="btn out" onclick="go('prd',null)">← Catalogue</button><strong style="font-family:var(--fh);font-size:14px;color:var(--nv)">Nouveau produit</strong><span style="font-size:11px;color:var(--tx3)">Sauvegardez a tout moment — revenez completer depuis le catalogue</span></div>
+  <div class="alert am">&#x1F4A1; Seule la section <strong>Identification</strong> est obligatoire. Toutes les autres sont optionnelles.</div>
+  <div class="acc"><div class="acc-h" onclick="tAcc(this)"><div class="acc-t"><span style="background:var(--nv);color:#fff;border-radius:50%;width:19px;height:19px;display:flex;align-items:center;justify-content:center;font-size:9px">1</span>Identification <span style="font-size:10px;font-weight:400;color:var(--tx3)">* Obligatoire</span></div><span class="acc-arr">▼</span></div>
+  <div class="acc-b"><div class="g3">
+    <div class="fg"><div class="fl">Categorie</div><select class="fsel"><option>Mini-Pelle</option><option>Maisons</option><option>Solaire</option><option>Agricole</option><option>Divers</option><option>Services</option></select></div>
+    <div class="fg"><div class="fl">Gamme</div><select class="fsel"><option>R18 PRO</option><option>R22 PRO</option><option>R32 PRO</option></select></div>
+    <div class="fg"><div class="fl">Type</div><select class="fsel"><option>Machine</option><option>Accessoire</option><option>Service</option></select></div>
+  </div>
+  <div class="alert gr" style="margin-bottom:9px">&#10003; Reference auto : <strong>ACC-R22-GDT-020</strong></div>
+  <div class="fg"><div class="fl">Nom FR *</div><input class="fi" placeholder="Godet a dents R22 PRO 20cm"/></div>
+  <div class="fg"><div class="fl">Nom ZH (auto DeepL)</div><input class="fi au" placeholder="齿斗 R22 PRO 20cm"/></div>
+  <div class="fg"><div class="fl">Nom EN (auto DeepL)</div><input class="fi au" placeholder="Bucket R22 PRO 20cm"/></div>
+  </div></div>
+  <div class="acc"><div class="acc-h" onclick="tAcc(this)"><div class="acc-t"><span style="background:var(--nv);color:#fff;border-radius:50%;width:19px;height:19px;display:flex;align-items:center;justify-content:center;font-size:9px">2</span>Prix &amp; marges</div><span class="acc-arr">▼</span></div>
+  <div class="acc-b"><div class="px-blk">
+    <div class="px-t">Chaine de prix — calcul auto</div>
+    <div class="px-row"><span class="px-lbl">Prix achat Yuan ¥</span><input class="px-inp yn" id="py" value="1150" oninput="calcP()"/></div>
+    <div class="px-row"><span class="px-lbl">Converti € (÷7.82)</span><input class="px-inp eu" id="pe" value="147 €" disabled/></div>
+    <div class="px-row"><span class="px-lbl">Prix achat € (modifiable)</span><input class="px-inp eu" id="pa" value="147" oninput="calcPe()"/></div>
+    <div class="px-row"><span class="px-lbl">Prix public ×2</span><input class="px-inp pb" id="pp" value="294 €" disabled/></div>
+    <div class="px-row"><span class="px-lbl">Prix partenaire ×1.2</span><input class="px-inp pt" id="pt2" value="176 €" disabled/></div>
+  </div></div></div>
+  <div class="acc"><div class="acc-h" onclick="tAcc(this)"><div class="acc-t"><span style="background:var(--nv);color:#fff;border-radius:50%;width:19px;height:19px;display:flex;align-items:center;justify-content:center;font-size:9px">3</span>Dimensions &amp; logistique</div><span class="acc-arr">▼</span></div>
+  <div class="acc-b"><div class="g3">
+    <div class="fg"><div class="fl">Longueur (cm)</div><input class="fi" placeholder="320"/></div>
+    <div class="fg"><div class="fl">Largeur (cm)</div><input class="fi" placeholder="140"/></div>
+    <div class="fg"><div class="fl">Hauteur (cm)</div><input class="fi" placeholder="250"/></div>
+    <div class="fg"><div class="fl">Poids net (kg)</div><input class="fi" placeholder="2200"/></div>
+    <div class="fg"><div class="fl">Poids brut (kg)</div><input class="fi" placeholder="2450"/></div>
+    <div class="fg"><div class="fl">Volume m³ (auto)</div><input class="fi gn" placeholder="11.2 auto" disabled/></div>
+  </div></div></div>
+  <div class="acc"><div class="acc-h" onclick="tAcc(this)"><div class="acc-t"><span style="background:var(--nv);color:#fff;border-radius:50%;width:19px;height:19px;display:flex;align-items:center;justify-content:center;font-size:9px">4</span>Douane &amp; export</div><span class="acc-arr">▼</span></div>
+  <div class="acc-b"><div class="g3">
+    <div class="fg"><div class="fl">Code HS</div><input class="fi" placeholder="8431.4900"/></div>
+    <div class="fg"><div class="fl">Marque</div><input class="fi" placeholder="RIPPA"/></div>
+    <div class="fg"><div class="fl">Ville origine CN</div><input class="fi" placeholder="重庆市"/></div>
+    <div class="fg"><div class="fl">CE Certification</div><select class="fsel"><option>Non</option><option>Oui</option></select></div>
+  </div>
+  <div class="fg"><div class="fl">Usage FR (douane)</div><input class="fi" placeholder="Excavatrice compacte pour travaux de terrassement"/></div>
+  <div class="fg"><div class="fl">Usage ZH</div><input class="fi" placeholder="土方挖掘测试拼装"/></div>
+  <div class="fg"><div class="fl">Usage EN</div><input class="fi" placeholder="Compact excavator for earthmoving works"/></div>
+  </div></div>
+  <div class="acc"><div class="acc-h" onclick="tAcc(this)"><div class="acc-t"><span style="background:var(--nv);color:#fff;border-radius:50%;width:19px;height:19px;display:flex;align-items:center;justify-content:center;font-size:9px">5</span>Options payantes</div><span class="acc-arr">▼</span></div>
+  <div class="acc-b">
+    <div class="alert pu" style="margin-bottom:9px">&#x1F4A1; Option selectionnee → ref. change automatiquement (ex: MP-R22-004 pour cabine)</div>
+    <table style="margin-bottom:8px"><thead><tr><th>Ref. option</th><th>Nom</th><th>Prix supp. €</th><th>Defaut</th><th></th></tr></thead><tbody>
+      <tr><td style="font-family:monospace;font-size:11px">MP-R22-004</td><td>Cabine fermee</td><td><input type="number" value="2800" style="width:75px;padding:3px;border:1.5px solid var(--gy4);border-radius:6px;font-size:11px"/></td><td><input type="checkbox"/></td><td><button style="background:none;border:none;cursor:pointer;color:var(--rd)">✕</button></td></tr>
+    </tbody></table>
+    <button class="btn out" onclick="alert('Ajouter option')">+ Ajouter option</button>
+  </div></div>
+  <div class="acc"><div class="acc-h" onclick="tAcc(this)"><div class="acc-t"><span style="background:var(--nv);color:#fff;border-radius:50%;width:19px;height:19px;display:flex;align-items:center;justify-content:center;font-size:9px">6</span>Descriptions longues (site web)</div><span class="acc-arr">▼</span></div>
+  <div class="acc-b">
+    <div class="fg"><div class="fl">Description FR</div><textarea class="fta" rows="3" placeholder="Description visible sur 97import.com..."></textarea></div>
+    <div class="fg"><div class="fl">Description ZH</div><textarea class="fta" rows="2" placeholder="中文描述..."></textarea></div>
+    <div class="fg"><div class="fl">Description EN</div><textarea class="fta" rows="2" placeholder="English description..."></textarea></div>
+  </div></div>
+  <div class="acc"><div class="acc-h" onclick="tAcc(this)"><div class="acc-t"><span style="background:var(--nv);color:#fff;border-radius:50%;width:19px;height:19px;display:flex;align-items:center;justify-content:center;font-size:9px">7</span>Medias</div><span class="acc-arr">▼</span></div>
+  <div class="acc-b"><div class="g3">
+    <div><div style="font-size:11px;font-weight:600;color:var(--nv);margin-bottom:6px">📷 Photos</div><div class="upz" onclick="alert('Upload photos')" style="padding:13px"><div style="font-size:20px">📷</div><div style="font-size:11px;color:var(--tx3)">Glisser ou cliquer</div></div></div>
+    <div><div style="font-size:11px;font-weight:600;color:var(--nv);margin-bottom:6px">▶ Video YouTube</div><input class="fi" placeholder="https://youtube.com/watch?v=..." style="margin-top:4px"/></div>
+    <div><div style="font-size:11px;font-weight:600;color:var(--nv);margin-bottom:6px">📄 Fiche PDF</div><div class="upz" onclick="alert('Upload PDF')" style="padding:13px"><div style="font-size:20px">📄</div><div style="font-size:11px;color:var(--tx3)">Fiche technique</div></div></div>
+  </div></div></div>
+  <div style="background:#fff;border-radius:var(--rl);padding:11px 14px;box-shadow:var(--sh);display:flex;align-items:center;justify-content:space-between;margin-top:12px;border:1px solid var(--gy2)">
+    <div style="font-size:12px;color:var(--tx3)">Completude : <strong style="color:var(--or)">1/7 sections</strong></div>
+    <div style="display:flex;gap:7px">
+      <button class="btn out" onclick="alert('Brouillon sauvegarde. Retrouvez-le dans le catalogue.')">Sauvegarder brouillon</button>
+      <button class="btn s" onclick="go('prd',null);alert('Produit cree et publie !')">&#10003; Creer et publier</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== EDIT PRODUIT (retour catalogue) ===== -->
+<div id="pg-edit-prd" class="pg">
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><button class="btn out" onclick="go('prd',null)">← Catalogue</button><strong style="font-family:var(--fh);font-size:14px;color:var(--nv)">Editer — MP-R22-001</strong><span class="pl p-tl">Actif</span><span style="font-size:12px;color:var(--or);font-weight:600">8/10 sections</span></div>
+  <div class="alert gr">&#10003; Produit publie — modifications visibles sur 97import.com apres sauvegarde.</div>
+  <div class="acc"><div class="acc-h" onclick="tAcc(this)"><div class="acc-t"><span style="background:var(--tl);color:#fff;border-radius:50%;width:19px;height:19px;display:flex;align-items:center;justify-content:center;font-size:9px">1</span>Identification <span style="font-size:10px;font-weight:400;color:var(--tl)">✓ Complete</span></div><span class="acc-arr op">▼</span></div>
+  <div class="acc-b op">
+    <div class="g3">
+      <div class="fg"><div class="fl">Categorie</div><select class="fsel"><option selected>Mini-Pelle</option></select></div>
+      <div class="fg"><div class="fl">Gamme</div><select class="fsel"><option selected>R22 PRO</option></select></div>
+      <div class="fg"><div class="fl">Type</div><select class="fsel"><option selected>Machine</option></select></div>
+    </div>
+    <div class="fg"><div class="fl">Nom FR</div><input class="fi" value="Mini-pelle R22 PRO 2.2T"/></div>
+    <div class="fg"><div class="fl">Nom ZH</div><input class="fi" value="小型推拔机 R22 PRO 2.2T"/></div>
+    <div class="fg"><div class="fl">Nom EN</div><input class="fi" value="Mini excavator R22 PRO 2.2T"/></div>
+  </div></div>
+  <div class="acc"><div class="acc-h" onclick="tAcc(this)"><div class="acc-t"><span style="background:var(--or);color:#fff;border-radius:50%;width:19px;height:19px;display:flex;align-items:center;justify-content:center;font-size:9px">3</span>Dimensions &amp; logistique <span style="font-size:10px;font-weight:400;color:var(--or)">⚠ Incomplet — Hauteur manquante</span></div><span class="acc-arr">▼</span></div>
+  <div class="acc-b"><div class="g3">
+    <div class="fg"><div class="fl">Longueur (cm)</div><input class="fi" value="320"/></div>
+    <div class="fg"><div class="fl">Largeur (cm)</div><input class="fi" value="140"/></div>
+    <div class="fg"><div class="fl">Hauteur (cm)</div><input class="fi" placeholder="A remplir" style="border-color:var(--or)"/></div>
+    <div class="fg"><div class="fl">Poids net (kg)</div><input class="fi" value="2200"/></div>
+    <div class="fg"><div class="fl">Poids brut (kg)</div><input class="fi" value="2450"/></div>
+    <div class="fg"><div class="fl">Volume m³</div><input class="fi gn" value="11.2" disabled/></div>
+  </div></div></div>
+  <div style="background:#fff;border-radius:var(--rl);padding:11px 14px;box-shadow:var(--sh);display:flex;align-items:center;justify-content:space-between;margin-top:12px;border:1px solid var(--gy2)">
+    <span style="font-size:11px;color:var(--tx3)">Derniere modif. : 08/04/2026</span>
+    <button class="btn s" onclick="alert('Modifications sauvegardees !')">Sauvegarder</button>
+  </div>
+</div>
+
+<!-- ===== CLIENTS ===== -->
+<div id="pg-cli" class="pg">
+  <div class="filters"><input class="si-bar" placeholder="Rechercher client, email..."/><select class="fsel" style="padding:7px 9px"><option>Tous roles</option><option>VIP</option><option>Client</option></select></div>
+  <div class="card"><div class="ch"><div class="ct">Clients (47)</div></div>
+    <table><thead><tr><th>Client</th><th>Role</th><th>Partenaire</th><th>Devis</th><th>CA total</th><th>Inscrit</th><th>Actions</th></tr></thead><tbody>
+      <tr><td><div style="font-weight:700">Dupont Michel</div><div style="font-size:10px;color:var(--tx3)">dupont@email.com</div></td><td><span class="pl p-pu">VIP</span></td><td><span class="pl p-pu">JM</span></td><td>2</td><td style="font-weight:700;color:var(--tl)">14 200€</td><td>15/02/26</td><td class="tda"><button class="ico-btn ib-eye" onclick="go('dv-det',null)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><span class="tt">Voir devis</span></button></td></tr>
+      <tr><td><div style="font-weight:700">Martin Pierre</div><div style="font-size:10px;color:var(--tx3)">martin@email.com</div></td><td><span class="pl p-bl">Client</span></td><td><span class="pl p-pu">TD</span></td><td>1</td><td style="font-weight:700;color:var(--tl)">18 400€</td><td>10/03/26</td><td class="tda"><button class="ico-btn ib-eye"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><span class="tt">Voir devis</span></button></td></tr>
+    </tbody></table>
+  </div>
+</div>
+
+<!-- ===== PARTENAIRES ===== -->
+<div id="pg-part" class="pg">
+  <div class="kgrid">
+    <div class="kpi"><div class="kpi-l">Actifs</div><div class="kpi-v">4</div></div>
+    <div class="kpi"><div class="kpi-l">Commissions dues</div><div class="kpi-v or">8 320€</div></div>
+    <div class="kpi"><div class="kpi-l">Payees</div><div class="kpi-v gr">22 100€</div></div>
+    <div class="kpi"><div class="kpi-l">CA via partenaires</div><div class="kpi-v tl">98 440€</div></div>
+  </div>
+  <div class="card"><div class="ch"><div class="ct">Partenaires</div><button class="btn p">+ Ajouter</button></div>
+    <table><thead><tr><th>Code</th><th>Partenaire</th><th>Clients</th><th>Due</th><th>Payee</th><th>Statut</th><th>Actions</th></tr></thead><tbody>
+      <tr>
+        <td><span class="pl p-pu" style="font-weight:800">JM</span></td><td style="font-weight:700">Jean-Marc</td><td>3</td><td style="color:var(--pu);font-weight:700">3 160€</td><td style="color:var(--gr);font-weight:700">2 400€</td><td><span class="pl p-tl">Actif</span></td>
+        <td class="tda">
+          <button class="ico-btn ib-nc" onclick="openM('m-nc')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg><span class="tt">NC PDF</span></button>
+          <button class="ico-btn ib-eur" id="enc-part-jm" onclick="toggleEnc('enc-part-jm','')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><text x="8.5" y="16.5" font-size="11" fill="currentColor" stroke="none" font-weight="bold">€</text></svg><span class="tt">Marquer commissions payees</span></button>
+          <button class="ico-btn ib-xl" onclick="simDl('NC_JM_export.xlsx')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span class="tt">Export NC Excel</span></button>
+        </td>
+      </tr>
+      <tr>
+        <td><span class="pl p-pu" style="font-weight:800">TD</span></td><td style="font-weight:700">Thomas D.</td><td>5</td><td style="color:var(--pu);font-weight:700">4 900€</td><td style="color:var(--gr);font-weight:700">9 400€</td><td><span class="pl p-tl">Actif</span></td>
+        <td class="tda"><button class="ico-btn ib-nc" onclick="openM('m-nc')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg><span class="tt">NC PDF</span></button></td>
+      </tr>
+      <tr>
+        <td><span class="pl p-pu" style="font-weight:800">MC</span></td><td style="font-weight:700">Marie C.</td><td>1</td><td style="color:var(--pu);font-weight:700">260€</td><td style="color:var(--gr);font-weight:700">4 500€</td><td><span class="pl p-tl">Actif</span></td>
+        <td class="tda"><button class="ico-btn ib-nc" onclick="openM('m-nc')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg><span class="tt">NC PDF</span></button></td>
+      </tr>
+    </tbody></table>
+  </div>
+</div>
+
+<!-- ===== RMB ===== -->
+<div id="pg-rmb" class="pg">
+  <div style="background:linear-gradient(135deg,#0B2545,#1565C0);border-radius:var(--rl);padding:18px;margin-bottom:13px;color:#fff">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px"><div style="font-family:var(--fh);font-size:16px;font-weight:700">💱 Taux de conversion Yuan / Euro</div><div style="display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.1);border-radius:20px;padding:3px 10px;font-size:10px"><div style="width:5px;height:5px;background:#22C55E;border-radius:50%"></div>Temps reel</div></div>
+    <div style="font-family:var(--fh);font-size:38px;font-weight:800;margin-bottom:3px"><span style="font-size:14px;opacity:.6">1 EUR = </span><span id="rmb-big">7.82</span> <span style="font-size:14px;opacity:.6">¥ CNY</span></div>
+    <div style="font-size:11px;opacity:.6;color:#fff">Derniere MAJ : il y a 2h · +0.3%</div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="ch"><div class="ct">Taux manuel</div><button class="btn p" onclick="updRmb()">Appliquer</button></div><div style="padding:12px"><div style="display:flex;align-items:center;gap:10px"><span style="font-weight:600">1 EUR =</span><input class="fi" id="rmb-inp" value="7.82" style="width:85px;font-size:16px;font-weight:700;text-align:center"/><span style="font-weight:600">¥</span></div></div></div>
+    <div class="card"><div class="ch"><div class="ct">Historique</div></div><div style="padding:12px"><table><thead><tr><th>Date</th><th>Taux</th><th>Variation</th></tr></thead><tbody><tr><td>07/04</td><td style="font-weight:700">7.82</td><td style="color:var(--gr)">+0.3%</td></tr><tr><td>06/04</td><td>7.80</td><td style="color:var(--gr)">+0.1%</td></tr><tr><td>05/04</td><td>7.79</td><td style="color:var(--rd)">-0.5%</td></tr></tbody></table></div></div>
+  </div>
+</div>
+
+<!-- ===== LOGS ===== -->
+<div id="pg-logs" class="pg">
+  <div class="filters"><input class="si-bar" placeholder="Rechercher..."/><select class="fsel" style="padding:7px 9px"><option>Tous types</option><option>SAV</option><option>email</option><option>firestore</option></select><button class="btn o" onclick="simDl('logs_export.csv')" style="margin-left:auto">Export CSV</button></div>
+  <div class="card"><div class="ch"><div class="ct">Journal des logs</div><span style="font-size:11px;color:var(--tx3)">Auto-refresh 30s</span></div>
+    <div style="display:flex;align-items:flex-start;gap:9px;padding:9px 12px;border-bottom:1px solid var(--gy2)"><span style="font-size:16px">🔧</span><div style="flex:1"><div style="font-size:9px;font-weight:700;text-transform:uppercase;color:var(--rd)">SAV</div><div style="font-size:12px">SAV2604002 recu — Dupont MQ — notif envoyee</div></div><span style="font-size:10px;color:var(--tx3)">10/04 11:02</span></div>
+    <div style="display:flex;align-items:flex-start;gap:9px;padding:9px 12px;border-bottom:1px solid var(--gy2)"><span style="font-size:16px">🚢</span><div style="flex:1"><div style="font-size:9px;font-weight:700;text-transform:uppercase;color:var(--tl)">Conteneur</div><div style="font-size:12px">CTN-2604-001 cree — LOG-CTN-2604-001 ajoute catalogue</div></div><span style="font-size:10px;color:var(--tx3)">10/04 10:54</span></div>
+    <div style="display:flex;align-items:flex-start;gap:9px;padding:9px 12px"><span style="font-size:16px">⚠️</span><div style="flex:1"><div style="font-size:9px;font-weight:700;text-transform:uppercase;color:var(--am)">Completude</div><div style="font-size:12px">MS-20-001 — section Dimensions incomplete (5/10)</div></div><span style="font-size:10px;color:var(--tx3)">10/04 09:30</span></div>
+  </div>
+</div>
+
+<!-- ===== PARAMS ===== -->
+<div id="pg-prm" class="pg">
+  <div class="g2">
+    <div class="card"><div class="ch"><div class="ct">⚙ Systeme</div><button class="btn s">Sauvegarder</button></div><div style="padding:12px">
+      <div class="fg"><div class="fl">Email admin</div><input class="fi" value="parisb2b@gmail.com"/></div>
+      <div class="fg"><div class="fl">Acompte par defaut €</div><input class="fi" value="500"/></div>
+      <div class="fg"><div class="fl">Multip. prix public</div><input class="fi au" value="×2" disabled/></div>
+      <div class="fg"><div class="fl">Multip. partenaire</div><input class="fi au" value="×1.2" disabled/></div>
+      <div class="fg"><div class="fl">Variance taux CNY (site)</div><input class="fi" value="2%"/></div>
+    </div></div>
+    <div class="card"><div class="ch"><div class="ct">Numerotation</div></div><div style="padding:12px"><table><thead><tr><th>Type</th><th>Prefixe</th><th>Prochain</th></tr></thead><tbody>
+      <tr><td>Devis</td><td>D</td><td style="font-family:monospace;font-weight:700">D2604008</td></tr>
+      <tr><td>Facture</td><td>F</td><td style="font-family:monospace;font-weight:700">F2604007</td></tr>
+      <tr><td>Facture acompte</td><td>FA</td><td style="font-family:monospace;font-weight:700">FA2604006</td></tr>
+      <tr><td>Note commission</td><td>NC</td><td style="font-family:monospace;font-weight:700">NC2604003</td></tr>
+      <tr><td>SAV</td><td>SAV</td><td style="font-family:monospace;font-weight:700">SAV2604003</td></tr>
+      <tr><td>Facture Logistique</td><td>FL</td><td style="font-family:monospace;font-weight:700">FL2604003</td></tr>
+    </tbody></table></div></div>
+  </div>
+</div>
+
+<!-- ===== SITE ===== -->
+<div id="pg-site" class="pg">
+  <div class="g2">
+    <div class="card"><div class="ch"><div class="ct">🌐 Page accueil</div><button class="btn s">Sauvegarder</button></div><div style="padding:12px">
+      <div class="fg"><div class="fl">Titre hero</div><input class="fi" value="L'importation simplifiee de la Chine vers les Antilles."/></div>
+      <div class="fg"><div class="fl">Sous-titre</div><input class="fi" value="Mini-pelles, maisons modulaires, kit solaire. Prix usine, DOM-TOM."/></div>
+    </div></div>
+    <div class="card"><div class="ch"><div class="ct">Coordonnees</div><button class="btn p">Sauvegarder</button></div><div style="padding:12px">
+      <div class="fg"><div class="fl">WhatsApp</div><input class="fi" value="+33 6 63 28 49 08"/></div>
+      <div class="fg"><div class="fl">Email</div><input class="fi" value="parisb2b@gmail.com"/></div>
+      <div class="fg"><div class="fl">TikTok</div><input class="fi" value="@direxport"/></div>
+    </div></div>
+  </div>
+</div>
+
+</div><!-- end content -->
+</div><!-- end main -->
+
+<!-- ====== MODALS ====== -->
+<div id="m-new-dv" class="ov" onclick="clMout(event,'m-new-dv')">
+  <div class="modal"><div class="m-h"><div class="m-t">✚ Nouveau devis</div><button class="m-x" onclick="clM('m-new-dv')">✕</button></div>
+    <div class="m-b"><div class="g2">
+      <div class="fg"><div class="fl">Client</div><select class="fsel"><option>Dupont Michel</option><option>Martin Pierre</option><option>+ Nouveau client</option></select></div>
+      <div class="fg"><div class="fl">Partenaire</div><select class="fsel"><option>Sans partenaire</option><option>JM — Jean-Marc</option><option>TD — Thomas D.</option><option>MC — Marie C.</option></select></div>
+      <div class="fg"><div class="fl">Destination</div><select class="fsel"><option>MQ — Martinique</option><option>GP — Guadeloupe</option><option>RE — Reunion</option><option>GF — Guyane</option></select></div>
+      <div class="fg"><div class="fl">Type</div><select class="fsel"><option>Standard</option><option>VIP</option></select></div>
+    </div>
+    <div class="fg" style="margin-top:6px"><div class="fl">Produit(s)</div><select class="fsel"><option>MP-R22-001 — Mini-pelle R22 PRO — 24 300€</option><option>MP-R18-001 — Mini-pelle R18 PRO — 19 076€</option><option>MS-20-001 — Maison Standard 20P — 8 616€</option></select></div>
+    </div>
+    <div class="m-f"><button class="btn out" onclick="clM('m-new-dv')">Annuler</button><button class="btn s" onclick="clM('m-new-dv');alert('Devis D2604008 cree !')">Creer le devis</button></div>
+  </div>
+</div>
+
+<!-- Modal Devis PDF -->
+<div id="m-dv" class="ov" onclick="clMout(event,'m-dv')">
+  <div class="modal"><div class="m-h">
+    <div class="m-t">📄 Apercu — Devis D2604006</div>
+    <div style="display:flex;gap:7px;align-items:center">
+      <button class="ico-btn ib-dl" onclick="simDl('Devis_D2604006.pdf')" style="width:32px;height:32px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg><span class="tt">Telecharger</span></button>
+      <button class="ico-btn ib-send" onclick="alert('Devis mis a disposition dans espace client + email envoye')" style="width:32px;height:32px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><span class="tt">Envoyer au client</span></button>
+      <button class="m-x" onclick="clM('m-dv')">✕</button>
+    </div>
+  </div>
+  <div class="m-b"><div class="pdf">
+    <div class="pdf-hdr"><div><div class="pdf-title">Devis D2604006</div><div class="pdf-date">08 avril 2026</div></div><div style="text-align:right"><div style="font-size:15px;font-weight:800;color:var(--nv2)">LUXENT LIMITED</div><div style="font-size:11px;color:var(--gy3)">Business Provider &amp; Export Agent</div></div></div>
+    <div class="pdf-cols"><div><div class="pdf-ct">Emetteur</div><div class="pdf-cv"><strong>LUXENT LIMITED</strong><br>2ND FLOOR COLLEGE HOUSE<br>17 KING EDWARDS ROAD RUISLIP<br>HA4 7AE LONDON — UK · N° 14852122</div></div><div><div class="pdf-ct">Destinataire</div><div class="pdf-cv"><strong>Dupont Michel</strong><br>12 rue des Hibiscus<br>97200 Fort-de-France — Martinique</div></div></div>
+    <div class="pdf-bk"><strong>Coordonnees bancaires</strong> · LUXENT LIMITED · IBAN: DE76 2022 0800 0059 5688 30 · SWIFT: SXPYDEHH · Banking Circle S.A. — Munich</div>
+    <table class="pdf-tbl"><thead><tr><th>Type</th><th>Description</th><th>Prix HT</th><th>Qte</th><th>Total HT</th></tr></thead><tbody>
+      <tr><td>Produit</td><td>Mini-pelle R22 PRO 2.2T</td><td>14 200€</td><td>1</td><td style="font-weight:700">14 200€</td></tr>
+    </tbody></table>
+    <div class="pdf-tot"><table><tr><td style="color:var(--gy3)">Total HT</td><td style="font-weight:700;text-align:right">14 200€</td></tr><tr class="fin"><td>TOTAL A PAYER</td><td style="text-align:right">14 200€</td></tr></table></div>
+    <div class="pdf-foot">TVA non applicable · Virement bancaire uniquement</div>
+  </div></div></div>
+</div>
+
+<!-- Modal Devis VIP -->
+<div id="m-vip" class="ov" onclick="clMout(event,'m-vip')">
+  <div class="modal"><div class="m-h">
+    <div class="m-t">⭐ Apercu — Devis VIP D2604006</div>
+    <div style="display:flex;gap:7px;align-items:center">
+      <button class="ico-btn ib-dl" onclick="simDl('Devis_VIP_D2604006.pdf')" style="width:32px;height:32px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg><span class="tt">Telecharger VIP</span></button>
+      <button class="m-x" onclick="clM('m-vip')">✕</button>
+    </div>
+  </div>
+  <div class="m-b"><div class="pdf">
+    <div class="pdf-hdr"><div><div class="pdf-title" style="color:var(--pu)">Devis VIP D2604006 ⭐</div><div class="pdf-date">08 avril 2026 · <strong style="color:var(--pu)">Prix negotie confidentiel</strong></div></div><div style="text-align:right"><div style="font-size:15px;font-weight:800;color:var(--nv2)">LUXENT LIMITED</div></div></div>
+    <div class="pdf-cols"><div><div class="pdf-ct">Emetteur</div><div class="pdf-cv"><strong>LUXENT LIMITED</strong><br>17 KING EDWARDS ROAD RUISLIP<br>HA4 7AE LONDON — UK</div></div><div><div class="pdf-ct">Destinataire</div><div class="pdf-cv"><strong>Dupont Michel</strong><br>97200 Fort-de-France — Martinique</div></div></div>
+    <div class="pdf-bk">IBAN: DE76 2022 0800 0059 5688 30 · SWIFT: SXPYDEHH · Banking Circle S.A.</div>
+    <table class="pdf-tbl"><thead><tr><th>Description</th><th>Prix public</th><th>Prix VIP</th><th>Qte</th><th>Total HT</th></tr></thead><tbody>
+      <tr><td>Mini-pelle R22 PRO 2.2T</td><td><s style="color:var(--gy3)">18 800€</s></td><td style="color:var(--pu);font-weight:700">14 200€</td><td>1</td><td style="color:var(--pu);font-weight:700">14 200€</td></tr>
+    </tbody></table>
+    <div class="pdf-tot"><table><tr><td style="color:var(--gy3)">Total VIP</td><td style="font-weight:700;text-align:right">14 200€</td></tr><tr style="color:var(--tl)"><td>✓ Acompte 1 encaisse</td><td style="text-align:right">− 5 000€</td></tr><tr class="fin"><td style="color:var(--or)">Solde restant</td><td style="text-align:right;color:var(--or)">9 200€</td></tr></table></div>
+    <div class="pdf-foot">Prix confidentiel — ne pas divulguer · TVA non applicable</div>
+  </div></div></div>
+</div>
+
+<!-- Modal Facture Acompte -->
+<div id="m-fa" class="ov" onclick="clMout(event,'m-fa')">
+  <div class="modal"><div class="m-h">
+    <div class="m-t">🧾 Apercu — Facture acompte FA2604001</div>
+    <div style="display:flex;gap:7px;align-items:center">
+      <button class="ico-btn ib-dl" onclick="simDl('FA2604001.pdf')" style="width:32px;height:32px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg><span class="tt">Telecharger</span></button>
+      <button class="ico-btn ib-send" onclick="alert('FA2604001 mis a disposition dans espace client')" style="width:32px;height:32px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><span class="tt">Envoyer au client</span></button>
+      <button class="m-x" onclick="clM('m-fa')">✕</button>
+    </div>
+  </div>
+  <div class="m-b"><div class="pdf">
+    <div class="pdf-hdr"><div><div class="pdf-title" style="color:var(--tl)">Facture Acompte FA2604001</div><div class="pdf-date">05 avril 2026</div></div><div style="text-align:right"><div style="font-size:15px;font-weight:800;color:var(--nv2)">LUXENT LIMITED</div></div></div>
+    <div class="pdf-cols"><div><div class="pdf-ct">Emetteur</div><div class="pdf-cv"><strong>LUXENT LIMITED</strong><br>17 KING EDWARDS ROAD · HA4 7AE LONDON</div></div><div><div class="pdf-ct">Destinataire</div><div class="pdf-cv"><strong>Dupont Michel</strong><br>97200 Fort-de-France — Martinique</div></div></div>
+    <div class="pdf-bk">IBAN: DE76 2022 0800 0059 5688 30 · SWIFT: SXPYDEHH · Banking Circle S.A.</div>
+    <table class="pdf-tbl"><thead><tr><th>Description</th><th>Devis ref.</th><th>Montant HT</th></tr></thead><tbody>
+      <tr><td>Acompte 1 sur commande — Mini-pelle R22 PRO 2.2T</td><td>D2604006</td><td style="font-weight:700;color:var(--tl)">5 000€</td></tr>
+    </tbody></table>
+    <div class="pdf-tot"><table><tr><td style="color:var(--gy3)">Acompte 1 encaisse</td><td style="font-weight:700;text-align:right;color:var(--tl)">5 000€</td></tr><tr class="fin"><td>Solde restant D2604006</td><td style="text-align:right">9 200€</td></tr></table></div>
+    <div class="pdf-foot">Recu le 05/04/2026 · Reference: FA2604001</div>
+  </div></div></div>
+</div>
+
+<!-- Modal Note Commission -->
+<div id="m-nc" class="ov" onclick="clMout(event,'m-nc')">
+  <div class="modal"><div class="m-h">
+    <div class="m-t">💰 Apercu — Note commission NC2604001</div>
+    <div style="display:flex;gap:7px;align-items:center">
+      <button class="ico-btn ib-dl" onclick="simDl('NC2604001_JM.pdf')" style="width:32px;height:32px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg><span class="tt">Telecharger NC</span></button>
+      <button class="ico-btn ib-send" onclick="alert('NC2604001 envoyee a JM par email')" style="width:32px;height:32px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><span class="tt">Envoyer a JM</span></button>
+      <button class="m-x" onclick="clM('m-nc')">✕</button>
+    </div>
+  </div>
+  <div class="m-b"><div style="border-radius:var(--r);overflow:hidden;border:1px solid var(--gy2)">
+    <div class="nc-hdr"><div style="font-family:var(--fh);font-size:16px;font-weight:800;color:#fff">Note de Commission NC2604001</div><div style="font-size:11px;color:rgba(255,255,255,.65);margin-top:2px">08 avril 2026 · Partenaire : Jean-Marc (JM)</div></div>
+    <div style="padding:18px">
+      <div class="pdf-cols" style="margin-bottom:13px"><div><div class="pdf-ct">Emis par</div><div class="pdf-cv"><strong>LUXENT LIMITED</strong><br>17 King Edwards Road · HA4 7AE London</div></div><div><div class="pdf-ct">Destinataire</div><div class="pdf-cv"><strong>Jean-Marc (JM)</strong><br>Partenaire 97import<br>jm@email.com</div></div></div>
+      <div class="nc-calc">
+        <div class="nc-calc-t">Calcul de la commission</div>
+        <div class="nc-row"><span>Devis D2604006 — Dupont Michel MQ</span><span></span></div>
+        <div class="nc-row"><span>Produit : Mini-pelle R22 PRO 2.2T</span><span></span></div>
+        <div class="nc-row"><span>Prix VIP facture au client</span><span>14 200€</span></div>
+        <div class="nc-row"><span>Base de calcul (prix achat × 1.2)</span><span>− 11 040€</span></div>
+        <div class="nc-row"><span>💰 Commission due</span><span>3 160€</span></div>
+      </div>
+      <div style="background:var(--grl);border-radius:8px;padding:9px 12px;font-size:12px;color:var(--gr)">🏦 <strong>Virement attendu :</strong> 3 160€ · Ref: NC2604001</div>
+    </div>
+  </div></div></div>
+</div>
+
+<!-- Modal Facture Logistique -->
+<div id="m-fl" class="ov" onclick="clMout(event,'m-fl')">
+  <div class="modal"><div class="m-h">
+    <div class="m-t">🛳 Apercu — Facture Logistique FL2604001</div>
+    <div style="display:flex;gap:7px;align-items:center">
+      <button class="ico-btn ib-dl" onclick="simDl('FL2604001.pdf')" style="width:32px;height:32px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg><span class="tt">Telecharger FL</span></button>
+      <button class="ico-btn ib-send" onclick="alert('FL2604001 mis a disposition dans espace client\nMention : Prix a demander a votre partenaire JM')" style="width:32px;height:32px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><span class="tt">Envoyer au client</span></button>
+      <button class="m-x" onclick="clM('m-fl')">✕</button>
+    </div>
+  </div>
+  <div class="m-b"><div style="border-radius:var(--r);overflow:hidden;border:1px solid var(--gy2)">
+    <div class="fl-hdr"><div style="font-family:var(--fh);font-size:15px;font-weight:800">Facture Logistique FL2604001</div><div style="font-size:11px;opacity:.8;margin-top:2px">Conteneur CTN-2604-001 · 40HC · MQ Fort de France</div></div>
+    <div style="padding:18px">
+      <div class="pdf-cols" style="margin-bottom:13px"><div><div class="pdf-ct">Emetteur</div><div class="pdf-cv"><strong>LUXENT LIMITED</strong><br>17 King Edwards Road · HA4 7AE London</div></div><div><div class="pdf-ct">Destinataire</div><div class="pdf-cv"><strong>Dupont Michel</strong><br>97200 Fort-de-France — Martinique</div></div></div>
+      <table class="pdf-tbl"><thead><tr><th>Description</th><th>Conteneur</th><th>BL</th><th>Montant HT</th></tr></thead><tbody>
+        <tr><td>Frais logistiques — Transport maritime 40HC<br><small style="color:var(--gy3)">LOG-CTN-2604-001</small></td><td>CTN-2604-001</td><td><span style="color:var(--gy3);font-style:italic">A definir (demander a JM)</span></td><td><span style="color:var(--am);font-weight:700">Prix a definir</span></td></tr>
+      </tbody></table>
+      <div style="background:var(--aml);border-radius:8px;padding:9px 12px;font-size:12px;color:var(--am)">⚠️ <strong>Version 1 :</strong> Prix a demander a votre partenaire JM.<br>Version 2 disponible une fois JM a saisi le prix dans son espace.</div>
+    </div>
+  </div></div></div>
+</div>
+
+</div><!-- end content -->
+</div><!-- end main -->
+
+<script>
+var PT={'db':'Tableau de bord','dv':'Devis','dv-det':'D2604006 — Dupont Michel MQ','fa':'Factures','nc':'Notes de commission','fl':'Factures logistiques','la':'Listes d\'achat','cnt':'Conteneurs','cnt-new':'Nouveau conteneur','cnt-det':'CTN-2604-001','stk':'Stock','sav':'SAV','sav-det':'SAV2604002','prd':'Produits','new-prd':'Ajouter un produit','edit-prd':'Editer MP-R22-001','cli':'Clients','part':'Partenaires','rmb':'Taux RMB','site':'Gestion site','logs':'Logs','prm':'Parametres'};
+function go(id,el){
+  document.querySelectorAll('.pg').forEach(function(x){x.classList.remove('on');});
+  var p=document.getElementById('pg-'+id);if(p)p.classList.add('on');
+  document.querySelectorAll('.si').forEach(function(x){x.classList.remove('on');});
+  if(el)el.classList.add('on');
+  var t=document.getElementById('ttl');if(t)t.textContent=PT[id]||id;
+  window.scrollTo(0,0);
+}
+function swTab(el,id){
+  var par=el.parentElement;
+  par.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});el.classList.add('on');
+  var sect=el.closest('.pg')||document.body;
+  sect.querySelectorAll('.tp').forEach(function(t){t.classList.remove('on');});
+  var tg=document.getElementById(id);if(tg)tg.classList.add('on');
+}
+function tAcc(hdr){
+  var b=hdr.nextElementSibling,a=hdr.querySelector('.acc-arr');
+  if(b.classList.contains('op')){b.classList.remove('op');if(a)a.classList.remove('op');}
+  else{b.classList.add('op');if(a)a.classList.add('op');}
+}
+function toggleEnc(btnId,noteId){
+  var btn=document.getElementById(btnId),note=noteId?document.getElementById(noteId):null;
+  if(!btn)return;
+  var paid=btn.classList.contains('paid');
+  if(paid){btn.classList.remove('paid');btn.style.background='#E8F5E9';btn.style.color='#2E7D32';if(note)note.style.display='none';}
+  else{btn.classList.add('paid');btn.style.background='#FFF9C4';btn.style.color='#F57F17';if(note)note.style.display='inline-flex';}
+}
+function openM(id){var m=document.getElementById(id);if(m)m.classList.add('on');}
+function clM(id){var m=document.getElementById(id);if(m)m.classList.remove('on');}
+function clMout(e,id){if(e.target===e.currentTarget)clM(id);}
+function simDl(fn){
+  var a=document.createElement('a');
+  var c='97import Back-office v4 — Simulation telechargement\nFichier : '+fn+'\nDate : '+new Date().toLocaleDateString('fr-FR')+'\n\nCe fichier sera genere en production.';
+  var b=new Blob([c],{type:'text/plain'});
+  a.href=URL.createObjectURL(b);a.download=fn;a.click();URL.revokeObjectURL(a.href);
+}
+function calcP(){
+  var y=parseFloat(document.getElementById('py').value)||0;
+  var e=Math.round(y/7.82);
+  document.getElementById('pe').value=e+'€';document.getElementById('pa').value=e;
+  document.getElementById('pp').value=(e*2)+'€';document.getElementById('pt2').value=Math.round(e*1.2)+'€';
+}
+function calcPe(){
+  var e=parseFloat(document.getElementById('pa').value)||0;
+  document.getElementById('pp').value=(e*2)+'€';document.getElementById('pt2').value=Math.round(e*1.2)+'€';
+}
+function updRmb(){
+  var v=parseFloat(document.getElementById('rmb-inp').value)||7.82;
+  document.getElementById('rmb-top').textContent=v.toFixed(2);
+  document.getElementById('rmb-big').textContent=v.toFixed(2);
+  alert('Taux mis a jour : 1 EUR = '+v.toFixed(2)+' ¥');
+}
+function updClocks(){
+  try{
+    var f=function(tz){return new Date().toLocaleTimeString('fr-FR',{timeZone:tz,hour:'2-digit',minute:'2-digit'});};
+    var mq=document.getElementById('c-mq'),fr=document.getElementById('c-fr'),cn=document.getElementById('c-cn');
+    if(mq)mq.textContent=f('America/Martinique');
+    if(fr)fr.textContent=f('Europe/Paris');
+    if(cn)cn.textContent=f('Asia/Shanghai');
+  }catch(e){}
+}
+updClocks();setInterval(updClocks,60000);
+</script>
+</body></html>

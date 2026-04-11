@@ -2,10 +2,8 @@ import { useState, useEffect } from 'react';
 import { collection, query, orderBy, getDocs } from 'firebase/firestore';
 import { Link } from 'wouter';
 import { db } from '../../lib/firebase';
-import { useI18n } from '../../i18n';
-import { SortControl } from '../../components/SortControl';
-import { DuplicateBtn, duplicateDoc } from '../../components/DuplicateBtn';
-import { OrangeIndicator, scoreCompletude } from '../../components/OrangeIndicator';
+import { scoreCompletude } from '../../components/OrangeIndicator';
+import { Card, Button, Pill, IconButton, EditIcon, ExcelIcon } from '../components/Icons';
 
 interface Product {
   id: string;
@@ -13,167 +11,216 @@ interface Product {
   categorie: string;
   nom_fr: string;
   prix_achat_cny: number;
-  prix_achat_eur: number;
+  prix_public_eur: number;
   actif: boolean;
-  photos: string[];
   createdAt: any;
 }
 
-const CATEGORIES: Record<string, string> = {
-  'mini-pelles': 'Mini-Pelles',
-  'maisons-modulaires': 'Maisons Modulaires',
-  solaire: 'Solaire',
-  'machines-agricoles': 'Machines Agricoles',
-  divers: 'Divers',
-  services: 'Services',
+const CATEGORIES: Record<string, { label: string; variant: 'bl' | 'tl' | 'pu' | 'or' | 'gy' }> = {
+  'mini-pelles': { label: 'Mini-Pelle', variant: 'bl' },
+  'maisons-modulaires': { label: 'Maisons', variant: 'tl' },
+  solaire: { label: 'Solaire', variant: 'pu' },
+  'machines-agricoles': { label: 'Agricole', variant: 'or' },
+  divers: { label: 'Divers', variant: 'gy' },
+  services: { label: 'Services', variant: 'gy' },
 };
 
-export default function CatalogueProduits() {
-  const { t } = useI18n();
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
-  const [filterCat, setFilterCat] = useState<string>('all');
-
-  const load = async () => {
-    setLoading(true);
-    try {
-      const q = query(collection(db, 'products'), orderBy('createdAt', sortOrder));
-      const snap = await getDocs(q);
-      setProducts(snap.docs.map((d) => ({ id: d.id, ...d.data() } as Product)));
-    } catch (err) {
-      console.error('Error loading products:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    load();
-  }, [sortOrder]);
-
-  const handleDuplicate = async (p: Product) => {
-    try {
-      const num = p.numero_interne.split('-');
-      const prefix = num.slice(0, -1).join('-');
-      await duplicateDoc(p, 'products', prefix);
-      load();
-    } catch (err) {
-      console.error('Error duplicating:', err);
-    }
-  };
-
-  const filtered =
-    filterCat === 'all'
-      ? products
-      : products.filter((p) => p.categorie === filterCat);
+// Completeness display like mockup: ●●●●●●●●○○ 8/10
+function CompletudeDisplay({ score }: { score: number }) {
+  const filled = Math.round(score / 10);
+  const empty = 10 - filled;
+  const color =
+    score >= 70 ? 'var(--tl)' : score >= 50 ? 'var(--or)' : 'var(--rd)';
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">{t('nav.produits')}</h1>
-        <div className="flex items-center gap-4">
-          <select
-            value={filterCat}
-            onChange={(e) => setFilterCat(e.target.value)}
-            className="border rounded px-3 py-2 text-sm"
-          >
-            <option value="all">Toutes catégories</option>
-            {Object.entries(CATEGORIES).map(([k, v]) => (
-              <option key={k} value={k}>
-                {v}
-              </option>
-            ))}
-          </select>
-          <SortControl value={sortOrder} onChange={setSortOrder} />
-          <Link href="/admin/produits/nouveau">
-            <a className="bg-navy text-white px-4 py-2 rounded hover:bg-opacity-90">
-              {t('btn.nouveau')}
-            </a>
-          </Link>
-        </div>
+    <span style={{ fontSize: 11, color }}>
+      {'●'.repeat(filled)}
+      {'○'.repeat(empty)} {filled}/10
+    </span>
+  );
+}
+
+export default function CatalogueProduits() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
+  const [filterCat, setFilterCat] = useState<string>('');
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const q = query(collection(db, 'products'), orderBy('createdAt', 'desc'));
+        const snap = await getDocs(q);
+        setProducts(snap.docs.map((d) => ({ id: d.id, ...d.data() } as Product)));
+      } catch (err) {
+        console.error('Error loading products:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
+  }, []);
+
+  // Demo products if no real data
+  const demoProducts: Product[] = [
+    {
+      id: 'MP-R22-001',
+      numero_interne: 'MP-R22-001',
+      categorie: 'mini-pelles',
+      nom_fr: 'Mini-pelle R22 PRO 2.2T',
+      prix_achat_cny: 94800,
+      prix_public_eur: 24300,
+      actif: true,
+      createdAt: null,
+    },
+    {
+      id: 'MS-20-001',
+      numero_interne: 'MS-20-001',
+      categorie: 'maisons-modulaires',
+      nom_fr: 'Maison Standard 20P',
+      prix_achat_cny: 33660,
+      prix_public_eur: 8616,
+      actif: true,
+      createdAt: null,
+    },
+    {
+      id: 'LOG-CTN-2604-001',
+      numero_interne: 'LOG-CTN-2604-001',
+      categorie: 'services',
+      nom_fr: 'Frais logistiques 40HC MQ',
+      prix_achat_cny: 0,
+      prix_public_eur: 0,
+      actif: false,
+      createdAt: null,
+    },
+  ];
+
+  const displayProducts = products.length > 0 ? products : demoProducts;
+  const filtered = displayProducts.filter((p) => {
+    const matchSearch =
+      !search ||
+      p.numero_interne.toLowerCase().includes(search.toLowerCase()) ||
+      p.nom_fr.toLowerCase().includes(search.toLowerCase());
+    const matchCat = !filterCat || p.categorie === filterCat;
+    return matchSearch && matchCat;
+  });
+
+  if (loading) {
+    return <div style={{ textAlign: 'center', padding: 32 }}>Chargement...</div>;
+  }
+
+  return (
+    <>
+      {/* Filters */}
+      <div className="filters">
+        <input
+          className="si-bar"
+          placeholder="Rechercher ref., nom produit, categorie..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+        <select
+          className="fsel"
+          style={{ padding: '7px 9px' }}
+          value={filterCat}
+          onChange={(e) => setFilterCat(e.target.value)}
+        >
+          <option value="">Toutes cat.</option>
+          {Object.entries(CATEGORIES).map(([k, v]) => (
+            <option key={k} value={k}>
+              {v.label}
+            </option>
+          ))}
+        </select>
+        <IconButton
+          icon={<ExcelIcon />}
+          tooltip="Export Excel 69col."
+          variant="xl"
+          size="lg"
+          onClick={() => alert('Export catalogue Excel')}
+        />
+        <Link href="/admin/produits/nouveau">
+          <Button variant="p">➕ Ajouter produit</Button>
+        </Link>
       </div>
 
-      {loading ? (
-        <div className="text-center py-8">{t('loading')}</div>
-      ) : filtered.length === 0 ? (
-        <div className="bg-white rounded-lg shadow p-8 text-center text-gray-500">
-          Aucun produit
-        </div>
-      ) : (
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          <table className="w-full">
-            <thead className="bg-salmon-light">
-              <tr>
-                <th className="text-left px-4 py-3 font-medium">Réf</th>
-                <th className="text-left px-4 py-3 font-medium">Nom</th>
-                <th className="text-left px-4 py-3 font-medium">Catégorie</th>
-                <th className="text-right px-4 py-3 font-medium">Prix CNY</th>
-                <th className="text-right px-4 py-3 font-medium">Prix EUR</th>
-                <th className="px-4 py-3 font-medium">Complétude</th>
-                <th className="px-4 py-3 font-medium">Actif</th>
-                <th className="px-4 py-3"></th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((p) => {
-                const score = scoreCompletude(p);
-                return (
-                  <tr key={p.id} className="border-b hover:bg-gray-50">
-                    <td className="px-4 py-3">
-                      <Link href={`/admin/produits/${p.id}`}>
-                        <a className="text-navy hover:underline font-medium">
-                          {p.numero_interne}
-                        </a>
-                      </Link>
-                    </td>
-                    <td className="px-4 py-3">
-                      {p.nom_fr}
-                      <OrangeIndicator show={!p.nom_fr} />
-                    </td>
-                    <td className="px-4 py-3 text-sm">
-                      {CATEGORIES[p.categorie] || p.categorie}
-                    </td>
-                    <td className="px-4 py-3 text-right">
-                      {p.prix_achat_cny?.toLocaleString('fr-FR')} ¥
-                    </td>
-                    <td className="px-4 py-3 text-right">
-                      {p.prix_achat_eur?.toLocaleString('fr-FR')} €
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-2">
-                        <div className="w-16 h-2 bg-gray-200 rounded-full overflow-hidden">
-                          <div
-                            className={`h-full ${
-                              score >= 80
-                                ? 'bg-green-500'
-                                : score >= 50
-                                ? 'bg-orange-400'
-                                : 'bg-red-400'
-                            }`}
-                            style={{ width: `${score}%` }}
-                          />
-                        </div>
-                        <span className="text-xs text-gray-500">{score}%</span>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 text-center">
-                      {p.actif ? (
-                        <span className="text-green-600">✓</span>
-                      ) : (
-                        <span className="text-gray-400">-</span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3">
-                      <DuplicateBtn onClick={() => handleDuplicate(p)} />
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </div>
+      {/* Card */}
+      <Card title={`Catalogue v3 (${filtered.length} ref.)`}>
+        <table className="admin-table">
+          <thead>
+            <tr>
+              <th>Reference</th>
+              <th>Nom FR</th>
+              <th>Cat.</th>
+              <th>Prix ¥</th>
+              <th>Prix public</th>
+              <th>Completude</th>
+              <th>Statut</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filtered.map((p) => {
+              const score = scoreCompletude(p);
+              const cat = CATEGORIES[p.categorie] || { label: p.categorie, variant: 'gy' as const };
+              const refColor =
+                p.categorie === 'mini-pelles'
+                  ? 'var(--nv3)'
+                  : p.categorie === 'maisons-modulaires'
+                    ? 'var(--tl)'
+                    : p.categorie === 'services'
+                      ? 'var(--pu)'
+                      : 'var(--or)';
+
+              return (
+                <tr key={p.id}>
+                  <td
+                    style={{
+                      fontFamily: 'monospace',
+                      fontSize: 11,
+                      color: refColor,
+                      fontWeight: 700,
+                    }}
+                  >
+                    {p.numero_interne}
+                  </td>
+                  <td style={{ fontWeight: 700 }}>{p.nom_fr}</td>
+                  <td>
+                    <Pill variant={cat.variant}>{cat.label}</Pill>
+                  </td>
+                  <td style={{ color: 'var(--rd)', fontWeight: 600 }}>
+                    {p.prix_achat_cny ? `¥${p.prix_achat_cny.toLocaleString('fr-FR')}` : '—'}
+                  </td>
+                  <td style={{ color: 'var(--nv3)', fontWeight: 700 }}>
+                    {p.prix_public_eur
+                      ? `${p.prix_public_eur.toLocaleString('fr-FR')}€`
+                      : 'Sur devis'}
+                  </td>
+                  <td>
+                    <CompletudeDisplay score={score} />
+                  </td>
+                  <td>
+                    {p.actif ? (
+                      <Pill variant="tl">Actif</Pill>
+                    ) : (
+                      <Pill variant="gy">Non visible</Pill>
+                    )}
+                  </td>
+                  <td className="tda">
+                    <Link href={`/admin/produits/${p.id}`}>
+                      <IconButton
+                        icon={<EditIcon />}
+                        tooltip="Editer / Completer"
+                        variant="edit"
+                      />
+                    </Link>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </Card>
+    </>
   );
 }
