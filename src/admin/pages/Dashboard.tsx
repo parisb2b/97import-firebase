@@ -66,6 +66,10 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const timeout = setTimeout(() => {
+      setLoading(false);
+    }, 3000);
+
     const loadData = async () => {
       try {
         // Load recent devis
@@ -123,11 +127,14 @@ export default function Dashboard() {
       } catch (err) {
         console.error('Error loading dashboard:', err);
       } finally {
+        clearTimeout(timeout);
         setLoading(false);
       }
     };
 
     loadData();
+
+    return () => clearTimeout(timeout);
   }, []);
 
   if (loading) {

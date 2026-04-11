@@ -47,6 +47,8 @@ export default function CatalogueProduits() {
   const [filterCat, setFilterCat] = useState<string>('');
 
   useEffect(() => {
+    const timeout = setTimeout(() => setLoading(false), 3000);
+
     const load = async () => {
       try {
         const q = query(collection(db, 'products'), orderBy('createdAt', 'desc'));
@@ -55,10 +57,13 @@ export default function CatalogueProduits() {
       } catch (err) {
         console.error('Error loading products:', err);
       } finally {
+        clearTimeout(timeout);
         setLoading(false);
       }
     };
     load();
+
+    return () => clearTimeout(timeout);
   }, []);
 
   // Demo products if no real data

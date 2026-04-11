@@ -37,6 +37,8 @@ export default function ListeDevis() {
   const [filterPartner, setFilterPartner] = useState('');
 
   useEffect(() => {
+    const timeout = setTimeout(() => setLoading(false), 3000);
+
     const loadDevis = async () => {
       try {
         const q = query(collection(db, 'quotes'), orderBy('createdAt', 'desc'));
@@ -64,10 +66,13 @@ export default function ListeDevis() {
       } catch (err) {
         console.error('Error loading devis:', err);
       } finally {
+        clearTimeout(timeout);
         setLoading(false);
       }
     };
     loadDevis();
+
+    return () => clearTimeout(timeout);
   }, []);
 
   // Demo data if no real data
