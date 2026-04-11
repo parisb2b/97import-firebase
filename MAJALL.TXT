@@ -135,3 +135,11 @@ Statut : PRODUCTION READY ✅
 - Templates PDF : devis OK, facture acompte OK, facture finale OK, commission AJOUTÉ
 - Données émetteur : OK (LUXENT LIMITED)
 - Build OK
+
+=== PARTIE B & C — 2026-04-12 00:00 ===
+- Homepage existante avec 4 sections (Hero, Destinations, Catégories, Avantages)
+- Navigation publique avec toggle langue OK
+- Catalogue existant avec filtres par catégorie
+- Page détail produit existante avec carrousel
+- Bouton WhatsApp ajouté sur page produit
+- Build OK

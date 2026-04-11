@@ -190,11 +190,21 @@ export default function Produit() {
           {price !== null && (
             <button
               onClick={addToCart}
-              className="w-full bg-navy text-white py-3 rounded-lg font-semibold hover:bg-opacity-90 mb-6"
+              className="w-full bg-navy text-white py-3 rounded-lg font-semibold hover:bg-opacity-90 mb-4"
             >
               {t('btn.ajouter.panier')}
             </button>
           )}
+
+          {/* WhatsApp button */}
+          <a
+            href={`https://wa.me/33663284908?text=${encodeURIComponent(`Bonjour, je souhaite un devis pour : ${product.numero_interne} - ${product.nom_fr}`)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 mb-6 flex items-center justify-center gap-2"
+          >
+            <span>📱</span> Demander un devis (WhatsApp)
+          </a>
 
           {/* Description */}
           <div className="mb-6">
