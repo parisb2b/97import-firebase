@@ -104,3 +104,11 @@
 - initializeFirestore avec experimentalForceLongPolling: true
 - Build OK
 - Commit pushé sur v2
+
+=== PHASE 2 — 2026-04-11 23:42 ===
+- Pages admin vérifiées : 22 fichiers
+- Imports Firebase OK (tous pointent vers ../../lib/firebase)
+- Routing admin OK
+- Seed Firestore confirmé : admin_params, products, profiles, quotes, invoices, containers, commissions, sav, stock, partners
+- Build OK
+- Commit pushé sur v2
