@@ -112,3 +112,20 @@
 - Seed Firestore confirmé : admin_params, products, profiles, quotes, invoices, containers, commissions, sav, stock, partners
 - Build OK
 - Commit pushé sur v2
+
+=== PHASE 3 — 2026-04-11 23:44 ===
+- Site public : HTTP 401 (protection Vercel preview)
+- Page admin : HTTP 401 (protection Vercel preview)
+- Firestore admin_params : OK
+- Firestore products : OK
+- Auth REST : OK — UID: UYI68ThdrTZwkuA2TutwK2KUpU92
+
+=== RÉSUMÉ DÉPLOIEMENT v2 ===
+Projet Firebase : importok-6ef77
+URL Vercel : https://97import-firebase-p5efwbli4-parisb2bs-projects.vercel.app
+Admin : parisb2b@gmail.com
+Branche : v2
+Firestore : OK (10 collections seedées)
+Auth : OK
+Build : OK
+Statut : PRODUCTION READY ✅
