@@ -3,13 +3,14 @@ import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 
+// Hardcoded config for debug
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  apiKey: "AIzaSyCeKBBsSgC8PQK40ETlsjNRwhYCmAKz6cwA",
+  authDomain: "import2050-59f11.firebaseapp.com",
+  projectId: "import2050-59f11",
+  storageBucket: "import2050-59f11.firebasestorage.app",
+  messagingSenderId: "496161620887",
+  appId: "1:496161620887:web:5cdbd6f3a879edd5bfbad2"
 };
 
 // Instance FRONT (clients)

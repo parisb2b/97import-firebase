@@ -19,6 +19,7 @@ const auth = getAuth();
 const db = getFirestore();
 
 const USERS = [
+  { email: 'parisb2b@gmail.com', role: 'admin', name: 'Paris B2B Admin' },
   { email: 'admin@97import.com', role: 'admin', name: 'Admin 97import' },
   { email: 'client@97import.com', role: 'user', name: 'Jean Dupont' },
   { email: 'vip@97import.com', role: 'vip', name: 'Marie Martin' },
