@@ -16,8 +16,7 @@ const firebaseConfig = {
 const clientApp = initializeApp(firebaseConfig, 'client');
 export const clientAuth = getAuth(clientApp);
 export const db = initializeFirestore(clientApp, {
-  experimentalForceLongPolling: true,
-  useFetchStreams: false
+  experimentalForceLongPolling: true
 });
 export const storage = getStorage(clientApp);
 
