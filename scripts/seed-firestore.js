@@ -3,13 +3,22 @@
 // Run: npx firebase-tools login && node scripts/seed-firestore.js
 
 import admin from 'firebase-admin';
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
 
-// Initialize with ADC
+const serviceAccount = require('./serviceAccountKey.json');
+
 admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
   projectId: 'import2050-59f11',
+  databaseURL: 'https://import2050-59f11.firebaseio.com'
 });
 
 const db = admin.firestore();
+db.settings({
+  host: 'firestore.googleapis.com',
+  ssl: true,
+});
 const now = admin.firestore.Timestamp.now();
 
 // ========== DATA ==========
@@ -173,5 +182,6 @@ async function seed() {
 
 seed().catch((e) => {
   console.error('❌ Error:', e.message);
+  console.error('Full error:', e);
   process.exit(1);
 });

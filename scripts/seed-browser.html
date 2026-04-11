@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Firestore REST Debug - 97import</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; line-height: 1.6; background: #1a1a2e; color: #eee; }
+        h1 { color: #EA580C; }
+        #log { background: #0d0d1a; color: #d4d4d4; padding: 15px; border-radius: 5px; height: 400px; overflow-y: auto; font-family: monospace; white-space: pre-wrap; }
+        .success { color: #4ade80; }
+        .error { color: #f87171; }
+        .info { color: #60a5fa; }
+        button { padding: 12px 24px; font-size: 16px; cursor: pointer; background: #EA580C; color: white; border: none; border-radius: 8px; margin: 5px; }
+        button:disabled { background: #666; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Firestore REST Debug</h1>
+    <p>Test REST pur sans SDK Firebase - Diagnostic réseau</p>
+
+    <button id="btnSeed" onclick="forceSeedRest()">Test Écriture REST</button>
+    <button onclick="testConnectivity()">Test Connectivité</button>
+    <pre id="log"></pre>
+
+    <script>
+        const API_KEY = 'AIzaSyD07lt6roFD8zTbSFivLw2BUVKJVVUf8Lo';
+        const PROJECT_ID = 'importok-6ef77';
+        const logEl = document.getElementById('log');
+
+        function log(msg, type = '') {
+            const time = new Date().toLocaleTimeString();
+            const span = document.createElement('span');
+            span.className = type;
+            span.textContent = `[${time}] ${msg}\n`;
+            logEl.appendChild(span);
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+
+        // Test de connectivité basique
+        async function testConnectivity() {
+            logEl.innerHTML = '';
+            log('🔍 Test de connectivité...', 'info');
+
+            // Test Google
+            try {
+                log('  → Test google.com...');
+                const t1 = Date.now();
+                await fetch('https://www.google.com', { mode: 'no-cors' });
+                log(`  ✅ Google OK (${Date.now() - t1}ms)`, 'success');
+            } catch (e) {
+                log(`  ❌ Google BLOQUÉ: ${e.message}`, 'error');
+            }
+
+            // Test Firebase Auth
+            try {
+                log('  → Test identitytoolkit.googleapis.com...');
+                const t2 = Date.now();
+                const res = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${API_KEY}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({})
+                });
+                log(`  ✅ Auth API accessible (${Date.now() - t2}ms)`, 'success');
+            } catch (e) {
+                log(`  ❌ Auth API BLOQUÉ: ${e.message}`, 'error');
+            }
+
+            // Test Firestore
+            try {
+                log('  → Test firestore.googleapis.com...');
+                const t3 = Date.now();
+                const res = await fetch(`https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases`, {
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const data = await res.json();
+                log(`  ✅ Firestore API accessible (${Date.now() - t3}ms) - Status: ${res.status}`, 'success');
+                if (data.error) {
+                    log(`     → Réponse: ${data.error.message}`, 'info');
+                }
+            } catch (e) {
+                log(`  ❌ Firestore API BLOQUÉ: ${e.message}`, 'error');
+            }
+        }
+
+        // Seed REST pur
+        async function forceSeedRest() {
+            const btn = document.getElementById('btnSeed');
+            btn.disabled = true;
+            logEl.innerHTML = '';
+            log('🚀 Démarrage du Seed REST pur...', 'info');
+
+            try {
+                // 1. Authentification
+                log('\n🔐 Étape 1: Authentification...', 'info');
+                const authStart = Date.now();
+
+                const authRes = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${API_KEY}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: "parisb2b@gmail.com",
+                        password: "20262026",
+                        returnSecureToken: true
+                    })
+                });
+
+                if (!authRes.ok) {
+                    const errData = await authRes.json();
+                    throw new Error(`Auth failed: ${errData.error?.message || authRes.status}`);
+                }
+
+                const authData = await authRes.json();
+                const token = authData.idToken;
+                log(`✅ Authentifié en ${Date.now() - authStart}ms (UID: ${authData.localId})`, 'success');
+
+                // 2. Test écriture simple
+                log('\n📝 Étape 2: Écriture test dans Firestore...', 'info');
+
+                const testData = {
+                    fields: {
+                        status: { stringValue: "REST_SUCCESS" },
+                        timestamp: { stringValue: new Date().toISOString() },
+                        test: { booleanValue: true }
+                    }
+                };
+
+                const url = `https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/${encodeURIComponent('(default)')}/documents/admin_params/test_rest?key=${API_KEY}`;
+
+                log(`  → URL: ${url.substring(0, 80)}...`);
+                log('  → Envoi PATCH...');
+
+                const writeStart = Date.now();
+                const fireRes = await fetch(url, {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(testData)
+                });
+
+                const responseTime = Date.now() - writeStart;
+                log(`  → Réponse reçue en ${responseTime}ms (Status: ${fireRes.status})`);
+
+                if (fireRes.ok) {
+                    const result = await fireRes.json();
+                    log(`\n✨ SUCCÈS ! Document créé/mis à jour.`, 'success');
+                    log(`  → Name: ${result.name}`, 'info');
+
+                    // Si le test passe, lancer le seed complet
+                    log('\n🌱 Le test a réussi ! Lancement du seed complet...', 'info');
+                    await fullSeed(token);
+
+                } else {
+                    const errData = await fireRes.json();
+                    log(`\n❌ ERREUR FIRESTORE (${fireRes.status}):`, 'error');
+                    log(JSON.stringify(errData, null, 2), 'error');
+                }
+
+            } catch (e) {
+                log(`\n💥 ERREUR: ${e.message}`, 'error');
+                console.error(e);
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        // Seed complet
+        async function fullSeed(token) {
+            const baseUrl = `https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/${encodeURIComponent('(default)')}/documents`;
+
+            async function writeDoc(collection, docId, data) {
+                const url = `${baseUrl}/${collection}/${docId}?key=${API_KEY}`;
+                const res = await fetch(url, {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ fields: toFirestoreFields(data) })
+                });
+                if (!res.ok) {
+                    const err = await res.json();
+                    throw new Error(`${collection}/${docId}: ${err.error?.message || res.status}`);
+                }
+                return res.json();
+            }
+
+            function toFirestoreFields(obj) {
+                const fields = {};
+                for (const [k, v] of Object.entries(obj)) {
+                    if (v === null || v === undefined) {
+                        fields[k] = { nullValue: null };
+                    } else if (typeof v === 'string') {
+                        fields[k] = { stringValue: v };
+                    } else if (typeof v === 'boolean') {
+                        fields[k] = { booleanValue: v };
+                    } else if (typeof v === 'number') {
+                        fields[k] = Number.isInteger(v) ? { integerValue: String(v) } : { doubleValue: v };
+                    } else if (Array.isArray(v)) {
+                        fields[k] = { arrayValue: { values: v.map(item => {
+                            if (typeof item === 'string') return { stringValue: item };
+                            if (typeof item === 'object') return { mapValue: { fields: toFirestoreFields(item) } };
+                            return { stringValue: String(item) };
+                        })}};
+                    } else if (typeof v === 'object') {
+                        fields[k] = { mapValue: { fields: toFirestoreFields(v) } };
+                    }
+                }
+                return fields;
+            }
+
+            const now = new Date().toISOString();
+            let count = 0;
+
+            // Admin params
+            log('\n📋 Admin params...');
+            await writeDoc('admin_params', 'global', { taux_rmb_eur: 7.82, taux_majoration_user: 2.0, taux_majoration_partner: 1.2, acompte_pct_defaut: 30, delai_validite_devis: 30 });
+            log('  ✅ global', 'success'); count++;
+            await writeDoc('admin_params', 'emetteur', { nom: 'LUXENT LIMITED', adresse: '2ND FLOOR COLLEGE HOUSE, 17 KING EDWARDS ROAD', ville: 'RUISLIP HA4 7AE — LONDON', pays: 'UNITED KINGDOM', company_number: '14852122', email: 'luxent@ltd-uk.eu' });
+            log('  ✅ emetteur', 'success'); count++;
+
+            // Clients
+            log('\n👥 Clients...');
+            const clients = [
+                { id: 'client-jean-dupont', email: 'jean.dupont@gmail.com', nom: 'Jean Dupont', tel: '+596 596 001 001', ville: 'Fort-de-France', territoire: 'Martinique', role: 'user' },
+                { id: 'client-marie-martin', email: 'marie.martin@gmail.com', nom: 'Marie Martin', tel: '+590 590 002 002', ville: 'Basse-Terre', territoire: 'Guadeloupe', role: 'user' },
+                { id: 'client-pierre-bernard', email: 'pierre.bernard@gmail.com', nom: 'Pierre Bernard', tel: '+262 262 003 003', ville: 'Sainte-Clotilde', territoire: 'La Réunion', role: 'user' },
+                { id: 'client-sophie-leblanc', email: 'sophie.leblanc@gmail.com', nom: 'Sophie Leblanc', tel: '+596 596 004 004', ville: 'Le Lamentin', territoire: 'Martinique', role: 'vip' },
+                { id: 'client-marc-durand', email: 'marc.durand@gmail.com', nom: 'Marc Durand', tel: '+594 594 005 005', ville: 'Cayenne', territoire: 'Guyane', role: 'user' },
+            ];
+            for (const c of clients) {
+                const { id, ...data } = c;
+                await writeDoc('profiles', id, { ...data, createdAt: now });
+                log(`  ✅ ${c.nom}`, 'success'); count++;
+            }
+
+            // Products
+            log('\n📦 Produits...');
+            const products = [
+                { id: 'TEST-001', numero_interne: 'TEST-001', nom_fr: 'TEST Mini-pelle', categorie: 'mini-pelles', prix_achat_cny: 30000, prix_public_eur: 7672, actif: true },
+                { id: 'TEST-002', numero_interne: 'TEST-002', nom_fr: 'TEST Maison Modulaire', categorie: 'maisons-modulaires', prix_achat_cny: 25000, prix_public_eur: 6394, actif: true },
+                { id: 'TEST-003', numero_interne: 'TEST-003', nom_fr: 'TEST Kit Solaire', categorie: 'solaire', prix_achat_cny: 8000, prix_public_eur: 2046, actif: true },
+                { id: 'TEST-004', numero_interne: 'TEST-004', nom_fr: 'TEST Machine Agricole', categorie: 'machines-agricoles', prix_achat_cny: 3000, prix_public_eur: 768, actif: true },
+                { id: 'TEST-005', numero_interne: 'TEST-005', nom_fr: 'TEST Fret Maritime', categorie: 'services', prix_achat_cny: 9000, prix_public_eur: 2302, actif: true },
+                { id: 'TEST-006', numero_interne: 'TEST-006', nom_fr: 'TEST Article Divers', categorie: 'divers', prix_achat_cny: 1500, prix_public_eur: 384, actif: true },
+            ];
+            for (const p of products) {
+                const { id, ...data } = p;
+                await writeDoc('products', id, { ...data, createdAt: now });
+                log(`  ✅ ${p.numero_interne}`, 'success'); count++;
+            }
+
+            // Quotes
+            log('\n📋 Devis...');
+            const quotes = [
+                { id: 'DVS-2604001', numero: 'DVS-2604001', client_nom: 'Jean Dupont', destination: 'MQ', statut: 'envoyé', total_ht: 9900 },
+                { id: 'DVS-2604002', numero: 'DVS-2604002', client_nom: 'Marie Martin', destination: 'GP', statut: 'accepté', total_ht: 6400 },
+                { id: 'DVS-2604003', numero: 'DVS-2604003', client_nom: 'Pierre Bernard', destination: 'RE', statut: 'brouillon', total_ht: 4100 },
+                { id: 'DVS-2604004', numero: 'DVS-2604004', client_nom: 'Sophie Leblanc', destination: 'MQ', statut: 'en cours', total_ht: 7600, is_vip: true },
+                { id: 'DVS-2604005', numero: 'DVS-2604005', client_nom: 'Marc Durand', destination: 'GF', statut: 'livré', total_ht: 2310 },
+            ];
+            for (const q of quotes) {
+                const { id, ...data } = q;
+                await writeDoc('quotes', id, { ...data, createdAt: now });
+                log(`  ✅ ${q.numero}`, 'success'); count++;
+            }
+
+            // Invoices
+            log('\n🧾 Factures...');
+            const invoices = [
+                { id: 'FA-2604001', numero: 'FA-2604001', type: 'acompte', quote_id: 'DVS-2604001', montant: 2970, client_nom: 'Jean Dupont' },
+                { id: 'FA-2604002', numero: 'FA-2604002', type: 'acompte', quote_id: 'DVS-2604002', montant: 1920, client_nom: 'Marie Martin' },
+                { id: 'FA-2604003', numero: 'FA-2604003', type: 'acompte', quote_id: 'DVS-2604004', montant: 2280, client_nom: 'Sophie Leblanc' },
+                { id: 'F-2604001', numero: 'F-2604001', type: 'facture', quote_id: 'DVS-2604005', montant: 2310, client_nom: 'Marc Durand' },
+            ];
+            for (const inv of invoices) {
+                const { id, ...data } = inv;
+                await writeDoc('invoices', id, { ...data, createdAt: now });
+                log(`  ✅ ${inv.numero}`, 'success'); count++;
+            }
+
+            // Containers
+            log('\n🚢 Conteneurs...');
+            await writeDoc('containers', 'CTN-2604-001', { numero: 'CTN-2604-001', type: '40ft-HC', destination: 'MQ', statut: 'préparation', port_chargement: 'NINGBO', createdAt: now });
+            log('  ✅ CTN-2604-001', 'success'); count++;
+            await writeDoc('containers', 'CTN-2604-002', { numero: 'CTN-2604-002', type: '20ft', destination: 'GP', statut: 'chargé', port_chargement: 'SHANGHAI', createdAt: now });
+            log('  ✅ CTN-2604-002', 'success'); count++;
+
+            // Commissions
+            log('\n💰 Commissions...');
+            await writeDoc('commissions', 'NC-2604001', { numero: 'NC-2604001', partenaire_id: 'jm', partenaire_nom: 'Jean-Marc Delacroix', total_commission: 1485, statut: 'due', createdAt: now });
+            log('  ✅ NC-2604001', 'success'); count++;
+            await writeDoc('commissions', 'NC-2604002', { numero: 'NC-2604002', partenaire_id: 'td', partenaire_nom: 'Thomas Dupont', total_commission: 2100, statut: 'due', createdAt: now });
+            log('  ✅ NC-2604002', 'success'); count++;
+
+            // SAV
+            log('\n🔧 SAV...');
+            await writeDoc('sav', 'SAV-2604001', { numero: 'SAV-2604001', client_nom: 'Jean Dupont', produit_ref: 'TEST-001', description: "Chenille abîmée", statut: 'nouveau', createdAt: now });
+            log('  ✅ SAV-2604001', 'success'); count++;
+            await writeDoc('sav', 'SAV-2604002', { numero: 'SAV-2604002', client_nom: 'Sophie Leblanc', produit_ref: 'TEST-001', description: 'Fuite hydraulique', statut: 'en cours', createdAt: now });
+            log('  ✅ SAV-2604002', 'success'); count++;
+
+            // Stock
+            log('\n📦 Stock...');
+            await writeDoc('stock', 'STK-001', { ref_piece: 'STK-001', nom: 'TEST Chenille caoutchouc', compatible: ['TEST-001'], qte: 2, seuil_alerte: 1, createdAt: now });
+            log('  ✅ STK-001', 'success'); count++;
+            await writeDoc('stock', 'STK-002', { ref_piece: 'STK-002', nom: 'TEST Joint hydraulique', compatible: ['TEST-001', 'TEST-004'], qte: 5, seuil_alerte: 2, createdAt: now });
+            log('  ✅ STK-002', 'success'); count++;
+            await writeDoc('stock', 'STK-003', { ref_piece: 'STK-003', nom: 'TEST Godet 60cm', compatible: ['TEST-001'], qte: 1, seuil_alerte: 1, createdAt: now });
+            log('  ✅ STK-003', 'success'); count++;
+
+            // Partners
+            log('\n🤝 Partenaires...');
+            const partners = [
+                { id: 'jm', nom: 'Jean-Marc Delacroix', code: 'JM', email: 'jm@partner.com', commission_taux: 15, actif: true },
+                { id: 'td', nom: 'Thomas Dupont', code: 'TD', email: 'td@partner.com', commission_taux: 15, actif: true },
+                { id: 'mc', nom: 'Michel Chen', code: 'MC', email: 'mc@partner.com', commission_taux: 12, actif: true },
+                { id: 'al', nom: 'Alice Laurent', code: 'AL', email: 'al@partner.com', commission_taux: 10, actif: true },
+            ];
+            for (const p of partners) {
+                const { id, ...data } = p;
+                await writeDoc('partners', id, { ...data, createdAt: now });
+                log(`  ✅ ${p.code}`, 'success'); count++;
+            }
+
+            log(`\n🎉 SEED TERMINÉ ! ${count} documents créés.`, 'success');
+        }
+    </script>
+</body>
+</html>

@@ -1,22 +1,24 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
+import { initializeFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 
-// Hardcoded config for debug
 const firebaseConfig = {
-  apiKey: "AIzaSyCeKBbSgC8PQK4OETlsjnRwhYCmAKz6cwA",
-  authDomain: "import2050-59f11.firebaseapp.com",
-  projectId: "import2050-59f11",
-  storageBucket: "import2050-59f11.firebasestorage.app",
-  messagingSenderId: "496161620887",
-  appId: "1:496161620887:web:5cdbd6f3a879edd5bfbad2"
+  apiKey: "AIzaSyD07lt6roFD8zTbSFivLw2BUVKJVVUf8Lo",
+  authDomain: "importok-6ef77.firebaseapp.com",
+  projectId: "importok-6ef77",
+  storageBucket: "importok-6ef77.firebasestorage.app",
+  messagingSenderId: "694030851164",
+  appId: "1:694030851164:web:1a534b65a93f8d816f1a99"
 };
 
 // Instance FRONT (clients)
 const clientApp = initializeApp(firebaseConfig, 'client');
 export const clientAuth = getAuth(clientApp);
-export const db = getFirestore(clientApp);
+export const db = initializeFirestore(clientApp, {
+  experimentalForceLongPolling: true,
+  useFetchStreams: false
+});
 export const storage = getStorage(clientApp);
 
 // Instance ADMIN (back-office — session isolée)
