@@ -129,3 +129,9 @@ Firestore : OK (10 collections seedées)
 Auth : OK
 Build : OK
 Statut : PRODUCTION READY ✅
+
+=== PARTIE A — 2026-04-11 23:55 ===
+- Pages testées : 22 fichiers admin, tous avec gestion états vides
+- Templates PDF : devis OK, facture acompte OK, facture finale OK, commission AJOUTÉ
+- Données émetteur : OK (LUXENT LIMITED)
+- Build OK

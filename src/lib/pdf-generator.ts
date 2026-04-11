@@ -328,6 +328,117 @@ export const generateFactureFinale = (
   return doc;
 };
 
+// Générer une note de commission
+interface LigneCommission {
+  quote_id: string;
+  client: string;
+  montant_ht: number;
+  taux: number;
+  commission: number;
+}
+
+interface NoteCommission {
+  numero: string;
+  partenaire_nom: string;
+  partenaire_code: string;
+  lignes: LigneCommission[];
+  total_commission: number;
+  createdAt: any;
+}
+
+export const generateNoteCommission = (
+  note: NoteCommission,
+  emetteur: Emetteur = DEFAULT_EMETTEUR
+): jsPDF => {
+  const doc = new jsPDF();
+  const pageWidth = doc.internal.pageSize.getWidth();
+  let y = 20;
+
+  doc.setFontSize(24);
+  doc.setTextColor(NAVY);
+  doc.text('LUXENT', pageWidth - 50, y);
+
+  doc.setFontSize(20);
+  doc.setTextColor(SALMON);
+  doc.text('NOTE DE COMMISSION', 20, y);
+
+  y += 10;
+  doc.setFontSize(12);
+  doc.setTextColor('#333333');
+  doc.text(note.numero, 20, y);
+
+  y += 20;
+
+  // Emetteur
+  doc.setFontSize(10);
+  doc.setTextColor('#666666');
+  doc.text(emetteur.nom, 20, y);
+  doc.text(emetteur.adresse, 20, y + 5);
+  doc.text(`${emetteur.ville} — ${emetteur.pays}`, 20, y + 10);
+
+  // Partenaire
+  doc.text('PARTENAIRE', pageWidth - 80, y);
+  doc.setTextColor('#333333');
+  doc.text(`${note.partenaire_nom} (${note.partenaire_code})`, pageWidth - 80, y + 7);
+
+  y += 35;
+
+  // Tableau
+  const tableTop = y;
+  const colWidths = [40, 50, 35, 20, 35];
+  const headers = ['N° Devis', 'Client', 'Montant HT', 'Taux', 'Commission'];
+
+  doc.setFillColor(SALMON_LIGHT);
+  doc.rect(20, tableTop, 170, 8, 'F');
+  doc.setFontSize(9);
+  doc.setTextColor(SALMON);
+  let x = 22;
+  headers.forEach((h, i) => {
+    doc.text(h, x, tableTop + 5.5);
+    x += colWidths[i];
+  });
+
+  y = tableTop + 12;
+  doc.setTextColor('#333333');
+  note.lignes.forEach((ligne) => {
+    x = 22;
+    doc.text(ligne.quote_id || '', x, y);
+    x += colWidths[0];
+    doc.text((ligne.client || '').substring(0, 25), x, y);
+    x += colWidths[1];
+    doc.text(`${ligne.montant_ht?.toLocaleString('fr-FR')} €`, x, y);
+    x += colWidths[2];
+    doc.text(`${ligne.taux}%`, x, y);
+    x += colWidths[3];
+    doc.text(`${ligne.commission?.toLocaleString('fr-FR')} €`, x, y);
+    y += 7;
+  });
+
+  // Total
+  y += 10;
+  doc.setDrawColor(BORDER);
+  doc.line(20, y, 190, y);
+  y += 10;
+
+  doc.setFillColor(SALMON_LIGHT);
+  doc.rect(100, y - 5, 90, 15, 'F');
+  doc.setFontSize(12);
+  doc.setTextColor(NAVY);
+  doc.text('TOTAL COMMISSION', 105, y + 3);
+  doc.setFontSize(14);
+  doc.text(`${note.total_commission?.toLocaleString('fr-FR')} €`, 165, y + 3);
+
+  // Coordonnées bancaires
+  y += 30;
+  doc.setFontSize(9);
+  doc.setTextColor('#666666');
+  doc.text('Paiement à effectuer sur :', 20, y);
+  doc.text(`IBAN: ${emetteur.iban}`, 20, y + 5);
+  doc.text(`SWIFT/BIC: ${emetteur.swift} — ${emetteur.banque}`, 20, y + 10);
+
+  return doc;
+};
+
 // Download helper
 export const downloadPDF = (doc: jsPDF, filename: string) => {
   doc.save(filename);
