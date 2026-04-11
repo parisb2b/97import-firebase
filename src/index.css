@@ -1,45 +1,44 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --navy: #1E3A5F;
+  --green: #166534;
+  --orange: #EA580C;
+  --purple: #7C3AED;
+  --gray: #6B7280;
+  --salmon: #C87F6B;
+  --salmon-light: #FBF0ED;
+  --border: #E5E5E5;
 }
 
 body {
-  font-family: 'Inter', -apple-system,
-    BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  font-size: 14px;
-  color: #374151;
-  background: #F9FAFB;
-  -webkit-font-smoothing: antialiased;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
-.admin-root * {
-  font-family: 'Inter', -apple-system,
-    BlinkMacSystemFont, sans-serif !important;
+/* Tooltip custom */
+.tooltip-wrapper {
+  position: relative;
+  display: inline-block;
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
+.tooltip-text {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1a1a2e;
+  color: white;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  white-space: nowrap;
+  z-index: 50;
 }
 
-/* ── Global Link Styles ─────────────── */
-a { color: inherit; text-decoration: none; }
-a:hover { opacity: 0.85; }
-
-/* ── Responsive container ────────────── */
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
-}
-
-/* ── Smooth scroll ───────────────────── */
-html { scroll-behavior: smooth; }
-
-/* ── Image responsive ────────────────── */
-img { max-width: 100%; height: auto; }
-
-/* ── Chinese font support ────────────── */
-:lang(zh) {
-  font-family: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+.tooltip-wrapper:hover .tooltip-text {
+  display: block;
 }

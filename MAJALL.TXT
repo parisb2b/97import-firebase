@@ -1,0 +1,59 @@
+[2026-04-11 10:48] v2 — RECONSTRUCTION FROM SCRATCH
+=================================================
+
+[2026-04-11 10:48] INIT — Branche v2, Firebase import2050-59f11
+[2026-04-11 10:48] — Ancien code supprimé (src/, public/, node_modules/)
+[2026-04-11 10:48] — Vite + React 19 + TypeScript créé from scratch
+[2026-04-11 10:48] — Dépendances: firebase, wouter, jspdf, xlsx, date-fns, tailwindcss, @tailwindcss/postcss
+[2026-04-11 10:48] — .env.local créé avec toutes les clés API
+
+[2026-04-11 10:50] Phase A — BACK-OFFICE COMPLET
+[2026-04-11 10:50] — src/lib/firebase.ts (dual auth: clientAuth + adminAuth)
+[2026-04-11 10:50] — src/i18n/index.tsx (FR/ZH/EN complet - 50+ traductions)
+[2026-04-11 10:50] — src/lib/counters.ts (numérotation atomique DVS/FA/CONT/SAV)
+[2026-04-11 10:50] — src/lib/deepl.ts (traduction auto FR→ZH/EN)
+[2026-04-11 10:50] — src/lib/exchange-rate.ts (API taux RMB)
+[2026-04-11 10:51] — src/components/ : GlobeToggle, SortControl, DuplicateBtn, OrangeIndicator
+[2026-04-11 10:51] — src/admin/AdminApp.tsx (layout sidebar 14 entrées + routing)
+[2026-04-11 10:51] — src/admin/AdminLogin.tsx
+[2026-04-11 10:52] — 20 pages admin créées :
+   - Dashboard (stats + derniers devis)
+   - ListeDevis / DetailDevis (CRUD + acomptes)
+   - Factures (liste invoices)
+   - NotesCommission (suivi partenaires)
+   - FraisLogistique (grille tarifaire)
+   - ListeConteneurs / NouveauConteneur / DetailConteneur (gestion conteneurs)
+   - Stock (gestion pièces détachées)
+   - SAVListe / SAVDetail (tickets SAV)
+   - CatalogueProduits / NouveauProduit / EditProduit (ProductForm miroir)
+   - Clients (liste profiles)
+   - Partenaires (gestion partenaires)
+   - TauxRMB (API + actualisation)
+   - Logs (historique actions)
+   - Parametres (global + émetteur)
+[2026-04-11 10:52] — ✅ Pastilles orange 🟠 sur champs manquants
+[2026-04-11 10:52] — ✅ Tri "plus récent" par défaut (desc)
+[2026-04-11 10:52] — ✅ Bouton ⧉ Dupliquer sur toutes les listes
+
+[2026-04-11 10:55] Phase B — FRONT-OFFICE COMPLET
+[2026-04-11 10:55] — src/front/FrontApp.tsx (header + footer + routing)
+[2026-04-11 10:55] — Home.tsx (hero trilingue + catégories + avantages)
+[2026-04-11 10:55] — Catalogue.tsx (filtres catégorie + recherche + grid produits)
+[2026-04-11 10:55] — Produit.tsx (galerie photos + options + panier localStorage)
+[2026-04-11 10:55] — Connexion.tsx / Inscription.tsx (Firebase Auth)
+[2026-04-11 10:55] — Panier.tsx (gestion localStorage + demande devis → Firestore)
+[2026-04-11 10:55] — MonCompte.tsx (onglets devis/factures/livraison/sav)
+
+[2026-04-11 10:58] Phase C — SEED + GENERATORS
+[2026-04-11 10:58] — scripts/seed-users.js (5 comptes: admin/client/vip/partner/client2, mdp: 20262026)
+[2026-04-11 10:58] — scripts/seed-products.js (5 produits + admin_params + partenaires)
+[2026-04-11 10:58] — src/lib/pdf-generator.ts (generateDevis, generateFactureAcompte, generateFactureFinale)
+[2026-04-11 10:58] — src/lib/excel-generator.ts (generateBCChine, generateBEExport, generateBDPackingList, generateBDInvoiceExcel)
+[2026-04-11 10:58] — Templates Excel restaurés dans src/templates/ (4 fichiers)
+
+[2026-04-11 11:00] BUILD TEST
+[2026-04-11 11:00] — ✅ npm run build réussi
+[2026-04-11 11:00] — dist/index.html + dist/assets/ générés
+[2026-04-11 11:00] — CSS: 56KB, JS: 811KB (warning chunk size > 500KB)
+
+[2026-04-11 11:00] STATUT: ✅ Build réussi — Prêt pour commit v2
