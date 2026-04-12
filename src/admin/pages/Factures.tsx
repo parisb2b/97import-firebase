@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { collection, query, orderBy, getDocs } from 'firebase/firestore';
+import { collection, query, orderBy, getDocs, doc, getDoc } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { useI18n } from '../../i18n';
 import { SortControl } from '../../components/SortControl';
+import { generateFactureAcompte, generateFactureFinale, downloadPDF } from '../../lib/pdf-generator';
 
 interface Invoice {
   id: string;
@@ -19,6 +20,42 @@ export default function Factures() {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
   const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
+  const [emetteurData, setEmetteurData] = useState<any>(null);
+
+  // Load emetteur data
+  useEffect(() => {
+    const fetchEmetteur = async () => {
+      try {
+        const snap = await getDoc(doc(db, 'admin_params', 'emetteur'));
+        if (snap.exists()) setEmetteurData(snap.data());
+      } catch (e) {
+        console.error('Erreur chargement émetteur:', e);
+      }
+    };
+    fetchEmetteur();
+  }, []);
+
+  const handleDownloadPDF = async (inv: Invoice) => {
+    try {
+      // Fetch the quote data
+      const quoteSnap = await getDoc(doc(db, 'quotes', inv.quote_id));
+      if (!quoteSnap.exists()) {
+        alert('Devis associé introuvable');
+        return;
+      }
+      const quoteData = quoteSnap.data();
+
+      // Generate PDF based on invoice type
+      const pdfDoc = inv.type === 'acompte'
+        ? generateFactureAcompte(quoteData, { montant: inv.montant, numero: inv.numero, createdAt: inv.createdAt }, emetteurData)
+        : generateFactureFinale(quoteData, inv.numero, emetteurData);
+
+      downloadPDF(pdfDoc, `${inv.numero}.pdf`);
+    } catch (err) {
+      console.error('Erreur génération PDF:', err);
+      alert('Erreur lors de la génération du PDF');
+    }
+  };
 
   useEffect(() => {
     const timeout = setTimeout(() => setLoading(false), 3000);
@@ -87,18 +124,13 @@ export default function Factures() {
                     {inv.montant?.toLocaleString('fr-FR')} €
                   </td>
                   <td className="px-4 py-3 text-center">
-                    {inv.pdf_url ? (
-                      <a
-                        href={inv.pdf_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-navy hover:underline"
-                      >
-                        📄
-                      </a>
-                    ) : (
-                      '-'
-                    )}
+                    <button
+                      onClick={() => handleDownloadPDF(inv)}
+                      className="text-blue-600 hover:text-blue-800 hover:underline"
+                      title="Télécharger PDF"
+                    >
+                      PDF
+                    </button>
                   </td>
                 </tr>
               ))}

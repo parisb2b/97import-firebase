@@ -1,0 +1,83 @@
+=== v13 STRUCTURE PDF DEVIS (D2604001.pdf) ===
+
+HEADER :
+- Logo LUXENT en haut à droite
+- Titre "Devis" centré, couleur salmon #C87F6B, taille 22pt
+- Numéro + Date en dessous
+
+BLOC EMETTEUR (gauche) :
+- Titre "Émetteur" en salmon #C87F6B, fond violet clair #F0EDF5
+- Société : LUXENT LIMITED
+- Adresse : 2ND FLOOR COLLEGE HOUSE, 17 KING EDWARDS ROAD
+- Ville : RUISLIP HA4 7AE — LONDON
+- Pays : UNITED KINGDOM
+- N° entreprise : 14852122
+- Email : luxent@ltd-uk.eu
+
+BLOC DESTINATAIRE (droite) :
+- Titre "Destinataire" en salmon #C87F6B, fond violet clair
+- Nom client
+- Adresse, Pays
+- Email, Téléphone
+
+BLOC BANCAIRE :
+- Account Name : LUXENT LIMITED
+- IBAN : DE76 2022 0800 0059 5688 30
+- SWIFT : SXPYDEHH
+- Bank : Banking Circle S.A.
+
+TABLEAU PRODUITS :
+- Header violet #9B8BBA, texte blanc
+- Colonnes : Type | Description | Prix HT | Qté | Total HT
+- Lignes alternées (fond blanc / gris clair #F5F5F5)
+- Bordures fines grises #CCCCCC
+
+TOTAUX :
+- TVA non applicable, art. 293 B du CGI
+- Box total avec fond violet clair, texte salmon gras
+
+FOOTER :
+- Conditions / Acceptation du client
+- Règlement : À réception / Mode : Virement bancaire
+- Signature : A _______, le __/__/__
+- Numéro devis + "Page 1 sur 1"
+
+=== COULEURS DE REFERENCE ===
+
+SALMON      : #C87F6B (200, 127, 107) - titres, sections
+VIOLET      : #9B8BBA (155, 139, 186) - header tableau
+VIOLET_LIGHT: #F0EDF5 (240, 237, 245) - fond blocs
+GRIS        : #666666 (102, 102, 102) - labels
+NOIR        : #333333 (51, 51, 51)    - valeurs
+BLANC       : #FFFFFF (255, 255, 255)
+GRIS_CLAIR  : #F5F5F5 (245, 245, 245) - lignes alternées
+GRIS_BORDURE: #CCCCCC (204, 204, 204) - bordures
+
+=== v13 RAPPORT PDF — 2026-04-12 ===
+
+ANALYSE PDF RÉFÉRENCE :
+- D2604001.pdf : structure devis documentée
+- F2600031.pdf : structure facture documentée
+- Couleurs extraites et appliquées
+
+PDF GENERATOR MIS À JOUR :
+- generateDevis() : header salmon, tableau violet, totaux, footer avec conditions
+- generateFactureAcompte() : même style + montant acompte/solde
+- generateFactureFinale() : même style + tableau complet + contact
+- generateNoteCommission() : tableau commissions, total, bank info
+
+PAGES ADMIN MISES À JOUR :
+- DetailDevis.tsx : bouton PDF + chargement émetteur [OK]
+- Factures.tsx : bouton PDF par facture + fetch quote associé [OK]
+- NotesCommission.tsx : bouton PDF par note [OK]
+- Émetteur chargé depuis Firestore [OK]
+
+DONNÉES FIRESTORE :
+- admin_params/emetteur : OK (LUXENT LIMITED)
+- admin_params/global : OK
+- quotes : collection existante
+- invoices : collection existante
+- commissions : collection existante
+
+BUILD : OK (1.77s)
+COMMIT : En cours...

@@ -1,446 +1,473 @@
 import jsPDF from 'jspdf';
 
-// Couleurs (basées sur les PDF de référence D2604001.pdf et F2600031.pdf)
-const SALMON = '#C87F6B';      // Titres (DEVIS, FACTURE)
-const VIOLET = '#9B8BBA';      // En-tête tableau
-const VIOLET_LIGHT = '#F0EDF5';
-const BORDER = '#E5E5E5';
-const NAVY = '#1E3A5F';
-
-interface Emetteur {
-  nom: string;
-  adresse: string;
-  ville: string;
-  pays: string;
-  company_number: string;
-  email: string;
-  tel_cn: string;
-  tel_fr: string;
-  iban: string;
-  swift: string;
-  banque: string;
-}
-
-interface LigneDevis {
-  ref: string;
-  nom_fr: string;
-  qte: number;
-  prix_unitaire: number;
-  total: number;
-}
-
-interface Devis {
-  numero: string;
-  client_nom: string;
-  client_email: string;
-  client_tel: string;
-  client_adresse: string;
-  client_siret: string;
-  lignes: LigneDevis[];
-  total_ht: number;
-  acompte_pct: number;
-  destination: string;
-  createdAt: any;
-}
-
-const DEFAULT_EMETTEUR: Emetteur = {
-  nom: 'LUXENT LIMITED',
-  adresse: '2ND FLOOR COLLEGE HOUSE, 17 KING EDWARDS ROAD',
-  ville: 'RUISLIP HA4 7AE — LONDON',
-  pays: 'UNITED KINGDOM',
-  company_number: '14852122',
-  email: 'luxent@ltd-uk.eu',
-  tel_cn: '+86 135 6627 1902',
-  tel_fr: '+33 620 607 448',
-  iban: 'DE76 2022 0800 0059 5688 30',
-  swift: 'SXPYDEHH',
-  banque: 'Banking Circle S.A.',
+// ============ COULEURS DE RÉFÉRENCE (RGB) ============
+const COLORS = {
+  salmon: [200, 127, 107] as const,      // #C87F6B - titres, sections
+  violet: [155, 139, 186] as const,      // #9B8BBA - header tableau
+  violetLight: [240, 237, 245] as const, // #F0EDF5 - fond acompte
+  gris: [102, 102, 102] as const,        // #666666 - labels
+  noir: [51, 51, 51] as const,           // #333333 - valeurs
+  blanc: [255, 255, 255] as const,       // #FFFFFF
+  grisClair: [245, 245, 245] as const,   // #F5F5F5 - lignes alternées
+  grisBordure: [204, 204, 204] as const, // #CCCCCC - bordures
 };
 
-// Générer un devis PDF
-export const generateDevis = (quote: Devis, emetteur: Emetteur = DEFAULT_EMETTEUR): jsPDF => {
-  const doc = new jsPDF();
-  const pageWidth = doc.internal.pageSize.getWidth();
-  let y = 20;
+// ============ HELPER : Émetteur par défaut ============
+function getEmetteur(emetteur?: any) {
+  return {
+    nom: emetteur?.nom || 'LUXENT LIMITED',
+    adresse: emetteur?.adresse || '2ND FLOOR COLLEGE HOUSE, 17 KING EDWARDS ROAD',
+    ville: emetteur?.ville || 'RUISLIP HA4 7AE — LONDON',
+    pays: emetteur?.pays || 'UNITED KINGDOM',
+    company_number: emetteur?.company_number || '14852122',
+    email: emetteur?.email || 'luxent@ltd-uk.eu',
+    tel_cn: emetteur?.tel_cn || '+86 135 6627 1902',
+    tel_fr: emetteur?.tel_fr || '+33 620 607 448',
+    iban: emetteur?.iban || 'DE76 2022 0800 0059 5688 30',
+    swift: emetteur?.swift || 'SXPYDEHH',
+    banque: emetteur?.banque || 'Banking Circle S.A.',
+  };
+}
 
-  // Logo placeholder (à remplacer par image base64)
-  doc.setFontSize(24);
-  doc.setTextColor(NAVY);
-  doc.text('LUXENT', pageWidth - 50, y);
-
+// ============ HELPER : Header commun ============
+function drawHeader(doc: jsPDF, title: string, numero: string, date: string) {
   // Titre
-  doc.setFontSize(20);
-  doc.setTextColor(SALMON);
-  doc.text('DEVIS', 20, y);
+  doc.setFontSize(22);
+  doc.setTextColor(...COLORS.salmon);
+  doc.text(title, 105, 25, { align: 'center' });
 
-  y += 10;
-  doc.setFontSize(12);
-  doc.setTextColor('#333333');
-  doc.text(quote.numero, 20, y);
+  // Numéro et date
+  doc.setFontSize(11);
+  doc.setTextColor(...COLORS.gris);
+  doc.text(`N° ${numero}`, 20, 35);
+  doc.text(`Date : ${date}`, 190, 35, { align: 'right' });
 
-  y += 15;
+  // Ligne séparatrice
+  doc.setDrawColor(...COLORS.salmon);
+  doc.setLineWidth(0.5);
+  doc.line(20, 38, 190, 38);
+}
 
-  // Emetteur
+// ============ HELPER : Bloc émetteur/destinataire ============
+function drawParties(doc: jsPDF, emetteur: any, destinataire: any, startY: number) {
+  const y = startY;
+
+  // ÉMETTEUR (gauche)
+  doc.setFillColor(...COLORS.violetLight);
+  doc.rect(20, y, 80, 8, 'F');
   doc.setFontSize(10);
-  doc.setTextColor('#666666');
-  doc.text(emetteur.nom, 20, y);
-  doc.text(emetteur.adresse, 20, y + 5);
-  doc.text(`${emetteur.ville} — ${emetteur.pays}`, 20, y + 10);
-  doc.text(`Company N° ${emetteur.company_number}`, 20, y + 15);
-  doc.text(`Email: ${emetteur.email}`, 20, y + 20);
-  doc.text(`Tél FR: ${emetteur.tel_fr} | CN: ${emetteur.tel_cn}`, 20, y + 25);
+  doc.setTextColor(...COLORS.salmon);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Émetteur', 25, y + 6);
 
-  // Destinataire
-  doc.text('DESTINATAIRE', pageWidth - 80, y);
-  doc.setTextColor('#333333');
-  doc.text(quote.client_nom || '-', pageWidth - 80, y + 7);
-  doc.text(quote.client_email || '', pageWidth - 80, y + 12);
-  doc.text(quote.client_tel || '', pageWidth - 80, y + 17);
-  if (quote.client_siret) {
-    doc.text(`SIRET: ${quote.client_siret}`, pageWidth - 80, y + 22);
-  }
-
-  y += 45;
-
-  // Tableau
-  const tableTop = y;
-  const colWidths = [25, 75, 20, 30, 30];
-  const headers = ['Réf', 'Désignation', 'Qté', 'PU HT', 'Total HT'];
-
-  // En-tête tableau (violet comme PDF référence)
-  doc.setFillColor(VIOLET);
-  doc.rect(20, tableTop, 170, 8, 'F');
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(...COLORS.noir);
   doc.setFontSize(9);
-  doc.setTextColor('#FFFFFF');
-  let x = 22;
-  headers.forEach((h, i) => {
-    doc.text(h, x, tableTop + 5.5);
-    x += colWidths[i];
-  });
+  let ey = y + 14;
+  doc.setFont('helvetica', 'bold');
+  doc.text(emetteur.nom, 25, ey); ey += 5;
+  doc.setFont('helvetica', 'normal');
+  doc.text(emetteur.adresse, 25, ey); ey += 4;
+  doc.text(emetteur.ville, 25, ey); ey += 4;
+  doc.text(emetteur.pays, 25, ey); ey += 4;
+  doc.setTextColor(...COLORS.gris);
+  doc.text(`N° entreprise: ${emetteur.company_number}`, 25, ey); ey += 4;
+  doc.text(`Email: ${emetteur.email}`, 25, ey);
 
-  y = tableTop + 12;
+  // DESTINATAIRE (droite)
+  doc.setFillColor(...COLORS.violetLight);
+  doc.rect(110, y, 80, 8, 'F');
+  doc.setFontSize(10);
+  doc.setTextColor(...COLORS.salmon);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Destinataire', 115, y + 6);
+
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(...COLORS.noir);
+  doc.setFontSize(9);
+  let dy = y + 14;
+  doc.setFont('helvetica', 'bold');
+  doc.text(destinataire.nom || 'Client', 115, dy); dy += 5;
+  doc.setFont('helvetica', 'normal');
+  if (destinataire.adresse) { doc.text(destinataire.adresse, 115, dy); dy += 4; }
+  if (destinataire.pays) { doc.text(`Pays: ${destinataire.pays}`, 115, dy); dy += 4; }
+  if (destinataire.email) { doc.text(`Email: ${destinataire.email}`, 115, dy); dy += 4; }
+  if (destinataire.tel) { doc.text(`Tel: ${destinataire.tel}`, 115, dy); }
+
+  return ey + 10;
+}
+
+// ============ HELPER : Bloc bancaire ============
+function drawBankInfo(doc: jsPDF, emetteur: any, startY: number) {
+  let y = startY;
+  doc.setFontSize(8);
+  doc.setTextColor(...COLORS.gris);
+  doc.text('Account Name: ' + emetteur.nom, 25, y); y += 4;
+  doc.text('IBAN: ' + emetteur.iban, 25, y); y += 4;
+  doc.text('SWIFT: ' + emetteur.swift + ' | Bank: ' + emetteur.banque, 25, y);
+  return y + 8;
+}
+
+// ============ HELPER : Tableau produits ============
+function drawProductTable(doc: jsPDF, lignes: any[], startY: number) {
+  let y = startY;
+
+  // Header violet
+  doc.setFillColor(...COLORS.violet);
+  doc.rect(20, y, 170, 8, 'F');
+  doc.setFontSize(9);
+  doc.setTextColor(...COLORS.blanc);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Type', 25, y + 6);
+  doc.text('Description', 50, y + 6);
+  doc.text('Prix HT', 125, y + 6);
+  doc.text('Qté', 150, y + 6);
+  doc.text('Total HT', 165, y + 6);
+  y += 8;
 
   // Lignes
-  doc.setTextColor('#333333');
-  quote.lignes.forEach((ligne) => {
-    x = 22;
-    doc.text(ligne.ref?.substring(0, 12) || '', x, y);
-    x += colWidths[0];
-    doc.text(ligne.nom_fr?.substring(0, 40) || '', x, y);
-    x += colWidths[1];
-    doc.text(String(ligne.qte), x, y);
-    x += colWidths[2];
-    doc.text(`${ligne.prix_unitaire?.toLocaleString('fr-FR')} €`, x, y);
-    x += colWidths[3];
-    doc.text(`${ligne.total?.toLocaleString('fr-FR')} €`, x, y);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(...COLORS.noir);
+  (lignes || []).forEach((ligne, i) => {
+    // Fond alterné
+    if (i % 2 === 0) {
+      doc.setFillColor(...COLORS.grisClair);
+      doc.rect(20, y, 170, 7, 'F');
+    }
+    // Bordure basse
+    doc.setDrawColor(...COLORS.grisBordure);
+    doc.line(20, y + 7, 190, y + 7);
+
+    doc.setFontSize(8);
+    doc.text('Produit', 25, y + 5);
+    doc.text((ligne.nom_fr || ligne.ref || '').substring(0, 35), 50, y + 5);
+    doc.text(formatEUR(ligne.prix_unitaire), 125, y + 5);
+    doc.text(String(ligne.qte || 1), 150, y + 5);
+    doc.text(formatEUR(ligne.total || ligne.prix_unitaire * (ligne.qte || 1)), 165, y + 5);
     y += 7;
   });
 
-  // Total
-  y += 5;
-  doc.setDrawColor(BORDER);
-  doc.line(20, y, 190, y);
+  return y;
+}
+
+// ============ HELPER : Totaux ============
+function drawTotals(doc: jsPDF, quote: any, startY: number) {
+  let y = startY + 5;
+
+  // TVA
+  doc.setFontSize(8);
+  doc.setTextColor(...COLORS.gris);
+  doc.text('TVA non applicable, art. 293 B du CGI', 105, y, { align: 'center' });
   y += 8;
 
-  doc.setFontSize(11);
-  doc.setTextColor(NAVY);
-  doc.text('Total HT', 130, y);
-  doc.text(`${quote.total_ht?.toLocaleString('fr-FR')} €`, 170, y);
+  // Box total
+  doc.setFillColor(...COLORS.violetLight);
+  doc.rect(120, y, 70, 10, 'F');
+  doc.setFontSize(12);
+  doc.setTextColor(...COLORS.salmon);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Total', 125, y + 7);
+  doc.text(formatEUR(quote.total_ht), 185, y + 7, { align: 'right' });
 
-  y += 10;
-  doc.setTextColor(SALMON);
-  doc.text(`Acompte demandé (${quote.acompte_pct}%)`, 130, y);
-  doc.text(`${(quote.total_ht * quote.acompte_pct / 100)?.toLocaleString('fr-FR')} €`, 170, y);
+  return y + 15;
+}
+
+// ============ HELPER : Footer devis ============
+function drawDevisFooter(doc: jsPDF, numero: string, startY: number) {
+  let y = startY;
+
+  // Conditions
+  doc.setDrawColor(...COLORS.grisBordure);
+  doc.line(20, y, 190, y);
+  y += 6;
+
+  doc.setFontSize(8);
+  doc.setTextColor(...COLORS.gris);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Conditions', 25, y);
+  doc.text('Acceptation du client', 120, y);
+  y += 5;
+
+  doc.setFont('helvetica', 'normal');
+  doc.text('Règlement: À réception', 25, y);
+  doc.text('A _______, le __/__/__', 120, y);
+  y += 4;
+  doc.text('Mode: Virement bancaire', 25, y);
+  doc.text('Signature', 120, y);
+  y += 4;
+  doc.text('Nom et qualité', 120, y);
 
   // Pied de page
-  y += 25;
-  doc.setFontSize(9);
-  doc.setTextColor('#666666');
-  doc.text('Validité du devis : 30 jours', 20, y);
-  doc.text(`Destination : ${quote.destination}`, 20, y + 5);
-
-  y += 15;
-  doc.text('Coordonnées bancaires :', 20, y);
-  doc.text(`IBAN: ${emetteur.iban}`, 20, y + 5);
-  doc.text(`SWIFT/BIC: ${emetteur.swift} — ${emetteur.banque}`, 20, y + 10);
-
-  return doc;
-};
-
-// Générer une facture d'acompte
-export const generateFactureAcompte = (
-  quote: Devis,
-  acompte: { montant: number; ref_fa: string; date: string },
-  emetteur: Emetteur = DEFAULT_EMETTEUR
-): jsPDF => {
-  const doc = new jsPDF();
-  const pageWidth = doc.internal.pageSize.getWidth();
-  let y = 20;
-
-  doc.setFontSize(24);
-  doc.setTextColor(NAVY);
-  doc.text('LUXENT', pageWidth - 50, y);
-
-  doc.setFontSize(20);
-  doc.setTextColor(SALMON);
-  doc.text('FACTURE D\'ACOMPTE', 20, y);
-
-  y += 10;
-  doc.setFontSize(12);
-  doc.setTextColor('#333333');
-  doc.text(acompte.ref_fa, 20, y);
-  doc.text(`Date: ${new Date(acompte.date).toLocaleDateString('fr-FR')}`, 100, y);
-
-  y += 20;
-
-  // Emetteur/Destinataire (même layout que devis)
-  doc.setFontSize(10);
-  doc.setTextColor('#666666');
-  doc.text(emetteur.nom, 20, y);
-  doc.text(emetteur.adresse, 20, y + 5);
-  doc.text(`${emetteur.ville} — ${emetteur.pays}`, 20, y + 10);
-
-  doc.text(quote.client_nom || '-', pageWidth - 80, y);
-  doc.text(quote.client_email || '', pageWidth - 80, y + 5);
-
-  y += 35;
-
-  // Référence devis
-  doc.setTextColor('#333333');
-  doc.text(`Devis de référence : ${quote.numero}`, 20, y);
-  doc.text(`Montant total du devis : ${quote.total_ht?.toLocaleString('fr-FR')} €`, 20, y + 7);
-
-  y += 25;
-
-  // Montant acompte (fond violet clair)
-  doc.setFillColor(VIOLET_LIGHT);
-  doc.rect(20, y, 170, 25, 'F');
-  y += 10;
-
-  doc.setFontSize(12);
-  doc.setTextColor(NAVY);
-  doc.text('Montant de l\'acompte', 30, y);
-  doc.setFontSize(16);
-  doc.text(`${acompte.montant.toLocaleString('fr-FR')} €`, 150, y);
-
-  y += 10;
-  doc.setFontSize(10);
-  doc.setTextColor('#666666');
-  const solde = quote.total_ht - acompte.montant;
-  doc.text(`Solde restant dû : ${solde.toLocaleString('fr-FR')} €`, 30, y);
-
-  // Coordonnées bancaires
-  y += 30;
-  doc.setTextColor('#666666');
-  doc.text('Paiement reçu sur :', 20, y);
-  doc.text(`IBAN: ${emetteur.iban}`, 20, y + 5);
-  doc.text(`SWIFT/BIC: ${emetteur.swift} — ${emetteur.banque}`, 20, y + 10);
-
-  return doc;
-};
-
-// Générer une facture finale
-export const generateFactureFinale = (
-  quote: Devis,
-  numero: string,
-  emetteur: Emetteur = DEFAULT_EMETTEUR
-): jsPDF => {
-  const doc = new jsPDF();
-  const pageWidth = doc.internal.pageSize.getWidth();
-  let y = 20;
-
-  doc.setFontSize(24);
-  doc.setTextColor(NAVY);
-  doc.text('LUXENT', pageWidth - 50, y);
-
-  doc.setFontSize(20);
-  doc.setTextColor(SALMON);
-  doc.text('FACTURE', 20, y);
-
-  y += 10;
-  doc.setFontSize(12);
-  doc.setTextColor('#333333');
-  doc.text(numero, 20, y);
-
-  y += 20;
-
-  // En-têtes
-  doc.setFontSize(10);
-  doc.setTextColor('#666666');
-  doc.text(emetteur.nom, 20, y);
-  doc.text(emetteur.adresse, 20, y + 5);
-  doc.text(`${emetteur.ville} — ${emetteur.pays}`, 20, y + 10);
-
-  doc.text(quote.client_nom || '-', pageWidth - 80, y);
-  doc.text(quote.client_email || '', pageWidth - 80, y + 5);
-  if (quote.client_siret) {
-    doc.text(`SIRET: ${quote.client_siret}`, pageWidth - 80, y + 10);
-  }
-
-  y += 35;
-
-  // Tableau des lignes (même que devis)
-  const tableTop = y;
-  const colWidths = [25, 75, 20, 30, 30];
-  const headers = ['Réf', 'Désignation', 'Qté', 'PU HT', 'Total HT'];
-
-  doc.setFillColor(VIOLET);
-  doc.rect(20, tableTop, 170, 8, 'F');
-  doc.setFontSize(9);
-  doc.setTextColor('#FFFFFF');
-  let x = 22;
-  headers.forEach((h, i) => {
-    doc.text(h, x, tableTop + 5.5);
-    x += colWidths[i];
-  });
-
-  y = tableTop + 12;
-  doc.setTextColor('#333333');
-  quote.lignes.forEach((ligne) => {
-    x = 22;
-    doc.text(ligne.ref?.substring(0, 12) || '', x, y);
-    x += colWidths[0];
-    doc.text(ligne.nom_fr?.substring(0, 40) || '', x, y);
-    x += colWidths[1];
-    doc.text(String(ligne.qte), x, y);
-    x += colWidths[2];
-    doc.text(`${ligne.prix_unitaire?.toLocaleString('fr-FR')} €`, x, y);
-    x += colWidths[3];
-    doc.text(`${ligne.total?.toLocaleString('fr-FR')} €`, x, y);
-    y += 7;
-  });
-
-  y += 10;
-  doc.setDrawColor(BORDER);
+  y = 285;
+  doc.setDrawColor(...COLORS.salmon);
   doc.line(20, y, 190, y);
-  y += 8;
+  doc.setFontSize(7);
+  doc.setTextColor(...COLORS.gris);
+  doc.text(`Devis ${numero}`, 25, y + 4);
+  doc.text('Page 1 sur 1', 185, y + 4, { align: 'right' });
+}
+
+// ============ FORMAT HELPERS ============
+function formatEUR(amount: number | undefined) {
+  if (!amount && amount !== 0) return '0,00 €';
+  return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(amount);
+}
+
+function formatDate(date: any) {
+  if (!date) return new Date().toLocaleDateString('fr-FR');
+  if (date.toDate) return date.toDate().toLocaleDateString('fr-FR');
+  if (date instanceof Date) return date.toLocaleDateString('fr-FR');
+  return String(date);
+}
+
+// ============================================================
+// FONCTION PRINCIPALE : GÉNÉRER DEVIS PDF
+// ============================================================
+export function generateDevis(quote: any, emetteur?: any) {
+  const doc = new jsPDF();
+  const em = getEmetteur(emetteur);
+  const date = formatDate(quote.createdAt);
+
+  // Header
+  drawHeader(doc, 'Devis', quote.numero || quote.id, date);
+
+  // Émetteur / Destinataire
+  let y = drawParties(doc, em, {
+    nom: quote.client_nom,
+    adresse: quote.client_adresse,
+    pays: 'France',
+    email: quote.client_email,
+    tel: quote.client_tel,
+  }, 42);
+
+  // Info bancaire
+  y = drawBankInfo(doc, em, y);
+
+  // Tableau produits
+  y = drawProductTable(doc, quote.lignes || [], y + 5);
 
   // Totaux
-  doc.setFontSize(10);
-  doc.text('Total HT', 130, y);
-  doc.text(`${quote.total_ht?.toLocaleString('fr-FR')} €`, 170, y);
+  y = drawTotals(doc, quote, y);
 
-  // Mention TVA non applicable
-  y += 20;
-  doc.setFontSize(8);
-  doc.setTextColor('#666666');
-  doc.text('TVA non applicable — article 259B du CGI', 20, y);
+  // Footer devis
+  drawDevisFooter(doc, quote.numero || quote.id, y + 10);
 
   return doc;
-};
-
-// Générer une note de commission
-interface LigneCommission {
-  quote_id: string;
-  client: string;
-  montant_ht: number;
-  taux: number;
-  commission: number;
 }
 
-interface NoteCommission {
-  numero: string;
-  partenaire_nom: string;
-  partenaire_code: string;
-  lignes: LigneCommission[];
-  total_commission: number;
-  createdAt: any;
-}
-
-export const generateNoteCommission = (
-  note: NoteCommission,
-  emetteur: Emetteur = DEFAULT_EMETTEUR
-): jsPDF => {
+// ============================================================
+// FONCTION : GÉNÉRER FACTURE ACOMPTE PDF
+// ============================================================
+export function generateFactureAcompte(quote: any, acompte: any, emetteur?: any) {
   const doc = new jsPDF();
-  const pageWidth = doc.internal.pageSize.getWidth();
-  let y = 20;
+  const em = getEmetteur(emetteur);
+  const numero = acompte?.numero || 'FA-' + (quote.numero || '').replace('DVS-', '');
+  const date = formatDate(acompte?.createdAt || quote.createdAt);
 
-  doc.setFontSize(24);
-  doc.setTextColor(NAVY);
-  doc.text('LUXENT', pageWidth - 50, y);
+  // Header
+  drawHeader(doc, "Facture d'Acompte", numero, date);
 
-  doc.setFontSize(20);
-  doc.setTextColor(SALMON);
-  doc.text('NOTE DE COMMISSION', 20, y);
+  // Émetteur / Destinataire
+  let y = drawParties(doc, em, {
+    nom: quote.client_nom,
+    adresse: quote.client_adresse,
+    pays: 'France',
+    email: quote.client_email,
+    tel: quote.client_tel,
+  }, 42);
 
-  y += 10;
-  doc.setFontSize(12);
-  doc.setTextColor('#333333');
-  doc.text(note.numero, 20, y);
+  // Info bancaire
+  y = drawBankInfo(doc, em, y);
 
-  y += 20;
-
-  // Emetteur
+  // Référence devis
+  y += 5;
   doc.setFontSize(10);
-  doc.setTextColor('#666666');
-  doc.text(emetteur.nom, 20, y);
-  doc.text(emetteur.adresse, 20, y + 5);
-  doc.text(`${emetteur.ville} — ${emetteur.pays}`, 20, y + 10);
+  doc.setTextColor(...COLORS.gris);
+  doc.text(`Référence devis : ${quote.numero || quote.id}`, 25, y);
+  y += 8;
 
-  // Partenaire
-  doc.text('PARTENAIRE', pageWidth - 80, y);
-  doc.setTextColor('#333333');
-  doc.text(`${note.partenaire_nom} (${note.partenaire_code})`, pageWidth - 80, y + 7);
+  // Montant acompte
+  doc.setFillColor(...COLORS.violetLight);
+  doc.rect(20, y, 170, 30, 'F');
+
+  doc.setFontSize(10);
+  doc.setTextColor(...COLORS.noir);
+  doc.text('Total devis HT :', 30, y + 8);
+  doc.text(formatEUR(quote.total_ht), 180, y + 8, { align: 'right' });
+
+  doc.text(`Acompte (${quote.acompte_pct || 30}%) :`, 30, y + 16);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(...COLORS.salmon);
+  doc.text(formatEUR(acompte?.montant || quote.total_encaisse), 180, y + 16, { align: 'right' });
+
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(...COLORS.noir);
+  doc.text('Solde restant :', 30, y + 24);
+  doc.text(formatEUR(quote.solde_restant), 180, y + 24, { align: 'right' });
 
   y += 35;
 
-  // Tableau
-  const tableTop = y;
-  const colWidths = [40, 50, 35, 20, 35];
-  const headers = ['N° Devis', 'Client', 'Montant HT', 'Taux', 'Commission'];
+  // TVA
+  doc.setFontSize(8);
+  doc.setTextColor(...COLORS.gris);
+  doc.text('TVA non applicable, art. 293 B du CGI', 105, y, { align: 'center' });
 
-  doc.setFillColor(VIOLET);
-  doc.rect(20, tableTop, 170, 8, 'F');
+  // Footer
+  y = 285;
+  doc.setDrawColor(...COLORS.salmon);
+  doc.line(20, y, 190, y);
+  doc.setFontSize(7);
+  doc.setTextColor(...COLORS.gris);
+  doc.text(`Facture ${numero}`, 25, y + 4);
+  doc.text('Page 1 sur 1', 185, y + 4, { align: 'right' });
+
+  return doc;
+}
+
+// ============================================================
+// FONCTION : GÉNÉRER FACTURE FINALE PDF
+// ============================================================
+export function generateFactureFinale(quote: any, numero: string, emetteur?: any) {
+  const doc = new jsPDF();
+  const em = getEmetteur(emetteur);
+  const date = formatDate(new Date());
+
+  // Header
+  drawHeader(doc, 'Facture', numero, date);
+
+  // Champ "Votre contact"
   doc.setFontSize(9);
-  doc.setTextColor('#FFFFFF');
-  let x = 22;
-  headers.forEach((h, i) => {
-    doc.text(h, x, tableTop + 5.5);
-    x += colWidths[i];
-  });
+  doc.setTextColor(...COLORS.gris);
+  doc.text('Votre contact :', 20, 40);
+  doc.setTextColor(...COLORS.noir);
+  doc.text(em.email + ' | ' + em.tel_fr, 55, 40);
 
-  y = tableTop + 12;
-  doc.setTextColor('#333333');
-  note.lignes.forEach((ligne) => {
-    x = 22;
-    doc.text(ligne.quote_id || '', x, y);
-    x += colWidths[0];
-    doc.text((ligne.client || '').substring(0, 25), x, y);
-    x += colWidths[1];
-    doc.text(`${ligne.montant_ht?.toLocaleString('fr-FR')} €`, x, y);
-    x += colWidths[2];
-    doc.text(`${ligne.taux}%`, x, y);
-    x += colWidths[3];
-    doc.text(`${ligne.commission?.toLocaleString('fr-FR')} €`, x, y);
+  // Émetteur / Destinataire
+  let y = drawParties(doc, em, {
+    nom: quote.client_nom,
+    adresse: quote.client_adresse,
+    pays: 'France',
+    email: quote.client_email,
+    tel: quote.client_tel,
+  }, 45);
+
+  // Info bancaire
+  y = drawBankInfo(doc, em, y);
+
+  // Tableau produits
+  y = drawProductTable(doc, quote.lignes || [], y + 5);
+
+  // Totaux
+  y = drawTotals(doc, quote, y);
+
+  // Mention TVA
+  doc.setFontSize(8);
+  doc.setTextColor(...COLORS.gris);
+  doc.text('TVA non applicable, art. 293 B du CGI', 105, y, { align: 'center' });
+
+  // Footer
+  y = 285;
+  doc.setDrawColor(...COLORS.salmon);
+  doc.line(20, y, 190, y);
+  doc.setFontSize(7);
+  doc.setTextColor(...COLORS.gris);
+  doc.text(`Facture ${numero}`, 25, y + 4);
+  doc.text('Page 1 sur 1', 185, y + 4, { align: 'right' });
+
+  return doc;
+}
+
+// ============================================================
+// FONCTION : GÉNÉRER NOTE DE COMMISSION PDF
+// ============================================================
+export function generateNoteCommission(note: any, emetteur?: any) {
+  const doc = new jsPDF();
+  const em = getEmetteur(emetteur);
+  const date = formatDate(note.createdAt);
+
+  // Header
+  drawHeader(doc, 'Note de Commission', note.numero || note.id, date);
+
+  // Info partenaire
+  let y = 45;
+  doc.setFillColor(...COLORS.violetLight);
+  doc.rect(20, y, 170, 12, 'F');
+  doc.setFontSize(10);
+  doc.setTextColor(...COLORS.salmon);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Partenaire', 25, y + 5);
+  doc.setTextColor(...COLORS.noir);
+  doc.text(note.partenaire_nom || 'Partenaire', 25, y + 10);
+  doc.setFont('helvetica', 'normal');
+  y += 18;
+
+  // Tableau commissions
+  // Header
+  doc.setFillColor(...COLORS.violet);
+  doc.rect(20, y, 170, 8, 'F');
+  doc.setFontSize(9);
+  doc.setTextColor(...COLORS.blanc);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Devis', 25, y + 6);
+  doc.text('Client', 60, y + 6);
+  doc.text('Montant HT', 105, y + 6);
+  doc.text('Taux', 140, y + 6);
+  doc.text('Commission', 165, y + 6);
+  y += 8;
+
+  // Lignes
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(...COLORS.noir);
+  doc.setFontSize(8);
+  (note.lignes || []).forEach((ligne: any, i: number) => {
+    if (i % 2 === 0) {
+      doc.setFillColor(...COLORS.grisClair);
+      doc.rect(20, y, 170, 7, 'F');
+    }
+    doc.setDrawColor(...COLORS.grisBordure);
+    doc.line(20, y + 7, 190, y + 7);
+
+    doc.text(ligne.quote_id || '', 25, y + 5);
+    doc.text((ligne.client || '').substring(0, 20), 60, y + 5);
+    doc.text(formatEUR(ligne.montant_ht), 105, y + 5);
+    doc.text(`${ligne.taux || 0}%`, 140, y + 5);
+    doc.text(formatEUR(ligne.commission), 165, y + 5);
     y += 7;
   });
 
-  // Total
-  y += 10;
-  doc.setDrawColor(BORDER);
-  doc.line(20, y, 190, y);
-  y += 10;
-
-  doc.setFillColor(VIOLET_LIGHT);
-  doc.rect(100, y - 5, 90, 15, 'F');
+  // Total commission
+  y += 5;
+  doc.setFillColor(...COLORS.violetLight);
+  doc.rect(120, y, 70, 10, 'F');
   doc.setFontSize(12);
-  doc.setTextColor(NAVY);
-  doc.text('TOTAL COMMISSION', 105, y + 3);
-  doc.setFontSize(14);
-  doc.text(`${note.total_commission?.toLocaleString('fr-FR')} €`, 165, y + 3);
+  doc.setTextColor(...COLORS.salmon);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Total Commission', 125, y + 7);
+  doc.text(formatEUR(note.total_commission), 185, y + 7, { align: 'right' });
 
-  // Coordonnées bancaires
-  y += 30;
-  doc.setFontSize(9);
-  doc.setTextColor('#666666');
-  doc.text('Paiement à effectuer sur :', 20, y);
-  doc.text(`IBAN: ${emetteur.iban}`, 20, y + 5);
-  doc.text(`SWIFT/BIC: ${emetteur.swift} — ${emetteur.banque}`, 20, y + 10);
+  // Bank info
+  y += 20;
+  doc.setFontSize(8);
+  doc.setTextColor(...COLORS.gris);
+  doc.text('Paiement à effectuer sur :', 25, y);
+  doc.text('IBAN: ' + em.iban, 25, y + 4);
+  doc.text('SWIFT: ' + em.swift + ' | Bank: ' + em.banque, 25, y + 8);
+
+  // Footer
+  y = 285;
+  doc.setDrawColor(...COLORS.salmon);
+  doc.line(20, y, 190, y);
+  doc.setFontSize(7);
+  doc.setTextColor(...COLORS.gris);
+  doc.text(`Note de commission ${note.numero || note.id}`, 25, y + 4);
+  doc.text('Page 1 sur 1', 185, y + 4, { align: 'right' });
 
   return doc;
-};
+}
 
-// Download helper
-export const downloadPDF = (doc: jsPDF, filename: string) => {
+// ============================================================
+// HELPER : Télécharger le PDF
+// ============================================================
+export function downloadPDF(doc: jsPDF, filename: string) {
   doc.save(filename);
-};
+}

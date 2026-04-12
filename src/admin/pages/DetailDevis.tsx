@@ -12,6 +12,7 @@ import { db } from '../../lib/firebase';
 import { useI18n } from '../../i18n';
 import { getNextNumber } from '../../lib/counters';
 import { OrangeIndicator } from '../../components/OrangeIndicator';
+import { generateDevis, downloadPDF } from '../../lib/pdf-generator';
 
 interface LigneDevis {
   ref: string;
@@ -70,8 +71,22 @@ export default function DetailDevis() {
   const [saving, setSaving] = useState(false);
   const [showAcompteModal, setShowAcompteModal] = useState(false);
   const [acompteMontant, setAcompteMontant] = useState(0);
+  const [emetteurData, setEmetteurData] = useState<any>(null);
 
   const isNew = params?.id === 'nouveau';
+
+  // Load emetteur data
+  useEffect(() => {
+    const fetchEmetteur = async () => {
+      try {
+        const snap = await getDoc(doc(db, 'admin_params', 'emetteur'));
+        if (snap.exists()) setEmetteurData(snap.data());
+      } catch (e) {
+        console.error('Erreur chargement émetteur:', e);
+      }
+    };
+    fetchEmetteur();
+  }, []);
 
   useEffect(() => {
     const load = async () => {
@@ -266,6 +281,17 @@ export default function DetailDevis() {
           >
             {saving ? t('loading') : t('btn.enregistrer')}
           </button>
+          {!isNew && (
+            <button
+              onClick={() => {
+                const pdfDoc = generateDevis(devis, emetteurData);
+                downloadPDF(pdfDoc, `${devis.numero}.pdf`);
+              }}
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+            >
+              PDF
+            </button>
+          )}
         </div>
       </div>
 

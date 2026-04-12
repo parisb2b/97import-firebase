@@ -1,16 +1,19 @@
 import { useState, useEffect } from 'react';
-import { collection, query, orderBy, getDocs } from 'firebase/firestore';
+import { collection, query, orderBy, getDocs, doc, getDoc } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { useI18n } from '../../i18n';
 import { SortControl } from '../../components/SortControl';
+import { generateNoteCommission, downloadPDF } from '../../lib/pdf-generator';
 
 interface Commission {
   id: string;
   numero: string;
   partenaire_id: string;
   partenaire_nom: string;
+  partenaire_code?: string;
   total_commission: number;
   statut: string;
+  lignes?: any[];
   createdAt: any;
 }
 
@@ -19,6 +22,25 @@ export default function NotesCommission() {
   const [commissions, setCommissions] = useState<Commission[]>([]);
   const [loading, setLoading] = useState(true);
   const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
+  const [emetteurData, setEmetteurData] = useState<any>(null);
+
+  // Load emetteur data
+  useEffect(() => {
+    const fetchEmetteur = async () => {
+      try {
+        const snap = await getDoc(doc(db, 'admin_params', 'emetteur'));
+        if (snap.exists()) setEmetteurData(snap.data());
+      } catch (e) {
+        console.error('Erreur chargement émetteur:', e);
+      }
+    };
+    fetchEmetteur();
+  }, []);
+
+  const handleDownloadPDF = (commission: Commission) => {
+    const pdfDoc = generateNoteCommission(commission, emetteurData);
+    downloadPDF(pdfDoc, `${commission.numero}.pdf`);
+  };
 
   useEffect(() => {
     const timeout = setTimeout(() => setLoading(false), 3000);
@@ -66,6 +88,7 @@ export default function NotesCommission() {
                 <th className="text-left px-4 py-3 font-medium">Partenaire</th>
                 <th className="text-left px-4 py-3 font-medium">Statut</th>
                 <th className="text-right px-4 py-3 font-medium">Commission</th>
+                <th className="px-4 py-3 font-medium">PDF</th>
               </tr>
             </thead>
             <tbody>
@@ -86,6 +109,15 @@ export default function NotesCommission() {
                   </td>
                   <td className="px-4 py-3 text-right font-medium text-purple-600">
                     {c.total_commission?.toLocaleString('fr-FR')} €
+                  </td>
+                  <td className="px-4 py-3 text-center">
+                    <button
+                      onClick={() => handleDownloadPDF(c)}
+                      className="text-blue-600 hover:text-blue-800 hover:underline"
+                      title="Télécharger PDF"
+                    >
+                      PDF
+                    </button>
                   </td>
                 </tr>
               ))}
