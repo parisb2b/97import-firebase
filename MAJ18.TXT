@@ -195,3 +195,61 @@ dist/assets/index-BRDG42C2.js            1,237.49 kB │ gzip: 340.83 kB
 - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
 - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
 ✓ built in 1.75s
+
+=== ÉTAPE 10 — TESTS FINAUX — dim. 12 avr. 2026 11:05:33 CEST ===
+  / → HTTP 200
+  /admin → HTTP 200
+  /admin/devis → HTTP 200
+  /admin/devis/DVS-2604201 → HTTP 200
+  /admin/devis/DVS-2604202 → HTTP 200
+  /admin/devis/DVS-2604205 → HTTP 200
+  /admin/factures → HTTP 200
+  /admin/commissions → HTTP 200
+  /admin/conteneurs → HTTP 200
+  /admin/stock → HTTP 200
+  /admin/sav → HTTP 200
+  /admin/produits → HTTP 200
+  /admin/clients → HTTP 200
+  /admin/partenaires → HTTP 200
+
+--- Firestore ---
+  admin_params : 2 docs
+  profiles : 5 docs
+  products : 6 docs
+  partners : 3 docs
+  quotes : 5 docs
+  invoices : 3 docs
+  containers : 2 docs
+  commissions : 2 docs
+  sav : 2 docs
+  stock : 3 docs
+
+=== RAPPORT FINAL v18 ===
+
+OBJECTIF : Correction définitive du back-office
+FIREBASE : importok-6ef77 (seul projet actif)
+URL : https://97import-firebase-git-v2-parisb2bs-projects.vercel.app
+
+CORRECTIONS APPLIQUÉES :
+1. Purge totale Firestore (34 documents supprimés)
+2. Seed propre avec timestamps Firestore (createdAt: timestampValue)
+3. IDs = numeros (DVS-2604201 à 205)
+4. ListeDevis.tsx : suppression demo data, ajout état vide
+5. pdf-generator.ts : couleurs OK (salmon #C87F6B, violet #9B8BBA)
+6. Build OK (1.75s)
+7. Déployé sur v2
+
+DONNÉES FIRESTORE :
+- admin_params: 2 (global, emetteur)
+- profiles: 5 (CLI-001 à CLI-005)
+- products: 6
+- partners: 3 (PART-JM, PART-TD, PART-MC)
+- quotes: 5 (DVS-2604201 à DVS-2604205)
+- invoices: 3 (FA-2604201, FA-2604202, F-2604201)
+- containers: 2 (CTN-2604201, CTN-2604202)
+- commissions: 2 (NC-2604201, NC-2604202)
+- sav: 2 (SAV-2604201, SAV-2604202)
+- stock: 3 (STK-001 à STK-003)
+TOTAL: 33 documents
+
+FIN DU RAPPORT v18
