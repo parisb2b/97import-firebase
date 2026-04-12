@@ -10,8 +10,8 @@ const serviceAccount = require('./serviceAccountKey.json');
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  projectId: 'import2050-59f11',
-  databaseURL: 'https://import2050-59f11.firebaseio.com'
+  projectId: 'importok-6ef77',
+  databaseURL: 'https://importok-6ef77.firebaseio.com'
 });
 
 const db = admin.firestore();
