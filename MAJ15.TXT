@@ -2,3 +2,37 @@
 Date: 2026-04-12 10:43
 Backup tag: backup-20260412-1043
 
+=== PHASE 1 : NETTOYAGE ===
+- .env.production : import2050-59f11 → importok-6ef77
+- scripts/seed-firestore.js : projectId corrigé
+- serviceAccountKey.json : déjà dans .gitignore (ancien projet supprimé)
+- Scan final : "Aucune occurrence - CLEAN!"
+- Commit : f671fa1
+
+=== PHASE 2 : PURGE + SEED SÉRIE 200 ===
+PURGE COLLECTIONS :
+- quotes: 1 doc supprimé
+- invoices: 1 doc supprimé
+- commissions: 1 doc supprimé
+- sav: 1 doc supprimé
+- stock: 1 doc supprimé
+- containers: 1 doc supprimé
+- profiles: 1 doc supprimé
+- partners: 1 doc supprimé
+- products: 1 doc supprimé
+
+NOUVEAU SEED (série 200) :
+- admin_params: 2 (emetteur, global)
+- profiles: 5 (Jean Dupont, Marie Martin, Pierre Bernard, Sophie Leblanc VIP, Marc Durand)
+- products: 6 (MP-2604-001/002, MM-2604-001, SOL-2604-001, MA-2604-001, DIV-2604-001)
+- partners: 3 (JM 15%, TD 12%, MC 10%)
+- quotes: 5 (DVS-2604201 à DVS-2604205 avec lignes complètes)
+- invoices: 3 (FA-2604201, FA-2604202, F-2604201)
+- containers: 2 (CTN-2604201, CTN-2604202)
+- commissions: 2 (NC-2604201, NC-2604202 avec lignes)
+- sav: 2 (SAV-2604201, SAV-2604202)
+- stock: 3 (STK-2604201 à STK-2604203)
+TOTAL: 33 documents créés
+
+BUILD: OK (1.78s)
+

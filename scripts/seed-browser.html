@@ -17,8 +17,8 @@
     </style>
 </head>
 <body>
-    <h1>Firestore Seed v13 - 97import</h1>
-    <p>Purge + Nouveau seed avec numeros DVS-2604101+</p>
+    <h1>Firestore Seed v15 - 97import</h1>
+    <p>Purge + Nouveau seed avec numeros DVS-2604201+ (serie 200)</p>
 
     <button id="btnSeed" onclick="runFullSeed()">Purge + Seed Complet</button>
     <button onclick="testConnectivity()">Test Connectivite</button>
@@ -55,7 +55,7 @@
             const btn = document.getElementById('btnSeed');
             btn.disabled = true;
             logEl.innerHTML = '';
-            log('DEMARRAGE PURGE + SEED v13...', 'info');
+            log('DEMARRAGE PURGE + SEED v15...', 'info');
 
             try {
                 // 1. Auth
@@ -148,7 +148,7 @@
                 log(`PURGE TERMINEE: ${totalDeleted} documents supprimes`, 'success');
 
                 // 3. SEED with new numbering
-                log('\n3. CREATION NOUVEAU SEED (DVS-2604101+)...', 'info');
+                log('\n3. CREATION NOUVEAU SEED (DVS-2604201+ serie 200)...', 'info');
                 const now = new Date().toISOString();
                 let count = 0;
 
@@ -213,7 +213,7 @@
                 log('\nQuotes (avec lignes)...');
                 const quotes = [
                     {
-                        id: 'DVS-2604101', numero: 'DVS-2604101',
+                        id: 'DVS-2604201', numero: 'DVS-2604201',
                         client_id: 'client-jean-dupont', client_nom: 'Jean Dupont', client_email: 'jean.dupont@gmail.com', client_tel: '+596 696 001 001', client_adresse: '12 rue des Caraibes, 97200 Fort-de-France',
                         destination: 'MQ', statut: 'envoye',
                         lignes: [
@@ -223,7 +223,7 @@
                         total_ht: 17650, acompte_pct: 30, total_encaisse: 0, solde_restant: 17650
                     },
                     {
-                        id: 'DVS-2604102', numero: 'DVS-2604102',
+                        id: 'DVS-2604202', numero: 'DVS-2604202',
                         client_id: 'client-marie-martin', client_nom: 'Marie Martin', client_email: 'marie.martin@gmail.com', client_tel: '+590 690 002 002', client_adresse: '5 avenue du Port, 97100 Basse-Terre',
                         destination: 'GP', statut: 'accepte',
                         lignes: [
@@ -232,7 +232,7 @@
                         total_ht: 21740, acompte_pct: 30, total_encaisse: 6522, solde_restant: 15218
                     },
                     {
-                        id: 'DVS-2604103', numero: 'DVS-2604103',
+                        id: 'DVS-2604203', numero: 'DVS-2604203',
                         client_id: 'client-pierre-bernard', client_nom: 'Pierre Bernard', client_email: 'pierre.bernard@gmail.com', client_tel: '+262 692 003 003', client_adresse: '8 chemin des Letchis, 97490 Sainte-Clotilde',
                         destination: 'RE', statut: 'brouillon',
                         lignes: [
@@ -241,7 +241,7 @@
                         total_ht: 6522, acompte_pct: 30, total_encaisse: 0, solde_restant: 6522
                     },
                     {
-                        id: 'DVS-2604104', numero: 'DVS-2604104',
+                        id: 'DVS-2604204', numero: 'DVS-2604204',
                         client_id: 'client-sophie-leblanc', client_nom: 'Sophie Leblanc', client_email: 'sophie.leblanc@gmail.com', client_tel: '+596 696 004 004', client_adresse: '25 boulevard du Commerce, 97232 Le Lamentin', client_siret: '12345678901234',
                         destination: 'MQ', statut: 'accepte', is_vip: true, partenaire_id: 'jm',
                         lignes: [
@@ -251,7 +251,7 @@
                         total_ht: 16372, acompte_pct: 30, total_encaisse: 4912, solde_restant: 11460
                     },
                     {
-                        id: 'DVS-2604105', numero: 'DVS-2604105',
+                        id: 'DVS-2604205', numero: 'DVS-2604205',
                         client_id: 'client-marc-durand', client_nom: 'Marc Durand', client_email: 'marc.durand@gmail.com', client_tel: '+594 694 005 005', client_adresse: '3 place de la Liberte, 97300 Cayenne',
                         destination: 'GF', statut: 'livre',
                         lignes: [
@@ -269,9 +269,9 @@
                 // Invoices
                 log('\nInvoices...');
                 const invoices = [
-                    { id: 'FA-2604101', numero: 'FA-2604101', type: 'acompte', quote_id: 'DVS-2604102', montant: 6522, client_nom: 'Marie Martin' },
-                    { id: 'FA-2604102', numero: 'FA-2604102', type: 'acompte', quote_id: 'DVS-2604104', montant: 4912, client_nom: 'Sophie Leblanc' },
-                    { id: 'F-2604101', numero: 'F-2604101', type: 'facture', quote_id: 'DVS-2604105', montant: 12280, client_nom: 'Marc Durand' },
+                    { id: 'FA-2604201', numero: 'FA-2604201', type: 'acompte', quote_id: 'DVS-2604202', montant: 6522, client_nom: 'Marie Martin' },
+                    { id: 'FA-2604202', numero: 'FA-2604202', type: 'acompte', quote_id: 'DVS-2604204', montant: 4912, client_nom: 'Sophie Leblanc' },
+                    { id: 'F-2604201', numero: 'F-2604201', type: 'facture', quote_id: 'DVS-2604205', montant: 12280, client_nom: 'Marc Durand' },
                 ];
                 for (const inv of invoices) {
                     const { id, ...data } = inv;
@@ -281,51 +281,51 @@
 
                 // Containers
                 log('\nContainers...');
-                await writeDoc('containers', 'CTN-2604101', { numero: 'CTN-2604101', type: '40ft-HC', destination: 'MQ', statut: 'preparation', port_chargement: 'NINGBO', devis_ids: ['DVS-2604101', 'DVS-2604104'], createdAt: now });
-                log('  CTN-2604101 OK', 'success'); count++;
-                await writeDoc('containers', 'CTN-2604102', { numero: 'CTN-2604102', type: '20ft', destination: 'GP', statut: 'charge', port_chargement: 'SHANGHAI', devis_ids: ['DVS-2604102'], createdAt: now });
-                log('  CTN-2604102 OK', 'success'); count++;
+                await writeDoc('containers', 'CTN-2604201', { numero: 'CTN-2604201', type: '40ft-HC', destination: 'MQ', statut: 'preparation', port_chargement: 'NINGBO', devis_ids: ['DVS-2604201', 'DVS-2604204'], createdAt: now });
+                log('  CTN-2604201 OK', 'success'); count++;
+                await writeDoc('containers', 'CTN-2604202', { numero: 'CTN-2604202', type: '20ft', destination: 'GP', statut: 'charge', port_chargement: 'SHANGHAI', devis_ids: ['DVS-2604202'], createdAt: now });
+                log('  CTN-2604202 OK', 'success'); count++;
 
                 // Commissions with lignes
                 log('\nCommissions...');
-                await writeDoc('commissions', 'NC-2604101', {
-                    numero: 'NC-2604101',
+                await writeDoc('commissions', 'NC-2604201', {
+                    numero: 'NC-2604201',
                     partenaire_id: 'jm', partenaire_nom: 'Jean-Marc Delacroix', partenaire_code: 'JM',
                     lignes: [
-                        { quote_id: 'DVS-2604104', client: 'Sophie Leblanc', montant_ht: 16372, taux: 15, commission: 2456 }
+                        { quote_id: 'DVS-2604204', client: 'Sophie Leblanc', montant_ht: 16372, taux: 15, commission: 2456 }
                     ],
                     total_commission: 2456,
                     statut: 'due',
                     createdAt: now
                 });
-                log('  NC-2604101 OK', 'success'); count++;
-                await writeDoc('commissions', 'NC-2604102', {
-                    numero: 'NC-2604102',
+                log('  NC-2604201 OK', 'success'); count++;
+                await writeDoc('commissions', 'NC-2604202', {
+                    numero: 'NC-2604202',
                     partenaire_id: 'td', partenaire_nom: 'Thomas Dupont', partenaire_code: 'TD',
                     lignes: [
-                        { quote_id: 'DVS-2604105', client: 'Marc Durand', montant_ht: 12280, taux: 12, commission: 1474 }
+                        { quote_id: 'DVS-2604205', client: 'Marc Durand', montant_ht: 12280, taux: 12, commission: 1474 }
                     ],
                     total_commission: 1474,
                     statut: 'payee',
                     createdAt: now
                 });
-                log('  NC-2604102 OK', 'success'); count++;
+                log('  NC-2604202 OK', 'success'); count++;
 
                 // SAV
                 log('\nSAV...');
-                await writeDoc('sav', 'SAV-2604101', { numero: 'SAV-2604101', client_id: 'client-jean-dupont', client_nom: 'Jean Dupont', produit_ref: 'MP-2604-001', description: 'Chenille droite abimee lors du transport', statut: 'nouveau', priorite: 'haute', createdAt: now });
-                log('  SAV-2604101 OK', 'success'); count++;
-                await writeDoc('sav', 'SAV-2604102', { numero: 'SAV-2604102', client_id: 'client-sophie-leblanc', client_nom: 'Sophie Leblanc', produit_ref: 'MP-2604-002', description: 'Fuite hydraulique sur verin de fleche', statut: 'en_cours', priorite: 'normale', createdAt: now });
-                log('  SAV-2604102 OK', 'success'); count++;
+                await writeDoc('sav', 'SAV-2604201', { numero: 'SAV-2604201', client_id: 'client-jean-dupont', client_nom: 'Jean Dupont', produit_ref: 'MP-2604-001', description: 'Chenille droite abimee lors du transport', statut: 'nouveau', priorite: 'haute', createdAt: now });
+                log('  SAV-2604201 OK', 'success'); count++;
+                await writeDoc('sav', 'SAV-2604202', { numero: 'SAV-2604202', client_id: 'client-sophie-leblanc', client_nom: 'Sophie Leblanc', produit_ref: 'MP-2604-002', description: 'Fuite hydraulique sur verin de fleche', statut: 'en_cours', priorite: 'normale', createdAt: now });
+                log('  SAV-2604202 OK', 'success'); count++;
 
                 // Stock
                 log('\nStock...');
-                await writeDoc('stock', 'STK-2604101', { ref_piece: 'STK-2604101', nom: 'Chenille caoutchouc 230mm', compatible: ['MP-2604-001', 'MP-2604-002'], qte: 4, seuil_alerte: 2, prix_unitaire: 450, createdAt: now });
-                log('  STK-2604101 OK', 'success'); count++;
-                await writeDoc('stock', 'STK-2604102', { ref_piece: 'STK-2604102', nom: 'Joint hydraulique verin', compatible: ['MP-2604-001', 'MP-2604-002'], qte: 12, seuil_alerte: 5, prix_unitaire: 35, createdAt: now });
-                log('  STK-2604102 OK', 'success'); count++;
-                await writeDoc('stock', 'STK-2604103', { ref_piece: 'STK-2604103', nom: 'Godet standard 60cm', compatible: ['MP-2604-001'], qte: 2, seuil_alerte: 1, prix_unitaire: 380, createdAt: now });
-                log('  STK-2604103 OK', 'success'); count++;
+                await writeDoc('stock', 'STK-2604201', { ref_piece: 'STK-2604201', nom: 'Chenille caoutchouc 230mm', compatible: ['MP-2604-001', 'MP-2604-002'], qte: 4, seuil_alerte: 2, prix_unitaire: 450, createdAt: now });
+                log('  STK-2604201 OK', 'success'); count++;
+                await writeDoc('stock', 'STK-2604202', { ref_piece: 'STK-2604202', nom: 'Joint hydraulique verin', compatible: ['MP-2604-001', 'MP-2604-002'], qte: 12, seuil_alerte: 5, prix_unitaire: 35, createdAt: now });
+                log('  STK-2604202 OK', 'success'); count++;
+                await writeDoc('stock', 'STK-2604203', { ref_piece: 'STK-2604203', nom: 'Godet standard 60cm', compatible: ['MP-2604-001'], qte: 2, seuil_alerte: 1, prix_unitaire: 380, createdAt: now });
+                log('  STK-2604203 OK', 'success'); count++;
 
                 // Partners
                 log('\nPartners...');
@@ -341,7 +341,7 @@
                 }
 
                 log(`\n========================================`, 'success');
-                log(`SEED v13 TERMINE ! ${count} documents crees.`, 'success');
+                log(`SEED v15 TERMINE ! ${count} documents crees.`, 'success');
                 log(`========================================`, 'success');
 
             } catch (e) {
