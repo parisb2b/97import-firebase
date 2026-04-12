@@ -4,6 +4,7 @@ import { Link } from 'wouter';
 import { db } from '../../lib/firebase';
 import { scoreCompletude } from '../../components/OrangeIndicator';
 import { Card, Button, Pill, IconButton, EditIcon, ExcelIcon } from '../components/Icons';
+import { exportCatalogueExcel } from '../../lib/excel-generator';
 
 interface Product {
   id: string;
@@ -142,7 +143,7 @@ export default function CatalogueProduits() {
           tooltip="Export Excel 69col."
           variant="xl"
           size="lg"
-          onClick={() => alert('Export catalogue Excel')}
+          onClick={() => exportCatalogueExcel(filtered)}
         />
         <Link href="/admin/produits/nouveau">
           <Button variant="p">➕ Ajouter produit</Button>

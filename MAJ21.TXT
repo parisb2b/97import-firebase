@@ -1,0 +1,70 @@
+============================================================
+MAJ21 — RAPPORT DE MISE À JOUR v21
+Date : 2026-04-13
+============================================================
+
+## FICHIERS MODIFIÉS
+
+1. src/index.css — Migration Tailwind v4 (@import + @theme)
+2. tailwind.config.js — SUPPRIMÉ (obsolète Tailwind v3)
+3. src/lib/pdf-generator.ts — Fix import jsPDF + downloadPDF Blob
+4. src/lib/excel-generator.ts — Ajout exportCatalogueExcel()
+5. src/admin/pages/ListeDevis.tsx — Boutons PDF/Encaisser connectés
+6. src/admin/pages/DetailDevis.tsx — Debug console.log PDF + fix hover
+7. src/admin/pages/CatalogueProduits.tsx — Export Excel connecté
+8. src/admin/AdminLogin.tsx — hover:bg-opacity-90 → hover:bg-navy-dark
+9. src/admin/components/ProductForm.tsx — hover:bg-opacity-90 → hover:bg-navy-dark
+10. src/admin/pages/DetailConteneur.tsx — hover:bg-opacity-90 → hover:bg-navy-dark
+11. src/admin/pages/ListeConteneurs.tsx — hover:bg-opacity-90 → hover:bg-navy-dark
+12. src/admin/pages/NouveauConteneur.tsx — hover:bg-opacity-90 → hover:bg-navy-dark
+13. src/admin/pages/Parametres.tsx — hover:bg-opacity-90 → hover:bg-navy-dark
+14. src/admin/pages/Partenaires.tsx — hover:bg-opacity-90 → hover:bg-navy-dark
+15. src/admin/pages/SAVDetail.tsx — hover:bg-opacity-90 → hover:bg-navy-dark
+16. src/admin/pages/Stock.tsx — hover:bg-opacity-90 → hover:bg-navy-dark
+17. src/admin/pages/TauxRMB.tsx — hover:bg-opacity-90 → hover:bg-navy-dark
+18. src/front/FrontApp.tsx — hover:bg-opacity-90 → hover:bg-navy-dark
+19. src/front/pages/Connexion.tsx — hover:bg-opacity-90 → hover:bg-navy-dark
+20. src/front/pages/Inscription.tsx — hover:bg-opacity-90 → hover:bg-navy-dark
+21. src/front/pages/Panier.tsx — hover:bg-opacity-90 → hover:bg-navy-dark
+22. src/front/pages/Produit.tsx — hover:bg-opacity-90 → hover:bg-navy-dark
+
+============================================================
+## STATUT PAR PROBLÈME
+
+### P1 — CSS Tailwind v4 ✅
+- index.css migré vers @import "tailwindcss" + @theme
+- 16 fichiers corrigés : hover:bg-opacity-90 → hover:bg-navy-dark
+- tailwind.config.js supprimé
+- Build OK : classes bg-navy, text-navy, from-navy, bg-salmon-light présentes dans CSS compilé
+
+### P2 — PDF ✅
+- Import corrigé : import { jsPDF } from 'jspdf'
+- downloadPDF() remplacé par version Blob robuste
+- Console.log debug ajouté dans DetailDevis.tsx
+- Test téléchargement : à valider en production (build OK)
+
+### P3 — Boutons placeholder ✅
+- ListeDevis.tsx : PDF devis → connecté à generateDevis + downloadPDF
+- ListeDevis.tsx : PDF VIP → connecté (mode VIP)
+- ListeDevis.tsx : Encaisser → redirige vers DetailDevis (modal existante)
+- CatalogueProduits.tsx : Export Excel → connecté à exportCatalogueExcel
+
+============================================================
+## VÉRIFICATIONS BUILD
+
+npm run build : ✅ SUCCÈS (354 modules, 2.12s)
+CSS compilé contient :
+- bg-navy : ✅ oui
+- text-navy : ✅ oui
+- from-navy : ✅ oui
+- bg-salmon-light : ✅ oui
+- hover:bg-navy-dark : ✅ oui
+
+Test PDF : ⚠️ À valider après déploiement (build OK, pas d'erreur TS)
+
+============================================================
+## BOUTONS NON CONNECTÉS (Priorité 4 — non traités dans v21)
+
+- DetailConteneur.tsx : Exporter BL, Packing, Email client/transitaire, Tracking
+- Stock.tsx : "Ajuster stock"
+- Partenaires.tsx : "Ajouter partenaire"

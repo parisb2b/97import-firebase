@@ -44,7 +44,7 @@ export default function Stock() {
         <h1 className="text-2xl font-bold">{t('nav.stock')}</h1>
         <div className="flex items-center gap-4">
           <SortControl value={sortOrder} onChange={setSortOrder} />
-          <button className="bg-navy text-white px-4 py-2 rounded hover:bg-opacity-90">
+          <button className="bg-navy text-white px-4 py-2 rounded hover:bg-navy-dark">
             {t('btn.nouveau')}
           </button>
         </div>

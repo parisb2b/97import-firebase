@@ -93,7 +93,7 @@ export default function TauxRMB() {
           <button
             onClick={handleRefresh}
             disabled={refreshing}
-            className="mt-4 w-full bg-navy text-white py-2 rounded hover:bg-opacity-90 disabled:opacity-50"
+            className="mt-4 w-full bg-navy text-white py-2 rounded hover:bg-navy-dark disabled:opacity-50"
           >
             {refreshing ? 'Actualisation...' : 'Actualiser maintenant'}
           </button>

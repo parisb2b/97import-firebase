@@ -103,7 +103,7 @@ export default function NouveauConteneur() {
           <button
             type="submit"
             disabled={saving}
-            className="px-4 py-2 bg-navy text-white rounded hover:bg-opacity-90 disabled:opacity-50"
+            className="px-4 py-2 bg-navy text-white rounded hover:bg-navy-dark disabled:opacity-50"
           >
             {saving ? t('loading') : t('btn.enregistrer')}
           </button>

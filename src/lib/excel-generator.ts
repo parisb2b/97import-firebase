@@ -412,6 +412,25 @@ export const generateBDInvoiceExcel = (container: Container): XLSX.WorkBook => {
   return wb;
 };
 
+// CATALOGUE PRODUITS — Export Excel
+export const exportCatalogueExcel = (products: any[]) => {
+  const wb = XLSX.utils.book_new();
+
+  const data = products.map((p) => ({
+    'Référence': p.numero_interne || '',
+    'Nom FR': p.nom_fr || '',
+    'Nom CN': p.nom_cn || '',
+    'Catégorie': p.categorie || '',
+    'Prix achat CNY': p.prix_achat_cny || 0,
+    'Prix public EUR': p.prix_public_eur || 0,
+    'Actif': p.actif ? 'Oui' : 'Non',
+  }));
+
+  const ws = XLSX.utils.json_to_sheet(data);
+  XLSX.utils.book_append_sheet(wb, ws, 'Catalogue');
+  XLSX.writeFile(wb, `catalogue-97import-${new Date().toISOString().slice(0, 10)}.xlsx`);
+};
+
 // Download helper
 export const downloadExcel = (wb: XLSX.WorkBook, filename: string) => {
   XLSX.writeFile(wb, filename);

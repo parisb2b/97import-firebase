@@ -277,13 +277,14 @@ export default function DetailDevis() {
           <button
             onClick={handleSave}
             disabled={saving}
-            className="bg-navy text-white px-4 py-2 rounded hover:bg-opacity-90 disabled:opacity-50"
+            className="bg-navy text-white px-4 py-2 rounded hover:bg-navy-dark disabled:opacity-50"
           >
             {saving ? t('loading') : t('btn.enregistrer')}
           </button>
           {!isNew && (
             <button
               onClick={() => {
+                console.log('PDF data:', JSON.stringify(devis, null, 2));
                 const pdfDoc = generateDevis(devis, emetteurData);
                 downloadPDF(pdfDoc, `${devis.numero}.pdf`);
               }}

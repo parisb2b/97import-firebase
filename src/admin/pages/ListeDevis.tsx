@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { collection, query, orderBy, getDocs } from 'firebase/firestore';
-import { Link } from 'wouter';
+import { collection, query, orderBy, getDocs, doc, getDoc } from 'firebase/firestore';
+import { Link, useLocation } from 'wouter';
 import { db } from '../../lib/firebase';
+import { generateDevis, downloadPDF } from '../../lib/pdf-generator';
 import {
   Card,
   Button,
@@ -35,6 +36,26 @@ export default function ListeDevis() {
   const [filterStatut, setFilterStatut] = useState('');
   const [filterDest, setFilterDest] = useState('');
   const [filterPartner, setFilterPartner] = useState('');
+  const [, setLocation] = useLocation();
+
+  const handleDownloadDevisPDF = async (devisId: string, isVip = false) => {
+    try {
+      const snap = await getDoc(doc(db, 'quotes', devisId));
+      if (!snap.exists()) { alert('Devis introuvable'); return; }
+      const data = snap.data();
+      const emSnap = await getDoc(doc(db, 'admin_params', 'emetteur'));
+      const emetteur = emSnap.exists() ? emSnap.data() : undefined;
+      console.log('PDF data:', JSON.stringify(data, null, 2));
+      const pdfDoc = generateDevis(data, emetteur);
+      const filename = isVip
+        ? `${data.numero || devisId}-VIP.pdf`
+        : `${data.numero || devisId}.pdf`;
+      downloadPDF(pdfDoc, filename);
+    } catch (err) {
+      console.error('Erreur PDF:', err);
+      alert('Erreur lors de la génération du PDF');
+    }
+  };
 
   useEffect(() => {
     const timeout = setTimeout(() => setLoading(false), 3000);
@@ -231,21 +252,21 @@ export default function ListeDevis() {
                     icon={<DownloadIcon />}
                     tooltip="Devis PDF"
                     variant="dl"
-                    onClick={() => alert('Telecharger Devis PDF')}
+                    onClick={() => handleDownloadDevisPDF(d.id)}
                   />
                   {d.is_vip && (
                     <IconButton
                       icon={<StarIcon />}
                       tooltip="Devis VIP PDF"
                       variant="vip"
-                      onClick={() => alert('Telecharger Devis VIP PDF')}
+                      onClick={() => handleDownloadDevisPDF(d.id, true)}
                     />
                   )}
                   <IconButton
                     icon={<EuroIcon />}
                     tooltip="Encaisser acompte"
                     variant="eur"
-                    onClick={() => alert('Encaisser acompte')}
+                    onClick={() => setLocation(`/admin/devis/${d.id}`)}
                   />
                 </td>
               </tr>

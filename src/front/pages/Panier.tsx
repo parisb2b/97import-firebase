@@ -180,7 +180,7 @@ export default function Panier() {
             <button
               onClick={handleSubmitDevis}
               disabled={submitting}
-              className="w-full bg-navy text-white py-3 rounded-lg font-semibold hover:bg-opacity-90 disabled:opacity-50"
+              className="w-full bg-navy text-white py-3 rounded-lg font-semibold hover:bg-navy-dark disabled:opacity-50"
             >
               {submitting ? t('loading') : t('btn.demander.devis')}
             </button>

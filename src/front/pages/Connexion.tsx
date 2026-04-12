@@ -60,7 +60,7 @@ export default function Connexion() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-navy text-white py-3 rounded-lg font-semibold hover:bg-opacity-90 disabled:opacity-50"
+            className="w-full bg-navy text-white py-3 rounded-lg font-semibold hover:bg-navy-dark disabled:opacity-50"
           >
             {loading ? t('loading') : t('btn.connexion')}
           </button>

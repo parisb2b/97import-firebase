@@ -151,7 +151,7 @@ export default function DetailConteneur() {
           <button
             onClick={handleSave}
             disabled={saving}
-            className="bg-navy text-white px-4 py-2 rounded hover:bg-opacity-90 disabled:opacity-50"
+            className="bg-navy text-white px-4 py-2 rounded hover:bg-navy-dark disabled:opacity-50"
           >
             {saving ? t('loading') : t('btn.enregistrer')}
           </button>

@@ -164,3 +164,14 @@ TEMPLATES PDF :
 - Commission : fonctionnel
 
 Build OK — Commit pushé sur v2
+
+[2026-04-13 01:15] v21 — Tailwind v4 @theme migration + PDF robuste + boutons connectés
+=========================================================================================
+- src/index.css : migration @tailwind → @import "tailwindcss" + @theme (couleurs custom)
+- tailwind.config.js : SUPPRIMÉ (format v3, ignoré par Tailwind v4)
+- 16 fichiers : hover:bg-opacity-90 → hover:bg-navy-dark (syntaxe v4)
+- src/lib/pdf-generator.ts : import { jsPDF } + downloadPDF Blob
+- src/admin/pages/ListeDevis.tsx : 3 boutons placeholder connectés (PDF, VIP, Encaisser)
+- src/admin/pages/CatalogueProduits.tsx : Export Excel connecté
+- src/lib/excel-generator.ts : ajout exportCatalogueExcel()
+- Build : ✅ SUCCÈS | CSS : ✅ toutes classes présentes

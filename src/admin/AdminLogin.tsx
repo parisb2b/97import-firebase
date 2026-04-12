@@ -72,7 +72,7 @@ export default function AdminLogin() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-navy text-white py-2 rounded font-medium hover:bg-opacity-90 disabled:opacity-50"
+              className="w-full bg-navy text-white py-2 rounded font-medium hover:bg-navy-dark disabled:opacity-50"
             >
               {loading ? t('loading') : t('admin.login.submit')}
             </button>

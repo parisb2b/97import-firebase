@@ -190,7 +190,7 @@ export default function Produit() {
           {price !== null && (
             <button
               onClick={addToCart}
-              className="w-full bg-navy text-white py-3 rounded-lg font-semibold hover:bg-opacity-90 mb-4"
+              className="w-full bg-navy text-white py-3 rounded-lg font-semibold hover:bg-navy-dark mb-4"
             >
               {t('btn.ajouter.panier')}
             </button>

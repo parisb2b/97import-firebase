@@ -1,6 +1,11 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --color-navy: #1E3A5F;
+  --color-navy-dark: #0B2545;
+  --color-salmon: #C87F6B;
+  --color-salmon-light: #FBF0ED;
+}
 
 :root {
   --navy: #1E3A5F;
@@ -18,12 +23,10 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
-/* Tooltip custom */
 .tooltip-wrapper {
   position: relative;
   display: inline-block;
 }
-
 .tooltip-text {
   display: none;
   position: absolute;
@@ -38,7 +41,6 @@ body {
   white-space: nowrap;
   z-index: 50;
 }
-
 .tooltip-wrapper:hover .tooltip-text {
   display: block;
 }

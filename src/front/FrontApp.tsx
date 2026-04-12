@@ -79,7 +79,7 @@ export default function FrontApp() {
               </div>
             ) : (
               <Link href="/connexion">
-                <a className="bg-navy text-white px-4 py-2 rounded hover:bg-opacity-90">
+                <a className="bg-navy text-white px-4 py-2 rounded hover:bg-navy-dark">
                   {t('btn.connexion')}
                 </a>
               </Link>
