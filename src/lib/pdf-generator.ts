@@ -1,8 +1,9 @@
 import jsPDF from 'jspdf';
 
-// Couleurs
-const SALMON = '#C87F6B';
-const SALMON_LIGHT = '#FBF0ED';
+// Couleurs (basées sur les PDF de référence D2604001.pdf et F2600031.pdf)
+const SALMON = '#C87F6B';      // Titres (DEVIS, FACTURE)
+const VIOLET = '#9B8BBA';      // En-tête tableau
+const VIOLET_LIGHT = '#F0EDF5';
 const BORDER = '#E5E5E5';
 const NAVY = '#1E3A5F';
 
@@ -106,11 +107,11 @@ export const generateDevis = (quote: Devis, emetteur: Emetteur = DEFAULT_EMETTEU
   const colWidths = [25, 75, 20, 30, 30];
   const headers = ['Réf', 'Désignation', 'Qté', 'PU HT', 'Total HT'];
 
-  // En-tête tableau
-  doc.setFillColor(SALMON_LIGHT);
+  // En-tête tableau (violet comme PDF référence)
+  doc.setFillColor(VIOLET);
   doc.rect(20, tableTop, 170, 8, 'F');
   doc.setFontSize(9);
-  doc.setTextColor(SALMON);
+  doc.setTextColor('#FFFFFF');
   let x = 22;
   headers.forEach((h, i) => {
     doc.text(h, x, tableTop + 5.5);
@@ -211,8 +212,8 @@ export const generateFactureAcompte = (
 
   y += 25;
 
-  // Montant acompte
-  doc.setFillColor(SALMON_LIGHT);
+  // Montant acompte (fond violet clair)
+  doc.setFillColor(VIOLET_LIGHT);
   doc.rect(20, y, 170, 25, 'F');
   y += 10;
 
@@ -283,10 +284,10 @@ export const generateFactureFinale = (
   const colWidths = [25, 75, 20, 30, 30];
   const headers = ['Réf', 'Désignation', 'Qté', 'PU HT', 'Total HT'];
 
-  doc.setFillColor(SALMON_LIGHT);
+  doc.setFillColor(VIOLET);
   doc.rect(20, tableTop, 170, 8, 'F');
   doc.setFontSize(9);
-  doc.setTextColor(SALMON);
+  doc.setTextColor('#FFFFFF');
   let x = 22;
   headers.forEach((h, i) => {
     doc.text(h, x, tableTop + 5.5);
@@ -388,10 +389,10 @@ export const generateNoteCommission = (
   const colWidths = [40, 50, 35, 20, 35];
   const headers = ['N° Devis', 'Client', 'Montant HT', 'Taux', 'Commission'];
 
-  doc.setFillColor(SALMON_LIGHT);
+  doc.setFillColor(VIOLET);
   doc.rect(20, tableTop, 170, 8, 'F');
   doc.setFontSize(9);
-  doc.setTextColor(SALMON);
+  doc.setTextColor('#FFFFFF');
   let x = 22;
   headers.forEach((h, i) => {
     doc.text(h, x, tableTop + 5.5);
@@ -420,7 +421,7 @@ export const generateNoteCommission = (
   doc.line(20, y, 190, y);
   y += 10;
 
-  doc.setFillColor(SALMON_LIGHT);
+  doc.setFillColor(VIOLET_LIGHT);
   doc.rect(100, y - 5, 90, 15, 'F');
   doc.setFontSize(12);
   doc.setTextColor(NAVY);
