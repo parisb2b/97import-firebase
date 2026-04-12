@@ -2,24 +2,26 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Firestore REST Debug - 97import</title>
+    <title>Firestore Seed v13 - 97import</title>
     <style>
         body { font-family: sans-serif; padding: 20px; line-height: 1.6; background: #1a1a2e; color: #eee; }
         h1 { color: #EA580C; }
-        #log { background: #0d0d1a; color: #d4d4d4; padding: 15px; border-radius: 5px; height: 400px; overflow-y: auto; font-family: monospace; white-space: pre-wrap; }
+        #log { background: #0d0d1a; color: #d4d4d4; padding: 15px; border-radius: 5px; height: 500px; overflow-y: auto; font-family: monospace; white-space: pre-wrap; font-size: 12px; }
         .success { color: #4ade80; }
         .error { color: #f87171; }
         .info { color: #60a5fa; }
+        .warn { color: #fbbf24; }
         button { padding: 12px 24px; font-size: 16px; cursor: pointer; background: #EA580C; color: white; border: none; border-radius: 8px; margin: 5px; }
         button:disabled { background: #666; }
+        button.danger { background: #dc2626; }
     </style>
 </head>
 <body>
-    <h1>🔧 Firestore REST Debug</h1>
-    <p>Test REST pur sans SDK Firebase - Diagnostic réseau</p>
+    <h1>Firestore Seed v13 - 97import</h1>
+    <p>Purge + Nouveau seed avec numeros DVS-2604101+</p>
 
-    <button id="btnSeed" onclick="forceSeedRest()">Test Écriture REST</button>
-    <button onclick="testConnectivity()">Test Connectivité</button>
+    <button id="btnSeed" onclick="runFullSeed()">Purge + Seed Complet</button>
+    <button onclick="testConnectivity()">Test Connectivite</button>
     <pre id="log"></pre>
 
     <script>
@@ -36,295 +38,318 @@
             logEl.scrollTop = logEl.scrollHeight;
         }
 
-        // Test de connectivité basique
         async function testConnectivity() {
             logEl.innerHTML = '';
-            log('🔍 Test de connectivité...', 'info');
-
-            // Test Google
+            log('Test de connectivite...', 'info');
             try {
-                log('  → Test google.com...');
-                const t1 = Date.now();
-                await fetch('https://www.google.com', { mode: 'no-cors' });
-                log(`  ✅ Google OK (${Date.now() - t1}ms)`, 'success');
-            } catch (e) {
-                log(`  ❌ Google BLOQUÉ: ${e.message}`, 'error');
-            }
-
-            // Test Firebase Auth
-            try {
-                log('  → Test identitytoolkit.googleapis.com...');
-                const t2 = Date.now();
-                const res = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${API_KEY}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({})
-                });
-                log(`  ✅ Auth API accessible (${Date.now() - t2}ms)`, 'success');
-            } catch (e) {
-                log(`  ❌ Auth API BLOQUÉ: ${e.message}`, 'error');
-            }
-
-            // Test Firestore
-            try {
-                log('  → Test firestore.googleapis.com...');
-                const t3 = Date.now();
                 const res = await fetch(`https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases`, {
                     headers: { 'Content-Type': 'application/json' }
                 });
-                const data = await res.json();
-                log(`  ✅ Firestore API accessible (${Date.now() - t3}ms) - Status: ${res.status}`, 'success');
-                if (data.error) {
-                    log(`     → Réponse: ${data.error.message}`, 'info');
-                }
+                log(`Firestore API: Status ${res.status}`, res.ok ? 'success' : 'error');
             } catch (e) {
-                log(`  ❌ Firestore API BLOQUÉ: ${e.message}`, 'error');
+                log(`Erreur: ${e.message}`, 'error');
             }
         }
 
-        // Seed REST pur
-        async function forceSeedRest() {
+        async function runFullSeed() {
             const btn = document.getElementById('btnSeed');
             btn.disabled = true;
             logEl.innerHTML = '';
-            log('🚀 Démarrage du Seed REST pur...', 'info');
+            log('DEMARRAGE PURGE + SEED v13...', 'info');
 
             try {
-                // 1. Authentification
-                log('\n🔐 Étape 1: Authentification...', 'info');
-                const authStart = Date.now();
-
+                // 1. Auth
+                log('\n1. Authentification...', 'info');
                 const authRes = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${API_KEY}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        email: "parisb2b@gmail.com",
-                        password: "20262026",
-                        returnSecureToken: true
-                    })
+                    body: JSON.stringify({ email: "parisb2b@gmail.com", password: "20262026", returnSecureToken: true })
                 });
-
-                if (!authRes.ok) {
-                    const errData = await authRes.json();
-                    throw new Error(`Auth failed: ${errData.error?.message || authRes.status}`);
-                }
-
+                if (!authRes.ok) throw new Error('Auth failed');
                 const authData = await authRes.json();
                 const token = authData.idToken;
-                log(`✅ Authentifié en ${Date.now() - authStart}ms (UID: ${authData.localId})`, 'success');
+                log(`OK - UID: ${authData.localId}`, 'success');
 
-                // 2. Test écriture simple
-                log('\n📝 Étape 2: Écriture test dans Firestore...', 'info');
+                const baseUrl = `https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/${encodeURIComponent('(default)')}/documents`;
 
-                const testData = {
-                    fields: {
-                        status: { stringValue: "REST_SUCCESS" },
-                        timestamp: { stringValue: new Date().toISOString() },
-                        test: { booleanValue: true }
-                    }
-                };
-
-                const url = `https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/${encodeURIComponent('(default)')}/documents/admin_params/test_rest?key=${API_KEY}`;
-
-                log(`  → URL: ${url.substring(0, 80)}...`);
-                log('  → Envoi PATCH...');
-
-                const writeStart = Date.now();
-                const fireRes = await fetch(url, {
-                    method: 'PATCH',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(testData)
-                });
-
-                const responseTime = Date.now() - writeStart;
-                log(`  → Réponse reçue en ${responseTime}ms (Status: ${fireRes.status})`);
-
-                if (fireRes.ok) {
-                    const result = await fireRes.json();
-                    log(`\n✨ SUCCÈS ! Document créé/mis à jour.`, 'success');
-                    log(`  → Name: ${result.name}`, 'info');
-
-                    // Si le test passe, lancer le seed complet
-                    log('\n🌱 Le test a réussi ! Lancement du seed complet...', 'info');
-                    await fullSeed(token);
-
-                } else {
-                    const errData = await fireRes.json();
-                    log(`\n❌ ERREUR FIRESTORE (${fireRes.status}):`, 'error');
-                    log(JSON.stringify(errData, null, 2), 'error');
+                // Helper: list all docs in collection
+                async function listDocs(collection) {
+                    const url = `${baseUrl}/${collection}?key=${API_KEY}`;
+                    const res = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
+                    if (!res.ok) return [];
+                    const data = await res.json();
+                    return (data.documents || []).map(d => d.name.split('/').pop());
                 }
 
+                // Helper: delete doc
+                async function deleteDoc(collection, docId) {
+                    const url = `${baseUrl}/${collection}/${docId}?key=${API_KEY}`;
+                    await fetch(url, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+                }
+
+                // Helper: write doc
+                async function writeDoc(collection, docId, data) {
+                    const url = `${baseUrl}/${collection}/${docId}?key=${API_KEY}`;
+                    const res = await fetch(url, {
+                        method: 'PATCH',
+                        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ fields: toFirestoreFields(data) })
+                    });
+                    if (!res.ok) {
+                        const err = await res.json();
+                        throw new Error(`${collection}/${docId}: ${err.error?.message || res.status}`);
+                    }
+                    return res.json();
+                }
+
+                function toFirestoreFields(obj) {
+                    const fields = {};
+                    for (const [k, v] of Object.entries(obj)) {
+                        if (v === null || v === undefined) {
+                            fields[k] = { nullValue: null };
+                        } else if (typeof v === 'string') {
+                            fields[k] = { stringValue: v };
+                        } else if (typeof v === 'boolean') {
+                            fields[k] = { booleanValue: v };
+                        } else if (typeof v === 'number') {
+                            fields[k] = Number.isInteger(v) ? { integerValue: String(v) } : { doubleValue: v };
+                        } else if (Array.isArray(v)) {
+                            fields[k] = { arrayValue: { values: v.map(item => {
+                                if (typeof item === 'string') return { stringValue: item };
+                                if (typeof item === 'number') return Number.isInteger(item) ? { integerValue: String(item) } : { doubleValue: item };
+                                if (typeof item === 'object') return { mapValue: { fields: toFirestoreFields(item) } };
+                                return { stringValue: String(item) };
+                            })}};
+                        } else if (typeof v === 'object') {
+                            fields[k] = { mapValue: { fields: toFirestoreFields(v) } };
+                        }
+                    }
+                    return fields;
+                }
+
+                // 2. PURGE all collections
+                log('\n2. PURGE DES COLLECTIONS...', 'warn');
+                const collections = ['quotes', 'invoices', 'commissions', 'sav', 'stock', 'containers', 'profiles', 'partners', 'products'];
+                let totalDeleted = 0;
+
+                for (const coll of collections) {
+                    const docs = await listDocs(coll);
+                    if (docs.length > 0) {
+                        log(`  ${coll}: ${docs.length} docs a supprimer...`, 'warn');
+                        for (const docId of docs) {
+                            await deleteDoc(coll, docId);
+                            totalDeleted++;
+                        }
+                        log(`  ${coll}: PURGE OK`, 'success');
+                    } else {
+                        log(`  ${coll}: vide`, 'info');
+                    }
+                }
+                log(`PURGE TERMINEE: ${totalDeleted} documents supprimes`, 'success');
+
+                // 3. SEED with new numbering
+                log('\n3. CREATION NOUVEAU SEED (DVS-2604101+)...', 'info');
+                const now = new Date().toISOString();
+                let count = 0;
+
+                // Admin params (keep)
+                log('\nAdmin params...');
+                await writeDoc('admin_params', 'global', {
+                    taux_rmb_eur: 7.82,
+                    taux_majoration_user: 2.0,
+                    taux_majoration_partner: 1.2,
+                    acompte_pct_defaut: 30,
+                    delai_validite_devis: 30
+                });
+                log('  global OK', 'success'); count++;
+
+                await writeDoc('admin_params', 'emetteur', {
+                    nom: 'LUXENT LIMITED',
+                    adresse: '2ND FLOOR COLLEGE HOUSE, 17 KING EDWARDS ROAD',
+                    ville: 'RUISLIP HA4 7AE - LONDON',
+                    pays: 'UNITED KINGDOM',
+                    company_number: '14852122',
+                    email: 'luxent@ltd-uk.eu',
+                    tel_cn: '+86 135 6627 1902',
+                    tel_fr: '+33 620 607 448',
+                    iban: 'DE76 2022 0800 0059 5688 30',
+                    swift: 'SXPYDEHH',
+                    banque: 'Banking Circle S.A.'
+                });
+                log('  emetteur OK', 'success'); count++;
+
+                // Profiles (clients)
+                log('\nProfiles...');
+                const profiles = [
+                    { id: 'client-jean-dupont', email: 'jean.dupont@gmail.com', nom: 'Jean Dupont', tel: '+596 696 001 001', adresse: '12 rue des Caraibes', ville: 'Fort-de-France', code_postal: '97200', territoire: 'Martinique', role: 'user' },
+                    { id: 'client-marie-martin', email: 'marie.martin@gmail.com', nom: 'Marie Martin', tel: '+590 690 002 002', adresse: '5 avenue du Port', ville: 'Basse-Terre', code_postal: '97100', territoire: 'Guadeloupe', role: 'user' },
+                    { id: 'client-pierre-bernard', email: 'pierre.bernard@gmail.com', nom: 'Pierre Bernard', tel: '+262 692 003 003', adresse: '8 chemin des Letchis', ville: 'Sainte-Clotilde', code_postal: '97490', territoire: 'La Reunion', role: 'user' },
+                    { id: 'client-sophie-leblanc', email: 'sophie.leblanc@gmail.com', nom: 'Sophie Leblanc', tel: '+596 696 004 004', adresse: '25 boulevard du Commerce', ville: 'Le Lamentin', code_postal: '97232', territoire: 'Martinique', role: 'vip', siret: '12345678901234' },
+                    { id: 'client-marc-durand', email: 'marc.durand@gmail.com', nom: 'Marc Durand', tel: '+594 694 005 005', adresse: '3 place de la Liberte', ville: 'Cayenne', code_postal: '97300', territoire: 'Guyane', role: 'user' },
+                ];
+                for (const p of profiles) {
+                    const { id, ...data } = p;
+                    await writeDoc('profiles', id, { ...data, createdAt: now });
+                    log(`  ${p.nom} OK`, 'success'); count++;
+                }
+
+                // Products
+                log('\nProducts...');
+                const products = [
+                    { id: 'MP-2604-001', numero_interne: 'MP-2604-001', nom_fr: 'Mini-pelle 1.8T', nom_zh: '1.8吨小型挖掘机', categorie: 'mini-pelles', prix_achat_cny: 45000, prix_achat_eur: 5755, actif: true, dimensions: { l: 400, L: 120, h: 230, poids_kg: 1800 } },
+                    { id: 'MP-2604-002', numero_interne: 'MP-2604-002', nom_fr: 'Mini-pelle 2.5T', nom_zh: '2.5吨小型挖掘机', categorie: 'mini-pelles', prix_achat_cny: 58000, prix_achat_eur: 7418, actif: true, dimensions: { l: 450, L: 140, h: 250, poids_kg: 2500 } },
+                    { id: 'MM-2604-001', numero_interne: 'MM-2604-001', nom_fr: 'Maison Modulaire 40m2', nom_zh: '40平方米模块化房屋', categorie: 'maisons-modulaires', prix_achat_cny: 85000, prix_achat_eur: 10870, actif: true, dimensions: { l: 1200, L: 600, h: 280 } },
+                    { id: 'SOL-2604-001', numero_interne: 'SOL-2604-001', nom_fr: 'Kit Solaire 5kW', nom_zh: '5千瓦太阳能套件', categorie: 'solaire', prix_achat_cny: 12000, prix_achat_eur: 1535, actif: true },
+                    { id: 'MA-2604-001', numero_interne: 'MA-2604-001', nom_fr: 'Motoculteur 15CV', nom_zh: '15马力微耕机', categorie: 'machines-agricoles', prix_achat_cny: 8500, prix_achat_eur: 1087, actif: true },
+                    { id: 'DIV-2604-001', numero_interne: 'DIV-2604-001', nom_fr: 'Groupe electrogene 5kVA', nom_zh: '5千伏安发电机', categorie: 'divers', prix_achat_cny: 6000, prix_achat_eur: 768, actif: true },
+                ];
+                for (const p of products) {
+                    const { id, ...data } = p;
+                    await writeDoc('products', id, { ...data, createdAt: now });
+                    log(`  ${p.numero_interne} OK`, 'success'); count++;
+                }
+
+                // Quotes with lignes
+                log('\nQuotes (avec lignes)...');
+                const quotes = [
+                    {
+                        id: 'DVS-2604101', numero: 'DVS-2604101',
+                        client_id: 'client-jean-dupont', client_nom: 'Jean Dupont', client_email: 'jean.dupont@gmail.com', client_tel: '+596 696 001 001', client_adresse: '12 rue des Caraibes, 97200 Fort-de-France',
+                        destination: 'MQ', statut: 'envoye',
+                        lignes: [
+                            { ref: 'MP-2604-001', nom_fr: 'Mini-pelle 1.8T', qte: 1, prix_unitaire: 11510, total: 11510 },
+                            { ref: 'SOL-2604-001', nom_fr: 'Kit Solaire 5kW', qte: 2, prix_unitaire: 3070, total: 6140 }
+                        ],
+                        total_ht: 17650, acompte_pct: 30, total_encaisse: 0, solde_restant: 17650
+                    },
+                    {
+                        id: 'DVS-2604102', numero: 'DVS-2604102',
+                        client_id: 'client-marie-martin', client_nom: 'Marie Martin', client_email: 'marie.martin@gmail.com', client_tel: '+590 690 002 002', client_adresse: '5 avenue du Port, 97100 Basse-Terre',
+                        destination: 'GP', statut: 'accepte',
+                        lignes: [
+                            { ref: 'MM-2604-001', nom_fr: 'Maison Modulaire 40m2', qte: 1, prix_unitaire: 21740, total: 21740 }
+                        ],
+                        total_ht: 21740, acompte_pct: 30, total_encaisse: 6522, solde_restant: 15218
+                    },
+                    {
+                        id: 'DVS-2604103', numero: 'DVS-2604103',
+                        client_id: 'client-pierre-bernard', client_nom: 'Pierre Bernard', client_email: 'pierre.bernard@gmail.com', client_tel: '+262 692 003 003', client_adresse: '8 chemin des Letchis, 97490 Sainte-Clotilde',
+                        destination: 'RE', statut: 'brouillon',
+                        lignes: [
+                            { ref: 'MA-2604-001', nom_fr: 'Motoculteur 15CV', qte: 3, prix_unitaire: 2174, total: 6522 }
+                        ],
+                        total_ht: 6522, acompte_pct: 30, total_encaisse: 0, solde_restant: 6522
+                    },
+                    {
+                        id: 'DVS-2604104', numero: 'DVS-2604104',
+                        client_id: 'client-sophie-leblanc', client_nom: 'Sophie Leblanc', client_email: 'sophie.leblanc@gmail.com', client_tel: '+596 696 004 004', client_adresse: '25 boulevard du Commerce, 97232 Le Lamentin', client_siret: '12345678901234',
+                        destination: 'MQ', statut: 'accepte', is_vip: true, partenaire_id: 'jm',
+                        lignes: [
+                            { ref: 'MP-2604-002', nom_fr: 'Mini-pelle 2.5T', qte: 1, prix_unitaire: 14836, total: 14836 },
+                            { ref: 'DIV-2604-001', nom_fr: 'Groupe electrogene 5kVA', qte: 1, prix_unitaire: 1536, total: 1536 }
+                        ],
+                        total_ht: 16372, acompte_pct: 30, total_encaisse: 4912, solde_restant: 11460
+                    },
+                    {
+                        id: 'DVS-2604105', numero: 'DVS-2604105',
+                        client_id: 'client-marc-durand', client_nom: 'Marc Durand', client_email: 'marc.durand@gmail.com', client_tel: '+594 694 005 005', client_adresse: '3 place de la Liberte, 97300 Cayenne',
+                        destination: 'GF', statut: 'livre',
+                        lignes: [
+                            { ref: 'SOL-2604-001', nom_fr: 'Kit Solaire 5kW', qte: 4, prix_unitaire: 3070, total: 12280 }
+                        ],
+                        total_ht: 12280, acompte_pct: 30, total_encaisse: 12280, solde_restant: 0
+                    },
+                ];
+                for (const q of quotes) {
+                    const { id, ...data } = q;
+                    await writeDoc('quotes', id, { ...data, createdAt: now });
+                    log(`  ${q.numero} OK`, 'success'); count++;
+                }
+
+                // Invoices
+                log('\nInvoices...');
+                const invoices = [
+                    { id: 'FA-2604101', numero: 'FA-2604101', type: 'acompte', quote_id: 'DVS-2604102', montant: 6522, client_nom: 'Marie Martin' },
+                    { id: 'FA-2604102', numero: 'FA-2604102', type: 'acompte', quote_id: 'DVS-2604104', montant: 4912, client_nom: 'Sophie Leblanc' },
+                    { id: 'F-2604101', numero: 'F-2604101', type: 'facture', quote_id: 'DVS-2604105', montant: 12280, client_nom: 'Marc Durand' },
+                ];
+                for (const inv of invoices) {
+                    const { id, ...data } = inv;
+                    await writeDoc('invoices', id, { ...data, createdAt: now });
+                    log(`  ${inv.numero} OK`, 'success'); count++;
+                }
+
+                // Containers
+                log('\nContainers...');
+                await writeDoc('containers', 'CTN-2604101', { numero: 'CTN-2604101', type: '40ft-HC', destination: 'MQ', statut: 'preparation', port_chargement: 'NINGBO', devis_ids: ['DVS-2604101', 'DVS-2604104'], createdAt: now });
+                log('  CTN-2604101 OK', 'success'); count++;
+                await writeDoc('containers', 'CTN-2604102', { numero: 'CTN-2604102', type: '20ft', destination: 'GP', statut: 'charge', port_chargement: 'SHANGHAI', devis_ids: ['DVS-2604102'], createdAt: now });
+                log('  CTN-2604102 OK', 'success'); count++;
+
+                // Commissions with lignes
+                log('\nCommissions...');
+                await writeDoc('commissions', 'NC-2604101', {
+                    numero: 'NC-2604101',
+                    partenaire_id: 'jm', partenaire_nom: 'Jean-Marc Delacroix', partenaire_code: 'JM',
+                    lignes: [
+                        { quote_id: 'DVS-2604104', client: 'Sophie Leblanc', montant_ht: 16372, taux: 15, commission: 2456 }
+                    ],
+                    total_commission: 2456,
+                    statut: 'due',
+                    createdAt: now
+                });
+                log('  NC-2604101 OK', 'success'); count++;
+                await writeDoc('commissions', 'NC-2604102', {
+                    numero: 'NC-2604102',
+                    partenaire_id: 'td', partenaire_nom: 'Thomas Dupont', partenaire_code: 'TD',
+                    lignes: [
+                        { quote_id: 'DVS-2604105', client: 'Marc Durand', montant_ht: 12280, taux: 12, commission: 1474 }
+                    ],
+                    total_commission: 1474,
+                    statut: 'payee',
+                    createdAt: now
+                });
+                log('  NC-2604102 OK', 'success'); count++;
+
+                // SAV
+                log('\nSAV...');
+                await writeDoc('sav', 'SAV-2604101', { numero: 'SAV-2604101', client_id: 'client-jean-dupont', client_nom: 'Jean Dupont', produit_ref: 'MP-2604-001', description: 'Chenille droite abimee lors du transport', statut: 'nouveau', priorite: 'haute', createdAt: now });
+                log('  SAV-2604101 OK', 'success'); count++;
+                await writeDoc('sav', 'SAV-2604102', { numero: 'SAV-2604102', client_id: 'client-sophie-leblanc', client_nom: 'Sophie Leblanc', produit_ref: 'MP-2604-002', description: 'Fuite hydraulique sur verin de fleche', statut: 'en_cours', priorite: 'normale', createdAt: now });
+                log('  SAV-2604102 OK', 'success'); count++;
+
+                // Stock
+                log('\nStock...');
+                await writeDoc('stock', 'STK-2604101', { ref_piece: 'STK-2604101', nom: 'Chenille caoutchouc 230mm', compatible: ['MP-2604-001', 'MP-2604-002'], qte: 4, seuil_alerte: 2, prix_unitaire: 450, createdAt: now });
+                log('  STK-2604101 OK', 'success'); count++;
+                await writeDoc('stock', 'STK-2604102', { ref_piece: 'STK-2604102', nom: 'Joint hydraulique verin', compatible: ['MP-2604-001', 'MP-2604-002'], qte: 12, seuil_alerte: 5, prix_unitaire: 35, createdAt: now });
+                log('  STK-2604102 OK', 'success'); count++;
+                await writeDoc('stock', 'STK-2604103', { ref_piece: 'STK-2604103', nom: 'Godet standard 60cm', compatible: ['MP-2604-001'], qte: 2, seuil_alerte: 1, prix_unitaire: 380, createdAt: now });
+                log('  STK-2604103 OK', 'success'); count++;
+
+                // Partners
+                log('\nPartners...');
+                const partners = [
+                    { id: 'jm', nom: 'Jean-Marc Delacroix', code: 'JM', email: 'jm@partner.fr', tel: '+33 6 12 34 56 78', commission_taux: 15, actif: true },
+                    { id: 'td', nom: 'Thomas Dupont', code: 'TD', email: 'td@partner.fr', tel: '+33 6 23 45 67 89', commission_taux: 12, actif: true },
+                    { id: 'mc', nom: 'Michel Chen', code: 'MC', email: 'mc@partner.fr', tel: '+86 138 1234 5678', commission_taux: 10, actif: true },
+                ];
+                for (const p of partners) {
+                    const { id, ...data } = p;
+                    await writeDoc('partners', id, { ...data, createdAt: now });
+                    log(`  ${p.code} OK`, 'success'); count++;
+                }
+
+                log(`\n========================================`, 'success');
+                log(`SEED v13 TERMINE ! ${count} documents crees.`, 'success');
+                log(`========================================`, 'success');
+
             } catch (e) {
-                log(`\n💥 ERREUR: ${e.message}`, 'error');
+                log(`\nERREUR: ${e.message}`, 'error');
                 console.error(e);
             } finally {
                 btn.disabled = false;
             }
-        }
-
-        // Seed complet
-        async function fullSeed(token) {
-            const baseUrl = `https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/${encodeURIComponent('(default)')}/documents`;
-
-            async function writeDoc(collection, docId, data) {
-                const url = `${baseUrl}/${collection}/${docId}?key=${API_KEY}`;
-                const res = await fetch(url, {
-                    method: 'PATCH',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ fields: toFirestoreFields(data) })
-                });
-                if (!res.ok) {
-                    const err = await res.json();
-                    throw new Error(`${collection}/${docId}: ${err.error?.message || res.status}`);
-                }
-                return res.json();
-            }
-
-            function toFirestoreFields(obj) {
-                const fields = {};
-                for (const [k, v] of Object.entries(obj)) {
-                    if (v === null || v === undefined) {
-                        fields[k] = { nullValue: null };
-                    } else if (typeof v === 'string') {
-                        fields[k] = { stringValue: v };
-                    } else if (typeof v === 'boolean') {
-                        fields[k] = { booleanValue: v };
-                    } else if (typeof v === 'number') {
-                        fields[k] = Number.isInteger(v) ? { integerValue: String(v) } : { doubleValue: v };
-                    } else if (Array.isArray(v)) {
-                        fields[k] = { arrayValue: { values: v.map(item => {
-                            if (typeof item === 'string') return { stringValue: item };
-                            if (typeof item === 'object') return { mapValue: { fields: toFirestoreFields(item) } };
-                            return { stringValue: String(item) };
-                        })}};
-                    } else if (typeof v === 'object') {
-                        fields[k] = { mapValue: { fields: toFirestoreFields(v) } };
-                    }
-                }
-                return fields;
-            }
-
-            const now = new Date().toISOString();
-            let count = 0;
-
-            // Admin params
-            log('\n📋 Admin params...');
-            await writeDoc('admin_params', 'global', { taux_rmb_eur: 7.82, taux_majoration_user: 2.0, taux_majoration_partner: 1.2, acompte_pct_defaut: 30, delai_validite_devis: 30 });
-            log('  ✅ global', 'success'); count++;
-            await writeDoc('admin_params', 'emetteur', { nom: 'LUXENT LIMITED', adresse: '2ND FLOOR COLLEGE HOUSE, 17 KING EDWARDS ROAD', ville: 'RUISLIP HA4 7AE — LONDON', pays: 'UNITED KINGDOM', company_number: '14852122', email: 'luxent@ltd-uk.eu' });
-            log('  ✅ emetteur', 'success'); count++;
-
-            // Clients
-            log('\n👥 Clients...');
-            const clients = [
-                { id: 'client-jean-dupont', email: 'jean.dupont@gmail.com', nom: 'Jean Dupont', tel: '+596 596 001 001', ville: 'Fort-de-France', territoire: 'Martinique', role: 'user' },
-                { id: 'client-marie-martin', email: 'marie.martin@gmail.com', nom: 'Marie Martin', tel: '+590 590 002 002', ville: 'Basse-Terre', territoire: 'Guadeloupe', role: 'user' },
-                { id: 'client-pierre-bernard', email: 'pierre.bernard@gmail.com', nom: 'Pierre Bernard', tel: '+262 262 003 003', ville: 'Sainte-Clotilde', territoire: 'La Réunion', role: 'user' },
-                { id: 'client-sophie-leblanc', email: 'sophie.leblanc@gmail.com', nom: 'Sophie Leblanc', tel: '+596 596 004 004', ville: 'Le Lamentin', territoire: 'Martinique', role: 'vip' },
-                { id: 'client-marc-durand', email: 'marc.durand@gmail.com', nom: 'Marc Durand', tel: '+594 594 005 005', ville: 'Cayenne', territoire: 'Guyane', role: 'user' },
-            ];
-            for (const c of clients) {
-                const { id, ...data } = c;
-                await writeDoc('profiles', id, { ...data, createdAt: now });
-                log(`  ✅ ${c.nom}`, 'success'); count++;
-            }
-
-            // Products
-            log('\n📦 Produits...');
-            const products = [
-                { id: 'TEST-001', numero_interne: 'TEST-001', nom_fr: 'TEST Mini-pelle', categorie: 'mini-pelles', prix_achat_cny: 30000, prix_public_eur: 7672, actif: true },
-                { id: 'TEST-002', numero_interne: 'TEST-002', nom_fr: 'TEST Maison Modulaire', categorie: 'maisons-modulaires', prix_achat_cny: 25000, prix_public_eur: 6394, actif: true },
-                { id: 'TEST-003', numero_interne: 'TEST-003', nom_fr: 'TEST Kit Solaire', categorie: 'solaire', prix_achat_cny: 8000, prix_public_eur: 2046, actif: true },
-                { id: 'TEST-004', numero_interne: 'TEST-004', nom_fr: 'TEST Machine Agricole', categorie: 'machines-agricoles', prix_achat_cny: 3000, prix_public_eur: 768, actif: true },
-                { id: 'TEST-005', numero_interne: 'TEST-005', nom_fr: 'TEST Fret Maritime', categorie: 'services', prix_achat_cny: 9000, prix_public_eur: 2302, actif: true },
-                { id: 'TEST-006', numero_interne: 'TEST-006', nom_fr: 'TEST Article Divers', categorie: 'divers', prix_achat_cny: 1500, prix_public_eur: 384, actif: true },
-            ];
-            for (const p of products) {
-                const { id, ...data } = p;
-                await writeDoc('products', id, { ...data, createdAt: now });
-                log(`  ✅ ${p.numero_interne}`, 'success'); count++;
-            }
-
-            // Quotes
-            log('\n📋 Devis...');
-            const quotes = [
-                { id: 'DVS-2604001', numero: 'DVS-2604001', client_nom: 'Jean Dupont', destination: 'MQ', statut: 'envoyé', total_ht: 9900 },
-                { id: 'DVS-2604002', numero: 'DVS-2604002', client_nom: 'Marie Martin', destination: 'GP', statut: 'accepté', total_ht: 6400 },
-                { id: 'DVS-2604003', numero: 'DVS-2604003', client_nom: 'Pierre Bernard', destination: 'RE', statut: 'brouillon', total_ht: 4100 },
-                { id: 'DVS-2604004', numero: 'DVS-2604004', client_nom: 'Sophie Leblanc', destination: 'MQ', statut: 'en cours', total_ht: 7600, is_vip: true },
-                { id: 'DVS-2604005', numero: 'DVS-2604005', client_nom: 'Marc Durand', destination: 'GF', statut: 'livré', total_ht: 2310 },
-            ];
-            for (const q of quotes) {
-                const { id, ...data } = q;
-                await writeDoc('quotes', id, { ...data, createdAt: now });
-                log(`  ✅ ${q.numero}`, 'success'); count++;
-            }
-
-            // Invoices
-            log('\n🧾 Factures...');
-            const invoices = [
-                { id: 'FA-2604001', numero: 'FA-2604001', type: 'acompte', quote_id: 'DVS-2604001', montant: 2970, client_nom: 'Jean Dupont' },
-                { id: 'FA-2604002', numero: 'FA-2604002', type: 'acompte', quote_id: 'DVS-2604002', montant: 1920, client_nom: 'Marie Martin' },
-                { id: 'FA-2604003', numero: 'FA-2604003', type: 'acompte', quote_id: 'DVS-2604004', montant: 2280, client_nom: 'Sophie Leblanc' },
-                { id: 'F-2604001', numero: 'F-2604001', type: 'facture', quote_id: 'DVS-2604005', montant: 2310, client_nom: 'Marc Durand' },
-            ];
-            for (const inv of invoices) {
-                const { id, ...data } = inv;
-                await writeDoc('invoices', id, { ...data, createdAt: now });
-                log(`  ✅ ${inv.numero}`, 'success'); count++;
-            }
-
-            // Containers
-            log('\n🚢 Conteneurs...');
-            await writeDoc('containers', 'CTN-2604-001', { numero: 'CTN-2604-001', type: '40ft-HC', destination: 'MQ', statut: 'préparation', port_chargement: 'NINGBO', createdAt: now });
-            log('  ✅ CTN-2604-001', 'success'); count++;
-            await writeDoc('containers', 'CTN-2604-002', { numero: 'CTN-2604-002', type: '20ft', destination: 'GP', statut: 'chargé', port_chargement: 'SHANGHAI', createdAt: now });
-            log('  ✅ CTN-2604-002', 'success'); count++;
-
-            // Commissions
-            log('\n💰 Commissions...');
-            await writeDoc('commissions', 'NC-2604001', { numero: 'NC-2604001', partenaire_id: 'jm', partenaire_nom: 'Jean-Marc Delacroix', total_commission: 1485, statut: 'due', createdAt: now });
-            log('  ✅ NC-2604001', 'success'); count++;
-            await writeDoc('commissions', 'NC-2604002', { numero: 'NC-2604002', partenaire_id: 'td', partenaire_nom: 'Thomas Dupont', total_commission: 2100, statut: 'due', createdAt: now });
-            log('  ✅ NC-2604002', 'success'); count++;
-
-            // SAV
-            log('\n🔧 SAV...');
-            await writeDoc('sav', 'SAV-2604001', { numero: 'SAV-2604001', client_nom: 'Jean Dupont', produit_ref: 'TEST-001', description: "Chenille abîmée", statut: 'nouveau', createdAt: now });
-            log('  ✅ SAV-2604001', 'success'); count++;
-            await writeDoc('sav', 'SAV-2604002', { numero: 'SAV-2604002', client_nom: 'Sophie Leblanc', produit_ref: 'TEST-001', description: 'Fuite hydraulique', statut: 'en cours', createdAt: now });
-            log('  ✅ SAV-2604002', 'success'); count++;
-
-            // Stock
-            log('\n📦 Stock...');
-            await writeDoc('stock', 'STK-001', { ref_piece: 'STK-001', nom: 'TEST Chenille caoutchouc', compatible: ['TEST-001'], qte: 2, seuil_alerte: 1, createdAt: now });
-            log('  ✅ STK-001', 'success'); count++;
-            await writeDoc('stock', 'STK-002', { ref_piece: 'STK-002', nom: 'TEST Joint hydraulique', compatible: ['TEST-001', 'TEST-004'], qte: 5, seuil_alerte: 2, createdAt: now });
-            log('  ✅ STK-002', 'success'); count++;
-            await writeDoc('stock', 'STK-003', { ref_piece: 'STK-003', nom: 'TEST Godet 60cm', compatible: ['TEST-001'], qte: 1, seuil_alerte: 1, createdAt: now });
-            log('  ✅ STK-003', 'success'); count++;
-
-            // Partners
-            log('\n🤝 Partenaires...');
-            const partners = [
-                { id: 'jm', nom: 'Jean-Marc Delacroix', code: 'JM', email: 'jm@partner.com', commission_taux: 15, actif: true },
-                { id: 'td', nom: 'Thomas Dupont', code: 'TD', email: 'td@partner.com', commission_taux: 15, actif: true },
-                { id: 'mc', nom: 'Michel Chen', code: 'MC', email: 'mc@partner.com', commission_taux: 12, actif: true },
-                { id: 'al', nom: 'Alice Laurent', code: 'AL', email: 'al@partner.com', commission_taux: 10, actif: true },
-            ];
-            for (const p of partners) {
-                const { id, ...data } = p;
-                await writeDoc('partners', id, { ...data, createdAt: now });
-                log(`  ✅ ${p.code}`, 'success'); count++;
-            }
-
-            log(`\n🎉 SEED TERMINÉ ! ${count} documents créés.`, 'success');
         }
     </script>
 </body>

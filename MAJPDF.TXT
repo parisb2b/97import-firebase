@@ -80,4 +80,43 @@ DONNÉES FIRESTORE :
 - commissions : collection existante
 
 BUILD : OK (1.77s)
+COMMIT : e51cdb5 pushé sur v2
+
+=== PURGE + RESEED v13 — 2026-04-12 08:55 ===
+
+PURGE COLLECTIONS :
+- quotes: PURGE OK
+- invoices: PURGE OK
+- commissions: PURGE OK
+- sav: PURGE OK
+- stock: PURGE OK
+- containers: PURGE OK
+- profiles: PURGE OK
+- partners: PURGE OK
+- products: PURGE OK
+
+NOUVEAU SEED (numerotation 2604101+) :
+- admin_params/emetteur : OK (LUXENT LIMITED complet)
+- admin_params/global : OK (taux RMB 7.82)
+- profiles : 5 docs (Jean Dupont, Marie Martin, Pierre Bernard, Sophie Leblanc VIP, Marc Durand)
+- products : 6 docs (MP-2604-001/002, MM-2604-001, SOL-2604-001, MA-2604-001, DIV-2604-001)
+- quotes : 5 docs (DVS-2604101 a DVS-2604105 avec lignes completes)
+- invoices : 3 docs (FA-2604101, FA-2604102, F-2604101)
+- partners : 3 docs (JM 15%, TD 12%, MC 10%)
+- containers : 2 docs (CTN-2604101, CTN-2604102)
+- commissions : 2 docs (NC-2604101, NC-2604102 avec lignes)
+- sav : 2 docs (SAV-2604101, SAV-2604102)
+- stock : 3 docs (STK-2604101, STK-2604102, STK-2604103)
+
+PDF GENERATOR VERIFIE :
+- salmon: [200, 127, 107] = #C87F6B OK
+- violet: [155, 139, 186] = #9B8BBA OK
+
+SEED-BROWSER.HTML MIS A JOUR :
+- Fonction purge + seed complete
+- Nouveau numerotation (DVS-2604101+, FA-2604101+, NC-2604101+)
+- Lignes completes pour devis et commissions
+
+TOTAL : 31 documents crees
+BUILD : OK
 COMMIT : En cours...
