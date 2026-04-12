@@ -1,0 +1,105 @@
+=== AUDIT PROJETS 97IMPORT — 2026-04-12 09:15 ===
+
+================================================================================
+TABLEAU DES PROJETS ET BRANCHES
+================================================================================
+
+| N | Projet            | Plateforme | Branche | Dernier commit                                      | URL                                                          | Firebase        | Statut                    |
+|---|-------------------|------------|---------|-----------------------------------------------------|--------------------------------------------------------------|-----------------|---------------------------|
+| 1 | 97import-firebase | Vercel     | main    | 2cb9715 Add images + templates + maquette + prompt  | https://97import-firebase.vercel.app                         | import2050-59f11| PRODUCTION - NE PAS TOUCHER |
+| 2 | 97import-firebase | Vercel     | v2      | fc6dcd8 feat: v13 purge + reseed Firestore          | https://97import-firebase-git-v2-parisb2bs-projects.vercel.app | importok-6ef77  | DEVELOPPEMENT ACTIF       |
+| 3 | 97import.com      | IONOS      | -       | -                                                   | https://97import.com                                         | ancien site     | SITE ACTUEL - NE PAS TOUCHER |
+
+================================================================================
+DETAILS TECHNIQUES
+================================================================================
+
+1. BRANCHES GIT :
+   - main (origin/main) : 2cb9715 - version stable ancienne
+   - v2 (origin/v2)     : fc6dcd8 - developpement actif (20+ commits ahead)
+   - master (origin/master) : branche obsolete
+
+2. GIT REMOTE :
+   origin = https://github.com/parisb2b/97import-firebase.git
+
+3. VERCEL CONFIG :
+   - Project ID : prj_pn8tIrpFBTpjKu76tlJrYVUZ6Eba
+   - Org ID     : team_Ke97VF31O6q3c2rdMJTgBjkQ
+   - Project    : 97import-firebase
+   - Auto-deploy: OUI (chaque branche a sa preview)
+
+4. FIREBASE CONFIG :
+   - Code utilise : import.meta.env.VITE_FIREBASE_* (variables Vercel)
+   - .env.local   : import2050-59f11 (pour dev local seulement)
+   - Vercel v2    : importok-6ef77 (configure dans Vercel Environment Variables)
+
+5. STATUT HTTP :
+   - https://97import-firebase.vercel.app : 200 OK
+   - https://97import-firebase-git-v2-parisb2bs-projects.vercel.app : 200 OK
+
+================================================================================
+COMMITS v2 NON MERGES DANS MAIN (20 commits)
+================================================================================
+
+fc6dcd8 feat: v13 purge + reseed Firestore avec nouveaux numeros
+e51cdb5 feat: v13 - PDF couleurs reference, boutons telechargement
+3a458ef fix: gestion erreurs EditProduit/NouveauProduit + couleurs PDF
+c759d3b fix: v12 - anti page blanche, ErrorBoundary, fallbacks
+f1c6ca3 feat: Partie B+C - homepage, catalogue, bouton WhatsApp
+00526aa fix: Partie A - tests back-office, anti page blanche
+e8a4b58 docs: Phase 3 - rapport deploiement production v2
+e766f65 chore: Phase 2 - verification back-office et seed OK
+05fce50 chore: Phase 1 - purge anciennes refs Firebase
+eb8285b fix: remove useFetchStreams
+238d4b8 chore: migrate to new Firebase project importok-6ef77
+... et plus
+
+================================================================================
+ANALYSE CONFIGURATION VERCEL
+================================================================================
+
+SITUATION ACTUELLE :
+- Vercel deploie AUTOMATIQUEMENT chaque branche separement
+- main → https://97import-firebase.vercel.app (PRODUCTION)
+- v2   → https://97import-firebase-git-v2-xxx.vercel.app (PREVIEW)
+
+PROBLEME IDENTIFIE : AUCUN
+- La config est correcte
+- Les travaux v2 ne touchent PAS la production main
+- Chaque branche a son propre deploiement
+
+OPTIONS POUR PASSER v2 EN PRODUCTION :
+1. MERGE v2 → main : fusionner les commits v2 dans main
+   - Commande : git checkout main && git merge v2 && git push origin main
+   - Risque : ecrase le contenu de main actuel
+
+2. CHANGER LA BRANCHE DE PRODUCTION VERCEL :
+   - Dashboard Vercel → Settings → Git → Production Branch → changer "main" en "v2"
+   - Plus sur : ne touche pas a main
+
+3. GARDER v2 EN PREVIEW (recommande pour l'instant) :
+   - Continuer le dev sur v2
+   - Tester sur l'URL preview
+   - Merger dans main quand pret pour production
+
+================================================================================
+ATTENTION
+================================================================================
+
+- Le site 97import.com (IONOS) ne doit JAMAIS etre modifie par les travaux v2
+- La branche main de 97import-firebase est la PRODUCTION Vercel
+- Ne PAS merger v2 dans main sans validation complete
+
+================================================================================
+RECOMMANDATION
+================================================================================
+
+Continuer le developpement sur v2 avec l'URL preview :
+https://97import-firebase-git-v2-parisb2bs-projects.vercel.app
+
+Quand v2 sera valide pour production :
+1. Faire une sauvegarde de main : git tag backup-main-$(date +%Y%m%d)
+2. Merger : git checkout main && git merge v2 && git push origin main
+3. Verifier le deploiement sur https://97import-firebase.vercel.app
+
+FIN DU RAPPORT

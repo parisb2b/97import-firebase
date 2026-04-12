@@ -75,52 +75,8 @@ export default function ListeDevis() {
     return () => clearTimeout(timeout);
   }, []);
 
-  // Demo data if no real data
-  const demoDevis: Devis[] = [
-    {
-      id: 'D2604006',
-      numero: 'D2604006',
-      date: '08/04',
-      client_nom: 'Dupont MQ',
-      partenaire_code: 'JM',
-      destination: 'MQ',
-      produits: 'MP-R22-001',
-      total_ht: 14200,
-      statut: 'vip',
-      is_vip: true,
-      conteneur_ref: 'CTN-2604-001',
-      createdAt: null,
-    },
-    {
-      id: 'D2604007',
-      numero: 'D2604007',
-      date: '10/04',
-      client_nom: 'Martin GP',
-      partenaire_code: 'TD',
-      destination: 'GP',
-      produits: 'MS-20-001',
-      total_ht: 18400,
-      statut: 'en_attente',
-      is_vip: false,
-      createdAt: null,
-    },
-    {
-      id: 'D2604004',
-      numero: 'D2604004',
-      date: '05/04',
-      client_nom: 'Carrera',
-      partenaire_code: 'MC',
-      destination: 'MQ',
-      produits: '+3 produits',
-      total_ht: 8800,
-      statut: 'acompte_1',
-      is_vip: false,
-      conteneur_ref: 'CTN-2604-001',
-      createdAt: null,
-    },
-  ];
-
-  const displayDevis = devis.length > 0 ? devis : demoDevis;
+  // Utiliser directement les vraies données (plus de demo data)
+  const displayDevis = devis;
   const filtered = displayDevis.filter((d) => {
     const matchSearch =
       !search ||
@@ -225,7 +181,13 @@ export default function ListeDevis() {
             </tr>
           </thead>
           <tbody>
-            {filtered.map((d) => (
+            {filtered.length === 0 ? (
+              <tr>
+                <td colSpan={10} style={{ textAlign: 'center', padding: '32px', color: '#666' }}>
+                  Aucun devis trouvé
+                </td>
+              </tr>
+            ) : filtered.map((d) => (
               <tr key={d.id} className="cl">
                 <td>
                   <Link href={`/admin/devis/${d.id}`}>

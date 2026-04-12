@@ -1,0 +1,59 @@
+=== RAPPORT DEPLOIEMENT v14 — 2026-04-12 09:00 ===
+
+VERCEL DEPLOYMENT STATUS :
+- URL : https://97import-firebase-git-v2-parisb2bs-projects.vercel.app/admin
+- HTTP Status : 200 OK (accessible)
+
+GIT LOG (derniers commits) :
+- fc6dcd8 feat: v13 purge + reseed Firestore avec nouveaux numeros  <-- DERNIER
+- e51cdb5 feat: v13 - PDF couleurs reference, boutons telechargement
+- 3a458ef fix: gestion erreurs EditProduit/NouveauProduit + couleurs PDF reference
+- c759d3b fix: v12 - anti page blanche, ErrorBoundary, fallbacks donnees
+- f1c6ca3 feat: Partie B+C - homepage, catalogue, bouton WhatsApp
+
+COMMIT DEPLOYE :
+- Dernier commit : fc6dcd8 (inclut e51cdb5 + purge/reseed)
+- Branche : v2
+- Auto-deploy Vercel : actif
+
+BACK-OFFICE URL CONFIRMEE :
+https://97import-firebase-git-v2-parisb2bs-projects.vercel.app/admin
+
+CONTENU DEPLOYE :
+- PDF Generator avec couleurs salmon #C87F6B + violet #9B8BBA
+- Boutons PDF sur DetailDevis, Factures, NotesCommission
+- Firestore seed v13 (DVS-2604101+, FA-2604101+, NC-2604101+)
+- 31 documents dans Firestore
+
+STATUT : DEPLOIEMENT OK
+
+=== AUDIT COMPLET PROJETS — 2026-04-12 09:15 ===
+
+BRANCHES :
+- main   : 2cb9715 (ancienne version stable)
+- v2     : fc6dcd8 (developpement actif, 20+ commits ahead)
+- master : obsolete
+
+URLS VERCEL :
+| Branche | URL                                                          | HTTP |
+|---------|--------------------------------------------------------------|------|
+| main    | https://97import-firebase.vercel.app                         | 200  |
+| v2      | https://97import-firebase-git-v2-parisb2bs-projects.vercel.app | 200  |
+
+FIREBASE :
+- Production v2 : importok-6ef77 (via Vercel env vars)
+- Local dev     : import2050-59f11 (via .env.local)
+
+CONFIGURATION VERCEL :
+- Auto-deploy : ACTIF pour toutes les branches
+- main = Production
+- v2 = Preview (notre environnement de dev)
+
+PROBLEME : AUCUN
+- Les travaux v2 sont isoles sur la preview
+- main (production) n'est pas affecte
+
+PROCHAINE ETAPE :
+Quand v2 sera pret → merger dans main pour deployer en production
+
+Voir liste-vercel.txt pour le rapport complet.
