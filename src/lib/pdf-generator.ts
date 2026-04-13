@@ -3,7 +3,7 @@ import { jsPDF } from 'jspdf';
 // ============ COULEURS DE RÉFÉRENCE (RGB) ============
 const COLORS = {
   salmon: [200, 127, 107] as const,      // #C87F6B - titres, sections
-  violet: [155, 139, 186] as const,      // #9B8BBA - header tableau
+  violet: [200, 127, 107] as const,      // salmon comme dans les templates validés
   violetLight: [240, 237, 245] as const, // #F0EDF5 - fond acompte
   gris: [102, 102, 102] as const,        // #666666 - labels
   noir: [51, 51, 51] as const,           // #333333 - valeurs

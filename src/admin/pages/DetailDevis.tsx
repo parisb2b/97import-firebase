@@ -13,6 +13,7 @@ import { useI18n } from '../../i18n';
 import { getNextNumber } from '../../lib/counters';
 import { OrangeIndicator } from '../../components/OrangeIndicator';
 import { generateDevis, downloadPDF } from '../../lib/pdf-generator';
+import { Card, Button } from '../components/Icons';
 
 interface LigneDevis {
   ref: string;
@@ -75,7 +76,6 @@ export default function DetailDevis() {
 
   const isNew = params?.id === 'nouveau';
 
-  // Load emetteur data
   useEffect(() => {
     const fetchEmetteur = async () => {
       try {
@@ -234,24 +234,16 @@ export default function DetailDevis() {
   };
 
   if (loading) {
-    return (
-      <div className="p-6">
-        <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-1/3 mb-4"></div>
-          <div className="h-4 bg-gray-200 rounded w-2/3 mb-2"></div>
-          <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-        </div>
-      </div>
-    );
+    return <div style={{ textAlign: 'center', padding: 32 }}>Chargement...</div>;
   }
 
   if (error) {
     return (
-      <div className="p-6">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <h2 className="text-red-800 text-lg font-bold">Erreur</h2>
-          <p className="text-red-600 mt-2">{error}</p>
-          <a href="/admin/devis" className="mt-4 inline-block text-blue-600 underline">
+      <div style={{ padding: 24 }}>
+        <div className="alert rd">
+          <strong>Erreur</strong> — {error}
+          <br />
+          <a href="/admin/devis" style={{ color: 'var(--bl)', marginTop: 8, display: 'inline-block' }}>
             Retour à la liste des devis
           </a>
         </div>
@@ -260,116 +252,65 @@ export default function DetailDevis() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">
+    <>
+      {/* Header */}
+      <div className="filters" style={{ justifyContent: 'space-between' }}>
+        <div className="ct" style={{ fontSize: 18 }}>
           {isNew ? 'Nouveau devis' : devis.numero}
-        </h1>
-        <div className="flex items-center gap-2">
+        </div>
+        <div style={{ display: 'flex', gap: 8 }}>
           {!isNew && devis.statut === 'accepte' && (
-            <button
-              onClick={() => setShowAcompteModal(true)}
-              className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-            >
+            <Button variant="s" onClick={() => setShowAcompteModal(true)}>
               {t('btn.encaisser')}
-            </button>
+            </Button>
           )}
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            className="bg-navy text-white px-4 py-2 rounded hover:bg-navy-dark disabled:opacity-50"
-          >
+          <Button variant="p" onClick={handleSave} disabled={saving}>
             {saving ? t('loading') : t('btn.enregistrer')}
-          </button>
+          </Button>
           {!isNew && (
-            <button
-              onClick={() => {
-                console.log('PDF data:', JSON.stringify(devis, null, 2));
-                const pdfDoc = generateDevis(devis, emetteurData);
-                downloadPDF(pdfDoc, `${devis.numero}.pdf`);
-              }}
-              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-            >
+            <Button variant="t" onClick={() => {
+              console.log('PDF data:', JSON.stringify(devis, null, 2));
+              const pdfDoc = generateDevis(devis, emetteurData);
+              downloadPDF(pdfDoc, `${devis.numero}.pdf`);
+            }}>
               PDF
-            </button>
+            </Button>
           )}
         </div>
       </div>
 
       {/* Client info */}
-      <div className="bg-white rounded-lg shadow p-4">
-        <h2 className="font-semibold mb-4">Informations client</h2>
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Nom
-              <OrangeIndicator show={!devis.client_nom} />
-            </label>
-            <input
-              type="text"
-              value={devis.client_nom}
-              onChange={(e) =>
-                setDevis({ ...devis, client_nom: e.target.value })
-              }
-              className="w-full border rounded px-3 py-2"
-            />
+      <Card title="Informations client">
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, padding: 16 }}>
+          <div className="fg">
+            <div className="fl">Nom <OrangeIndicator show={!devis.client_nom} /></div>
+            <input className="fi" type="text" value={devis.client_nom}
+              onChange={(e) => setDevis({ ...devis, client_nom: e.target.value })} />
           </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Email
-              <OrangeIndicator show={!devis.client_email} />
-            </label>
-            <input
-              type="email"
-              value={devis.client_email}
-              onChange={(e) =>
-                setDevis({ ...devis, client_email: e.target.value })
-              }
-              className="w-full border rounded px-3 py-2"
-            />
+          <div className="fg">
+            <div className="fl">Email <OrangeIndicator show={!devis.client_email} /></div>
+            <input className="fi" type="email" value={devis.client_email}
+              onChange={(e) => setDevis({ ...devis, client_email: e.target.value })} />
           </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Téléphone</label>
-            <input
-              type="tel"
-              value={devis.client_tel}
-              onChange={(e) =>
-                setDevis({ ...devis, client_tel: e.target.value })
-              }
-              className="w-full border rounded px-3 py-2"
-            />
+          <div className="fg">
+            <div className="fl">Téléphone</div>
+            <input className="fi" type="tel" value={devis.client_tel}
+              onChange={(e) => setDevis({ ...devis, client_tel: e.target.value })} />
           </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">SIRET</label>
-            <input
-              type="text"
-              value={devis.client_siret}
-              onChange={(e) =>
-                setDevis({ ...devis, client_siret: e.target.value })
-              }
-              className="w-full border rounded px-3 py-2"
-            />
+          <div className="fg">
+            <div className="fl">SIRET</div>
+            <input className="fi" type="text" value={devis.client_siret}
+              onChange={(e) => setDevis({ ...devis, client_siret: e.target.value })} />
           </div>
-          <div className="col-span-2">
-            <label className="block text-sm font-medium mb-1">Adresse</label>
-            <textarea
-              value={devis.client_adresse}
-              onChange={(e) =>
-                setDevis({ ...devis, client_adresse: e.target.value })
-              }
-              className="w-full border rounded px-3 py-2"
-              rows={2}
-            />
+          <div className="fg" style={{ gridColumn: 'span 2' }}>
+            <div className="fl">Adresse</div>
+            <textarea className="fi" value={devis.client_adresse} rows={2}
+              onChange={(e) => setDevis({ ...devis, client_adresse: e.target.value })} />
           </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Destination</label>
-            <select
-              value={devis.destination}
-              onChange={(e) =>
-                setDevis({ ...devis, destination: e.target.value })
-              }
-              className="w-full border rounded px-3 py-2"
-            >
+          <div className="fg">
+            <div className="fl">Destination</div>
+            <select className="fsel" value={devis.destination}
+              onChange={(e) => setDevis({ ...devis, destination: e.target.value })}>
               <option value="MQ">Martinique</option>
               <option value="GP">Guadeloupe</option>
               <option value="RE">Réunion</option>
@@ -377,13 +318,10 @@ export default function DetailDevis() {
               <option value="FR">France métropolitaine</option>
             </select>
           </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Statut</label>
-            <select
-              value={devis.statut}
-              onChange={(e) => setDevis({ ...devis, statut: e.target.value })}
-              className="w-full border rounded px-3 py-2"
-            >
+          <div className="fg">
+            <div className="fl">Statut</div>
+            <select className="fsel" value={devis.statut}
+              onChange={(e) => setDevis({ ...devis, statut: e.target.value })}>
               <option value="brouillon">Brouillon</option>
               <option value="envoye">Envoyé</option>
               <option value="accepte">Accepté</option>
@@ -392,91 +330,55 @@ export default function DetailDevis() {
             </select>
           </div>
         </div>
-      </div>
+      </Card>
 
       {/* Lignes */}
-      <div className="bg-white rounded-lg shadow p-4">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="font-semibold">Lignes du devis</h2>
-          <button
-            onClick={handleAddLigne}
-            className="text-sm bg-gray-100 px-3 py-1 rounded hover:bg-gray-200"
-          >
-            + Ajouter une ligne
-          </button>
-        </div>
-
+      <Card title="Lignes du devis" actions={
+        <Button variant="o" onClick={handleAddLigne} style={{ fontSize: 12 }}>
+          + Ajouter une ligne
+        </Button>
+      }>
         {devis.lignes.length === 0 ? (
-          <p className="text-gray-500 text-center py-4">Aucune ligne</p>
+          <div style={{ textAlign: 'center', padding: 24, color: 'var(--tx3)' }}>Aucune ligne</div>
         ) : (
-          <table className="w-full text-sm">
+          <table className="admin-table">
             <thead>
-              <tr className="border-b">
-                <th className="text-left py-2">Réf</th>
-                <th className="text-left py-2">Désignation</th>
-                <th className="text-right py-2 w-20">Qté</th>
-                <th className="text-right py-2 w-28">PU HT</th>
-                <th className="text-right py-2 w-28">Total HT</th>
-                <th className="w-10"></th>
+              <tr>
+                <th>Réf</th>
+                <th>Désignation</th>
+                <th style={{ textAlign: 'right', width: 80 }}>Qté</th>
+                <th style={{ textAlign: 'right', width: 110 }}>PU HT</th>
+                <th style={{ textAlign: 'right', width: 110 }}>Total HT</th>
+                <th style={{ width: 40 }}></th>
               </tr>
             </thead>
             <tbody>
               {devis.lignes.map((ligne, index) => (
-                <tr key={index} className="border-b">
-                  <td className="py-2">
-                    <input
-                      type="text"
-                      value={ligne.ref}
-                      onChange={(e) =>
-                        handleLigneChange(index, 'ref', e.target.value)
-                      }
-                      className="w-full border rounded px-2 py-1"
-                    />
+                <tr key={index}>
+                  <td>
+                    <input className="fi" type="text" value={ligne.ref}
+                      onChange={(e) => handleLigneChange(index, 'ref', e.target.value)} />
                   </td>
-                  <td className="py-2">
-                    <input
-                      type="text"
-                      value={ligne.nom_fr}
-                      onChange={(e) =>
-                        handleLigneChange(index, 'nom_fr', e.target.value)
-                      }
-                      className="w-full border rounded px-2 py-1"
-                    />
+                  <td>
+                    <input className="fi" type="text" value={ligne.nom_fr}
+                      onChange={(e) => handleLigneChange(index, 'nom_fr', e.target.value)} />
                   </td>
-                  <td className="py-2">
-                    <input
-                      type="number"
-                      value={ligne.qte}
-                      onChange={(e) =>
-                        handleLigneChange(index, 'qte', Number(e.target.value))
-                      }
-                      className="w-full border rounded px-2 py-1 text-right"
-                      min={1}
-                    />
+                  <td>
+                    <input className="fi" type="number" value={ligne.qte} min={1}
+                      style={{ textAlign: 'right' }}
+                      onChange={(e) => handleLigneChange(index, 'qte', Number(e.target.value))} />
                   </td>
-                  <td className="py-2">
-                    <input
-                      type="number"
-                      value={ligne.prix_unitaire}
-                      onChange={(e) =>
-                        handleLigneChange(
-                          index,
-                          'prix_unitaire',
-                          Number(e.target.value)
-                        )
-                      }
-                      className="w-full border rounded px-2 py-1 text-right"
-                      min={0}
-                    />
+                  <td>
+                    <input className="fi" type="number" value={ligne.prix_unitaire} min={0}
+                      style={{ textAlign: 'right' }}
+                      onChange={(e) => handleLigneChange(index, 'prix_unitaire', Number(e.target.value))} />
                   </td>
-                  <td className="py-2 text-right font-medium">
+                  <td style={{ textAlign: 'right', fontWeight: 600 }}>
                     {ligne.total.toLocaleString('fr-FR')} €
                   </td>
-                  <td className="py-2">
-                    <button
-                      onClick={() => handleRemoveLigne(index)}
-                      className="text-red-500 hover:text-red-700"
-                    >
+                  <td>
+                    <button onClick={() => handleRemoveLigne(index)}
+                      style={{ color: 'var(--rd)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 16 }}>
                       ✕
                     </button>
                   </td>
@@ -484,11 +386,11 @@ export default function DetailDevis() {
               ))}
             </tbody>
             <tfoot>
-              <tr className="font-semibold">
-                <td colSpan={4} className="text-right py-3">
+              <tr>
+                <td colSpan={4} style={{ textAlign: 'right', fontWeight: 700, padding: '12px 8px' }}>
                   Total HT
                 </td>
-                <td className="text-right py-3">
+                <td style={{ textAlign: 'right', fontWeight: 700, padding: '12px 8px' }}>
                   {calculateTotal(devis.lignes).toLocaleString('fr-FR')} €
                 </td>
                 <td></td>
@@ -496,81 +398,66 @@ export default function DetailDevis() {
             </tfoot>
           </table>
         )}
-      </div>
+      </Card>
 
       {/* Acomptes */}
       {devis.acomptes && devis.acomptes.length > 0 && (
-        <div className="bg-white rounded-lg shadow p-4">
-          <h2 className="font-semibold mb-4">Acomptes encaissés</h2>
-          <table className="w-full text-sm">
+        <Card title="Acomptes encaissés">
+          <table className="admin-table">
             <thead>
-              <tr className="border-b">
-                <th className="text-left py-2">Date</th>
-                <th className="text-left py-2">Référence</th>
-                <th className="text-right py-2">Montant</th>
+              <tr>
+                <th>Date</th>
+                <th>Référence</th>
+                <th style={{ textAlign: 'right' }}>Montant</th>
               </tr>
             </thead>
             <tbody>
               {devis.acomptes.map((a, i) => (
-                <tr key={i} className="border-b">
-                  <td className="py-2">
-                    {new Date(a.date).toLocaleDateString('fr-FR')}
-                  </td>
-                  <td className="py-2">{a.ref_fa}</td>
-                  <td className="py-2 text-right">
-                    {a.montant.toLocaleString('fr-FR')} €
-                  </td>
+                <tr key={i}>
+                  <td>{new Date(a.date).toLocaleDateString('fr-FR')}</td>
+                  <td>{a.ref_fa}</td>
+                  <td style={{ textAlign: 'right' }}>{a.montant.toLocaleString('fr-FR')} €</td>
                 </tr>
               ))}
             </tbody>
             <tfoot>
-              <tr className="font-semibold">
-                <td colSpan={2} className="text-right py-3">
+              <tr>
+                <td colSpan={2} style={{ textAlign: 'right', fontWeight: 700, padding: '12px 8px' }}>
                   Solde restant
                 </td>
-                <td className="text-right py-3">
+                <td style={{ textAlign: 'right', fontWeight: 700, padding: '12px 8px', color: 'var(--or)' }}>
                   {devis.solde_restant?.toLocaleString('fr-FR')} €
                 </td>
               </tr>
             </tfoot>
           </table>
-        </div>
+        </Card>
       )}
 
       {/* Modal Acompte */}
       {showAcompteModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg p-6 w-96">
-            <h3 className="font-semibold text-lg mb-4">Enregistrer un acompte</h3>
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-1">
-                Montant (€)
-              </label>
-              <input
-                type="number"
-                value={acompteMontant}
-                onChange={(e) => setAcompteMontant(Number(e.target.value))}
-                className="w-full border rounded px-3 py-2"
-                min={0}
-              />
+        <div className="modal-overlay" style={{
+          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 999
+        }}>
+          <div className="card" style={{ width: 380, padding: 24 }}>
+            <div className="ct" style={{ marginBottom: 16 }}>Enregistrer un acompte</div>
+            <div className="fg">
+              <div className="fl">Montant (€)</div>
+              <input className="fi" type="number" value={acompteMontant} min={0}
+                onChange={(e) => setAcompteMontant(Number(e.target.value))} />
             </div>
-            <div className="flex justify-end gap-2">
-              <button
-                onClick={() => setShowAcompteModal(false)}
-                className="px-4 py-2 border rounded hover:bg-gray-50"
-              >
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 16 }}>
+              <Button variant="o" onClick={() => setShowAcompteModal(false)}>
                 {t('btn.annuler')}
-              </button>
-              <button
-                onClick={handleEncaisser}
-                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-              >
+              </Button>
+              <Button variant="s" onClick={handleEncaisser}>
                 {t('btn.encaisser')}
-              </button>
+              </Button>
             </div>
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }

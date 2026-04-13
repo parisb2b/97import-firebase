@@ -4,7 +4,6 @@ import { Link } from 'wouter';
 import { db } from '../../lib/firebase';
 import { scoreCompletude } from '../../components/OrangeIndicator';
 import { Card, Button, Pill, IconButton, EditIcon, ExcelIcon } from '../components/Icons';
-import { exportCatalogueExcel } from '../../lib/excel-generator';
 
 interface Product {
   id: string;
@@ -143,7 +142,22 @@ export default function CatalogueProduits() {
           tooltip="Export Excel 69col."
           variant="xl"
           size="lg"
-          onClick={() => exportCatalogueExcel(filtered)}
+          onClick={async () => {
+            const snap = await getDocs(collection(db, 'products'));
+            const products = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            const XLSX = await import('xlsx');
+            const ws = XLSX.utils.json_to_sheet(products.map((p: any) => ({
+              'Réf. interne': p.numero_interne || '',
+              'Nom FR': p.nom_fr || p.nom || '',
+              'Nom ZH': p.nom_chinois || p.nom_cn || '',
+              'Catégorie': p.categorie || '',
+              'Prix achat (¥)': p.prix_achat_cny || p.prix_achat || 0,
+              'Actif': p.actif ? 'Oui' : 'Non',
+            })));
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Catalogue');
+            XLSX.writeFile(wb, `catalogue_97import_${new Date().toISOString().slice(0, 10)}.xlsx`);
+          }}
         />
         <Link href="/admin/produits/nouveau">
           <Button variant="p">➕ Ajouter produit</Button>

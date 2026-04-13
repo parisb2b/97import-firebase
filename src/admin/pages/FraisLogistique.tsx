@@ -1,7 +1,13 @@
-import { useState } from 'react';
-import { useI18n } from '../../i18n';
+import { useState, useEffect } from 'react';
+import { collection, query, orderBy, getDocs } from 'firebase/firestore';
+import { db } from '../../lib/firebase';
+import { Card, Pill, IconButton, Kpi, FileIcon, DownloadIcon } from '../components/Icons';
 
 interface FraisLigne {
+  id: string;
+  numero: string;
+  conteneur_ref: string;
+  client_nom: string;
   destination: string;
   type_conteneur: string;
   fret_maritime: number;
@@ -9,82 +15,20 @@ interface FraisLigne {
   douane: number;
   livraison: number;
   total: number;
+  statut: string;
+  createdAt: any;
 }
 
-const FRAIS_DATA: FraisLigne[] = [
-  {
-    destination: 'MQ',
-    type_conteneur: '20ft',
-    fret_maritime: 2800,
-    dechargement: 450,
-    douane: 200,
-    livraison: 350,
-    total: 3800,
-  },
-  {
-    destination: 'MQ',
-    type_conteneur: '40ft',
-    fret_maritime: 4200,
-    dechargement: 650,
-    douane: 350,
-    livraison: 500,
-    total: 5700,
-  },
-  {
-    destination: 'GP',
-    type_conteneur: '20ft',
-    fret_maritime: 2900,
-    dechargement: 480,
-    douane: 220,
-    livraison: 380,
-    total: 3980,
-  },
-  {
-    destination: 'GP',
-    type_conteneur: '40ft',
-    fret_maritime: 4400,
-    dechargement: 700,
-    douane: 380,
-    livraison: 550,
-    total: 6030,
-  },
-  {
-    destination: 'RE',
-    type_conteneur: '20ft',
-    fret_maritime: 3200,
-    dechargement: 520,
-    douane: 250,
-    livraison: 400,
-    total: 4370,
-  },
-  {
-    destination: 'RE',
-    type_conteneur: '40ft',
-    fret_maritime: 4800,
-    dechargement: 750,
-    douane: 420,
-    livraison: 600,
-    total: 6570,
-  },
-  {
-    destination: 'GF',
-    type_conteneur: '20ft',
-    fret_maritime: 3500,
-    dechargement: 550,
-    douane: 280,
-    livraison: 450,
-    total: 4780,
-  },
-  {
-    destination: 'GF',
-    type_conteneur: '40ft',
-    fret_maritime: 5200,
-    dechargement: 800,
-    douane: 480,
-    livraison: 680,
-    total: 7160,
-  },
-];
+const FRAIS_DEFAUT: Record<string, Record<string, number>> = {
+  'MQ-20ft': { fret: 2800, dechargement: 450, douane: 200, livraison: 350 },
+  'MQ-40ft': { fret: 4200, dechargement: 650, douane: 350, livraison: 500 },
+  'GP-20ft': { fret: 2900, dechargement: 480, douane: 220, livraison: 380 },
+  'GP-40ft': { fret: 4400, dechargement: 700, douane: 380, livraison: 550 },
+  'RE-20ft': { fret: 3200, dechargement: 520, douane: 250, livraison: 400 },
+  'RE-40ft': { fret: 4800, dechargement: 750, douane: 420, livraison: 600 },
+  'GF-20ft': { fret: 3500, dechargement: 550, douane: 280, livraison: 450 },
+  'GF-40ft': { fret: 5200, dechargement: 800, douane: 480, livraison: 680 },
+};
 
 const DESTINATIONS: Record<string, string> = {
   MQ: 'Martinique',
@@ -94,74 +38,146 @@ const DESTINATIONS: Record<string, string> = {
 };
 
 export default function FraisLogistique() {
-  const { t } = useI18n();
-  const [filterDest, setFilterDest] = useState<string>('all');
+  const [frais, setFrais] = useState<FraisLigne[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [filterDest, setFilterDest] = useState('');
+  const [filterStatut, setFilterStatut] = useState('');
 
-  const filteredData =
-    filterDest === 'all'
-      ? FRAIS_DATA
-      : FRAIS_DATA.filter((f) => f.destination === filterDest);
+  useEffect(() => {
+    const timeout = setTimeout(() => setLoading(false), 3000);
+    const load = async () => {
+      try {
+        // Try logistics_invoices first
+        let snap = await getDocs(query(collection(db, 'logistics_invoices'), orderBy('createdAt', 'desc')));
+
+        if (snap.empty) {
+          // Fallback: build from containers
+          snap = await getDocs(query(collection(db, 'containers'), orderBy('createdAt', 'desc')));
+          const data = snap.docs.map((d) => {
+            const raw = d.data();
+            const key = `${raw.destination || 'MQ'}-${raw.type || '40ft'}`;
+            const defaults = FRAIS_DEFAUT[key] || FRAIS_DEFAUT['MQ-40ft'];
+            const total = defaults.fret + defaults.dechargement + defaults.douane + defaults.livraison;
+            return {
+              id: d.id,
+              numero: `FM-${raw.numero || d.id}`,
+              conteneur_ref: raw.numero || d.id,
+              client_nom: raw.client_nom || '—',
+              destination: raw.destination || 'MQ',
+              type_conteneur: raw.type || '40ft',
+              fret_maritime: defaults.fret,
+              dechargement: defaults.dechargement,
+              douane: defaults.douane,
+              livraison: defaults.livraison,
+              total,
+              statut: raw.statut_frais || 'en_attente',
+              createdAt: raw.createdAt,
+            } as FraisLigne;
+          });
+          setFrais(data);
+        } else {
+          setFrais(snap.docs.map((d) => ({ id: d.id, ...d.data() } as FraisLigne)));
+        }
+      } catch (err) {
+        console.error('Error loading frais:', err);
+      } finally {
+        clearTimeout(timeout);
+        setLoading(false);
+      }
+    };
+    load();
+    return () => clearTimeout(timeout);
+  }, []);
+
+  const filtered = frais.filter((f) => {
+    const matchDest = !filterDest || f.destination === filterDest;
+    const matchStatut = !filterStatut || f.statut === filterStatut;
+    return matchDest && matchStatut;
+  });
+
+  const totalFrais = filtered.reduce((s, f) => s + (f.total || 0), 0);
+  const envoyees = filtered.filter(f => f.statut === 'envoyee').length;
+  const enAttente = filtered.filter(f => f.statut === 'en_attente' || !f.statut).length;
+
+  if (loading) {
+    return <div style={{ textAlign: 'center', padding: 32 }}>Chargement...</div>;
+  }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">{t('nav.frais')}</h1>
-        <select
-          value={filterDest}
-          onChange={(e) => setFilterDest(e.target.value)}
-          className="border rounded px-3 py-2"
-        >
-          <option value="all">Toutes destinations</option>
-          {Object.entries(DESTINATIONS).map(([code, name]) => (
-            <option key={code} value={code}>
-              {name}
-            </option>
+    <>
+      <div className="kgrid">
+        <Kpi label="Conteneurs actifs" value={filtered.length} color="tl" />
+        <Kpi label="Total frais" value={`${totalFrais.toLocaleString('fr-FR')}€`} color="tl" />
+        <Kpi label="Factures envoyées" value={envoyees} color="gr" />
+        <Kpi label="En attente" value={enAttente} color="or" />
+      </div>
+
+      <div className="filters">
+        <select className="fsel" value={filterDest} onChange={(e) => setFilterDest(e.target.value)}>
+          <option value="">Toutes destinations</option>
+          {Object.entries(DESTINATIONS).map(([k, v]) => (
+            <option key={k} value={k}>{v}</option>
           ))}
+        </select>
+        <select className="fsel" value={filterStatut} onChange={(e) => setFilterStatut(e.target.value)}>
+          <option value="">Tous statuts</option>
+          <option value="envoyee">Envoyée</option>
+          <option value="en_attente">En attente</option>
+          <option value="payee">Payée</option>
         </select>
       </div>
 
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <table className="w-full">
-          <thead className="bg-salmon-light">
+      <Card title={`Frais logistiques (${filtered.length})`} subtitle="Thème teal — factures conteneurs">
+        <table className="admin-table">
+          <thead>
             <tr>
-              <th className="text-left px-4 py-3 font-medium">Destination</th>
-              <th className="text-left px-4 py-3 font-medium">Conteneur</th>
-              <th className="text-right px-4 py-3 font-medium">Fret maritime</th>
-              <th className="text-right px-4 py-3 font-medium">Déchargement</th>
-              <th className="text-right px-4 py-3 font-medium">Douane</th>
-              <th className="text-right px-4 py-3 font-medium">Livraison</th>
-              <th className="text-right px-4 py-3 font-medium">Total</th>
+              <th>N° FM</th>
+              <th>Conteneur</th>
+              <th>Client</th>
+              <th>Destination</th>
+              <th>Fret</th>
+              <th>Décharg.</th>
+              <th>Douane</th>
+              <th>Livraison</th>
+              <th>Total</th>
+              <th>Statut</th>
+              <th>Documents</th>
             </tr>
           </thead>
           <tbody>
-            {filteredData.map((f, i) => (
-              <tr key={i} className="border-b hover:bg-gray-50">
-                <td className="px-4 py-3">{DESTINATIONS[f.destination]}</td>
-                <td className="px-4 py-3">{f.type_conteneur}</td>
-                <td className="px-4 py-3 text-right">
-                  {f.fret_maritime.toLocaleString('fr-FR')} €
+            {filtered.length === 0 ? (
+              <tr>
+                <td colSpan={11} style={{ textAlign: 'center', padding: 32, color: '#666' }}>
+                  Aucun frais logistique
                 </td>
-                <td className="px-4 py-3 text-right">
-                  {f.dechargement.toLocaleString('fr-FR')} €
+              </tr>
+            ) : filtered.map((f) => (
+              <tr key={f.id} className="cl">
+                <td style={{ fontWeight: 700 }}>{f.numero}</td>
+                <td><Pill variant="nv">{f.conteneur_ref}</Pill></td>
+                <td>{f.client_nom}</td>
+                <td><Pill variant="tl">{DESTINATIONS[f.destination] || f.destination}</Pill></td>
+                <td style={{ textAlign: 'right' }}>{f.fret_maritime.toLocaleString('fr-FR')}€</td>
+                <td style={{ textAlign: 'right' }}>{f.dechargement.toLocaleString('fr-FR')}€</td>
+                <td style={{ textAlign: 'right' }}>{f.douane.toLocaleString('fr-FR')}€</td>
+                <td style={{ textAlign: 'right' }}>{f.livraison.toLocaleString('fr-FR')}€</td>
+                <td style={{ fontWeight: 700, color: 'var(--tl)', textAlign: 'right' }}>
+                  {f.total.toLocaleString('fr-FR')}€
                 </td>
-                <td className="px-4 py-3 text-right">
-                  {f.douane.toLocaleString('fr-FR')} €
+                <td>
+                  <Pill variant={f.statut === 'payee' ? 'gr' : f.statut === 'envoyee' ? 'tl' : 'or'}>
+                    {f.statut === 'payee' ? 'Payée' : f.statut === 'envoyee' ? 'Envoyée' : 'En attente'}
+                  </Pill>
                 </td>
-                <td className="px-4 py-3 text-right">
-                  {f.livraison.toLocaleString('fr-FR')} €
-                </td>
-                <td className="px-4 py-3 text-right font-semibold">
-                  {f.total.toLocaleString('fr-FR')} €
+                <td className="tda">
+                  <IconButton icon={<FileIcon />} tooltip="FM PDF" variant="eye" onClick={() => alert(`PDF FM ${f.numero}`)} />
+                  <IconButton icon={<DownloadIcon />} tooltip="Télécharger" variant="dl" onClick={() => alert(`Download ${f.numero}`)} />
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
-      </div>
-
-      <p className="text-sm text-gray-500">
-        * Ces tarifs sont indicatifs et peuvent varier selon les conditions du marché.
-      </p>
-    </div>
+      </Card>
+    </>
   );
 }
