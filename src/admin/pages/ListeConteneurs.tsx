@@ -140,7 +140,7 @@ export default function ListeConteneurs() {
                   <Link href={`/admin/conteneurs/${c.id}`}>
                     <IconButton icon={<EyeIcon />} tooltip="Détail" variant="eye" />
                   </Link>
-                  <DuplicateBtn onClick={() => handleDuplicate(c)} />
+                  <DuplicateBtn onClick={(e: any) => { e?.stopPropagation(); handleDuplicate(c); }} />
                 </td>
               </tr>
             ))}

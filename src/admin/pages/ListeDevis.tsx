@@ -252,21 +252,21 @@ export default function ListeDevis() {
                     icon={<DownloadIcon />}
                     tooltip="Devis PDF"
                     variant="dl"
-                    onClick={() => handleDownloadDevisPDF(d.id)}
+                    onClick={(e: any) => { e?.stopPropagation(); handleDownloadDevisPDF(d.id); }}
                   />
                   {d.is_vip && (
                     <IconButton
                       icon={<StarIcon />}
                       tooltip="Devis VIP PDF"
                       variant="vip"
-                      onClick={() => handleDownloadDevisPDF(d.id, true)}
+                      onClick={(e: any) => { e?.stopPropagation(); handleDownloadDevisPDF(d.id, true); }}
                     />
                   )}
                   <IconButton
                     icon={<EuroIcon />}
                     tooltip="Encaisser acompte"
                     variant="eur"
-                    onClick={() => setLocation(`/admin/devis/${d.id}`)}
+                    onClick={(e: any) => { e?.stopPropagation(); setLocation(`/admin/devis/${d.id}`); }}
                   />
                 </td>
               </tr>
