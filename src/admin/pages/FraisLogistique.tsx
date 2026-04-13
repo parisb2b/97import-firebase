@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { collection, query, orderBy, getDocs } from 'firebase/firestore';
+import { collection, query, orderBy, getDocs, doc, getDoc } from 'firebase/firestore';
 import { useLocation } from 'wouter';
 import { db } from '../../lib/firebase';
 import { Card, Pill, IconButton, Kpi, FileIcon, DownloadIcon, EyeIcon } from '../components/Icons';
+import { generateFactureLogistique, downloadPDF } from '../../lib/pdf-generator';
 
 interface FraisLigne {
   id: string;
@@ -41,6 +42,28 @@ const DESTINATIONS: Record<string, string> = {
 export default function FraisLogistique() {
   const [frais, setFrais] = useState<FraisLigne[]>([]);
   const [, setLocation] = useLocation();
+  const [emetteurData, setEmetteurData] = useState<any>(null);
+
+  useEffect(() => {
+    getDoc(doc(db, 'admin_params', 'emetteur')).then(s => { if (s.exists()) setEmetteurData(s.data()); }).catch(() => {});
+  }, []);
+
+  const handleFMPDF = async (f: FraisLigne) => {
+    try {
+      const containerSnap = await getDoc(doc(db, 'containers', f.id));
+      const containerData = containerSnap.exists() ? containerSnap.data() : {};
+      const fraisLignes = [
+        { description: `Fret maritime ${containerData.port_chargement || ''} → ${containerData.port_destination || ''}`, volume_poids: `${containerData.volume_total?.toFixed(1) || 0} m³`, prix_unitaire: f.fret_maritime, total: f.fret_maritime },
+        { description: 'Déchargement', volume_poids: `${containerData.poids_total || 0} kg`, prix_unitaire: f.dechargement, total: f.dechargement },
+        { description: 'Douane', volume_poids: '—', prix_unitaire: f.douane, total: f.douane },
+        { description: 'Livraison', volume_poids: '—', prix_unitaire: f.livraison, total: f.livraison },
+      ];
+      const pdfDoc = generateFactureLogistique({ ...containerData, ...f, numero: f.conteneur_ref || f.id }, fraisLignes, emetteurData);
+      downloadPDF(pdfDoc, `${f.numero}.pdf`);
+    } catch (err) {
+      console.error('Erreur FM PDF:', err);
+    }
+  };
   const [loading, setLoading] = useState(true);
   const [filterDest, setFilterDest] = useState('');
   const [filterStatut, setFilterStatut] = useState('');
@@ -173,8 +196,8 @@ export default function FraisLogistique() {
                 </td>
                 <td className="tda">
                   <IconButton icon={<EyeIcon />} tooltip="Voir détail" variant="eye" onClick={(e: any) => { e.stopPropagation(); setLocation('/admin/frais/' + f.id); }} />
-                  <IconButton icon={<FileIcon />} tooltip="FM PDF" variant="eye" onClick={(e: any) => { e.stopPropagation(); alert(`PDF FM ${f.numero}`); }} />
-                  <IconButton icon={<DownloadIcon />} tooltip="Télécharger" variant="dl" onClick={(e: any) => { e.stopPropagation(); alert(`Download ${f.numero}`); }} />
+                  <IconButton icon={<FileIcon />} tooltip="FM PDF" variant="eye" onClick={(e: any) => { e.stopPropagation(); handleFMPDF(f); }} />
+                  <IconButton icon={<DownloadIcon />} tooltip="Télécharger" variant="dl" onClick={(e: any) => { e.stopPropagation(); handleFMPDF(f); }} />
                 </td>
               </tr>
             ))}
