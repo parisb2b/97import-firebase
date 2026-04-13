@@ -65,17 +65,20 @@ export default function DetailCommission() {
       {comm.lignes && comm.lignes.length > 0 && (
         <Card title="Détail des devis">
           <table className="admin-table">
-            <thead><tr><th>Devis</th><th>Client</th><th>Montant HT</th><th>Taux</th><th>Commission</th></tr></thead>
+            <thead><tr><th>Devis</th><th>Client</th><th style={{textAlign:'right'}}>Prix négocié</th><th style={{textAlign:'right'}}>Prix partenaire</th><th style={{textAlign:'right'}}>Commission</th></tr></thead>
             <tbody>
-              {comm.lignes.map((l: any, i: number) => (
-                <tr key={i} className="cl">
-                  <td><a onClick={() => setLocation(`/admin/devis/${l.quote_id}`)} style={{ color: 'var(--bl)', cursor: 'pointer' }}>{l.quote_id}</a></td>
-                  <td>{l.client || '—'}</td>
-                  <td>{(l.montant_ht || 0).toLocaleString('fr-FR')} €</td>
-                  <td>{l.taux || 0}%</td>
-                  <td style={{ fontWeight: 700, color: 'var(--pu)' }}>{(l.commission || 0).toLocaleString('fr-FR')} €</td>
-                </tr>
-              ))}
+              {comm.lignes.map((l: any, i: number) => {
+                const prixPart = (l.montant_ht || 0) - (l.commission || 0);
+                return (
+                  <tr key={i} className="cl">
+                    <td><a onClick={() => setLocation(`/admin/devis/${l.quote_id}`)} style={{ color: 'var(--bl)', cursor: 'pointer' }}>{l.quote_id}</a></td>
+                    <td>{l.client || '—'}</td>
+                    <td style={{ textAlign: 'right' }}>{(l.montant_ht || 0).toLocaleString('fr-FR')} €</td>
+                    <td style={{ textAlign: 'right' }}>{prixPart.toLocaleString('fr-FR')} €</td>
+                    <td style={{ textAlign: 'right', fontWeight: 700, color: 'var(--pu)' }}>{(l.commission || 0).toLocaleString('fr-FR')} €</td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </Card>
