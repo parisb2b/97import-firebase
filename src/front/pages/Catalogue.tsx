@@ -11,7 +11,7 @@ export default function Catalogue() {
   const categorie = params?.categorie || '';
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState<User | null>(null);
+  const [_user, setUser] = useState<User | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
   const [filterGamme, setFilterGamme] = useState('');
 
@@ -28,7 +28,7 @@ export default function Catalogue() {
       setLoading(true);
       try {
         const snap = await getDocs(collection(db, 'products'));
-        const all = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        const all: any[] = snap.docs.map(d => ({ id: d.id, ...d.data() }));
         const filtered = categorie
           ? all.filter(p => p.categorie === categorie && p.actif !== false && p.type !== 'service')
           : all.filter(p => p.actif !== false && p.categorie !== 'Logistique' && p.type !== 'service');

@@ -11,7 +11,7 @@ export default function Produit() {
   const [product, setProduct] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [selectedImg, setSelectedImg] = useState(0);
-  const [user, setUser] = useState<User | null>(null);
+  const [_user, setUser] = useState<User | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
   const [hasAccessoires, setHasAccessoires] = useState(false);
   const [accCount, setAccCount] = useState(0);
@@ -31,7 +31,7 @@ export default function Produit() {
       try {
         const snap = await getDoc(doc(db, 'products', params.id));
         if (snap.exists()) {
-          const p = { id: snap.id, ...snap.data() };
+          const p: any = { id: snap.id, ...snap.data() };
           setProduct(p);
 
           // Check for accessories
