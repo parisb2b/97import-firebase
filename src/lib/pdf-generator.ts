@@ -633,7 +633,7 @@ export function generateNoteCommission(note: any, emetteur?: any): jsPDF {
       }
       grouped.get(key)!.lignes.push({
         ref: l.ref || '',
-        nom_fr: l.nom_fr || l.client || '',
+        nom_fr: l.nom_fr || l.description || '',
         prix_negocie: l.montant_ht || 0,
         prix_partenaire: (l.montant_ht || 0) - (l.commission || 0),
       });
