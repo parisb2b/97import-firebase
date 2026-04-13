@@ -1,61 +1,38 @@
 import { useState, useEffect } from 'react';
-import { useRoute, Link } from 'wouter';
-import { collection, query, where, getDocs, orderBy } from 'firebase/firestore';
+import { useRoute } from 'wouter';
+import { collection, getDocs } from 'firebase/firestore';
+import { onAuthStateChanged, User } from 'firebase/auth';
 import { db, clientAuth } from '../../lib/firebase';
-import { useI18n } from '../../i18n';
-
-interface Product {
-  id: string;
-  numero_interne: string;
-  categorie: string;
-  nom_fr: string;
-  nom_zh: string;
-  nom_en: string;
-  prix_achat_cny: number;
-  prix_achat_eur: number;
-  photos: string[];
-  actif: boolean;
-}
-
-const CATEGORIES = [
-  'mini-pelles',
-  'maisons-modulaires',
-  'solaire',
-  'machines-agricoles',
-  'divers',
-  'services',
-];
+import Breadcrumb from '../components/Breadcrumb';
+import ProductCard from '../components/ProductCard';
 
 export default function Catalogue() {
-  const { t, lang } = useI18n();
   const [, params] = useRoute('/catalogue/:categorie');
-  const [products, setProducts] = useState<Product[]>([]);
+  const categorie = params?.categorie || '';
+  const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
+  const [user, setUser] = useState<User | null>(null);
+  const [userRole, setUserRole] = useState<string | null>(null);
+  const [filterGamme, setFilterGamme] = useState('');
 
-  const selectedCat = params?.categorie;
+  useEffect(() => {
+    const unsub = onAuthStateChanged(clientAuth, (u) => {
+      setUser(u);
+      setUserRole(u ? 'user' : null); // TODO: fetch role from profiles
+    });
+    return () => unsub();
+  }, []);
 
   useEffect(() => {
     const load = async () => {
       setLoading(true);
       try {
-        let q;
-        if (selectedCat && CATEGORIES.includes(selectedCat)) {
-          q = query(
-            collection(db, 'products'),
-            where('actif', '==', true),
-            where('categorie', '==', selectedCat),
-            orderBy('createdAt', 'desc')
-          );
-        } else {
-          q = query(
-            collection(db, 'products'),
-            where('actif', '==', true),
-            orderBy('createdAt', 'desc')
-          );
-        }
-        const snap = await getDocs(q);
-        setProducts(snap.docs.map((d) => ({ id: d.id, ...d.data() } as Product)));
+        const snap = await getDocs(collection(db, 'products'));
+        const all = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        const filtered = categorie
+          ? all.filter(p => p.categorie === categorie && p.actif !== false && p.type !== 'service')
+          : all.filter(p => p.actif !== false && p.categorie !== 'Logistique' && p.type !== 'service');
+        setProducts(filtered);
       } catch (err) {
         console.error('Error loading products:', err);
       } finally {
@@ -63,119 +40,76 @@ export default function Catalogue() {
       }
     };
     load();
-  }, [selectedCat]);
+    setFilterGamme('');
+  }, [categorie]);
 
-  const filtered = products.filter((p) => {
-    if (!search) return true;
-    const s = search.toLowerCase();
-    return (
-      p.nom_fr?.toLowerCase().includes(s) ||
-      p.nom_en?.toLowerCase().includes(s) ||
-      p.numero_interne?.toLowerCase().includes(s)
-    );
-  });
+  // Get distinct gammes for filter chips
+  const gammes = [...new Set(products.map(p => p.gamme).filter(Boolean))].sort();
 
-  const getProductName = (p: Product) => {
-    if (lang === 'zh') return p.nom_zh || p.nom_fr;
-    if (lang === 'en') return p.nom_en || p.nom_fr;
-    return p.nom_fr;
-  };
+  const displayed = filterGamme ? products.filter(p => p.gamme === filterGamme) : products;
 
-  const getDisplayPrice = (p: Product) => {
-    const user = clientAuth.currentUser;
-    if (!user) return null;
-    // Prix simplifié - en production, utiliser les custom claims
-    return p.prix_achat_eur ? p.prix_achat_eur * 2 : null;
-  };
+  // Only show "parent" products (hide options that have ref_parente)
+  const mainProducts = displayed.filter(p => !p.ref_parente && !p.option_payante);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">{t('nav.catalogue')}</h1>
-
-      {/* Filtres */}
-      <div className="flex flex-wrap gap-4 mb-8">
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Rechercher..."
-          className="border rounded-lg px-4 py-2 w-full md:w-64"
-        />
-
-        <div className="flex flex-wrap gap-2">
-          <Link href="/catalogue">
-            <a
-              className={`px-4 py-2 rounded-lg ${
-                !selectedCat
-                  ? 'bg-navy text-white'
-                  : 'bg-gray-100 hover:bg-gray-200'
-              }`}
-            >
-              Tous
-            </a>
-          </Link>
-          {CATEGORIES.map((cat) => (
-            <Link key={cat} href={`/catalogue/${cat}`}>
-              <a
-                className={`px-4 py-2 rounded-lg ${
-                  selectedCat === cat
-                    ? 'bg-navy text-white'
-                    : 'bg-gray-100 hover:bg-gray-200'
-                }`}
-              >
-                {t(`categorie.${cat}`)}
-              </a>
-            </Link>
-          ))}
+    <>
+      {/* Banner */}
+      <div style={{
+        background: 'linear-gradient(135deg, #0B2545, #1E3A5F)',
+        padding: '32px 0',
+      }}>
+        <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px' }}>
+          <Breadcrumb items={[
+            { label: 'Accueil', href: '/' },
+            ...(categorie ? [{ label: categorie }] : [{ label: 'Tous les produits' }]),
+          ]} />
+          <h1 style={{ color: 'white', fontSize: 28, fontWeight: 800, marginTop: 12 }}>
+            {categorie || 'Catalogue'}
+          </h1>
+          <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 14, marginTop: 4 }}>
+            {loading ? 'Chargement...' : `${mainProducts.length} produits disponibles`}
+          </p>
         </div>
       </div>
 
-      {/* Produits */}
-      {loading ? (
-        <div className="text-center py-12">{t('loading')}</div>
-      ) : filtered.length === 0 ? (
-        <div className="text-center py-12 text-gray-500">Aucun produit trouvé</div>
-      ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {filtered.map((p) => {
-            const price = getDisplayPrice(p);
-            return (
-              <Link key={p.id} href={`/produit/${p.id}`}>
-                <a className="bg-white rounded-xl shadow hover:shadow-lg transition overflow-hidden group">
-                  <div className="aspect-square bg-gray-100 relative">
-                    {p.photos?.[0] ? (
-                      <img
-                        src={p.photos[0]}
-                        alt={getProductName(p)}
-                        className="w-full h-full object-cover group-hover:scale-105 transition"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-4xl">
-                        📦
-                      </div>
-                    )}
-                  </div>
-                  <div className="p-4">
-                    <p className="text-xs text-gray-400 mb-1">{p.numero_interne}</p>
-                    <h3 className="font-medium line-clamp-2 mb-2">
-                      {getProductName(p)}
-                    </h3>
-                    {price !== null ? (
-                      <p className="text-navy font-bold">
-                        {price.toLocaleString('fr-FR')} €
-                      </p>
-                    ) : (
-                      <p className="text-sm text-gray-400 italic">
-                        {t('prix.non.disponible')}
-                      </p>
-                    )}
-                  </div>
-                </a>
-              </Link>
-            );
-          })}
+      {/* Filters */}
+      {gammes.length > 1 && (
+        <div style={{ maxWidth: 1280, margin: '0 auto', padding: '16px 20px', display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          <button onClick={() => setFilterGamme('')}
+            style={{
+              padding: '6px 16px', borderRadius: 20, border: '1px solid #E5E7EB', cursor: 'pointer',
+              background: !filterGamme ? '#0B2545' : 'white', color: !filterGamme ? 'white' : '#374151',
+              fontSize: 13, fontWeight: 500,
+            }}>
+            Tous
+          </button>
+          {gammes.map(g => (
+            <button key={g} onClick={() => setFilterGamme(g)}
+              style={{
+                padding: '6px 16px', borderRadius: 20, border: '1px solid #E5E7EB', cursor: 'pointer',
+                background: filterGamme === g ? '#0B2545' : 'white', color: filterGamme === g ? 'white' : '#374151',
+                fontSize: 13, fontWeight: 500,
+              }}>
+              {g}
+            </button>
+          ))}
         </div>
       )}
-    </div>
+
+      {/* Grid */}
+      <div style={{ maxWidth: 1280, margin: '0 auto', padding: '20px 20px 60px' }}>
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: 60, color: '#6B7280' }}>Chargement des produits...</div>
+        ) : mainProducts.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: 60, color: '#6B7280' }}>Aucun produit dans cette catégorie</div>
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 20 }}>
+            {mainProducts.map(p => (
+              <ProductCard key={p.id} product={p} userRole={userRole} />
+            ))}
+          </div>
+        )}
+      </div>
+    </>
   );
 }

@@ -23,6 +23,8 @@ export default function FrontApp() {
         <Switch>
           <Route path="/" component={Home} />
           <Route path="/catalogue" component={Catalogue} />
+          <Route path="/catalogue/:categorie/:gamme/accessoires" component={Catalogue} />
+          <Route path="/catalogue/:categorie/:gamme" component={Catalogue} />
           <Route path="/catalogue/:categorie" component={Catalogue} />
           <Route path="/produit/:id" component={Produit} />
           <Route path="/connexion" component={Connexion} />

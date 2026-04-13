@@ -1,289 +1,199 @@
 import { useState, useEffect } from 'react';
 import { useRoute, Link } from 'wouter';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
+import { onAuthStateChanged, User } from 'firebase/auth';
 import { db, clientAuth } from '../../lib/firebase';
-import { useI18n } from '../../i18n';
-
-interface Product {
-  id: string;
-  numero_interne: string;
-  categorie: string;
-  nom_fr: string;
-  nom_zh: string;
-  nom_en: string;
-  description_fr: string;
-  description_zh: string;
-  description_en: string;
-  prix_achat_cny: number;
-  prix_achat_eur: number;
-  dimensions: {
-    l: number;
-    L: number;
-    h: number;
-    volume_m3: number;
-    poids_net_kg: number;
-    poids_brut_kg: number;
-  };
-  code_hs: string;
-  fournisseur: string;
-  photos: string[];
-  video_url: string;
-  options_payantes: Array<{
-    ref: string;
-    nom_fr: string;
-    nom_zh: string;
-    nom_en: string;
-    surcout_eur: number;
-  }>;
-}
+import Breadcrumb from '../components/Breadcrumb';
+import PriceDisplay from '../components/PriceDisplay';
 
 export default function Produit() {
-  const { t, lang } = useI18n();
   const [, params] = useRoute('/produit/:id');
-  const [product, setProduct] = useState<Product | null>(null);
+  const [product, setProduct] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [selectedPhoto, setSelectedPhoto] = useState(0);
+  const [selectedImg, setSelectedImg] = useState(0);
+  const [user, setUser] = useState<User | null>(null);
+  const [userRole, setUserRole] = useState<string | null>(null);
+  const [hasAccessoires, setHasAccessoires] = useState(false);
+  const [accCount, setAccCount] = useState(0);
+
+  useEffect(() => {
+    const unsub = onAuthStateChanged(clientAuth, (u) => {
+      setUser(u);
+      setUserRole(u ? 'user' : null);
+    });
+    return () => unsub();
+  }, []);
 
   useEffect(() => {
     const load = async () => {
       if (!params?.id) return;
+      setLoading(true);
       try {
-        const docRef = doc(db, 'products', params.id);
-        const snap = await getDoc(docRef);
+        const snap = await getDoc(doc(db, 'products', params.id));
         if (snap.exists()) {
-          setProduct({ id: snap.id, ...snap.data() } as Product);
+          const p = { id: snap.id, ...snap.data() };
+          setProduct(p);
+
+          // Check for accessories
+          const accQ = query(collection(db, 'products'), where('machine_compatible', '==', p.gamme || p.id));
+          const accSnap = await getDocs(accQ);
+          setHasAccessoires(accSnap.size > 0);
+          setAccCount(accSnap.size);
         }
       } catch (err) {
-        console.error('Error loading product:', err);
+        console.error('Error:', err);
       } finally {
         setLoading(false);
       }
     };
     load();
+    setSelectedImg(0);
   }, [params?.id]);
 
-  if (loading) {
-    return <div className="text-center py-12">{t('loading')}</div>;
-  }
+  if (loading) return <div style={{ padding: 60, textAlign: 'center', color: '#6B7280' }}>Chargement...</div>;
+  if (!product) return <div style={{ padding: 60, textAlign: 'center', color: '#6B7280' }}>Produit non trouvé</div>;
 
-  if (!product) {
-    return (
-      <div className="text-center py-12">
-        <p className="text-gray-500 mb-4">Produit non trouvé</p>
-        <Link href="/catalogue">
-          <a className="text-navy hover:underline">Retour au catalogue</a>
-        </Link>
-      </div>
-    );
-  }
-
-  const getName = () => {
-    if (lang === 'zh') return product.nom_zh || product.nom_fr;
-    if (lang === 'en') return product.nom_en || product.nom_fr;
-    return product.nom_fr;
-  };
-
-  const getDescription = () => {
-    if (lang === 'zh') return product.description_zh || product.description_fr;
-    if (lang === 'en') return product.description_en || product.description_fr;
-    return product.description_fr;
-  };
-
-  const getDisplayPrice = () => {
-    const user = clientAuth.currentUser;
-    if (!user) return null;
-    return product.prix_achat_eur ? product.prix_achat_eur * 2 : null;
-  };
-
-  const addToCart = () => {
-    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    const existing = cart.find((item: any) => item.id === product.id);
-    if (existing) {
-      existing.qte += 1;
-    } else {
-      cart.push({
-        id: product.id,
-        ref: product.numero_interne,
-        nom_fr: product.nom_fr,
-        prix: getDisplayPrice() || 0,
-        qte: 1,
-      });
-    }
-    localStorage.setItem('cart', JSON.stringify(cart));
-    alert('Produit ajouté au panier');
-  };
-
-  const price = getDisplayPrice();
+  const images = product.images_urls || [];
+  const specs = [
+    product.poids_net_kg && { label: 'Poids net', value: `${product.poids_net_kg} kg` },
+    product.poids_brut_kg && { label: 'Poids brut', value: `${product.poids_brut_kg} kg` },
+    product.longueur_cm && { label: 'Longueur', value: `${product.longueur_cm} cm` },
+    product.largeur_cm && { label: 'Largeur', value: `${product.largeur_cm} cm` },
+    product.hauteur_cm && { label: 'Hauteur', value: `${product.hauteur_cm} cm` },
+    product.volume_m3 && { label: 'Volume', value: `${product.volume_m3} m³` },
+    product.marque && { label: 'Marque', value: product.marque },
+    product.matiere_fr && { label: 'Matière', value: product.matiere_fr },
+    product.code_hs && { label: 'Code HS', value: product.code_hs },
+    product.ce_certification && { label: 'Certification', value: product.ce_certification },
+  ].filter(Boolean);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
-      {/* Breadcrumb */}
-      <nav className="text-sm text-gray-500 mb-6">
-        <Link href="/catalogue">
-          <a className="hover:text-navy">{t('nav.catalogue')}</a>
-        </Link>
-        <span className="mx-2">/</span>
-        <Link href={`/catalogue/${product.categorie}`}>
-          <a className="hover:text-navy">{t(`categorie.${product.categorie}`)}</a>
-        </Link>
-        <span className="mx-2">/</span>
-        <span>{product.numero_interne}</span>
-      </nav>
+    <>
+      {/* Banner */}
+      <div style={{ background: 'linear-gradient(135deg, #0B2545, #1E3A5F)', padding: '24px 0' }}>
+        <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px' }}>
+          <Breadcrumb items={[
+            { label: 'Accueil', href: '/' },
+            { label: product.categorie || 'Catalogue', href: `/catalogue/${product.categorie || ''}` },
+            { label: product.nom_fr || product.nom || product.numero_interne },
+          ]} />
+        </div>
+      </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Photos */}
+      {/* Content */}
+      <div style={{ maxWidth: 1280, margin: '0 auto', padding: '40px 20px 60px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 40 }}>
+
+        {/* Left — Gallery */}
         <div>
-          <div className="aspect-square bg-gray-100 rounded-xl overflow-hidden mb-4">
-            {product.photos?.[selectedPhoto] ? (
-              <img
-                src={product.photos[selectedPhoto]}
-                alt={getName()}
-                className="w-full h-full object-cover"
-              />
+          <div style={{ borderRadius: 16, overflow: 'hidden', background: '#F9FAFB', height: 400, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            {images[selectedImg] ? (
+              <img src={images[selectedImg]} alt={product.nom_fr} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-6xl">
-                📦
-              </div>
+              <span style={{ fontSize: 80, color: '#D1D5DB' }}>📦</span>
             )}
           </div>
-          {product.photos && product.photos.length > 1 && (
-            <div className="flex gap-2 overflow-x-auto">
-              {product.photos.map((photo, i) => (
-                <button
-                  key={i}
-                  onClick={() => setSelectedPhoto(i)}
-                  className={`w-20 h-20 rounded-lg overflow-hidden border-2 flex-shrink-0 ${
-                    selectedPhoto === i ? 'border-navy' : 'border-transparent'
-                  }`}
-                >
-                  <img
-                    src={photo}
-                    alt=""
-                    className="w-full h-full object-cover"
-                  />
-                </button>
+          {images.length > 1 && (
+            <div style={{ display: 'flex', gap: 8, marginTop: 12, flexWrap: 'wrap' }}>
+              {images.map((img: string, i: number) => (
+                <div key={i} onClick={() => setSelectedImg(i)}
+                  style={{
+                    width: 64, height: 64, borderRadius: 8, overflow: 'hidden', cursor: 'pointer',
+                    border: selectedImg === i ? '2px solid #0B2545' : '2px solid transparent',
+                  }}>
+                  <img src={img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                </div>
               ))}
             </div>
           )}
         </div>
 
-        {/* Infos */}
+        {/* Right — Info */}
         <div>
-          <p className="text-gray-400 text-sm mb-2">{product.numero_interne}</p>
-          <h1 className="text-3xl font-bold mb-4">{getName()}</h1>
+          {product.marque && (
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#F0FDF4', padding: '4px 12px', borderRadius: 20, fontSize: 12, color: '#166534', marginBottom: 12 }}>
+              ✅ {product.marque} · Importation directe Chine
+            </div>
+          )}
 
-          {price !== null ? (
-            <p className="text-3xl font-bold text-navy mb-6">
-              {price.toLocaleString('fr-FR')} €
+          <h1 style={{ fontSize: 28, fontWeight: 800, color: '#0B2545', marginBottom: 8, lineHeight: 1.2 }}>
+            {product.nom_fr || product.nom || product.numero_interne}
+          </h1>
+
+          {product.gamme && (
+            <p style={{ fontSize: 15, color: '#6B7280', marginBottom: 20 }}>
+              Gamme {product.gamme} · {product.categorie}
             </p>
-          ) : (
-            <div className="bg-gray-100 rounded-lg p-4 mb-6">
-              <p className="text-gray-600">{t('prix.non.disponible')}</p>
-              <Link href="/connexion">
-                <a className="text-navy hover:underline font-medium">
-                  {t('btn.connexion')}
-                </a>
+          )}
+
+          {/* Price block */}
+          <div style={{ background: '#F9FAFB', borderRadius: 12, padding: 20, marginBottom: 24 }}>
+            <PriceDisplay product={product} userRole={userRole} size="lg" />
+          </div>
+
+          {/* Action buttons */}
+          {userRole && (
+            <div style={{ display: 'flex', gap: 12, marginBottom: 24 }}>
+              <button style={{
+                flex: 1, background: '#EA580C', color: 'white', border: 'none', borderRadius: 10,
+                padding: '14px 0', fontSize: 15, fontWeight: 700, cursor: 'pointer',
+              }}>
+                🛒 Ajouter au panier
+              </button>
+              <Link href="/panier">
+                <button style={{
+                  background: '#0B2545', color: 'white', border: 'none', borderRadius: 10,
+                  padding: '14px 24px', fontSize: 15, fontWeight: 600, cursor: 'pointer',
+                }}>
+                  📋 Devis
+                </button>
               </Link>
             </div>
           )}
 
-          {price !== null && (
-            <button
-              onClick={addToCart}
-              className="w-full bg-navy text-white py-3 rounded-lg font-semibold hover:bg-navy-dark mb-4"
-            >
-              {t('btn.ajouter.panier')}
-            </button>
-          )}
-
-          {/* WhatsApp button */}
-          <a
-            href={`https://wa.me/33663284908?text=${encodeURIComponent(`Bonjour, je souhaite un devis pour : ${product.numero_interne} - ${product.nom_fr}`)}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 mb-6 flex items-center justify-center gap-2"
-          >
-            <span>📱</span> Demander un devis (WhatsApp)
-          </a>
-
-          {/* Description */}
-          <div className="mb-6">
-            <h2 className="font-semibold mb-2">Description</h2>
-            <p className="text-gray-600 whitespace-pre-line">{getDescription()}</p>
-          </div>
-
-          {/* Dimensions */}
-          {product.dimensions && (
-            <div className="bg-gray-50 rounded-lg p-4 mb-6">
-              <h2 className="font-semibold mb-3">Dimensions</h2>
-              <div className="grid grid-cols-2 gap-2 text-sm">
-                {product.dimensions.l && (
-                  <div>
-                    <span className="text-gray-500">Longueur:</span>{' '}
-                    {product.dimensions.l} cm
-                  </div>
-                )}
-                {product.dimensions.L && (
-                  <div>
-                    <span className="text-gray-500">Largeur:</span>{' '}
-                    {product.dimensions.L} cm
-                  </div>
-                )}
-                {product.dimensions.h && (
-                  <div>
-                    <span className="text-gray-500">Hauteur:</span>{' '}
-                    {product.dimensions.h} cm
-                  </div>
-                )}
-                {product.dimensions.volume_m3 && (
-                  <div>
-                    <span className="text-gray-500">Volume:</span>{' '}
-                    {product.dimensions.volume_m3} m³
-                  </div>
-                )}
-                {product.dimensions.poids_net_kg && (
-                  <div>
-                    <span className="text-gray-500">Poids net:</span>{' '}
-                    {product.dimensions.poids_net_kg} kg
-                  </div>
-                )}
-                {product.dimensions.poids_brut_kg && (
-                  <div>
-                    <span className="text-gray-500">Poids brut:</span>{' '}
-                    {product.dimensions.poids_brut_kg} kg
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* Options */}
-          {product.options_payantes && product.options_payantes.length > 0 && (
-            <div>
-              <h2 className="font-semibold mb-3">Options disponibles</h2>
-              <div className="space-y-2">
-                {product.options_payantes.map((opt, i) => (
-                  <div
-                    key={i}
-                    className="flex items-center justify-between border rounded-lg p-3"
-                  >
-                    <span>
-                      {lang === 'zh'
-                        ? opt.nom_zh || opt.nom_fr
-                        : lang === 'en'
-                        ? opt.nom_en || opt.nom_fr
-                        : opt.nom_fr}
-                    </span>
-                    <span className="font-medium text-navy">
-                      +{opt.surcout_eur} €
-                    </span>
+          {/* Specs */}
+          {specs.length > 0 && (
+            <div style={{ marginBottom: 24 }}>
+              <h3 style={{ fontWeight: 700, fontSize: 16, color: '#0B2545', marginBottom: 12 }}>Caractéristiques techniques</h3>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                {specs.map((s: any, i: number) => (
+                  <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: i % 2 === 0 ? '#F9FAFB' : 'white', borderRadius: 6 }}>
+                    <span style={{ fontSize: 13, color: '#6B7280' }}>{s.label}</span>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: '#0B2545' }}>{s.value}</span>
                   </div>
                 ))}
               </div>
             </div>
           )}
+
+          {/* Description */}
+          {product.description_fr && (
+            <div style={{ marginBottom: 24 }}>
+              <h3 style={{ fontWeight: 700, fontSize: 16, color: '#0B2545', marginBottom: 8 }}>Description</h3>
+              <p style={{ fontSize: 14, color: '#4B5563', lineHeight: 1.6 }}>{product.description_fr}</p>
+            </div>
+          )}
+
+          {/* Accessoires banner */}
+          {hasAccessoires && (
+            <Link href={`/catalogue/${product.categorie}`}>
+              <div style={{
+                background: 'linear-gradient(135deg, #1E3A5F, #0B2545)', borderRadius: 12,
+                padding: 20, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              }}>
+                <div>
+                  <div style={{ color: 'white', fontWeight: 700, fontSize: 15 }}>
+                    🔧 Accessoires compatibles {product.gamme || product.nom_fr}
+                  </div>
+                  <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: 13, marginTop: 4 }}>
+                    {accCount} accessoires disponibles — Godets, grappins, marteaux...
+                  </div>
+                </div>
+                <span style={{ color: 'white', fontSize: 24 }}>→</span>
+              </div>
+            </Link>
+          )}
         </div>
       </div>
-    </div>
+    </>
   );
 }
