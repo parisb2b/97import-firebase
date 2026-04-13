@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { collection, query, orderBy, getDocs, doc, updateDoc } from 'firebase/firestore';
+import { useLocation } from 'wouter';
 import { db } from '../../lib/firebase';
 import { Card, Kpi, Pill, Button } from '../components/Icons';
 
@@ -18,6 +19,7 @@ export default function Stock() {
   const [items, setItems] = useState<StockItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [, setLocation] = useLocation();
   const [showModal, setShowModal] = useState(false);
   const [editItem, setEditItem] = useState<StockItem | null>(null);
   const [newQte, setNewQte] = useState(0);
@@ -98,7 +100,7 @@ export default function Stock() {
             {filtered.length === 0 ? (
               <tr><td colSpan={7} style={{ textAlign: 'center', padding: 32, color: '#666' }}>Aucune pièce</td></tr>
             ) : filtered.map((item) => (
-              <tr key={item.id} className="cl">
+              <tr key={item.id} className="cl" onClick={() => setLocation(`/admin/produits/${item.id}`)}>
                 <td style={{ fontWeight: 700 }}>{item.ref_piece}</td>
                 <td>{item.nom}</td>
                 <td style={{ color: 'var(--tx3)', fontSize: 12 }}>{item.compatible?.join(', ') || '—'}</td>

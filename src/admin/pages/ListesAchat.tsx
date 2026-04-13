@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { collection, query, orderBy, getDocs } from 'firebase/firestore';
+import { useLocation } from 'wouter';
 import { db } from '../../lib/firebase';
 import { Kpi, Card, Button, Pill, IconButton, EyeIcon, EditIcon, ExcelIcon } from '../components/Icons';
 
@@ -16,6 +17,7 @@ interface ListeAchat {
 export default function ListesAchat() {
   const [listes, setListes] = useState<ListeAchat[]>([]);
   const [loading, setLoading] = useState(true);
+  const [, setLocation] = useLocation();
   const [search, setSearch] = useState('');
 
   useEffect(() => {
@@ -94,7 +96,7 @@ export default function ListesAchat() {
               </tr>
             ) : (
               filtered.map((la) => (
-                <tr key={la.id} className="cl">
+                <tr key={la.id} className="cl" onClick={() => setLocation(`/admin/achats/${la.id}`)}>
                   <td>
                     <strong>{la.reference}</strong>
                   </td>
