@@ -1,0 +1,54 @@
+============================================================
+MAJ24b — Phase 1B : Fix prix PDF + Pages Opérations
+Date : 2026-04-13
+============================================================
+
+## PRIORITÉ 1 — FIX PRIX PDF
+- pdf-generator.ts : formatEUR réécrit avec toFixed(2) + regex espace séparateur milliers
+- Colonnes prix du tableau produits élargies (colPrix 132→126, colQte 160→158)
+- 30690 → "30 690,00 €" (espace, pas /)
+→ ✅ OK
+
+## PRIORITÉ 2 — PAGES OPÉRATIONS (7 fichiers)
+
+1. ListeConteneurs.tsx — REFONTE V4 ✅
+   - 4 KPIs (actifs, volume, poids, livrés)
+   - Filtres recherche + statut
+   - Progress bar remplissage
+   - Pill statut couleur (orange/bleu/teal/vert)
+   - Navigation détail clic ligne
+
+2. DetailConteneur.tsx — REFONTE V4 + BOUTONS ✅
+   - Classes Tailwind → admin.css (Card, Button, InfoBlock, fi, fsel)
+   - 4 boutons export Excel connectés : BC CHINE, BE EXPORT, BD INVOICE, BD PACKING LIST
+   - 3 boutons alert() explicites : Email client, Email transitaire, Tracking
+   - Logique save/statut inchangée
+
+3. NouveauConteneur.tsx — DESIGN V4 ✅
+   - Card + FormGroup + fi/fsel + Button p/out
+   - Logique Firestore inchangée
+
+4. Stock.tsx — REFONTE V4 ✅
+   - 4 KPIs (stock, pièces, rupture, transit)
+   - Modal ajustement quantité avec Firestore updateDoc
+   - Pill statut (vert=stock, rouge=rupture, orange=transit)
+
+5. SAVListe.tsx — REFONTE V4 ✅
+   - 4 KPIs (ouverts, en cours, résolus, ce mois)
+   - Filtres recherche + statut
+   - Pill (rouge/orange/vert/gris)
+   - Navigation détail clic ligne
+
+6. SAVDetail.tsx — REFONTE V4 ✅
+   - Card + FormGroup + fi/fsel
+   - Bouton retour + enregistrer
+   - Photos dans grid CSS
+
+7. ListesAchat.tsx — DÉJÀ EN ADMIN.CSS ✅
+   - Aucune modification nécessaire
+
+## BUILD
+npm run build : ✅ SUCCÈS (354 modules, 2.12s)
+
+## PUSH
+git push origin v2 : ✅ 01b59a7
