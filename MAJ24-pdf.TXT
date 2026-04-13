@@ -1,0 +1,41 @@
+============================================================
+MAJ24-pdf — Réécriture complète pdf-generator.ts
+Date : 2026-04-13
+============================================================
+
+## FICHIER MODIFIÉ
+src/lib/pdf-generator.ts — 823 lignes (remplacement intégral)
+
+## CONSTANTES
+- LUXENT_LOGO_BASE64 : 18 916 caractères (luxent.JPG embarqué)
+- COLORS : salmon, salmonLight, violet, violetLight, teal, tealLight, grayText, black, grayLight, grayLine, grayStrike, white
+- EMETTEUR_PRO / BANK_PRO : LUXENT LIMITED (Company No 14852122)
+- EMETTEUR_PRIVE / BANK_PRIVE : Michel Chen (N26)
+
+## FONCTIONS INTERNES
+- getConfig(emetteur?) : PRO/PRIVÉ auto selon emetteur.type
+- formatEUR, formatDate, wrapText
+- drawLogo : logo LUXENT en haut à droite (PRO only)
+- drawHeader : titre + numéro + date + ligne couleur
+- drawEmetteurDestinataire : 2 colonnes, adresse 3 lignes, label Société/Nom
+- drawBankInfo : 7-8 lignes complètes
+- drawProductTable : en-têtes couleur, texte wrappé, VIP prix barré
+- drawTotals : TVA + box total couleur
+- drawTotalsVIP : prix public barré + total négocié violet
+- drawAcompteBlock : fond salmonLight + total/versé/solde
+- drawConditionsSignature : conditions + zone signature
+- drawFooter : ligne couleur + numéro + pagination
+
+## FONCTIONS EXPORTÉES
+1. generateDevis(quote, emetteur?) — Devis standard + VIP auto
+2. generateFactureAcompte(quote, acompte, emetteur?) — Facture acompte
+3. generateFactureFinale(quote, numero, emetteur?) — Facture finale
+4. generateNoteCommission(note, emetteur?) — Note commission violet
+5. generateFactureLogistique(container, fraisLignes, emetteur?) — FM teal
+6. downloadPDF(doc, filename) — Téléchargement Blob
+
+## BUILD
+npm run build : ✅ SUCCÈS (353 modules, 2.11s)
+
+## PUSH
+git push origin v2 : ✅ f575dff
