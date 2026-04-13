@@ -70,9 +70,54 @@ export default function NotesCommission() {
     }
   };
 
-  const handleNCPDF = (c: Commission) => {
-    const pdfDoc = generateNoteCommission(c, emetteurData);
-    downloadPDF(pdfDoc, `${c.numero}.pdf`);
+  const handleNCPDF = async (c: Commission) => {
+    try {
+      const devisDetails = [];
+
+      for (const ligne of (c.lignes || [])) {
+        const quoteId = ligne.quote_id;
+        if (!quoteId) continue;
+
+        const quoteSnap = await getDoc(doc(db, 'quotes', quoteId));
+
+        if (quoteSnap.exists()) {
+          const quoteData = quoteSnap.data();
+          const produits = (quoteData.lignes || []).map((l: any) => ({
+            ref: l.ref || '',
+            nom_fr: l.nom_fr || '',
+            prix_negocie: l.prix_unitaire || 0,
+            prix_partenaire: l.prix_unitaire
+              ? Math.round((l.prix_unitaire - (l.prix_unitaire * (ligne.commission || 0) / (ligne.montant_ht || 1))) * 100) / 100
+              : 0,
+          }));
+
+          devisDetails.push({
+            numero: quoteData.numero || quoteId,
+            client: ligne.client || quoteData.client_nom || '',
+            destination: quoteData.destination || '',
+            lignes: produits,
+          });
+        } else {
+          devisDetails.push({
+            numero: quoteId,
+            client: ligne.client || '',
+            destination: '',
+            lignes: [{
+              ref: '',
+              nom_fr: `Devis ${quoteId}`,
+              prix_negocie: ligne.montant_ht || 0,
+              prix_partenaire: (ligne.montant_ht || 0) - (ligne.commission || 0),
+            }],
+          });
+        }
+      }
+
+      const noteEnrichie = { ...c, devis: devisDetails };
+      const pdfDoc = generateNoteCommission(noteEnrichie, emetteurData);
+      downloadPDF(pdfDoc, `${c.numero}.pdf`);
+    } catch (err) {
+      console.error('Erreur génération NC PDF:', err);
+    }
   };
 
   const handleTogglePaid = async (c: Commission) => {
