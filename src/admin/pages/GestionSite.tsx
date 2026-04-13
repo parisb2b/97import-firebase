@@ -21,6 +21,7 @@ export default function GestionSite() {
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -42,7 +43,8 @@ export default function GestionSite() {
     setSaving(true);
     try {
       await updateDoc(doc(db, 'admin_params', 'site'), { ...params });
-      alert('Parametres enregistres !');
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
     } catch (e) {
       console.error('Error saving:', e);
       alert('Erreur lors de la sauvegarde');
@@ -56,6 +58,8 @@ export default function GestionSite() {
   }
 
   return (
+    <>
+    {saved && <div className="alert gr">Paramètres enregistrés avec succès</div>}
     <div className="g2">
       {/* Page accueil */}
       <Card
@@ -119,5 +123,6 @@ export default function GestionSite() {
         </div>
       </Card>
     </div>
+    </>
   );
 }

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { useI18n } from '../../i18n';
+import { Card, Button } from '../components/Icons';
 
 interface GlobalParams {
   taux_rmb_eur: number;
@@ -23,6 +24,7 @@ interface Emetteur {
   iban: string;
   swift: string;
   banque: string;
+  type?: string;
 }
 
 export default function Parametres() {
@@ -31,6 +33,7 @@ export default function Parametres() {
   const [emetteur, setEmetteur] = useState<Emetteur | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -39,13 +42,8 @@ export default function Parametres() {
           getDoc(doc(db, 'admin_params', 'global')),
           getDoc(doc(db, 'admin_params', 'emetteur')),
         ]);
-
-        if (globalSnap.exists()) {
-          setGlobal(globalSnap.data() as GlobalParams);
-        }
-        if (emetteurSnap.exists()) {
-          setEmetteur(emetteurSnap.data() as Emetteur);
-        }
+        if (globalSnap.exists()) setGlobal(globalSnap.data() as GlobalParams);
+        if (emetteurSnap.exists()) setEmetteur(emetteurSnap.data() as Emetteur);
       } catch (err) {
         console.error('Error loading params:', err);
       } finally {
@@ -58,12 +56,10 @@ export default function Parametres() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      if (global) {
-        await updateDoc(doc(db, 'admin_params', 'global'), { ...global });
-      }
-      if (emetteur) {
-        await updateDoc(doc(db, 'admin_params', 'emetteur'), { ...emetteur });
-      }
+      if (global) await updateDoc(doc(db, 'admin_params', 'global'), { ...global });
+      if (emetteur) await updateDoc(doc(db, 'admin_params', 'emetteur'), { ...emetteur });
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
     } catch (err) {
       console.error('Error saving:', err);
     } finally {
@@ -71,221 +67,104 @@ export default function Parametres() {
     }
   };
 
-  if (loading) {
-    return <div className="text-center py-8">{t('loading')}</div>;
-  }
+  if (loading) return <div style={{ textAlign: 'center', padding: 32 }}>Chargement...</div>;
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">{t('nav.parametres')}</h1>
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          className="bg-navy text-white px-4 py-2 rounded hover:bg-navy-dark disabled:opacity-50"
-        >
+    <>
+      <div className="filters" style={{ justifyContent: 'space-between' }}>
+        <div className="ct" style={{ fontSize: 18 }}>Paramètres</div>
+        <Button variant="p" onClick={handleSave} disabled={saving}>
           {saving ? t('loading') : t('btn.enregistrer')}
-        </button>
+        </Button>
       </div>
 
-      {/* Paramètres globaux */}
-      <div className="bg-white rounded-lg shadow p-4">
-        <h2 className="font-semibold mb-4">Paramètres globaux</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Acompte par défaut (%)
-            </label>
-            <input
-              type="number"
-              value={global?.acompte_pct_defaut || 30}
-              onChange={(e) =>
-                setGlobal((g) =>
-                  g ? { ...g, acompte_pct_defaut: Number(e.target.value) } : null
-                )
-              }
-              className="w-full border rounded px-3 py-2"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Validité devis (jours)
-            </label>
-            <input
-              type="number"
-              value={global?.delai_validite_devis || 30}
-              onChange={(e) =>
-                setGlobal((g) =>
-                  g ? { ...g, delai_validite_devis: Number(e.target.value) } : null
-                )
-              }
-              className="w-full border rounded px-3 py-2"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Coef. majoration clients
-            </label>
-            <input
-              type="number"
-              step="0.1"
-              value={global?.taux_majoration_user || 2}
-              onChange={(e) =>
-                setGlobal((g) =>
-                  g ? { ...g, taux_majoration_user: Number(e.target.value) } : null
-                )
-              }
-              className="w-full border rounded px-3 py-2"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Coef. majoration partenaires
-            </label>
-            <input
-              type="number"
-              step="0.1"
-              value={global?.taux_majoration_partner || 1.2}
-              onChange={(e) =>
-                setGlobal((g) =>
-                  g ? { ...g, taux_majoration_partner: Number(e.target.value) } : null
-                )
-              }
-              className="w-full border rounded px-3 py-2"
-            />
-          </div>
-        </div>
-      </div>
+      {saved && <div className="alert gr">Paramètres enregistrés avec succès</div>}
 
-      {/* Informations émetteur */}
-      <div className="bg-white rounded-lg shadow p-4">
-        <h2 className="font-semibold mb-4">Informations émetteur (factures)</h2>
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">Nom société</label>
-            <input
-              type="text"
-              value={emetteur?.nom || ''}
-              onChange={(e) =>
-                setEmetteur((em) => (em ? { ...em, nom: e.target.value } : null))
-              }
-              className="w-full border rounded px-3 py-2"
-            />
+      <Card title="Paramètres globaux">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, padding: 16 }}>
+          <div className="fg">
+            <div className="fl">Acompte par défaut (%)</div>
+            <input className="fi" type="number" value={global?.acompte_pct_defaut || 30}
+              onChange={(e) => setGlobal(g => g ? { ...g, acompte_pct_defaut: Number(e.target.value) } : null)} />
           </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">N° Company</label>
-            <input
-              type="text"
-              value={emetteur?.company_number || ''}
-              onChange={(e) =>
-                setEmetteur((em) =>
-                  em ? { ...em, company_number: e.target.value } : null
-                )
-              }
-              className="w-full border rounded px-3 py-2"
-            />
+          <div className="fg">
+            <div className="fl">Validité devis (jours)</div>
+            <input className="fi" type="number" value={global?.delai_validite_devis || 30}
+              onChange={(e) => setGlobal(g => g ? { ...g, delai_validite_devis: Number(e.target.value) } : null)} />
           </div>
-          <div className="col-span-2">
-            <label className="block text-sm font-medium mb-1">Adresse</label>
-            <input
-              type="text"
-              value={emetteur?.adresse || ''}
-              onChange={(e) =>
-                setEmetteur((em) => (em ? { ...em, adresse: e.target.value } : null))
-              }
-              className="w-full border rounded px-3 py-2"
-            />
+          <div className="fg">
+            <div className="fl">Coef. majoration clients</div>
+            <input className="fi" type="number" step="0.1" value={global?.taux_majoration_user || 2}
+              onChange={(e) => setGlobal(g => g ? { ...g, taux_majoration_user: Number(e.target.value) } : null)} />
           </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Ville</label>
-            <input
-              type="text"
-              value={emetteur?.ville || ''}
-              onChange={(e) =>
-                setEmetteur((em) => (em ? { ...em, ville: e.target.value } : null))
-              }
-              className="w-full border rounded px-3 py-2"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Pays</label>
-            <input
-              type="text"
-              value={emetteur?.pays || ''}
-              onChange={(e) =>
-                setEmetteur((em) => (em ? { ...em, pays: e.target.value } : null))
-              }
-              className="w-full border rounded px-3 py-2"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Email</label>
-            <input
-              type="email"
-              value={emetteur?.email || ''}
-              onChange={(e) =>
-                setEmetteur((em) => (em ? { ...em, email: e.target.value } : null))
-              }
-              className="w-full border rounded px-3 py-2"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Tél France</label>
-            <input
-              type="tel"
-              value={emetteur?.tel_fr || ''}
-              onChange={(e) =>
-                setEmetteur((em) => (em ? { ...em, tel_fr: e.target.value } : null))
-              }
-              className="w-full border rounded px-3 py-2"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Tél Chine</label>
-            <input
-              type="tel"
-              value={emetteur?.tel_cn || ''}
-              onChange={(e) =>
-                setEmetteur((em) => (em ? { ...em, tel_cn: e.target.value } : null))
-              }
-              className="w-full border rounded px-3 py-2"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">IBAN</label>
-            <input
-              type="text"
-              value={emetteur?.iban || ''}
-              onChange={(e) =>
-                setEmetteur((em) => (em ? { ...em, iban: e.target.value } : null))
-              }
-              className="w-full border rounded px-3 py-2"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">SWIFT/BIC</label>
-            <input
-              type="text"
-              value={emetteur?.swift || ''}
-              onChange={(e) =>
-                setEmetteur((em) => (em ? { ...em, swift: e.target.value } : null))
-              }
-              className="w-full border rounded px-3 py-2"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Banque</label>
-            <input
-              type="text"
-              value={emetteur?.banque || ''}
-              onChange={(e) =>
-                setEmetteur((em) => (em ? { ...em, banque: e.target.value } : null))
-              }
-              className="w-full border rounded px-3 py-2"
-            />
+          <div className="fg">
+            <div className="fl">Coef. majoration partenaires</div>
+            <input className="fi" type="number" step="0.1" value={global?.taux_majoration_partner || 1.2}
+              onChange={(e) => setGlobal(g => g ? { ...g, taux_majoration_partner: Number(e.target.value) } : null)} />
           </div>
         </div>
-      </div>
-    </div>
+      </Card>
+
+      <Card title="Émetteur (LUXENT)">
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, padding: 16 }}>
+          <div className="fg">
+            <div className="fl">Nom société</div>
+            <input className="fi" value={emetteur?.nom || ''} onChange={(e) => setEmetteur(em => em ? { ...em, nom: e.target.value } : null)} />
+          </div>
+          <div className="fg">
+            <div className="fl">N° entreprise</div>
+            <input className="fi" value={emetteur?.company_number || ''} onChange={(e) => setEmetteur(em => em ? { ...em, company_number: e.target.value } : null)} />
+          </div>
+          <div className="fg">
+            <div className="fl">Adresse</div>
+            <input className="fi" value={emetteur?.adresse || ''} onChange={(e) => setEmetteur(em => em ? { ...em, adresse: e.target.value } : null)} />
+          </div>
+          <div className="fg">
+            <div className="fl">Ville</div>
+            <input className="fi" value={emetteur?.ville || ''} onChange={(e) => setEmetteur(em => em ? { ...em, ville: e.target.value } : null)} />
+          </div>
+          <div className="fg">
+            <div className="fl">Pays</div>
+            <input className="fi" value={emetteur?.pays || ''} onChange={(e) => setEmetteur(em => em ? { ...em, pays: e.target.value } : null)} />
+          </div>
+          <div className="fg">
+            <div className="fl">Email</div>
+            <input className="fi" type="email" value={emetteur?.email || ''} onChange={(e) => setEmetteur(em => em ? { ...em, email: e.target.value } : null)} />
+          </div>
+          <div className="fg">
+            <div className="fl">Tél. Chine</div>
+            <input className="fi" value={emetteur?.tel_cn || ''} onChange={(e) => setEmetteur(em => em ? { ...em, tel_cn: e.target.value } : null)} />
+          </div>
+          <div className="fg">
+            <div className="fl">Tél. France</div>
+            <input className="fi" value={emetteur?.tel_fr || ''} onChange={(e) => setEmetteur(em => em ? { ...em, tel_fr: e.target.value } : null)} />
+          </div>
+        </div>
+      </Card>
+
+      <Card title="Coordonnées bancaires">
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, padding: 16 }}>
+          <div className="fg">
+            <div className="fl">IBAN</div>
+            <input className="fi" value={emetteur?.iban || ''} onChange={(e) => setEmetteur(em => em ? { ...em, iban: e.target.value } : null)} />
+          </div>
+          <div className="fg">
+            <div className="fl">SWIFT / BIC</div>
+            <input className="fi" value={emetteur?.swift || ''} onChange={(e) => setEmetteur(em => em ? { ...em, swift: e.target.value } : null)} />
+          </div>
+          <div className="fg">
+            <div className="fl">Banque</div>
+            <input className="fi" value={emetteur?.banque || ''} onChange={(e) => setEmetteur(em => em ? { ...em, banque: e.target.value } : null)} />
+          </div>
+          <div className="fg">
+            <div className="fl">Type (pro/prive)</div>
+            <select className="fsel" value={emetteur?.type || 'pro'} onChange={(e) => setEmetteur(em => em ? { ...em, type: e.target.value } : null)}>
+              <option value="pro">PRO (LUXENT)</option>
+              <option value="prive">PRIVÉ (Michel Chen)</option>
+            </select>
+          </div>
+        </div>
+      </Card>
+    </>
   );
 }

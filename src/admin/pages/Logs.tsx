@@ -1,33 +1,27 @@
 import { useState, useEffect } from 'react';
 import { collection, query, orderBy, getDocs, limit } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
-import { useI18n } from '../../i18n';
-import { SortControl } from '../../components/SortControl';
+import { Card, Pill } from '../components/Icons';
 
 interface Log {
   id: string;
   action: string;
+  type?: string;
   user: string;
   details: Record<string, any>;
   createdAt: any;
 }
 
 export default function Logs() {
-  const { t } = useI18n();
   const [logs, setLogs] = useState<Log[]>([]);
   const [loading, setLoading] = useState(true);
-  const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
+  const [filterType, setFilterType] = useState('');
 
   useEffect(() => {
     const timeout = setTimeout(() => setLoading(false), 3000);
     const load = async () => {
-      setLoading(true);
       try {
-        const q = query(
-          collection(db, 'logs'),
-          orderBy('createdAt', sortOrder),
-          limit(100)
-        );
+        const q = query(collection(db, 'logs'), orderBy('createdAt', 'desc'), limit(100));
         const snap = await getDocs(q);
         setLogs(snap.docs.map((d) => ({ id: d.id, ...d.data() } as Log)));
       } catch (err) {
@@ -39,53 +33,53 @@ export default function Logs() {
     };
     load();
     return () => clearTimeout(timeout);
-  }, [sortOrder]);
+  }, []);
+
+  const getTypePill = (log: Log) => {
+    const t = (log.type || log.action || '').toLowerCase();
+    if (t.includes('error') || t.includes('erreur')) return <Pill variant="rd">Erreur</Pill>;
+    if (t.includes('warn')) return <Pill variant="or">Warning</Pill>;
+    if (t.includes('success') || t.includes('ok')) return <Pill variant="gr">Succès</Pill>;
+    return <Pill variant="bl">Info</Pill>;
+  };
+
+  const filtered = logs.filter(l => !filterType || (l.type || l.action || '').toLowerCase().includes(filterType));
+
+  if (loading) return <div style={{ textAlign: 'center', padding: 32 }}>Chargement...</div>;
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">{t('nav.logs')}</h1>
-        <SortControl value={sortOrder} onChange={setSortOrder} />
+    <>
+      <div className="filters">
+        <select className="fsel" value={filterType} onChange={(e) => setFilterType(e.target.value)}>
+          <option value="">Tous types</option>
+          <option value="error">Erreurs</option>
+          <option value="warn">Warnings</option>
+          <option value="success">Succès</option>
+        </select>
       </div>
 
-      {loading ? (
-        <div className="text-center py-8">{t('loading')}</div>
-      ) : logs.length === 0 ? (
-        <div className="bg-white rounded-lg shadow p-8 text-center text-gray-500">
-          Aucun log
-        </div>
-      ) : (
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          <table className="w-full">
-            <thead className="bg-salmon-light">
-              <tr>
-                <th className="text-left px-4 py-3 font-medium">Date</th>
-                <th className="text-left px-4 py-3 font-medium">Action</th>
-                <th className="text-left px-4 py-3 font-medium">Utilisateur</th>
-                <th className="text-left px-4 py-3 font-medium">Détails</th>
+      <Card title={`Logs système (${filtered.length})`}>
+        <table className="admin-table">
+          <thead>
+            <tr><th>Date</th><th>Type</th><th>Action</th><th>Utilisateur</th><th>Détails</th></tr>
+          </thead>
+          <tbody>
+            {filtered.length === 0 ? (
+              <tr><td colSpan={5} style={{ textAlign: 'center', padding: 32, color: '#666' }}>Aucun log</td></tr>
+            ) : filtered.map((log) => (
+              <tr key={log.id}>
+                <td style={{ color: 'var(--tx3)', fontSize: 12 }}>{log.createdAt?.toDate?.()?.toLocaleString('fr-FR') || '—'}</td>
+                <td>{getTypePill(log)}</td>
+                <td style={{ fontWeight: 600 }}>{log.action}</td>
+                <td>{log.user || '—'}</td>
+                <td style={{ maxWidth: 250, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: 'var(--tx3)', fontSize: 12 }}>
+                  {JSON.stringify(log.details)}
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {logs.map((log) => (
-                <tr key={log.id} className="border-b hover:bg-gray-50">
-                  <td className="px-4 py-3 text-sm">
-                    {log.createdAt?.toDate?.()?.toLocaleString('fr-FR') || '-'}
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className="px-2 py-0.5 rounded text-xs bg-gray-100">
-                      {log.action}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-sm">{log.user || '-'}</td>
-                  <td className="px-4 py-3 text-sm text-gray-500 max-w-md truncate">
-                    {JSON.stringify(log.details)}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </div>
+            ))}
+          </tbody>
+        </table>
+      </Card>
+    </>
   );
 }
