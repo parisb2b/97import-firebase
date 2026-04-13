@@ -1,0 +1,39 @@
+============================================================
+MAJ25-fix — Correctifs rapides post-audit
+Date : 2026-04-13
+============================================================
+
+## FIX 1 — FM PDF dans FraisLogistique ✅
+- Import generateFactureLogistique + downloadPDF
+- Fetch emetteurData + containerData depuis Firestore
+- 2 boutons alert remplacés par vraie génération PDF
+
+## FIX 2 — stopPropagation ✅
+- ListeDevis.tsx : 3 boutons (PDF, VIP, Encaisser) avec stopPropagation
+- ListeConteneurs.tsx : DuplicateBtn avec stopPropagation
+- SAVListe.tsx : pas de bouton action à modifier (liens via Link)
+
+## FIX 3 — Clic ligne CatalogueProduits ✅
+- Import useLocation + setLocation
+- <tr className="cl" onClick> vers /admin/produits/:id
+
+## FIX 4 — Navigation ListesAchat + Stock ✅
+- ListesAchat.tsx : clic ligne → /admin/achats/:id
+- Stock.tsx : clic ligne → /admin/produits/:id
+
+## FIX 5 — ProductForm.tsx migration v4 ✅
+- Tous les inputs: "w-full border rounded px-3 py-2" → "fi"
+- Labels → "fl"
+- Selects → "fsel"
+- Bouton save → "btn p"
+- Boutons traduire → "btn t"
+- Cards/grids → inline styles avec CSS variables
+- Toast → "alert gr"
+- 0 classe Tailwind résiduelle
+
+## BUILD
+npm run build : ✅ SUCCÈS (359 modules, 2.18s)
+28/28 pages admin clean (0 Tailwind résiduel)
+
+## PUSH
+git push origin v2 : ✅ eb4dde7
