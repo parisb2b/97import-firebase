@@ -72,8 +72,10 @@ function getConfig(emetteur?: any) {
 
 // ============ FORMAT HELPERS ============
 function formatEUR(amount: number | undefined): string {
-  if (!amount && amount !== 0) return '0,00 €';
-  return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(amount);
+  if (amount === undefined || amount === null) return '0,00 €';
+  const parts = amount.toFixed(2).split('.');
+  const intPart = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+  return `${intPart},${parts[1]} €`;
 }
 
 function formatDate(date: any): string {
@@ -287,11 +289,11 @@ function drawProductTable(
   const isVip = options?.isVip || false;
   let y = startY;
 
-  // Column positions
+  // Column positions (prix élargi à 32mm pour gros montants)
   const colRef = 20;
   const colDesc = 45;
-  const colPrix = 132;
-  const colQte = 160;
+  const colPrix = 126;
+  const colQte = 158;
   const tableRight = 190;
   const descWidth = colPrix - colDesc - 2;
 
