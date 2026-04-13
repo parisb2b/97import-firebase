@@ -1,0 +1,51 @@
+=== AUDIT v22 — Phase 2 Front Client ===
+Date : 2026-04-13 17:05
+
+STRUCTURE PROJET :
+  Fichiers total : 57 (.tsx/.ts/.css)
+  Fichiers front : 8 (FrontApp + 7 pages)
+  Fichiers admin : 32 (pages + composants)
+  Fichiers partagés : 14 (lib, components, App, i18n)
+
+PAGES FRONT EXISTANTES :
+  src/front/FrontApp.tsx (layout + routing)
+  src/front/pages/Home.tsx
+  src/front/pages/Catalogue.tsx
+  src/front/pages/Produit.tsx
+  src/front/pages/Connexion.tsx
+  src/front/pages/Inscription.tsx
+  src/front/pages/MonCompte.tsx
+  src/front/pages/Panier.tsx
+
+FIREBASE :
+  Projet : importok-6ef77
+  Produits Firestore : 96 (93 catalogue + 3 anciens)
+  Catégories : Mini-Pelle:42, Maisons:24, Solaire:17, Logistique:8, Divers:4, Machines-Agricoles:1
+  Images dans Firestore : 4 avec URLs, 92 sans (photos non liées)
+  Profiles : 5
+  Partenaires : 3
+  Admin_params : 3 documents (global, emetteur, pricing)
+
+ASSETS :
+  globe_accueil.png : ✅ copié dans public/images/
+  luxent.png : ✅ dans public/
+  Logo 97import HD : ✅ dans HTML-2030/ (plusieurs versions)
+  public/images/ : globe_accueil.png
+
+TAILWIND :
+  Version : v4 avec @import "tailwindcss" + @theme ✅
+  tailwind.config.js supprimé : ✅
+  Couleurs custom : navy, navy-dark, salmon, salmon-light ✅
+
+ROUTING :
+  App.tsx : détection admin via hostname/pathname → AdminApp ou FrontApp
+  FrontApp.tsx : routing wouter pour pages front
+  AdminApp.tsx : routing wouter pour 30+ pages admin
+
+BUILD TEST :
+  npm run build : ✅ SUCCÈS (359 modules, 2.16s)
+
+CONCLUSION : Prêt pour le codage front ✅
+  ⚠️ 92/96 produits n'ont pas d'images_urls dans Firestore
+  ⚠️ Les 119 photos sont dans ~/97import-OK/images/ mais pas dans Firebase Storage
+  → Phase 2 peut commencer, les images seront liées ensuite
