@@ -103,20 +103,20 @@ export default function ProductForm({
   }, [data.dimensions?.l, data.dimensions?.L, data.dimensions?.h]);
 
   return (
-    <div className="space-y-6">
+    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
       {/* Toast */}
       {toast && (
-        <div className="fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded shadow-lg z-50">
+        <div className="alert gr" style={{ position: "fixed", top: 16, right: 16, zIndex: 50 }}>
           {toast} ✓
         </div>
       )}
 
       {/* Bloc BDD */}
-      <div className="bg-white rounded-lg shadow p-4">
-        <h2 className="font-semibold mb-4 text-salmon">Données produit</h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+      <div className="card" style={{ padding: 16 }}>
+        <h2 className="ct" style={{ color: "var(--salmon)", marginBottom: 12 }}>Données produit</h2>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }}>
           <div>
-            <label className="block text-sm font-medium mb-1">
+            <label className="fl">
               N° Interne
               <OrangeIndicator show={!data.numero_interne} />
             </label>
@@ -124,19 +124,19 @@ export default function ProductForm({
               type="text"
               value={data.numero_interne || ''}
               onChange={(e) => handleChange('numero_interne', e.target.value)}
-              className="w-full border rounded px-3 py-2"
+              className="fi"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">
+            <label className="fl">
               Catégorie
               <OrangeIndicator show={!data.categorie} />
             </label>
             <select
               value={data.categorie || ''}
               onChange={(e) => handleChange('categorie', e.target.value)}
-              className="w-full border rounded px-3 py-2"
+              className="fi"
             >
               <option value="">Sélectionner...</option>
               {CATEGORIES.map((c) => (
@@ -148,27 +148,27 @@ export default function ProductForm({
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">Sous-catégorie</label>
+            <label className="fl">Sous-catégorie</label>
             <input
               type="text"
               value={data.sous_categorie || ''}
               onChange={(e) => handleChange('sous_categorie', e.target.value)}
-              className="w-full border rounded px-3 py-2"
+              className="fi"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">Fournisseur</label>
+            <label className="fl">Fournisseur</label>
             <input
               type="text"
               value={data.fournisseur || ''}
               onChange={(e) => handleChange('fournisseur', e.target.value)}
-              className="w-full border rounded px-3 py-2"
+              className="fi"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">
+            <label className="fl">
               Prix achat CNY ¥
               <OrangeIndicator show={!data.prix_achat_cny} />
             </label>
@@ -176,22 +176,22 @@ export default function ProductForm({
               type="number"
               value={data.prix_achat_cny || ''}
               onChange={(e) => handleChange('prix_achat_cny', Number(e.target.value))}
-              className="w-full border rounded px-3 py-2"
+              className="fi"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">Prix achat EUR €</label>
+            <label className="fl">Prix achat EUR €</label>
             <input
               type="number"
               value={data.prix_achat_eur || ''}
               onChange={(e) => handleChange('prix_achat_eur', Number(e.target.value))}
-              className="w-full border rounded px-3 py-2 bg-gray-50"
+              className="fi" style={{ background: "var(--bg2)" }}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">
+            <label className="fl">
               Code HS douanier
               <OrangeIndicator show={!data.code_hs} />
             </label>
@@ -199,7 +199,7 @@ export default function ProductForm({
               type="text"
               value={data.code_hs || ''}
               onChange={(e) => handleChange('code_hs', e.target.value)}
-              className="w-full border rounded px-3 py-2"
+              className="fi"
               placeholder="ex: 8429.52"
             />
           </div>
@@ -207,47 +207,47 @@ export default function ProductForm({
       </div>
 
       {/* Dimensions */}
-      <div className="bg-white rounded-lg shadow p-4">
-        <h2 className="font-semibold mb-4 text-salmon">Dimensions</h2>
-        <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
+      <div className="card" style={{ padding: 16 }}>
+        <h2 className="ct" style={{ color: "var(--salmon)", marginBottom: 12 }}>Dimensions</h2>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 12 }}>
           <div>
-            <label className="block text-sm font-medium mb-1">Longueur (cm)</label>
+            <label className="fl">Longueur (cm)</label>
             <input
               type="number"
               value={data.dimensions?.l || ''}
               onChange={(e) => handleChange('dimensions.l', Number(e.target.value))}
-              className="w-full border rounded px-3 py-2"
+              className="fi"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Largeur (cm)</label>
+            <label className="fl">Largeur (cm)</label>
             <input
               type="number"
               value={data.dimensions?.L || ''}
               onChange={(e) => handleChange('dimensions.L', Number(e.target.value))}
-              className="w-full border rounded px-3 py-2"
+              className="fi"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Hauteur (cm)</label>
+            <label className="fl">Hauteur (cm)</label>
             <input
               type="number"
               value={data.dimensions?.h || ''}
               onChange={(e) => handleChange('dimensions.h', Number(e.target.value))}
-              className="w-full border rounded px-3 py-2"
+              className="fi"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Volume (m³)</label>
+            <label className="fl">Volume (m³)</label>
             <input
               type="number"
               value={data.dimensions?.volume_m3 || ''}
               readOnly
-              className="w-full border rounded px-3 py-2 bg-gray-50"
+              className="fi" style={{ background: "var(--bg2)" }}
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">
+            <label className="fl">
               Poids net (kg)
               <OrangeIndicator show={!data.dimensions?.poids_net_kg} />
             </label>
@@ -257,38 +257,38 @@ export default function ProductForm({
               onChange={(e) =>
                 handleChange('dimensions.poids_net_kg', Number(e.target.value))
               }
-              className="w-full border rounded px-3 py-2"
+              className="fi"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Poids brut (kg)</label>
+            <label className="fl">Poids brut (kg)</label>
             <input
               type="number"
               value={data.dimensions?.poids_brut_kg || ''}
               onChange={(e) =>
                 handleChange('dimensions.poids_brut_kg', Number(e.target.value))
               }
-              className="w-full border rounded px-3 py-2"
+              className="fi"
             />
           </div>
         </div>
       </div>
 
       {/* Bloc Web */}
-      <div className="bg-white rounded-lg shadow p-4">
-        <h2 className="font-semibold mb-4 text-salmon">Contenu web</h2>
-        <div className="space-y-4">
+      <div className="card" style={{ padding: 16 }}>
+        <h2 className="ct" style={{ color: "var(--salmon)", marginBottom: 12 }}>Contenu web</h2>
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           <div>
-            <label className="block text-sm font-medium mb-1">
+            <label className="fl">
               Nom FR
               <OrangeIndicator show={!data.nom_fr} />
             </label>
-            <div className="flex gap-2">
+            <div style={{ display: "flex", gap: 8 }}>
               <input
                 type="text"
                 value={data.nom_fr || ''}
                 onChange={(e) => handleChange('nom_fr', e.target.value)}
-                className="flex-1 border rounded px-3 py-2"
+                className="fi" style={{ flex: 1 }}
               />
               <button
                 onClick={() => {
@@ -296,16 +296,16 @@ export default function ProductForm({
                   handleTranslate('nom_fr', 'nom_en', 'EN-GB');
                 }}
                 disabled={translating || !data.nom_fr}
-                className="px-3 py-2 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 disabled:opacity-50 text-sm"
+                className="btn t" style={{ fontSize: 12 }}
               >
                 Traduire
               </button>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
             <div>
-              <label className="block text-sm font-medium mb-1">
+              <label className="fl">
                 Nom ZH 中文
                 <OrangeIndicator show={!data.nom_zh} />
               </label>
@@ -313,11 +313,11 @@ export default function ProductForm({
                 type="text"
                 value={data.nom_zh || ''}
                 onChange={(e) => handleChange('nom_zh', e.target.value)}
-                className="w-full border rounded px-3 py-2"
+                className="fi"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">
+              <label className="fl">
                 Nom EN
                 <OrangeIndicator show={!data.nom_en} />
               </label>
@@ -325,21 +325,21 @@ export default function ProductForm({
                 type="text"
                 value={data.nom_en || ''}
                 onChange={(e) => handleChange('nom_en', e.target.value)}
-                className="w-full border rounded px-3 py-2"
+                className="fi"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">
+            <label className="fl">
               Description FR
               <OrangeIndicator show={!data.description_fr} />
             </label>
-            <div className="flex gap-2">
+            <div style={{ display: "flex", gap: 8 }}>
               <textarea
                 value={data.description_fr || ''}
                 onChange={(e) => handleChange('description_fr', e.target.value)}
-                className="flex-1 border rounded px-3 py-2"
+                className="fi" style={{ flex: 1 }}
                 rows={3}
               />
               <button
@@ -348,42 +348,42 @@ export default function ProductForm({
                   handleTranslate('description_fr', 'description_en', 'EN-GB');
                 }}
                 disabled={translating || !data.description_fr}
-                className="px-3 py-2 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 disabled:opacity-50 text-sm h-fit"
+                className="btn t" style={{ fontSize: 12 }}
               >
                 Traduire
               </button>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
             <div>
-              <label className="block text-sm font-medium mb-1">Description ZH</label>
+              <label className="fl">Description ZH</label>
               <textarea
                 value={data.description_zh || ''}
                 onChange={(e) => handleChange('description_zh', e.target.value)}
-                className="w-full border rounded px-3 py-2"
+                className="fi"
                 rows={3}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Description EN</label>
+              <label className="fl">Description EN</label>
               <textarea
                 value={data.description_en || ''}
                 onChange={(e) => handleChange('description_en', e.target.value)}
-                className="w-full border rounded px-3 py-2"
+                className="fi"
                 rows={3}
               />
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
             <div>
-              <label className="block text-sm font-medium mb-1">URL Vidéo</label>
+              <label className="fl">URL Vidéo</label>
               <input
                 type="text"
                 value={data.video_url || ''}
                 onChange={(e) => handleChange('video_url', e.target.value)}
-                className="w-full border rounded px-3 py-2"
+                className="fi"
               />
             </div>
             <div className="flex items-center gap-4 pt-6">
@@ -407,7 +407,7 @@ export default function ProductForm({
           <button
             onClick={handleSubmit}
             disabled={saving}
-            className="bg-navy text-white px-6 py-2 rounded hover:bg-navy-dark disabled:opacity-50"
+            className="btn p"
           >
             {saving ? t('loading') : t('btn.enregistrer')}
           </button>

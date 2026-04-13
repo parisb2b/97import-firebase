@@ -4,7 +4,7 @@ import { db } from '../lib/firebase';
 import { getNextNumber } from '../lib/counters';
 
 interface DuplicateBtnProps {
-  onClick: () => void;
+  onClick: (e?: any) => void;
 }
 
 export const DuplicateBtn = ({ onClick }: DuplicateBtnProps) => {
