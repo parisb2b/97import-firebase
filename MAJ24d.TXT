@@ -1,0 +1,52 @@
+============================================================
+MAJ24d — PHASE 1 DU BACK-OFFICE TERMINÉE
+Date : 2026-04-13
+============================================================
+
+## Phase 1 COMPLÈTE — 22 pages admin toutes en design v4
+
+### Tâche 1 — Fix NC PDF ✅
+- pdf-generator.ts : rétrocompat nom_fr sans fallback client name
+
+### Tâche 2 — Fix DetailCommission ✅
+- DetailCommission.tsx : colonnes sans taux, avec prix partenaire
+
+### Tâche 3 — TauxRMB.tsx ✅
+- Refonte design v4 : Kpi, Card, Button, InfoRow, Alert
+
+### Tâche 4 — GestionSite.tsx ✅
+- alert() → message inline succès 3s
+
+### Tâche 5 — Parametres.tsx ✅
+- Refonte complète : Cards Émetteur + Bancaire + Global
+- Select PRO/PRIVÉ pour type émetteur
+
+### Tâche 6 — Logs.tsx ✅
+- Refonte design v4 : Card, admin-table, Pill (info/warning/error/success)
+
+### Tâche 7 — Dashboard.tsx ✅
+- Déjà en design v4, aucune modification nécessaire
+
+### Tâche 8 — Pages détail ✅
+- 8 pages détail présentes et routées dans AdminApp.tsx
+
+## BILAN PHASE 1 COMPLÈTE
+
+Pages Commerce (6) : ✅ Toutes en design v4
+Pages Opérations (7) : ✅ Toutes en design v4
+Pages Système (4) : ✅ Toutes en design v4
+Pages Catalogue (3) : ✅ Design v4
+Pages Utilisateurs (2) : ✅ Design v4
+Pages Détail (8) : ✅ Toutes créées + routées
+
+TOTAL : 22 pages admin + 8 pages détail = 30 composants pages
+
+Navigation liste → détail : ✅ TOUTES les sections
+PDF : ✅ 6 fonctions (Devis, VIP, Facture, FA, NC, FM)
+Excel : ✅ 5 templates (BC/BE/PL/INV/Catalogue)
+
+## BUILD
+npm run build : ✅ SUCCÈS (359 modules, 2.10s)
+
+## PUSH
+git push origin v2 : ✅ 1095972
