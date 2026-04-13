@@ -1,0 +1,59 @@
+============================================================
+MAJ24a — RAPPORT Phase 1A : 6 Pages Commerce
+Date : 2026-04-13
+============================================================
+
+## FICHIERS MODIFIÉS (6)
+
+1. src/admin/pages/Factures.tsx — REMPLACEMENT COMPLET v5
+   - 4 KPI cards (total, montant, encaissé, reste)
+   - Barre filtres (recherche + type + statut)
+   - Tableau admin-table avec Pill (teal=Acompte, bleu=Finale, vert=Payée, orange=Finalisée)
+   - 5 IconButton par ligne : Devis PDF, Facture PDF, NC, Télécharger, Toggle payée
+   - Toggle payée/non payée via Firestore updateDoc
+   ✅ OK
+
+2. src/admin/pages/ListeDevis.tsx — DÉJÀ CORRIGÉ (v21)
+   - 3 boutons déjà connectés : PDF devis, PDF VIP, Encaisser → navigation DetailDevis
+   ✅ OK (inchangé)
+
+3. src/admin/pages/NotesCommission.tsx — REFONTE V4 VIOLET
+   - 4 KPI cards (dues, payées, à envoyer, ce mois)
+   - Filtres : recherche + partenaire + statut
+   - Tableau admin-table avec Pill violet partenaires
+   - 5 IconButton : Devis PDF, NC PDF, Télécharger, Envoyer, Toggle payée
+   ✅ OK
+
+4. src/admin/pages/FraisLogistique.tsx — REFONTE V4 TEAL + FIRESTORE
+   - Lecture Firestore logistics_invoices ou fallback containers
+   - 4 KPI cards (conteneurs, total frais, envoyées, en attente)
+   - Filtres destination + statut
+   - Tableau admin-table avec Pill navy/teal
+   ✅ OK
+
+5. src/admin/pages/DetailDevis.tsx — DESIGN V4
+   - Toutes classes Tailwind remplacées par admin.css (Card, Button, fi, fl, fg, fsel)
+   - Logique Firestore inchangée (save, acompte, PDF)
+   - Modal acompte avec classes admin.css
+   ✅ OK
+
+6. src/admin/pages/CatalogueProduits.tsx — EXPORT EXCEL
+   - Dynamic import xlsx pour code-splitting
+   - Fetch tous produits Firestore (pas seulement filtrés)
+   ✅ OK
+
+## CORRECTIONS SUPPLÉMENTAIRES
+
+7. src/lib/pdf-generator.ts — Couleur violet → salmon dans headers tableau
+   ✅ OK
+
+## FICHIER CRÉÉ
+
+8. ~/97import-OK/config/IDENTIFIANTS.md — Tous identifiants projet
+
+## BUILD
+npm run build : ✅ SUCCÈS (353 modules, 2.12s)
+xlsx code-split en chunk séparé (429 kB)
+
+## PUSH
+git push origin v2 : ✅ ba7d839
