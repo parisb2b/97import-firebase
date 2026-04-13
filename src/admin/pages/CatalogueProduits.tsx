@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { collection, query, orderBy, getDocs } from 'firebase/firestore';
-import { Link } from 'wouter';
+import { Link, useLocation } from 'wouter';
 import { db } from '../../lib/firebase';
 import { scoreCompletude } from '../../components/OrangeIndicator';
 import { Card, Button, Pill, IconButton, EditIcon, ExcelIcon } from '../components/Icons';
@@ -45,6 +45,7 @@ export default function CatalogueProduits() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [filterCat, setFilterCat] = useState<string>('');
+  const [, setLocation] = useLocation();
 
   useEffect(() => {
     const timeout = setTimeout(() => setLoading(false), 3000);
@@ -193,7 +194,7 @@ export default function CatalogueProduits() {
                       : 'var(--or)';
 
               return (
-                <tr key={p.id}>
+                <tr key={p.id} className="cl" onClick={() => setLocation(`/admin/produits/${p.id}`)}>
                   <td
                     style={{
                       fontFamily: 'monospace',
