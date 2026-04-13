@@ -1,0 +1,37 @@
+============================================================
+MAJ24c — Pages Détail + Navigation liste→détail
+Date : 2026-04-13
+============================================================
+
+## FICHIERS CRÉÉS (6)
+1. src/admin/pages/DetailFacture.tsx — Infos facture + devis lié + PDF + toggle payée
+2. src/admin/pages/DetailCommission.tsx — Thème violet, tableau lignes devis, NC PDF
+3. src/admin/pages/DetailFraisLogistique.tsx — Thème teal, info conteneur
+4. src/admin/pages/DetailAchat.tsx — Tableau produits commandés FR/ZH/prix
+5. src/admin/pages/DetailClient.tsx — Infos client + devis associés (query where)
+6. src/admin/pages/DetailPartenaire.tsx — KPIs commissions + tableau, thème violet
+
+## FICHIERS MODIFIÉS (7)
+7. src/admin/AdminApp.tsx — 6 routes :id + 6 imports (routes avant listes pour wouter)
+8. src/admin/pages/Factures.tsx — import useLocation, EyeIcon + stopPropagation actions
+9. src/admin/pages/NotesCommission.tsx — EyeIcon + navigation détail
+10. src/admin/pages/FraisLogistique.tsx — EyeIcon + navigation détail
+11. src/admin/pages/Clients.tsx — REFONTE v4 complète + KPIs + navigation
+12. src/admin/pages/Partenaires.tsx — REFONTE v4 complète + KPIs + navigation
+13. src/admin/components/Icons.tsx — onClick type élargi (e?: any) pour stopPropagation
+
+## BUILD
+npm run build : ✅ SUCCÈS (360 modules, 2.20s)
+
+## NAVIGATION
+Toutes les sections ont maintenant le pattern liste→détail :
+- /admin/factures → /admin/factures/:id ✅
+- /admin/commissions → /admin/commissions/:id ✅
+- /admin/frais → /admin/frais/:id ✅
+- /admin/achats → /admin/achats/:id ✅
+- /admin/clients → /admin/clients/:id ✅
+- /admin/partenaires → /admin/partenaires/:id ✅
+(+ devis, conteneurs, sav, produits déjà existants)
+
+## PUSH
+git push origin v2 : ✅ 7a6b920
