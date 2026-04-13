@@ -1,0 +1,30 @@
+============================================================
+MAJ26 — Import catalogue v4 + photos + pricing
+Date : 2026-04-13
+============================================================
+
+## Catalogue v4
+- Source : ~/Downloads/97import-catalogue-v4.xlsx → ~/97import-OK/data/
+- Feuille : "Catalogue Produits" (headers row 6, données row 7+)
+- 69 colonnes mappées vers champs Firestore
+
+## Import Firestore
+- Script : scripts/import-catalogue-v4.mjs
+- 93 produits importés dans collection products
+- 0 erreurs
+- Conversions : OUI/NON → boolean, prix → number, vides ignorés
+- ID document = numero_interne (colonne A)
+
+## Photos
+- 119 images copiées dans ~/97import-OK/images/
+  products: 49 | accessories: 32 | maisons: 28 | solaire: 10
+
+## Pricing
+- admin_params/pricing créé dans Firestore :
+  multiplicateur_public: 2.0
+  multiplicateur_partenaire: 1.2
+  devise: EUR
+  taux_rmb_eur: 7.82
+
+## PUSH
+git push origin v2 : ✅ 53e7b80
