@@ -623,72 +623,174 @@ export function generateNoteCommission(note: any, emetteur?: any): jsPDF {
   const date = formatDate(note.createdAt);
   const numero = note.numero || note.id;
 
+  // Rétrocompatibilité : ancien format avec lignes plates → grouper par devis
+  if (!note.devis && note.lignes) {
+    const grouped = new Map<string, any>();
+    for (const l of note.lignes) {
+      const key = l.quote_id || 'inconnu';
+      if (!grouped.has(key)) {
+        grouped.set(key, { numero: key, client: l.client || '', destination: '', lignes: [] });
+      }
+      grouped.get(key)!.lignes.push({
+        ref: l.ref || '',
+        nom_fr: l.nom_fr || l.client || '',
+        prix_negocie: l.montant_ht || 0,
+        prix_partenaire: (l.montant_ht || 0) - (l.commission || 0),
+      });
+    }
+    note.devis = Array.from(grouped.values());
+  }
+
   drawLogo(doc, cfg.showLogo);
   drawHeader(doc, 'Note de Commission', numero, date, C.violet);
 
-  // Partenaire instead of Destinataire
+  // Partenaire (droite)
   let y = drawEmetteurDestinataire(doc, cfg.emetteurInfo, {
     nom: note.partenaire_nom || 'Partenaire',
     email: note.partenaire_email,
+    tel: note.partenaire_tel,
   }, 42, C.violet, 'Partenaire');
 
-  // Commission table
-  const colDevis = 20;
-  const colClient = 55;
-  const colMontant = 105;
-  const colTaux = 140;
-  const colComm = 190;
+  // Coordonnées bancaires
+  y = drawBankInfo(doc, cfg.bankInfo, y);
 
-  // Header
-  doc.setFillColor(...C.violet);
-  doc.rect(20, y, 170, 8, 'F');
-  doc.setFontSize(9);
-  doc.setTextColor(...C.white);
-  doc.setFont('helvetica', 'bold');
-  doc.text('N° Devis', colDevis + 2, y + 6);
-  doc.text('Client', colClient, y + 6);
-  doc.text('Montant HT', colMontant, y + 6);
-  doc.text('Taux', colTaux, y + 6);
-  doc.text('Commission', colComm, y + 6, { align: 'right' });
-  y += 8;
-
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(8);
-  (note.lignes || []).forEach((ligne: any, i: number) => {
-    if (i % 2 === 0) {
-      doc.setFillColor(...C.grayLight);
-      doc.rect(20, y, 170, 7, 'F');
-    }
-    doc.setDrawColor(...C.grayLine);
-    doc.line(20, y + 7, 190, y + 7);
-
-    doc.setTextColor(...C.black);
-    doc.text((ligne.quote_id || '').substring(0, 15), colDevis + 2, y + 5);
-    doc.text((ligne.client || '').substring(0, 20), colClient, y + 5);
-    doc.text(formatEUR(ligne.montant_ht), colMontant, y + 5);
-    doc.text(`${ligne.taux || 0}%`, colTaux, y + 5);
-    doc.setTextColor(...C.violet);
-    doc.setFont('helvetica', 'bold');
-    doc.text(formatEUR(ligne.commission), colComm, y + 5, { align: 'right' });
-    doc.setFont('helvetica', 'normal');
-    y += 7;
-  });
-
-  // Total commission
-  y += 5;
-  doc.setFillColor(...C.violetLight);
-  doc.rect(20, y, 170, 12, 'F');
-  doc.setFontSize(12);
+  // Section title
+  doc.setFontSize(14);
   doc.setTextColor(...C.violet);
   doc.setFont('helvetica', 'bold');
-  doc.text(`Total dû au partenaire ${note.partenaire_nom || ''}`, 25, y + 8);
-  doc.setTextColor(...C.black);
-  doc.text(formatEUR(note.total_commission), 186, y + 8, { align: 'right' });
+  doc.text('Détail des commissions', 20, y);
   doc.setFont('helvetica', 'normal');
-  y += 17;
+  y += 7;
 
-  // Bank info
-  y = drawBankInfo(doc, cfg.bankInfo, y);
+  // Column positions (6 colonnes)
+  const L = 20;   // left edge
+  const R = 190;  // right edge
+  const colRef = 45;
+  const colDesc = 70;
+  const colPrixNeg = 128;
+  const colPrixPart = 158;
+
+  // Table header
+  doc.setFillColor(...C.violet);
+  doc.rect(L, y, R - L, 8, 'F');
+  doc.setFontSize(8);
+  doc.setTextColor(...C.white);
+  doc.setFont('helvetica', 'bold');
+  doc.text('N° Devis', L + 2, y + 6);
+  doc.text('Réf.', colRef, y + 6);
+  doc.text('Description', colDesc, y + 6);
+  doc.text('Prix négocié', colPrixNeg, y + 6, { align: 'right' });
+  doc.text('Prix part.', colPrixPart, y + 6, { align: 'right' });
+  doc.text('Commission', R - 2, y + 6, { align: 'right' });
+  y += 8;
+
+  // Rows grouped by devis
+  const devisList = note.devis || [];
+  for (const devis of devisList) {
+    // Devis header row — violet clair
+    doc.setFillColor(...C.violetLight);
+    doc.rect(L, y, R - L, 7, 'F');
+    doc.setFontSize(8);
+    doc.setTextColor(...C.violet);
+    doc.setFont('helvetica', 'bold');
+    const headerText = `${devis.numero}${devis.client ? ' — Client : ' + devis.client : ''}${devis.destination ? ' — ' + devis.destination : ''}`;
+    doc.text(headerText, L + 2, y + 5);
+    doc.setFont('helvetica', 'normal');
+    y += 7;
+
+    let sousTotal_negocie = 0;
+    let sousTotal_partenaire = 0;
+    let sousTotal_commission = 0;
+
+    // Product lines
+    (devis.lignes || []).forEach((ligne: any, i: number) => {
+      const desc = ligne.nom_fr || '';
+      const descLines = wrapText(doc, desc, colPrixNeg - colDesc - 5);
+      const rowH = Math.max(7, descLines.length * 4 + 3);
+
+      if (i % 2 === 0) {
+        doc.setFillColor(...C.grayLight);
+        doc.rect(L, y, R - L, rowH, 'F');
+      }
+      doc.setDrawColor(...C.grayLine);
+      doc.line(L, y + rowH, R, y + rowH);
+
+      doc.setFontSize(8);
+      // Ref
+      doc.setTextColor(...C.black);
+      doc.text((ligne.ref || '').substring(0, 12), colRef, y + 5);
+
+      // Description (wrapped)
+      for (let li = 0; li < descLines.length; li++) {
+        doc.text(descLines[li], colDesc, y + 5 + li * 4);
+      }
+
+      // Prix négocié
+      const pn = ligne.prix_negocie || 0;
+      const pp = ligne.prix_partenaire || 0;
+      const comm = pn - pp;
+      sousTotal_negocie += pn;
+      sousTotal_partenaire += pp;
+      sousTotal_commission += comm;
+
+      doc.setTextColor(...C.black);
+      doc.text(formatEUR(pn), colPrixNeg, y + 5, { align: 'right' });
+      doc.text(formatEUR(pp), colPrixPart, y + 5, { align: 'right' });
+
+      // Commission en violet bold
+      doc.setTextColor(...C.violet);
+      doc.setFont('helvetica', 'bold');
+      doc.text(formatEUR(comm), R - 2, y + 5, { align: 'right' });
+      doc.setFont('helvetica', 'normal');
+
+      y += rowH;
+    });
+
+    // Sous-total row
+    doc.setFillColor(...C.grayLight);
+    doc.rect(L, y, R - L, 7, 'F');
+    doc.setDrawColor(...C.grayLine);
+    doc.line(L, y + 7, R, y + 7);
+    doc.setFontSize(8);
+    doc.setTextColor(...C.black);
+    doc.setFont('helvetica', 'bold');
+    doc.text(`Sous-total ${devis.numero}`, L + 2, y + 5);
+    doc.text(formatEUR(sousTotal_negocie), colPrixNeg, y + 5, { align: 'right' });
+    doc.text(formatEUR(sousTotal_partenaire), colPrixPart, y + 5, { align: 'right' });
+    doc.setTextColor(...C.violet);
+    doc.text(formatEUR(sousTotal_commission), R - 2, y + 5, { align: 'right' });
+    doc.setFont('helvetica', 'normal');
+    y += 9;
+  }
+
+  // Total dû — pleine largeur
+  y += 3;
+  doc.setDrawColor(...C.violet);
+  doc.setFillColor(...C.violetLight);
+  doc.rect(L, y, R - L, 14, 'FD');
+  doc.setFontSize(13);
+  doc.setTextColor(...C.violet);
+  doc.setFont('helvetica', 'bold');
+  doc.text(`Total dû au partenaire ${note.partenaire_code || note.partenaire_nom || ''}`, L + 5, y + 10);
+  doc.text(formatEUR(note.total_commission), R - 5, y + 10, { align: 'right' });
+  doc.setFont('helvetica', 'normal');
+  y += 20;
+
+  // Conditions
+  doc.setDrawColor(...C.grayLine);
+  doc.line(20, y, 190, y);
+  y += 5;
+  doc.setFontSize(9);
+  doc.setTextColor(...C.violet);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Conditions', 20, y);
+  y += 5;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
+  doc.setTextColor(...C.grayText);
+  doc.text('Règlement : À réception de la note de commission', 20, y);
+  y += 4;
+  doc.text('Mode : Virement bancaire aux coordonnées ci-dessus', 20, y);
 
   drawFooter(doc, 'Note de commission', numero, C.violet);
 
