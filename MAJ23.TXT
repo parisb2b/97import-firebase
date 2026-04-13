@@ -1,0 +1,18 @@
+=== MAJ23 — Upload images + Homepage + Header/Footer ===
+Date : 2026-04-13
+
+PARTIE A — IMAGES :
+  Images locales : 113 fichiers
+  Vidéos locales : 6 fichiers
+  Firebase Storage : ❌ bloqué (règles sécurité non configurées pour upload client)
+  Solution : images servies depuis public/ + URLs locales dans Firestore
+  Produits avec images après update : 33/96
+  Produits encore sans images : 63 (options, logistique, doublons variantes)
+
+PARTIE B — PAGES FRONT :
+  Header.tsx : ✅ (nav catégories, 3 fuseaux, panier orange, switch langue, connexion)
+  Footer.tsx : ✅ (4 colonnes, WhatsApp/Email, copyright LUXENT)
+  FrontApp.tsx : ✅ (refactorisé avec Header/Footer séparés + 16 routes)
+  Home.tsx : ✅ (hero 3 zones, catégories Firestore, stats band)
+
+BUILD : npm run build → ✅ (359 modules, 2.39s)
