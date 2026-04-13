@@ -3,6 +3,8 @@ import { useRoute } from 'wouter';
 import { doc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { useI18n } from '../../i18n';
+import { Card, Button, InfoBlock } from '../components/Icons';
+import { generateBCChine, generateBEExport, generateBDPackingList, generateBDInvoiceExcel, downloadExcel } from '../../lib/excel-generator';
 
 interface LigneConteneur {
   ref: string;
@@ -45,32 +47,24 @@ export default function DetailConteneur() {
   useEffect(() => {
     const load = async () => {
       if (!params?.id) return;
-      const docRef = doc(db, 'containers', params.id);
-      const snap = await getDoc(docRef);
-      if (snap.exists()) {
-        setContainer({ id: snap.id, ...snap.data() } as Container);
-      }
+      const snap = await getDoc(doc(db, 'containers', params.id));
+      if (snap.exists()) setContainer({ id: snap.id, ...snap.data() } as Container);
       setLoading(false);
     };
     load();
   }, [params?.id]);
 
-  const calculateTotals = (lignes: LigneConteneur[]) => {
-    const volume_total = lignes.reduce((sum, l) => sum + l.volume_m3, 0);
-    const poids_total = lignes.reduce((sum, l) => sum + l.poids_net * l.qte_pieces, 0);
-    return { volume_total, poids_total };
-  };
+  const calculateTotals = (lignes: LigneConteneur[]) => ({
+    volume_total: lignes.reduce((sum, l) => sum + l.volume_m3, 0),
+    poids_total: lignes.reduce((sum, l) => sum + l.poids_net * l.qte_pieces, 0),
+  });
 
   const handleSave = async () => {
     if (!container) return;
     setSaving(true);
     try {
       const totals = calculateTotals(container.lignes);
-      await updateDoc(doc(db, 'containers', container.id), {
-        ...container,
-        ...totals,
-        updatedAt: serverTimestamp(),
-      });
+      await updateDoc(doc(db, 'containers', container.id), { ...container, ...totals, updatedAt: serverTimestamp() });
       setContainer({ ...container, ...totals });
     } catch (err) {
       console.error('Error saving:', err);
@@ -81,110 +75,73 @@ export default function DetailConteneur() {
 
   const handleAddLigne = () => {
     if (!container) return;
-    const newLigne: LigneConteneur = {
-      ref: '',
-      nom_fr: '',
-      nom_zh: '',
-      qte_colis: 1,
-      qte_pieces: 1,
-      l: 0,
-      L: 0,
-      h: 0,
-      volume_m3: 0,
-      poids_net: 0,
-    };
-    setContainer({ ...container, lignes: [...container.lignes, newLigne] });
+    setContainer({ ...container, lignes: [...container.lignes, { ref: '', nom_fr: '', nom_zh: '', qte_colis: 1, qte_pieces: 1, l: 0, L: 0, h: 0, volume_m3: 0, poids_net: 0 }] });
   };
 
-  const handleLigneChange = (
-    index: number,
-    field: keyof LigneConteneur,
-    value: string | number
-  ) => {
+  const handleLigneChange = (index: number, field: keyof LigneConteneur, value: string | number) => {
     if (!container) return;
     const newLignes = [...container.lignes];
     newLignes[index] = { ...newLignes[index], [field]: value };
-
-    // Auto-calcul volume
     if (['l', 'L', 'h'].includes(field)) {
       const { l, L, h } = newLignes[index];
       newLignes[index].volume_m3 = (l * L * h) / 1000000;
     }
-
     setContainer({ ...container, lignes: newLignes });
   };
 
   const handleRemoveLigne = (index: number) => {
     if (!container) return;
-    setContainer({
-      ...container,
-      lignes: container.lignes.filter((_, i) => i !== index),
-    });
+    setContainer({ ...container, lignes: container.lignes.filter((_, i) => i !== index) });
   };
 
   const handleStatutChange = async (newStatut: string) => {
     if (!container) return;
     try {
-      await updateDoc(doc(db, 'containers', container.id), {
-        statut: newStatut,
-        updatedAt: serverTimestamp(),
-      });
+      await updateDoc(doc(db, 'containers', container.id), { statut: newStatut, updatedAt: serverTimestamp() });
       setContainer({ ...container, statut: newStatut });
     } catch (err) {
       console.error('Error updating statut:', err);
     }
   };
 
-  if (loading) {
-    return <div className="text-center py-8">{t('loading')}</div>;
-  }
+  const handleExportExcel = (type: string) => {
+    if (!container) return;
+    const data = { ...container } as any;
+    switch (type) {
+      case 'bc': downloadExcel(generateBCChine(data), `BC-${container.numero}.xlsx`); break;
+      case 'be': downloadExcel(generateBEExport(data), `BE-${container.numero}.xlsx`); break;
+      case 'packing': downloadExcel(generateBDPackingList(data), `PL-${container.numero}.xlsx`); break;
+      case 'invoice': downloadExcel(generateBDInvoiceExcel(data), `INV-${container.numero}.xlsx`); break;
+    }
+  };
 
-  if (!container) {
-    return <div className="text-center py-8 text-gray-500">Conteneur non trouvé</div>;
-  }
+  if (loading) return <div style={{ textAlign: 'center', padding: 32 }}>Chargement...</div>;
+  if (!container) return <div className="alert rd">Conteneur non trouvé</div>;
+
+  const totals = calculateTotals(container.lignes);
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">{container.numero}</h1>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            className="bg-navy text-white px-4 py-2 rounded hover:bg-navy-dark disabled:opacity-50"
-          >
+    <>
+      {/* Header */}
+      <div className="filters" style={{ justifyContent: 'space-between' }}>
+        <div className="ct" style={{ fontSize: 18 }}>{container.numero}</div>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <Button variant="p" onClick={handleSave} disabled={saving}>
             {saving ? t('loading') : t('btn.enregistrer')}
-          </button>
+          </Button>
         </div>
       </div>
 
       {/* Infos conteneur */}
-      <div className="bg-white rounded-lg shadow p-4">
-        <h2 className="font-semibold mb-4">Informations conteneur</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div>
-            <label className="block text-sm text-gray-500">Type</label>
-            <p className="font-medium">{container.type}</p>
-          </div>
-          <div>
-            <label className="block text-sm text-gray-500">Destination</label>
-            <p className="font-medium">{container.destination}</p>
-          </div>
-          <div>
-            <label className="block text-sm text-gray-500">Port chargement</label>
-            <p className="font-medium">{container.port_chargement}</p>
-          </div>
-          <div>
-            <label className="block text-sm text-gray-500">Port destination</label>
-            <p className="font-medium">{container.port_destination}</p>
-          </div>
-          <div>
-            <label className="block text-sm text-gray-500">Statut</label>
-            <select
-              value={container.statut}
-              onChange={(e) => handleStatutChange(e.target.value)}
-              className="border rounded px-2 py-1 text-sm"
-            >
+      <Card title="Informations conteneur">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, padding: 16 }}>
+          <InfoBlock title="Type"><span style={{ fontWeight: 600 }}>{container.type}</span></InfoBlock>
+          <InfoBlock title="Destination"><span style={{ fontWeight: 600 }}>{container.destination}</span></InfoBlock>
+          <InfoBlock title="Port chargement"><span>{container.port_chargement}</span></InfoBlock>
+          <InfoBlock title="Port destination"><span>{container.port_destination}</span></InfoBlock>
+          <div className="fg">
+            <div className="fl">Statut</div>
+            <select className="fsel" value={container.statut} onChange={(e) => handleStatutChange(e.target.value)}>
               <option value="préparation">En préparation</option>
               <option value="chargé">Chargé</option>
               <option value="parti">Parti du port</option>
@@ -192,182 +149,63 @@ export default function DetailConteneur() {
               <option value="livré">Livré</option>
             </select>
           </div>
-          <div>
-            <label className="block text-sm text-gray-500">Volume total</label>
-            <p className="font-medium">{container.volume_total?.toFixed(2)} m³</p>
-          </div>
-          <div>
-            <label className="block text-sm text-gray-500">Poids total</label>
-            <p className="font-medium">
-              {container.poids_total?.toLocaleString('fr-FR')} kg
-            </p>
-          </div>
+          <InfoBlock title="Volume total"><span style={{ fontWeight: 600 }}>{totals.volume_total.toFixed(2)} m³</span></InfoBlock>
+          <InfoBlock title="Poids total"><span style={{ fontWeight: 600 }}>{totals.poids_total.toLocaleString('fr-FR')} kg</span></InfoBlock>
         </div>
-      </div>
+      </Card>
 
-      {/* Actions export */}
-      <div className="bg-white rounded-lg shadow p-4">
-        <h2 className="font-semibold mb-4">Documents export</h2>
-        <div className="flex flex-wrap gap-2">
-          <button className="px-3 py-2 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 text-sm">
-            📥 BC CHINE
-          </button>
-          <button className="px-3 py-2 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 text-sm">
-            📥 BE EXPORT
-          </button>
-          <button className="px-3 py-2 bg-green-100 text-green-700 rounded hover:bg-green-200 text-sm">
-            📥 BD INVOICE
-          </button>
-          <button className="px-3 py-2 bg-green-100 text-green-700 rounded hover:bg-green-200 text-sm">
-            📥 BD PACKING LIST
-          </button>
-          <button className="px-3 py-2 bg-purple-100 text-purple-700 rounded hover:bg-purple-200 text-sm">
-            📄 BD Invoice PDF
-          </button>
+      {/* Documents export */}
+      <Card title="Documents export">
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, padding: 16 }}>
+          <Button variant="t" onClick={() => handleExportExcel('bc')}>BC CHINE</Button>
+          <Button variant="t" onClick={() => handleExportExcel('be')}>BE EXPORT</Button>
+          <Button variant="s" onClick={() => handleExportExcel('invoice')}>BD INVOICE</Button>
+          <Button variant="s" onClick={() => handleExportExcel('packing')}>BD PACKING LIST</Button>
+          <Button variant="o" onClick={() => alert('Fonction email client en cours de développement')}>Email client</Button>
+          <Button variant="o" onClick={() => alert('Fonction email transitaire en cours de développement')}>Email transitaire</Button>
+          <Button variant="o" onClick={() => alert('Fonction tracking en cours de développement')}>Tracking</Button>
         </div>
-      </div>
+      </Card>
 
-      {/* Lignes */}
-      <div className="bg-white rounded-lg shadow p-4">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="font-semibold">Contenu du conteneur</h2>
-          <button
-            onClick={handleAddLigne}
-            className="text-sm bg-gray-100 px-3 py-1 rounded hover:bg-gray-200"
-          >
-            + Ajouter une ligne
-          </button>
-        </div>
-
+      {/* Lignes conteneur */}
+      <Card title="Contenu du conteneur" actions={
+        <Button variant="o" onClick={handleAddLigne} style={{ fontSize: 12 }}>+ Ajouter une ligne</Button>
+      }>
         {container.lignes.length === 0 ? (
-          <p className="text-gray-500 text-center py-4">Aucun produit</p>
+          <div style={{ textAlign: 'center', padding: 24, color: 'var(--tx3)' }}>Aucun produit</div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+          <div style={{ overflowX: 'auto' }}>
+            <table className="admin-table">
               <thead>
-                <tr className="border-b bg-salmon-light">
-                  <th className="text-left py-2 px-2">Réf</th>
-                  <th className="text-left py-2 px-2">Nom FR</th>
-                  <th className="text-left py-2 px-2">Nom ZH</th>
-                  <th className="text-right py-2 px-2 w-16">Colis</th>
-                  <th className="text-right py-2 px-2 w-16">Pièces</th>
-                  <th className="text-right py-2 px-2 w-16">L cm</th>
-                  <th className="text-right py-2 px-2 w-16">l cm</th>
-                  <th className="text-right py-2 px-2 w-16">H cm</th>
-                  <th className="text-right py-2 px-2 w-20">Vol m³</th>
-                  <th className="text-right py-2 px-2 w-20">Poids kg</th>
-                  <th className="w-10"></th>
+                <tr>
+                  <th>Réf</th>
+                  <th>Nom FR</th>
+                  <th>Nom ZH</th>
+                  <th style={{ textAlign: 'right', width: 60 }}>Colis</th>
+                  <th style={{ textAlign: 'right', width: 60 }}>Pièces</th>
+                  <th style={{ textAlign: 'right', width: 60 }}>L cm</th>
+                  <th style={{ textAlign: 'right', width: 60 }}>l cm</th>
+                  <th style={{ textAlign: 'right', width: 60 }}>H cm</th>
+                  <th style={{ textAlign: 'right', width: 75 }}>Vol m³</th>
+                  <th style={{ textAlign: 'right', width: 75 }}>Poids kg</th>
+                  <th style={{ width: 40 }}></th>
                 </tr>
               </thead>
               <tbody>
                 {container.lignes.map((ligne, index) => (
-                  <tr key={index} className="border-b">
-                    <td className="py-2 px-2">
-                      <input
-                        type="text"
-                        value={ligne.ref}
-                        onChange={(e) =>
-                          handleLigneChange(index, 'ref', e.target.value)
-                        }
-                        className="w-full border rounded px-1 py-0.5 text-sm"
-                      />
-                    </td>
-                    <td className="py-2 px-2">
-                      <input
-                        type="text"
-                        value={ligne.nom_fr}
-                        onChange={(e) =>
-                          handleLigneChange(index, 'nom_fr', e.target.value)
-                        }
-                        className="w-full border rounded px-1 py-0.5 text-sm"
-                      />
-                    </td>
-                    <td className="py-2 px-2">
-                      <input
-                        type="text"
-                        value={ligne.nom_zh}
-                        onChange={(e) =>
-                          handleLigneChange(index, 'nom_zh', e.target.value)
-                        }
-                        className="w-full border rounded px-1 py-0.5 text-sm"
-                      />
-                    </td>
-                    <td className="py-2 px-2">
-                      <input
-                        type="number"
-                        value={ligne.qte_colis}
-                        onChange={(e) =>
-                          handleLigneChange(index, 'qte_colis', Number(e.target.value))
-                        }
-                        className="w-full border rounded px-1 py-0.5 text-sm text-right"
-                        min={1}
-                      />
-                    </td>
-                    <td className="py-2 px-2">
-                      <input
-                        type="number"
-                        value={ligne.qte_pieces}
-                        onChange={(e) =>
-                          handleLigneChange(index, 'qte_pieces', Number(e.target.value))
-                        }
-                        className="w-full border rounded px-1 py-0.5 text-sm text-right"
-                        min={1}
-                      />
-                    </td>
-                    <td className="py-2 px-2">
-                      <input
-                        type="number"
-                        value={ligne.l}
-                        onChange={(e) =>
-                          handleLigneChange(index, 'l', Number(e.target.value))
-                        }
-                        className="w-full border rounded px-1 py-0.5 text-sm text-right"
-                        min={0}
-                      />
-                    </td>
-                    <td className="py-2 px-2">
-                      <input
-                        type="number"
-                        value={ligne.L}
-                        onChange={(e) =>
-                          handleLigneChange(index, 'L', Number(e.target.value))
-                        }
-                        className="w-full border rounded px-1 py-0.5 text-sm text-right"
-                        min={0}
-                      />
-                    </td>
-                    <td className="py-2 px-2">
-                      <input
-                        type="number"
-                        value={ligne.h}
-                        onChange={(e) =>
-                          handleLigneChange(index, 'h', Number(e.target.value))
-                        }
-                        className="w-full border rounded px-1 py-0.5 text-sm text-right"
-                        min={0}
-                      />
-                    </td>
-                    <td className="py-2 px-2 text-right font-medium">
-                      {ligne.volume_m3.toFixed(3)}
-                    </td>
-                    <td className="py-2 px-2">
-                      <input
-                        type="number"
-                        value={ligne.poids_net}
-                        onChange={(e) =>
-                          handleLigneChange(index, 'poids_net', Number(e.target.value))
-                        }
-                        className="w-full border rounded px-1 py-0.5 text-sm text-right"
-                        min={0}
-                      />
-                    </td>
-                    <td className="py-2 px-2">
-                      <button
-                        onClick={() => handleRemoveLigne(index)}
-                        className="text-red-500 hover:text-red-700"
-                      >
-                        ✕
-                      </button>
+                  <tr key={index}>
+                    <td><input className="fi" type="text" value={ligne.ref} onChange={(e) => handleLigneChange(index, 'ref', e.target.value)} /></td>
+                    <td><input className="fi" type="text" value={ligne.nom_fr} onChange={(e) => handleLigneChange(index, 'nom_fr', e.target.value)} /></td>
+                    <td><input className="fi" type="text" value={ligne.nom_zh} onChange={(e) => handleLigneChange(index, 'nom_zh', e.target.value)} /></td>
+                    <td><input className="fi" type="number" value={ligne.qte_colis} min={1} style={{ textAlign: 'right' }} onChange={(e) => handleLigneChange(index, 'qte_colis', Number(e.target.value))} /></td>
+                    <td><input className="fi" type="number" value={ligne.qte_pieces} min={1} style={{ textAlign: 'right' }} onChange={(e) => handleLigneChange(index, 'qte_pieces', Number(e.target.value))} /></td>
+                    <td><input className="fi" type="number" value={ligne.l} min={0} style={{ textAlign: 'right' }} onChange={(e) => handleLigneChange(index, 'l', Number(e.target.value))} /></td>
+                    <td><input className="fi" type="number" value={ligne.L} min={0} style={{ textAlign: 'right' }} onChange={(e) => handleLigneChange(index, 'L', Number(e.target.value))} /></td>
+                    <td><input className="fi" type="number" value={ligne.h} min={0} style={{ textAlign: 'right' }} onChange={(e) => handleLigneChange(index, 'h', Number(e.target.value))} /></td>
+                    <td style={{ textAlign: 'right', fontWeight: 600 }}>{ligne.volume_m3.toFixed(3)}</td>
+                    <td><input className="fi" type="number" value={ligne.poids_net} min={0} style={{ textAlign: 'right' }} onChange={(e) => handleLigneChange(index, 'poids_net', Number(e.target.value))} /></td>
+                    <td>
+                      <button onClick={() => handleRemoveLigne(index)} style={{ color: 'var(--rd)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 16 }}>✕</button>
                     </td>
                   </tr>
                 ))}
@@ -375,7 +213,7 @@ export default function DetailConteneur() {
             </table>
           </div>
         )}
-      </div>
-    </div>
+      </Card>
+    </>
   );
 }
