@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { collection, query, orderBy, getDocs, doc, updateDoc } from 'firebase/firestore';
+import { useLocation } from 'wouter';
 import { db } from '../../lib/firebase';
-import { useI18n } from '../../i18n';
-import { SortControl } from '../../components/SortControl';
+import { Card, Kpi, Pill, Button, IconButton, EyeIcon } from '../components/Icons';
 
 interface Partner {
   id: string;
@@ -15,15 +15,14 @@ interface Partner {
 }
 
 export default function Partenaires() {
-  const { t } = useI18n();
   const [partners, setPartners] = useState<Partner[]>([]);
   const [loading, setLoading] = useState(true);
-  const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
+  const [, setLocation] = useLocation();
 
   const load = async () => {
     setLoading(true);
     try {
-      const q = query(collection(db, 'partners'), orderBy('nom', sortOrder));
+      const q = query(collection(db, 'partners'), orderBy('nom', 'asc'));
       const snap = await getDocs(q);
       setPartners(snap.docs.map((d) => ({ id: d.id, ...d.data() } as Partner)));
     } catch (err) {
@@ -37,80 +36,62 @@ export default function Partenaires() {
     const timeout = setTimeout(() => setLoading(false), 3000);
     load();
     return () => clearTimeout(timeout);
-  }, [sortOrder]);
+  }, []);
 
-  const toggleActif = async (partner: Partner) => {
+  const toggleActif = async (p: Partner) => {
     try {
-      await updateDoc(doc(db, 'partners', partner.id), {
-        actif: !partner.actif,
-      });
+      await updateDoc(doc(db, 'partners', p.id), { actif: !p.actif });
       load();
     } catch (err) {
       console.error('Error toggling:', err);
     }
   };
 
+  const actifs = partners.filter(p => p.actif).length;
+
+  if (loading) return <div style={{ textAlign: 'center', padding: 32 }}>Chargement...</div>;
+
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">{t('nav.partenaires')}</h1>
-        <div className="flex items-center gap-4">
-          <SortControl value={sortOrder} onChange={setSortOrder} />
-          <button className="bg-navy text-white px-4 py-2 rounded hover:bg-navy-dark">
-            {t('btn.nouveau')}
-          </button>
-        </div>
+    <>
+      <div className="kgrid">
+        <Kpi label="Total partenaires" value={partners.length} color="pu" />
+        <Kpi label="Actifs" value={actifs} color="gr" />
+        <Kpi label="Inactifs" value={partners.length - actifs} />
       </div>
 
-      {loading ? (
-        <div className="text-center py-8">{t('loading')}</div>
-      ) : partners.length === 0 ? (
-        <div className="bg-white rounded-lg shadow p-8 text-center text-gray-500">
-          Aucun partenaire
-        </div>
-      ) : (
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          <table className="w-full">
-            <thead className="bg-salmon-light">
-              <tr>
-                <th className="text-left px-4 py-3 font-medium">Code</th>
-                <th className="text-left px-4 py-3 font-medium">Nom</th>
-                <th className="text-left px-4 py-3 font-medium">Email</th>
-                <th className="text-left px-4 py-3 font-medium">Téléphone</th>
-                <th className="text-right px-4 py-3 font-medium">Commission</th>
-                <th className="px-4 py-3 font-medium">Actif</th>
+      <div className="filters">
+        <Button variant="p" onClick={() => alert('Ajouter partenaire')}>+ Ajouter partenaire</Button>
+      </div>
+
+      <Card title={`Partenaires (${partners.length})`} subtitle="Cliquer sur une ligne pour voir le détail">
+        <table className="admin-table">
+          <thead>
+            <tr><th>Code</th><th>Nom</th><th>Email</th><th>Tél</th><th style={{textAlign:'right'}}>Commission</th><th>Actif</th><th>Actions</th></tr>
+          </thead>
+          <tbody>
+            {partners.length === 0 ? (
+              <tr><td colSpan={7} style={{ textAlign: 'center', padding: 32, color: '#666' }}>Aucun partenaire</td></tr>
+            ) : partners.map((p) => (
+              <tr key={p.id} className="cl" onClick={() => setLocation(`/admin/partenaires/${p.id}`)}>
+                <td><Pill variant="pu">{p.code}</Pill></td>
+                <td style={{ fontWeight: 700 }}>{p.nom}</td>
+                <td>{p.email}</td>
+                <td>{p.tel || '—'}</td>
+                <td style={{ textAlign: 'right' }}>{p.commission_taux}%</td>
+                <td>
+                  <Button variant={p.actif ? 's' : 'o'} onClick={(e: any) => { e.stopPropagation(); toggleActif(p); }}
+                    style={{ fontSize: 11, padding: '2px 8px' }}>
+                    {p.actif ? '✓ Actif' : '✕ Inactif'}
+                  </Button>
+                </td>
+                <td className="tda">
+                  <IconButton icon={<EyeIcon />} tooltip="Détail" variant="eye" onClick={(e: any) => { e.stopPropagation(); setLocation(`/admin/partenaires/${p.id}`); }} />
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {partners.map((p) => (
-                <tr key={p.id} className="border-b hover:bg-gray-50">
-                  <td className="px-4 py-3">
-                    <span className="px-2 py-0.5 rounded bg-purple-100 text-purple-700 text-xs font-medium">
-                      {p.code}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 font-medium">{p.nom}</td>
-                  <td className="px-4 py-3">{p.email}</td>
-                  <td className="px-4 py-3">{p.tel || '-'}</td>
-                  <td className="px-4 py-3 text-right">{p.commission_taux}%</td>
-                  <td className="px-4 py-3 text-center">
-                    <button
-                      onClick={() => toggleActif(p)}
-                      className={`w-8 h-8 rounded ${
-                        p.actif
-                          ? 'bg-green-100 text-green-600'
-                          : 'bg-gray-100 text-gray-400'
-                      }`}
-                    >
-                      {p.actif ? '✓' : '✕'}
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </div>
+            ))}
+          </tbody>
+        </table>
+      </Card>
+    </>
   );
 }

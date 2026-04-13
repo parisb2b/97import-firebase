@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { collection, query, orderBy, getDocs } from 'firebase/firestore';
+import { useLocation } from 'wouter';
 import { db } from '../../lib/firebase';
-import { Card, Pill, IconButton, Kpi, FileIcon, DownloadIcon } from '../components/Icons';
+import { Card, Pill, IconButton, Kpi, FileIcon, DownloadIcon, EyeIcon } from '../components/Icons';
 
 interface FraisLigne {
   id: string;
@@ -39,6 +40,7 @@ const DESTINATIONS: Record<string, string> = {
 
 export default function FraisLogistique() {
   const [frais, setFrais] = useState<FraisLigne[]>([]);
+  const [, setLocation] = useLocation();
   const [loading, setLoading] = useState(true);
   const [filterDest, setFilterDest] = useState('');
   const [filterStatut, setFilterStatut] = useState('');
@@ -170,8 +172,9 @@ export default function FraisLogistique() {
                   </Pill>
                 </td>
                 <td className="tda">
-                  <IconButton icon={<FileIcon />} tooltip="FM PDF" variant="eye" onClick={() => alert(`PDF FM ${f.numero}`)} />
-                  <IconButton icon={<DownloadIcon />} tooltip="Télécharger" variant="dl" onClick={() => alert(`Download ${f.numero}`)} />
+                  <IconButton icon={<EyeIcon />} tooltip="Voir détail" variant="eye" onClick={(e: any) => { e.stopPropagation(); setLocation('/admin/frais/' + f.id); }} />
+                  <IconButton icon={<FileIcon />} tooltip="FM PDF" variant="eye" onClick={(e: any) => { e.stopPropagation(); alert(`PDF FM ${f.numero}`); }} />
+                  <IconButton icon={<DownloadIcon />} tooltip="Télécharger" variant="dl" onClick={(e: any) => { e.stopPropagation(); alert(`Download ${f.numero}`); }} />
                 </td>
               </tr>
             ))}

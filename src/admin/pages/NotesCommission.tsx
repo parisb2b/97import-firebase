@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { collection, query, orderBy, getDocs, doc, getDoc, updateDoc } from 'firebase/firestore';
+import { useLocation } from 'wouter';
 import { db } from '../../lib/firebase';
-import { Card, Pill, IconButton, Kpi, FileIcon, DownloadIcon, EuroIcon, SendIcon, DollarIcon } from '../components/Icons';
+import { Card, Pill, IconButton, Kpi, FileIcon, DownloadIcon, EuroIcon, SendIcon, DollarIcon, EyeIcon } from '../components/Icons';
 import { generateDevis, generateNoteCommission, downloadPDF } from '../../lib/pdf-generator';
 
 interface Commission {
@@ -25,6 +26,7 @@ export default function NotesCommission() {
   const [filterPartner, setFilterPartner] = useState('');
   const [filterStatut, setFilterStatut] = useState('');
   const [emetteurData, setEmetteurData] = useState<any>(null);
+  const [, setLocation] = useLocation();
 
   useEffect(() => {
     const fetchEmetteur = async () => {
@@ -177,7 +179,8 @@ export default function NotesCommission() {
                   </Pill>
                 </td>
                 <td className="tda">
-                  <IconButton icon={<FileIcon />} tooltip="Devis PDF" variant="eye" onClick={() => handleDevisPDF(c)} />
+                  <IconButton icon={<EyeIcon />} tooltip="Voir détail" variant="eye" onClick={(e: any) => { e.stopPropagation(); setLocation('/admin/commissions/' + c.id); }} />
+                  <IconButton icon={<FileIcon />} tooltip="Devis PDF" variant="eye" onClick={(e: any) => { e.stopPropagation(); handleDevisPDF(c); }} />
                   <IconButton icon={<DollarIcon />} tooltip="NC PDF" variant="nc" onClick={() => handleNCPDF(c)} />
                   <IconButton icon={<DownloadIcon />} tooltip="Télécharger" variant="dl" onClick={() => handleNCPDF(c)} />
                   <IconButton icon={<SendIcon />} tooltip="Envoyer" variant="send" onClick={() => alert(`Envoi NC ${c.numero} à ${c.partenaire_nom}`)} />

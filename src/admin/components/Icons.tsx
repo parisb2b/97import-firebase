@@ -104,7 +104,7 @@ interface IconButtonProps {
   icon: React.ReactNode;
   tooltip: string;
   variant?: 'eye' | 'dl' | 'send' | 'vip' | 'eur' | 'nc' | 'edit' | 'xl' | 'rd' | 'tl';
-  onClick?: () => void;
+  onClick?: (e?: any) => void;
   paid?: boolean;
   size?: 'sm' | 'md' | 'lg';
 }
@@ -154,7 +154,7 @@ export const Pill = ({ children, variant = 'gy', small }: PillProps) => (
 interface ButtonProps {
   children: React.ReactNode;
   variant?: 'p' | 's' | 'o' | 'u' | 't' | 'r' | 'a' | 'out';
-  onClick?: () => void;
+  onClick?: (e?: any) => void;
   disabled?: boolean;
   style?: React.CSSProperties;
 }

@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { collection, query, orderBy, getDocs, doc, getDoc, updateDoc } from 'firebase/firestore';
+import { useLocation } from 'wouter';
 import { db } from '../../lib/firebase';
-import { Card, Pill, IconButton, Kpi, FileIcon, CardIcon, DollarIcon, DownloadIcon, EuroIcon } from '../components/Icons';
+import { Card, Pill, IconButton, Kpi, FileIcon, CardIcon, DollarIcon, DownloadIcon, EuroIcon, EyeIcon } from '../components/Icons';
 import { generateDevis, generateFactureAcompte, generateFactureFinale, generateNoteCommission, downloadPDF } from '../../lib/pdf-generator';
 
 interface Invoice {
@@ -23,6 +24,7 @@ export default function Factures() {
   const [filterType, setFilterType] = useState('');
   const [filterStatut, setFilterStatut] = useState('');
   const [emetteurData, setEmetteurData] = useState<any>(null);
+  const [, setLocation] = useLocation();
 
   useEffect(() => {
     const fetchEmetteur = async () => {
@@ -185,16 +187,17 @@ export default function Factures() {
                   </Pill>
                 </td>
                 <td className="tda">
-                  <IconButton icon={<FileIcon />} tooltip="Devis PDF" variant="eye" onClick={() => handleDevisPDF(inv)} />
-                  <IconButton icon={<CardIcon />} tooltip="Facture PDF" variant="dl" onClick={() => handleFacturePDF(inv)} />
-                  <IconButton icon={<DollarIcon />} tooltip="Note commission" variant="nc" onClick={() => handleNCPDF(inv)} />
-                  <IconButton icon={<DownloadIcon />} tooltip="Télécharger" variant="dl" onClick={() => handleFacturePDF(inv)} />
+                  <IconButton icon={<EyeIcon />} tooltip="Voir détail" variant="eye" onClick={(e: any) => { e.stopPropagation(); setLocation('/admin/factures/' + inv.id); }} />
+                  <IconButton icon={<FileIcon />} tooltip="Devis PDF" variant="eye" onClick={(e: any) => { e.stopPropagation(); handleDevisPDF(inv); }} />
+                  <IconButton icon={<CardIcon />} tooltip="Facture PDF" variant="dl" onClick={(e: any) => { e.stopPropagation(); handleFacturePDF(inv); }} />
+                  <IconButton icon={<DollarIcon />} tooltip="Note commission" variant="nc" onClick={(e: any) => { e.stopPropagation(); handleNCPDF(inv); }} />
+                  <IconButton icon={<DownloadIcon />} tooltip="Télécharger" variant="dl" onClick={(e: any) => { e.stopPropagation(); handleFacturePDF(inv); }} />
                   <IconButton
                     icon={<EuroIcon />}
                     tooltip={inv.statut === 'payee' ? 'Marquer non payée' : 'Marquer payée'}
                     variant="eur"
                     paid={inv.statut === 'payee'}
-                    onClick={() => handleTogglePaid(inv)}
+                    onClick={(e: any) => { e.stopPropagation(); handleTogglePaid(inv); }}
                   />
                 </td>
               </tr>

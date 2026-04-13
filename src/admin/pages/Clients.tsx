@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { collection, query, orderBy, getDocs } from 'firebase/firestore';
+import { useLocation } from 'wouter';
 import { db } from '../../lib/firebase';
-import { useI18n } from '../../i18n';
-import { SortControl } from '../../components/SortControl';
+import { Card, Kpi, Pill, IconButton, EyeIcon } from '../components/Icons';
 
 interface Client {
   id: string;
@@ -12,25 +12,17 @@ interface Client {
   createdAt: any;
 }
 
-const ROLES: Record<string, { label: string; color: string }> = {
-  user: { label: 'Client', color: 'bg-gray-100 text-gray-700' },
-  vip: { label: 'VIP', color: 'bg-purple-100 text-purple-700' },
-  partner: { label: 'Partenaire', color: 'bg-blue-100 text-blue-700' },
-  admin: { label: 'Admin', color: 'bg-red-100 text-red-700' },
-};
-
 export default function Clients() {
-  const { t } = useI18n();
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
-  const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
+  const [search, setSearch] = useState('');
+  const [, setLocation] = useLocation();
 
   useEffect(() => {
     const timeout = setTimeout(() => setLoading(false), 3000);
     const load = async () => {
-      setLoading(true);
       try {
-        const q = query(collection(db, 'profiles'), orderBy('createdAt', sortOrder));
+        const q = query(collection(db, 'profiles'), orderBy('createdAt', 'desc'));
         const snap = await getDocs(q);
         setClients(snap.docs.map((d) => ({ id: d.id, ...d.data() } as Client)));
       } catch (err) {
@@ -42,55 +34,52 @@ export default function Clients() {
     };
     load();
     return () => clearTimeout(timeout);
-  }, [sortOrder]);
+  }, []);
+
+  const filtered = clients.filter(c =>
+    !search || (c.nom || '').toLowerCase().includes(search.toLowerCase()) || c.email.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const vips = filtered.filter(c => c.role === 'vip').length;
+  const partners = filtered.filter(c => c.role === 'partner').length;
+
+  if (loading) return <div style={{ textAlign: 'center', padding: 32 }}>Chargement...</div>;
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">{t('nav.clients')}</h1>
-        <SortControl value={sortOrder} onChange={setSortOrder} />
+    <>
+      <div className="kgrid">
+        <Kpi label="Total clients" value={filtered.length} color="tl" />
+        <Kpi label="VIP" value={vips} color="pu" />
+        <Kpi label="Partenaires" value={partners} color="or" />
       </div>
 
-      {loading ? (
-        <div className="text-center py-8">{t('loading')}</div>
-      ) : clients.length === 0 ? (
-        <div className="bg-white rounded-lg shadow p-8 text-center text-gray-500">
-          Aucun client
-        </div>
-      ) : (
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          <table className="w-full">
-            <thead className="bg-salmon-light">
-              <tr>
-                <th className="text-left px-4 py-3 font-medium">Nom</th>
-                <th className="text-left px-4 py-3 font-medium">Email</th>
-                <th className="text-left px-4 py-3 font-medium">Rôle</th>
-                <th className="text-left px-4 py-3 font-medium">Inscrit le</th>
+      <div className="filters">
+        <input className="si-bar" placeholder="Rechercher nom, email..." value={search}
+          onChange={(e) => setSearch(e.target.value)} />
+      </div>
+
+      <Card title={`Clients (${filtered.length})`} subtitle="Cliquer sur une ligne pour voir le détail">
+        <table className="admin-table">
+          <thead>
+            <tr><th>Nom</th><th>Email</th><th>Rôle</th><th>Inscrit le</th><th>Actions</th></tr>
+          </thead>
+          <tbody>
+            {filtered.length === 0 ? (
+              <tr><td colSpan={5} style={{ textAlign: 'center', padding: 32, color: '#666' }}>Aucun client</td></tr>
+            ) : filtered.map((c) => (
+              <tr key={c.id} className="cl" onClick={() => setLocation(`/admin/clients/${c.id}`)}>
+                <td style={{ fontWeight: 700 }}>{c.nom || '—'}</td>
+                <td>{c.email}</td>
+                <td><Pill variant={c.role === 'vip' ? 'pu' : c.role === 'partner' ? 'tl' : c.role === 'admin' ? 'rd' : 'bl'}>{c.role || 'user'}</Pill></td>
+                <td style={{ color: 'var(--tx3)' }}>{c.createdAt?.toDate?.()?.toLocaleDateString('fr-FR') || '—'}</td>
+                <td className="tda">
+                  <IconButton icon={<EyeIcon />} tooltip="Voir détail" variant="eye" onClick={(e: any) => { e.stopPropagation(); setLocation(`/admin/clients/${c.id}`); }} />
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {clients.map((c) => (
-                <tr key={c.id} className="border-b hover:bg-gray-50">
-                  <td className="px-4 py-3 font-medium">{c.nom || '-'}</td>
-                  <td className="px-4 py-3">{c.email}</td>
-                  <td className="px-4 py-3">
-                    <span
-                      className={`px-2 py-0.5 rounded text-xs ${
-                        ROLES[c.role]?.color || 'bg-gray-100'
-                      }`}
-                    >
-                      {ROLES[c.role]?.label || c.role}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-500">
-                    {c.createdAt?.toDate?.()?.toLocaleDateString('fr-FR') || '-'}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </div>
+            ))}
+          </tbody>
+        </table>
+      </Card>
+    </>
   );
 }

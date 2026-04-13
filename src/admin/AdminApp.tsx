@@ -30,6 +30,12 @@ import TauxRMB from './pages/TauxRMB';
 import GestionSite from './pages/GestionSite';
 import Logs from './pages/Logs';
 import Parametres from './pages/Parametres';
+import DetailFacture from './pages/DetailFacture';
+import DetailCommission from './pages/DetailCommission';
+import DetailFraisLogistique from './pages/DetailFraisLogistique';
+import DetailAchat from './pages/DetailAchat';
+import DetailClient from './pages/DetailClient';
+import DetailPartenaire from './pages/DetailPartenaire';
 
 // Sidebar item type
 interface SidebarItem {
@@ -290,9 +296,13 @@ export default function AdminApp() {
               <Route path="/admin/devis" component={ListeDevis} />
               <Route path="/admin/devis/nouveau" component={DetailDevis} />
               <Route path="/admin/devis/:id" component={DetailDevis} />
+              <Route path="/admin/factures/:id" component={DetailFacture} />
               <Route path="/admin/factures" component={Factures} />
+              <Route path="/admin/commissions/:id" component={DetailCommission} />
               <Route path="/admin/commissions" component={NotesCommission} />
+              <Route path="/admin/frais/:id" component={DetailFraisLogistique} />
               <Route path="/admin/frais" component={FraisLogistique} />
+              <Route path="/admin/achats/:id" component={DetailAchat} />
               <Route path="/admin/achats" component={ListesAchat} />
               <Route path="/admin/conteneurs" component={ListeConteneurs} />
               <Route path="/admin/conteneurs/nouveau" component={NouveauConteneur} />
@@ -303,7 +313,9 @@ export default function AdminApp() {
               <Route path="/admin/produits" component={CatalogueProduits} />
               <Route path="/admin/produits/nouveau" component={NouveauProduit} />
               <Route path="/admin/produits/:id" component={EditProduit} />
+              <Route path="/admin/clients/:id" component={DetailClient} />
               <Route path="/admin/clients" component={Clients} />
+              <Route path="/admin/partenaires/:id" component={DetailPartenaire} />
               <Route path="/admin/partenaires" component={Partenaires} />
               <Route path="/admin/taux" component={TauxRMB} />
               <Route path="/admin/site" component={GestionSite} />
