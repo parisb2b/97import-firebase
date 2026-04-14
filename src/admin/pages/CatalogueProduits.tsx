@@ -48,8 +48,6 @@ export default function CatalogueProduits() {
   const [, setLocation] = useLocation();
 
   useEffect(() => {
-    const timeout = setTimeout(() => setLoading(false), 3000);
-
     const load = async () => {
       try {
         const q = query(collection(db, 'products'), orderBy('createdAt', 'desc'));
@@ -58,51 +56,13 @@ export default function CatalogueProduits() {
       } catch (err) {
         console.error('Error loading products:', err);
       } finally {
-        clearTimeout(timeout);
         setLoading(false);
       }
     };
     load();
-
-    return () => clearTimeout(timeout);
   }, []);
 
-  // Demo products if no real data
-  const demoProducts: Product[] = [
-    {
-      id: 'MP-R22-001',
-      numero_interne: 'MP-R22-001',
-      categorie: 'mini-pelles',
-      nom_fr: 'Mini-pelle R22 PRO 2.2T',
-      prix_achat_cny: 94800,
-      prix_public_eur: 24300,
-      actif: true,
-      createdAt: null,
-    },
-    {
-      id: 'MS-20-001',
-      numero_interne: 'MS-20-001',
-      categorie: 'maisons-modulaires',
-      nom_fr: 'Maison Standard 20P',
-      prix_achat_cny: 33660,
-      prix_public_eur: 8616,
-      actif: true,
-      createdAt: null,
-    },
-    {
-      id: 'LOG-CTN-2604-001',
-      numero_interne: 'LOG-CTN-2604-001',
-      categorie: 'services',
-      nom_fr: 'Frais logistiques 40HC MQ',
-      prix_achat_cny: 0,
-      prix_public_eur: 0,
-      actif: false,
-      createdAt: null,
-    },
-  ];
-
-  const displayProducts = products.length > 0 ? products : demoProducts;
-  const filtered = displayProducts.filter((p) => {
+  const filtered = products.filter((p) => {
     const matchSearch =
       !search ||
       p.numero_interne.toLowerCase().includes(search.toLowerCase()) ||
@@ -113,6 +73,18 @@ export default function CatalogueProduits() {
 
   if (loading) {
     return <div style={{ textAlign: 'center', padding: 32 }}>Chargement...</div>;
+  }
+
+  if (products.length === 0) {
+    return (
+      <div style={{ textAlign: 'center', padding: 64, color: '#666' }}>
+        <p style={{ fontSize: 18, marginBottom: 8 }}>Aucun produit dans le catalogue</p>
+        <p>Ajoutez votre premier produit pour commencer.</p>
+        <Link href="/admin/produits/nouveau">
+          <Button variant="p" style={{ marginTop: 16 }}>+ Ajouter produit</Button>
+        </Link>
+      </div>
+    );
   }
 
   return (
@@ -194,7 +166,7 @@ export default function CatalogueProduits() {
                       : 'var(--or)';
 
               return (
-                <tr key={p.id} className="cl" onClick={() => setLocation(`/admin/produits/${p.id}`)}>
+                <tr key={p.id} className="cl" style={{ opacity: p.actif === false ? 0.5 : 1 }} onClick={() => setLocation(`/admin/produits/${p.id}`)}>
                   <td
                     style={{
                       fontFamily: 'monospace',
@@ -205,7 +177,7 @@ export default function CatalogueProduits() {
                   >
                     {p.numero_interne}
                   </td>
-                  <td style={{ fontWeight: 700 }}>{p.nom_fr}</td>
+                  <td style={{ fontWeight: 700 }}>{p.nom_fr}{p.actif === false && <span style={{ background: '#FEE2E2', color: '#991B1B', padding: '2px 8px', borderRadius: 20, fontSize: 10, fontWeight: 600, marginLeft: 8 }}>INACTIF</span>}</td>
                   <td>
                     <Pill variant={cat.variant}>{cat.label}</Pill>
                   </td>

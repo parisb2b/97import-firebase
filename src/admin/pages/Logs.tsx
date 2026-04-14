@@ -18,7 +18,6 @@ export default function Logs() {
   const [filterType, setFilterType] = useState('');
 
   useEffect(() => {
-    const timeout = setTimeout(() => setLoading(false), 3000);
     const load = async () => {
       try {
         const q = query(collection(db, 'logs'), orderBy('createdAt', 'desc'), limit(100));
@@ -27,12 +26,10 @@ export default function Logs() {
       } catch (err) {
         console.error('Error loading logs:', err);
       } finally {
-        clearTimeout(timeout);
         setLoading(false);
       }
     };
     load();
-    return () => clearTimeout(timeout);
   }, []);
 
   const getTypePill = (log: Log) => {

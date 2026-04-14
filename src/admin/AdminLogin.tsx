@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { adminAuth } from '../lib/firebase';
+import { doc, getDoc } from 'firebase/firestore';
+import { adminAuth, db } from '../lib/firebase';
 import { useI18n } from '../i18n';
 import { GlobeToggle } from '../components/GlobeToggle';
 
@@ -17,7 +18,15 @@ export default function AdminLogin() {
     setLoading(true);
 
     try {
-      await signInWithEmailAndPassword(adminAuth, email, password);
+      const cred = await signInWithEmailAndPassword(adminAuth, email, password);
+      // Check admin role
+      const userSnap = await getDoc(doc(db, 'users', cred.user.uid));
+      const role = userSnap.data()?.role;
+      if (role !== 'admin') {
+        await adminAuth.signOut();
+        setError('Accès refusé. Ce compte n\'a pas les droits administrateur.');
+        return;
+      }
     } catch (err) {
       setError((err as Error).message);
     } finally {

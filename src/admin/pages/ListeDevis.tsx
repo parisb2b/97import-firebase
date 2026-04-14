@@ -45,7 +45,6 @@ export default function ListeDevis() {
       const data = snap.data();
       const emSnap = await getDoc(doc(db, 'admin_params', 'emetteur'));
       const emetteur = emSnap.exists() ? emSnap.data() : undefined;
-      console.log('PDF data:', JSON.stringify(data, null, 2));
       const pdfDoc = generateDevis(data, emetteur);
       const filename = isVip
         ? `${data.numero || devisId}-VIP.pdf`
@@ -58,8 +57,6 @@ export default function ListeDevis() {
   };
 
   useEffect(() => {
-    const timeout = setTimeout(() => setLoading(false), 3000);
-
     const loadDevis = async () => {
       try {
         const q = query(collection(db, 'quotes'), orderBy('createdAt', 'desc'));
@@ -87,14 +84,30 @@ export default function ListeDevis() {
       } catch (err) {
         console.error('Error loading devis:', err);
       } finally {
-        clearTimeout(timeout);
         setLoading(false);
       }
     };
     loadDevis();
-
-    return () => clearTimeout(timeout);
   }, []);
+
+  const handleExportCSV = () => {
+    if (devis.length === 0) return;
+    const BOM = '\uFEFF';
+    const headers = ['Numéro', 'Client', 'Statut', 'Total HT', 'Partenaire', 'Date'];
+    const rows = devis.map(d => [
+      d.numero, d.client_nom, d.statut, d.total_ht,
+      d.partenaire_code || 'Direct',
+      d.date || '',
+    ]);
+    const csv = BOM + [headers.join(';'), ...rows.map(r => r.join(';'))].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'devis-97import-' + new Date().toISOString().slice(0,10) + '.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   // Utiliser directement les vraies données (plus de demo data)
   const displayDevis = devis;
@@ -175,7 +188,7 @@ export default function ListeDevis() {
           <option value="TD">TD</option>
           <option value="MC">MC</option>
         </select>
-        <Button variant="o">📊 Export Excel</Button>
+        <Button variant="o" onClick={handleExportCSV}>📊 Export Excel</Button>
         <Link href="/admin/devis/nouveau">
           <Button variant="p">➕ Nouveau devis</Button>
         </Link>

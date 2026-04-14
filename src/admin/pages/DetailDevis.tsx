@@ -70,6 +70,8 @@ export default function DetailDevis() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [successMsg, setSuccessMsg] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
   const [showAcompteModal, setShowAcompteModal] = useState(false);
   const [acompteMontant, setAcompteMontant] = useState(0);
   const [emetteurData, setEmetteurData] = useState<any>(null);
@@ -141,6 +143,8 @@ export default function DetailDevis() {
   };
 
   const handleSave = async () => {
+    if (!devis.client_nom) { setErrorMsg('Nom du client obligatoire'); setTimeout(() => setErrorMsg(''), 5000); return; }
+    if (!devis.lignes || devis.lignes.length === 0) { setErrorMsg('Au moins une ligne obligatoire'); setTimeout(() => setErrorMsg(''), 5000); return; }
     setSaving(true);
     try {
       const total_ht = calculateTotal(devis.lignes);
@@ -161,8 +165,10 @@ export default function DetailDevis() {
       } else {
         await updateDoc(doc(db, 'quotes', devis.id), data);
       }
+      setSuccessMsg('Devis sauvegardé'); setTimeout(() => setSuccessMsg(''), 3000);
     } catch (err) {
       console.error('Error saving:', err);
+      setErrorMsg('Erreur sauvegarde'); setTimeout(() => setErrorMsg(''), 5000);
     } finally {
       setSaving(false);
     }
@@ -253,6 +259,8 @@ export default function DetailDevis() {
 
   return (
     <>
+      {successMsg && <div className="card" style={{ background: '#DCFCE7', color: '#166534', padding: '12px 20px', marginBottom: 16, borderLeft: '4px solid #22C55E' }}>✅ {successMsg}</div>}
+      {errorMsg && <div className="card" style={{ background: '#FEE2E2', color: '#991B1B', padding: '12px 20px', marginBottom: 16, borderLeft: '4px solid #EF4444' }}>❌ {errorMsg}</div>}
       {/* Header */}
       <div className="filters" style={{ justifyContent: 'space-between' }}>
         <div className="ct" style={{ fontSize: 18 }}>
@@ -269,7 +277,6 @@ export default function DetailDevis() {
           </Button>
           {!isNew && (
             <Button variant="t" onClick={() => {
-              console.log('PDF data:', JSON.stringify(devis, null, 2));
               const pdfDoc = generateDevis(devis, emetteurData);
               downloadPDF(pdfDoc, `${devis.numero}.pdf`);
             }}>

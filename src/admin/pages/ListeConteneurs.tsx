@@ -37,9 +37,7 @@ export default function ListeConteneurs() {
   };
 
   useEffect(() => {
-    const timeout = setTimeout(() => setLoading(false), 3000);
     load();
-    return () => clearTimeout(timeout);
   }, []);
 
   const handleDuplicate = async (c: Container) => {

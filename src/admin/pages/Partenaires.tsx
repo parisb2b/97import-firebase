@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { collection, query, orderBy, getDocs, doc, updateDoc } from 'firebase/firestore';
+import { collection, query, orderBy, getDocs, doc, updateDoc, addDoc } from 'firebase/firestore';
 import { useLocation } from 'wouter';
 import { db } from '../../lib/firebase';
 import { Card, Kpi, Pill, Button, IconButton, EyeIcon } from '../components/Icons';
@@ -18,6 +18,10 @@ export default function Partenaires() {
   const [partners, setPartners] = useState<Partner[]>([]);
   const [loading, setLoading] = useState(true);
   const [, setLocation] = useLocation();
+  const [showAdd, setShowAdd] = useState(false);
+  const [newP, setNewP] = useState({ nom: '', email: '', code: '', telephone: '' });
+  const [successMsg, setSuccessMsg] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
 
   const load = async () => {
     setLoading(true);
@@ -33,17 +37,43 @@ export default function Partenaires() {
   };
 
   useEffect(() => {
-    const timeout = setTimeout(() => setLoading(false), 3000);
     load();
-    return () => clearTimeout(timeout);
   }, []);
 
   const toggleActif = async (p: Partner) => {
     try {
       await updateDoc(doc(db, 'partners', p.id), { actif: !p.actif });
       load();
+      setSuccessMsg('Statut mis à jour');
+      setTimeout(() => setSuccessMsg(''), 3000);
     } catch (err) {
       console.error('Error toggling:', err);
+      setErrorMsg('Erreur lors de la mise à jour du statut');
+      setTimeout(() => setErrorMsg(''), 3000);
+    }
+  };
+
+  const handleAddPartner = async () => {
+    if (!newP.nom || !newP.code) return;
+    try {
+      await addDoc(collection(db, 'partners'), {
+        nom: newP.nom,
+        email: newP.email,
+        code: newP.code,
+        tel: newP.telephone,
+        commission_taux: 0,
+        actif: true,
+        createdAt: new Date(),
+      });
+      setShowAdd(false);
+      setNewP({ nom: '', email: '', code: '', telephone: '' });
+      setSuccessMsg('Partenaire ajouté avec succès');
+      setTimeout(() => setSuccessMsg(''), 3000);
+      load();
+    } catch (err) {
+      console.error('Error adding partner:', err);
+      setErrorMsg('Erreur lors de l\'ajout du partenaire');
+      setTimeout(() => setErrorMsg(''), 3000);
     }
   };
 
@@ -53,6 +83,9 @@ export default function Partenaires() {
 
   return (
     <>
+      {successMsg && <div className="alert gr">{successMsg}</div>}
+      {errorMsg && <div className="alert rd">{errorMsg}</div>}
+
       <div className="kgrid">
         <Kpi label="Total partenaires" value={partners.length} color="pu" />
         <Kpi label="Actifs" value={actifs} color="gr" />
@@ -60,7 +93,7 @@ export default function Partenaires() {
       </div>
 
       <div className="filters">
-        <Button variant="p" onClick={() => alert('Ajouter partenaire')}>+ Ajouter partenaire</Button>
+        <Button variant="p" onClick={() => setShowAdd(true)}>+ Ajouter partenaire</Button>
       </div>
 
       <Card title={`Partenaires (${partners.length})`} subtitle="Cliquer sur une ligne pour voir le détail">
@@ -92,6 +125,24 @@ export default function Partenaires() {
           </tbody>
         </table>
       </Card>
+
+      {showAdd && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div className="card" style={{ width: 440, padding: 32 }}>
+            <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 20 }}>Nouveau partenaire</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <input className="fi" placeholder="Nom complet" value={newP.nom} onChange={e => setNewP({...newP, nom: e.target.value})} />
+              <input className="fi" placeholder="Email" type="email" value={newP.email} onChange={e => setNewP({...newP, email: e.target.value})} />
+              <input className="fi" placeholder="Code (2-3 lettres)" value={newP.code} onChange={e => setNewP({...newP, code: e.target.value.toUpperCase().slice(0,3)})} maxLength={3} />
+              <input className="fi" placeholder="Telephone (optionnel)" value={newP.telephone} onChange={e => setNewP({...newP, telephone: e.target.value})} />
+            </div>
+            <div style={{ display: 'flex', gap: 12, marginTop: 20, justifyContent: 'flex-end' }}>
+              <button className="btn" onClick={() => setShowAdd(false)}>Annuler</button>
+              <button className="btn p" onClick={handleAddPartner} disabled={!newP.nom || !newP.code}>Ajouter</button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

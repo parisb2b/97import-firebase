@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { collection, query, getDocs, where, orderBy, limit } from 'firebase/firestore';
+import { collection, query, getDocs, where, limit } from 'firebase/firestore';
 import { Link } from 'wouter';
 import { db } from '../../lib/firebase';
 import {
@@ -13,10 +13,12 @@ import {
 } from '../components/Icons';
 
 interface Stats {
+  devisTotal: number;
   devisEnAttente: number;
   devisVip: number;
   devisStd: number;
   caEncaisse: number;
+  soldeRestant: number;
   commissionsDues: number;
   commissionsPartenaires: number;
   savUrgents: number;
@@ -52,38 +54,84 @@ interface Commission {
 
 export default function Dashboard() {
   const [stats, setStats] = useState<Stats>({
-    devisEnAttente: 7,
-    devisVip: 3,
-    devisStd: 4,
-    caEncaisse: 34200,
-    commissionsDues: 8320,
-    commissionsPartenaires: 3,
-    savUrgents: 2,
+    devisTotal: 0,
+    devisEnAttente: 0,
+    devisVip: 0,
+    devisStd: 0,
+    caEncaisse: 0,
+    soldeRestant: 0,
+    commissionsDues: 0,
+    commissionsPartenaires: 0,
+    savUrgents: 0,
   });
   const [recentDevis, setRecentDevis] = useState<RecentDevis[]>([]);
   const [conteneurs, setConteneurs] = useState<Conteneur[]>([]);
   const [commissions, setCommissions] = useState<Commission[]>([]);
   const [loading, setLoading] = useState(true);
+  const [errorMsg, setErrorMsg] = useState('');
 
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      setLoading(false);
-    }, 3000);
-
     const loadData = async () => {
       try {
-        // Load recent devis
-        const devisQuery = query(
-          collection(db, 'quotes'),
-          orderBy('createdAt', 'desc'),
-          limit(5)
+        // Load ALL quotes
+        const allQuotesSnap = await getDocs(collection(db, 'quotes'));
+        const allQuotes = allQuotesSnap.docs.map((d) => ({ id: d.id, ...d.data() })) as any[];
+
+        const devisTotal = allQuotes.length;
+        const devisEnAttente = allQuotes.filter((q) => q.statut === 'nouveau' || q.statut === 'envoye').length;
+        const devisVip = allQuotes.filter((q) => q.is_vip || q.statut === 'vip_envoye').length;
+
+        // CA encaisse: sum of acomptes where statut='encaisse'
+        let caEncaisse = 0;
+        allQuotes.forEach((q) => {
+          if (q.acomptes && Array.isArray(q.acomptes)) {
+            q.acomptes.forEach((a: any) => {
+              if (a.statut === 'encaisse') caEncaisse += (a.montant || 0);
+            });
+          }
+          if (q.total_encaisse) caEncaisse += q.total_encaisse;
+        });
+
+        // Solde restant
+        const totalHtAll = allQuotes.reduce((sum, q) => sum + (q.total_ht || 0), 0);
+        const soldeRestant = totalHtAll - caEncaisse;
+
+        // Load commissions from BOTH collections
+        const [commSnap, notesCommSnap] = await Promise.all([
+          getDocs(collection(db, 'commissions')).catch(() => null),
+          getDocs(collection(db, 'notes_commission')).catch(() => null),
+        ]);
+
+        let commissionsDues = 0;
+        const partenaireSet = new Set<string>();
+        const commList: Commission[] = [];
+
+        if (commSnap) {
+          commSnap.docs.forEach((d) => {
+            const data = d.data();
+            if (data.statut === 'due') {
+              commissionsDues += (data.montant || 0);
+              if (data.partenaire_code) partenaireSet.add(data.partenaire_code);
+              commList.push({ id: d.id, ...data } as Commission);
+            }
+          });
+        }
+        if (notesCommSnap) {
+          notesCommSnap.docs.forEach((d) => {
+            const data = d.data();
+            if (data.statut === 'due') {
+              commissionsDues += (data.montant || 0);
+              if (data.partenaire_code) partenaireSet.add(data.partenaire_code);
+              commList.push({ id: d.id, ...data } as Commission);
+            }
+          });
+        }
+        setCommissions(commList.slice(0, 5));
+
+        // Load SAV urgents
+        const savSnap = await getDocs(
+          query(collection(db, 'sav'), where('statut', '==', 'nouveau'))
         );
-        const devisSnap = await getDocs(devisQuery);
-        const devisData = devisSnap.docs.map((d) => ({
-          id: d.id,
-          ...d.data(),
-        })) as RecentDevis[];
-        setRecentDevis(devisData);
 
         // Load active containers
         const contQuery = query(
@@ -98,43 +146,35 @@ export default function Dashboard() {
         })) as Conteneur[];
         setConteneurs(contData);
 
-        // Load pending commissions
-        const commQuery = query(
-          collection(db, 'notes_commission'),
-          where('statut', '==', 'due'),
-          limit(5)
-        );
-        const commSnap = await getDocs(commQuery);
-        const commData = commSnap.docs.map((d) => ({
-          id: d.id,
-          ...d.data(),
-        })) as Commission[];
-        setCommissions(commData);
+        // 5 most recent devis sorted by createdAt
+        const sorted = [...allQuotes].sort((a, b) => {
+          const ta = a.createdAt?.toMillis?.() || a.createdAt?.seconds * 1000 || 0;
+          const tb = b.createdAt?.toMillis?.() || b.createdAt?.seconds * 1000 || 0;
+          return tb - ta;
+        });
+        setRecentDevis(sorted.slice(0, 5) as RecentDevis[]);
 
-        // Update stats from actual data
-        const devisEnAttenteSnap = await getDocs(
-          query(collection(db, 'quotes'), where('statut', 'in', ['brouillon', 'envoye']))
-        );
-        const savUrgentsSnap = await getDocs(
-          query(collection(db, 'sav'), where('statut', '==', 'nouveau'))
-        );
+        setStats({
+          devisTotal,
+          devisEnAttente,
+          devisVip,
+          devisStd: devisEnAttente - devisVip,
+          caEncaisse,
+          soldeRestant,
+          commissionsDues,
+          commissionsPartenaires: partenaireSet.size,
+          savUrgents: savSnap.size,
+        });
 
-        setStats((s) => ({
-          ...s,
-          devisEnAttente: devisEnAttenteSnap.size || s.devisEnAttente,
-          savUrgents: savUrgentsSnap.size || s.savUrgents,
-        }));
+        setLoading(false);
       } catch (err) {
         console.error('Error loading dashboard:', err);
-      } finally {
-        clearTimeout(timeout);
+        setErrorMsg('Erreur lors du chargement du tableau de bord');
         setLoading(false);
       }
     };
 
     loadData();
-
-    return () => clearTimeout(timeout);
   }, []);
 
   if (loading) {
@@ -143,6 +183,7 @@ export default function Dashboard() {
 
   return (
     <>
+      {errorMsg && <div className="card" style={{ background: '#FEE2E2', color: '#991B1B', padding: '12px 20px', marginBottom: 16, borderLeft: '4px solid #EF4444' }}>{errorMsg}</div>}
       {/* KPI Grid */}
       <div className="kgrid">
         <Kpi

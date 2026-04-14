@@ -19,7 +19,6 @@ export default function Clients() {
   const [, setLocation] = useLocation();
 
   useEffect(() => {
-    const timeout = setTimeout(() => setLoading(false), 3000);
     const load = async () => {
       try {
         const q = query(collection(db, 'profiles'), orderBy('createdAt', 'desc'));
@@ -28,12 +27,10 @@ export default function Clients() {
       } catch (err) {
         console.error('Error loading clients:', err);
       } finally {
-        clearTimeout(timeout);
         setLoading(false);
       }
     };
     load();
-    return () => clearTimeout(timeout);
   }, []);
 
   const filtered = clients.filter(c =>
