@@ -133,13 +133,20 @@ export default function Header() {
 
           {/* Connexion */}
           {user ? (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)' }}>{user.email?.split('@')[0]}</span>
-              <button onClick={() => clientAuth.signOut()}
-                style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)', background: 'none', border: 'none', cursor: 'pointer' }}>
-                {t('btn.deconnexion')}
-              </button>
-            </div>
+            <Link href="/espace-client">
+              <div style={{
+                display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer',
+                border: '1px solid rgba(255,255,255,0.3)', borderRadius: 12, padding: '6px 14px',
+              }}>
+                <div style={{
+                  width: 24, height: 24, borderRadius: '50%', background: '#1E3A5F',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700,
+                }}>
+                  {user.displayName?.[0]?.toUpperCase() || '👤'}
+                </div>
+                <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.8)' }}>{user.displayName || user.email?.split('@')[0]}</span>
+              </div>
+            </Link>
           ) : (
             <Link href="/connexion">
               <span style={{

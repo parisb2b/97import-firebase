@@ -10,6 +10,8 @@ import Connexion from './pages/Connexion';
 import Inscription from './pages/Inscription';
 import Panier from './pages/Panier';
 import MonCompte from './pages/MonCompte';
+import Profil from './pages/Profil';
+import EspaceClient from './pages/EspaceClient';
 
 function Placeholder({ name }: { name: string }) {
   return <div style={{ padding: 60, textAlign: 'center', color: '#666' }}>{name} — page à venir</div>;
@@ -33,9 +35,9 @@ export default function FrontApp() {
           <Route path="/mon-compte/:tab?" component={MonCompte} />
           <Route path="/services">{() => <Placeholder name="Services" />}</Route>
           <Route path="/contact">{() => <Placeholder name="Contact" />}</Route>
-          <Route path="/espace-client">{() => <Placeholder name="Espace Client" />}</Route>
+          <Route path="/espace-client" component={EspaceClient} />
           <Route path="/espace-partenaire">{() => <Placeholder name="Espace Partenaire" />}</Route>
-          <Route path="/profil">{() => <Placeholder name="Profil" />}</Route>
+          <Route path="/profil" component={Profil} />
           <Route path="/mentions-legales">{() => <Placeholder name="Mentions légales" />}</Route>
           <Route path="/cgv">{() => <Placeholder name="CGV" />}</Route>
           <Route path="/rgpd">{() => <Placeholder name="RGPD" />}</Route>
