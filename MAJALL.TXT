@@ -1,3 +1,15 @@
+[2026-04-14 22:10] fix-ux-admin — 15 bugs parcours admin corrigés
+  - Dashboard KPI Firestore (plus de hardcode 34200€)
+  - Formulaire Ajouter partenaire (modal)
+  - Export CSV ListeDevis connecté
+  - AdminLogin vérifie rôle admin
+  - DetailDevis validation + banners
+  - setTimeout 3s supprimé (7 pages)
+  - Badge INACTIF, produits démo supprimés
+  - console.log debug supprimés
+  - destination + is_vip dans création devis
+  - Collection commissions unifiée dans Dashboard
+
 [2026-04-14 21:50] fix-ux — 11 bugs parcours utilisateur corrigés
   - Inscription écrit dans users/ + profiles/
   - Compteur panier Header connecté (localStorage + event cart-updated)
