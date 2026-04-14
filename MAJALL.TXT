@@ -1,3 +1,11 @@
+[2026-04-14 15:40] v28-prep — Normalisation + 5 produits test + 5 comptes test
+=================================================
+- Normalisation catégories Firestore : 3 produits corrigés (mini-pelle→Mini-Pelle, solaire→Solaire, etc.)
+- 6 catégories propres : Agricole(1), Divers(4), Logistique(9), Maisons(25), Mini-Pelle(44), Solaire(18)
+- 5 comptes test créés : admin, client, vip, partenaire, client2 (@97import.com / 20262026)
+- 5 produits test créés : TEST-MP-R22, TEST-MS-20, TEST-SOL-10, TEST-ACC-GD20, TEST-LOG-MQ
+- Vérification complète OK
+
 [2026-04-11 10:48] v2 — RECONSTRUCTION FROM SCRATCH
 =================================================
 

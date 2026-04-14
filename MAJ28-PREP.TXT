@@ -1,0 +1,29 @@
+=== MAJ28-PREP — Normalisation + 5 produits test + 5 comptes test ===
+Date : 2026-04-14
+
+PARTIE A — NORMALISATION CATÉGORIES :
+  Produits mis à jour : 3
+  Catégories après normalisation :
+    Agricole : 1
+    Divers : 4
+    Logistique : 9
+    Maisons : 25
+    Mini-Pelle : 44
+    Solaire : 18
+
+PARTIE B — COMPTES TEST :
+  admin@97import.com (admin) : ✅ UID: k9lrMDiRr0OgSrBx9pD6RtGkuKy2
+  client@97import.com (user) : ✅ UID: d4FH6o9ZukOZZBKRAidreFJUEji2
+  vip@97import.com (vip) : ✅ UID: zE1pLFaFGLMdEVzlS3XaR5S20OW2
+  partenaire@97import.com (partner) : ✅ UID: EAlzNFTuB8dKOhbRzBJJ7ks6yXt2
+  client2@97import.com (user) : ✅ UID: xhPwvggknSWyhfcJGkDjYy3cAQD2
+  Mot de passe : 20262026
+
+PARTIE C — PRODUITS TEST :
+  TEST-MP-R22 (Mini-pelle R22 PRO) : ✅ | 24 300 €
+  TEST-MS-20 (Maison Standard 20P) : ✅ | 14 840 €
+  TEST-SOL-10 (Kit Solaire 10kW) : ✅ | 10 740 €
+  TEST-ACC-GD20 (Godet R22 20cm) : ✅ | 588 €
+  TEST-LOG-MQ (Frais Martinique) : ✅ | 3 800 €
+
+VÉRIFICATION : Tous les produits et comptes accessibles ✅
