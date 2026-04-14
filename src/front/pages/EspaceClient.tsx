@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation, Redirect } from 'wouter';
-import { collection, query, where, orderBy, getDocs } from 'firebase/firestore';
+import { collection, query, where, orderBy, getDocs, doc, getDoc } from 'firebase/firestore';
 import { clientAuth, db } from '../../lib/firebase';
 import { useI18n } from '../../i18n';
+import { generateDevis, generateFactureAcompte, downloadPDF } from '../../lib/pdf-generator';
 
 interface DevisLine {
   ref: string;
@@ -72,6 +73,28 @@ export default function EspaceClient() {
   }, [user]);
 
   if (!user) return <Redirect to="/connexion" />;
+
+  const handleDownloadDoc = async (d: Devis, docType: 'devis' | 'facture_acompte') => {
+    try {
+      const emSnap = await getDoc(doc(db, 'admin_params', 'emetteur'));
+      const emetteur = emSnap.exists() ? emSnap.data() : undefined;
+      const quoteSnap = await getDoc(doc(db, 'quotes', d.id));
+      if (!quoteSnap.exists()) return;
+      const data = quoteSnap.data();
+      if (docType === 'devis') {
+        downloadPDF(generateDevis(data, emetteur), `${d.numero}.pdf`);
+      } else if (docType === 'facture_acompte' && d.acomptes?.length) {
+        downloadPDF(generateFactureAcompte(data, d.acomptes[0], emetteur), `FA-${d.numero}.pdf`);
+      }
+    } catch (err) {
+      console.error('PDF error:', err);
+    }
+  };
+
+  const handleVerserAcompte = (d: Devis) => {
+    // Navigate to panier-style flow with pre-filled quote info
+    window.open(`https://wa.me/33663284908?text=${encodeURIComponent(`Bonjour, je souhaite verser un acompte pour le devis ${d.numero} (${d.total_ht}€). Merci.`)}`, '_blank');
+  };
 
   const handleLogout = async () => {
     await clientAuth.signOut();
@@ -195,23 +218,23 @@ export default function EspaceClient() {
                         <h4 style={{ fontSize: 13, fontWeight: 700, color: '#0B2545', marginBottom: 12 }}>{t('espace.documents')}</h4>
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 20 }}>
                           {[
-                            { icon: '📄', label: 'Devis', status: 'Disponible', active: true },
-                            { icon: '🧾', label: 'Facture acompte', status: encaisse > 0 ? 'Disponible' : 'En attente', active: encaisse > 0 },
-                            { icon: '🚚', label: 'Bon de livraison', status: 'Apres expedition', active: false },
-                            { icon: '📃', label: 'Facture finale', status: 'Apres paiement complet', active: false },
-                          ].map((doc, i) => (
+                            { icon: '📄', label: 'Devis', status: 'Disponible', active: true, action: () => handleDownloadDoc(d, 'devis') },
+                            { icon: '🧾', label: 'Facture acompte', status: encaisse > 0 ? 'Disponible' : 'En attente', active: encaisse > 0, action: () => handleDownloadDoc(d, 'facture_acompte') },
+                            { icon: '🚚', label: 'Bon de livraison', status: 'Apres expedition', active: false, action: undefined },
+                            { icon: '📃', label: 'Facture finale', status: 'Apres paiement complet', active: false, action: undefined },
+                          ].map((docItem, i) => (
                             <div key={i} style={{
                               display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px',
-                              borderRadius: 10, background: doc.active ? '#F9FAFB' : '#F9FAFB',
-                              opacity: doc.active ? 1 : 0.5,
+                              borderRadius: 10, background: '#F9FAFB',
+                              opacity: docItem.active ? 1 : 0.5,
                             }}>
-                              <span style={{ fontSize: 18 }}>{doc.icon}</span>
+                              <span style={{ fontSize: 18 }}>{docItem.icon}</span>
                               <div style={{ flex: 1 }}>
-                                <p style={{ fontSize: 13, fontWeight: 600, color: '#0B2545' }}>{doc.label}</p>
-                                <p style={{ fontSize: 11, color: '#9CA3AF' }}>{doc.status}</p>
+                                <p style={{ fontSize: 13, fontWeight: 600, color: '#0B2545' }}>{docItem.label}</p>
+                                <p style={{ fontSize: 11, color: '#9CA3AF' }}>{docItem.status}</p>
                               </div>
-                              {doc.active && (
-                                <button style={{
+                              {docItem.active && (
+                                <button onClick={docItem.action} style={{
                                   padding: '4px 10px', borderRadius: 8, border: '1px solid #E5E7EB',
                                   background: 'white', fontSize: 11, cursor: 'pointer', color: '#374151',
                                 }}>Telecharger</button>
@@ -239,7 +262,7 @@ export default function EspaceClient() {
 
                         {/* Verser un acompte */}
                         {solde > 0 && (
-                          <button style={{
+                          <button onClick={() => handleVerserAcompte(d)} style={{
                             width: '100%', padding: '12px 0', background: '#0D9488', color: 'white',
                             border: 'none', borderRadius: 12, fontSize: 14, fontWeight: 700, cursor: 'pointer',
                           }}>

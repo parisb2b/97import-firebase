@@ -12,12 +12,11 @@ interface Devis {
   createdAt: any;
 }
 
-const TABS = [
-  { id: 'devis', label: 'Mes devis', icon: '📋' },
-  { id: 'factures', label: 'Mes factures', icon: '🧾' },
-  { id: 'livraison', label: 'Suivi livraison', icon: '🚚' },
-  { id: 'sav', label: 'SAV', icon: '🔧' },
-];
+const STATUT_STYLE: Record<string, { bg: string; color: string }> = {
+  accepte: { bg: '#DCFCE7', color: '#166534' },
+  envoye: { bg: '#DBEAFE', color: '#1E40AF' },
+  refuse: { bg: '#FEE2E2', color: '#991B1B' },
+};
 
 export default function MonCompte() {
   const { t } = useI18n();
@@ -28,9 +27,15 @@ export default function MonCompte() {
   const user = clientAuth.currentUser;
   const currentTab = params?.tab || 'devis';
 
+  const TABS = [
+    { id: 'devis', label: t('espace.mesDevis'), icon: '📋' },
+    { id: 'factures', label: 'Factures', icon: '🧾' },
+    { id: 'livraison', label: 'Suivi livraison', icon: '🚚' },
+    { id: 'sav', label: 'SAV', icon: '🔧' },
+  ];
+
   useEffect(() => {
     if (!user) return;
-
     const loadDevis = async () => {
       setLoading(true);
       try {
@@ -47,92 +52,73 @@ export default function MonCompte() {
         setLoading(false);
       }
     };
-
     loadDevis();
   }, [user]);
 
-  if (!user) {
-    return <Redirect to="/connexion" />;
-  }
+  if (!user) return <Redirect to="/connexion" />;
 
-  const getStatutClass = (statut: string) => {
-    switch (statut) {
-      case 'accepte':
-        return 'bg-green-100 text-green-700';
-      case 'envoye':
-        return 'bg-blue-100 text-blue-700';
-      case 'refuse':
-        return 'bg-red-100 text-red-700';
-      default:
-        return 'bg-gray-100 text-gray-700';
-    }
+  const statutStyle = (statut: string): React.CSSProperties => {
+    const s = STATUT_STYLE[statut] || { bg: '#F3F4F6', color: '#374151' };
+    return { background: s.bg, color: s.color, padding: '2px 10px', borderRadius: 20, fontSize: 11, fontWeight: 600 };
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">Mon compte</h1>
+    <div style={{ maxWidth: 1100, margin: '0 auto', padding: '32px 16px' }}>
+      <h1 style={{ fontSize: 28, fontWeight: 800, color: '#0B2545', marginBottom: 32 }}>{t('auth.monCompte')}</h1>
 
-      <div className="flex flex-col md:flex-row gap-8">
+      <div style={{ display: 'flex', gap: 32, alignItems: 'flex-start' }}>
         {/* Sidebar */}
-        <aside className="md:w-64">
-          <div className="bg-white rounded-xl shadow p-4 mb-4">
-            <p className="font-medium">{user.displayName || 'Client'}</p>
-            <p className="text-sm text-gray-500">{user.email}</p>
+        <aside style={{ width: 240, flexShrink: 0 }}>
+          <div style={{ background: 'white', borderRadius: 16, boxShadow: '0 2px 8px rgba(0,0,0,0.04)', padding: 16, marginBottom: 16 }}>
+            <p style={{ fontWeight: 600, color: '#0B2545' }}>{user.displayName || 'Client'}</p>
+            <p style={{ fontSize: 13, color: '#6B7280', marginTop: 2 }}>{user.email}</p>
           </div>
 
-          <nav className="bg-white rounded-xl shadow overflow-hidden">
+          <nav style={{ background: 'white', borderRadius: 16, boxShadow: '0 2px 8px rgba(0,0,0,0.04)', overflow: 'hidden' }}>
             {TABS.map((tab) => (
               <Link key={tab.id} href={`/mon-compte/${tab.id}`}>
-                <a
-                  className={`flex items-center gap-3 px-4 py-3 border-b last:border-0 ${
-                    currentTab === tab.id
-                      ? 'bg-navy text-white'
-                      : 'hover:bg-gray-50'
-                  }`}
-                >
+                <div style={{
+                  display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px',
+                  borderBottom: '1px solid #F3F4F6', cursor: 'pointer',
+                  background: currentTab === tab.id ? '#0B2545' : 'white',
+                  color: currentTab === tab.id ? 'white' : '#374151',
+                  fontWeight: currentTab === tab.id ? 600 : 400, fontSize: 14,
+                }}>
                   <span>{tab.icon}</span>
                   <span>{tab.label}</span>
-                </a>
+                </div>
               </Link>
             ))}
           </nav>
         </aside>
 
         {/* Content */}
-        <main className="flex-1">
+        <main style={{ flex: 1, minWidth: 0 }}>
           {currentTab === 'devis' && (
-            <div className="bg-white rounded-xl shadow">
-              <div className="p-4 border-b">
-                <h2 className="font-semibold text-lg">Mes devis</h2>
+            <div style={{ background: 'white', borderRadius: 16, boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+              <div style={{ padding: 16, borderBottom: '1px solid #F3F4F6' }}>
+                <h2 style={{ fontWeight: 700, fontSize: 18, color: '#0B2545' }}>{t('espace.mesDevis')}</h2>
               </div>
               {loading ? (
-                <div className="p-8 text-center">{t('loading')}</div>
+                <div style={{ padding: 32, textAlign: 'center', color: '#6B7280' }}>{t('loading')}</div>
               ) : devis.length === 0 ? (
-                <div className="p-8 text-center text-gray-500">
-                  Aucun devis
-                </div>
+                <div style={{ padding: 32, textAlign: 'center', color: '#6B7280' }}>{t('espace.aucunDevis')}</div>
               ) : (
-                <div className="divide-y">
+                <div>
                   {devis.map((d) => (
-                    <div
-                      key={d.id}
-                      className="p-4 flex items-center justify-between hover:bg-gray-50"
-                    >
+                    <div key={d.id} style={{
+                      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                      padding: '14px 16px', borderBottom: '1px solid #F3F4F6',
+                    }}>
                       <div>
-                        <p className="font-medium">{d.numero}</p>
-                        <p className="text-sm text-gray-500">
+                        <p style={{ fontWeight: 600, color: '#0B2545', fontSize: 14 }}>{d.numero}</p>
+                        <p style={{ fontSize: 12, color: '#9CA3AF', marginTop: 2 }}>
                           {d.createdAt?.toDate?.()?.toLocaleDateString('fr-FR')}
                         </p>
                       </div>
-                      <div className="text-right">
-                        <span
-                          className={`px-2 py-0.5 rounded text-xs ${getStatutClass(
-                            d.statut
-                          )}`}
-                        >
-                          {t(`statut.${d.statut}`)}
-                        </span>
-                        <p className="font-semibold mt-1">
+                      <div style={{ textAlign: 'right' }}>
+                        <span style={statutStyle(d.statut)}>{t(`statut.${d.statut}`)}</span>
+                        <p style={{ fontWeight: 700, color: '#0B2545', marginTop: 4, fontSize: 14 }}>
                           {d.total_ht?.toLocaleString('fr-FR')} €
                         </p>
                       </div>
@@ -144,27 +130,25 @@ export default function MonCompte() {
           )}
 
           {currentTab === 'factures' && (
-            <div className="bg-white rounded-xl shadow p-8 text-center text-gray-500">
-              Les factures apparaîtront ici après validation de vos devis
+            <div style={{ background: 'white', borderRadius: 16, boxShadow: '0 2px 8px rgba(0,0,0,0.04)', padding: 32, textAlign: 'center', color: '#6B7280' }}>
+              Les factures apparaitront ici apres validation de vos devis
             </div>
           )}
 
           {currentTab === 'livraison' && (
-            <div className="bg-white rounded-xl shadow p-8 text-center text-gray-500">
-              Le suivi de livraison apparaîtra ici après expédition
+            <div style={{ background: 'white', borderRadius: 16, boxShadow: '0 2px 8px rgba(0,0,0,0.04)', padding: 32, textAlign: 'center', color: '#6B7280' }}>
+              Le suivi de livraison apparaitra ici apres expedition
             </div>
           )}
 
           {currentTab === 'sav' && (
-            <div className="bg-white rounded-xl shadow p-8">
-              <h2 className="font-semibold text-lg mb-4">Service après-vente</h2>
-              <p className="text-gray-500 mb-4">
+            <div style={{ background: 'white', borderRadius: 16, boxShadow: '0 2px 8px rgba(0,0,0,0.04)', padding: 32 }}>
+              <h2 style={{ fontWeight: 700, fontSize: 18, color: '#0B2545', marginBottom: 16 }}>Service apres-vente</h2>
+              <p style={{ color: '#6B7280', marginBottom: 16 }}>
                 Pour toute demande SAV, contactez-nous :
               </p>
-              <div className="space-y-2">
-                <p>
-                  📧 <a href="mailto:luxent@ltd-uk.eu" className="text-navy hover:underline">luxent@ltd-uk.eu</a>
-                </p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <p>📧 <a href="mailto:luxent@ltd-uk.eu" style={{ color: '#0B2545', textDecoration: 'underline' }}>luxent@ltd-uk.eu</a></p>
                 <p>📞 France: +33 620 607 448</p>
                 <p>📞 Chine: +86 135 6627 1902</p>
               </div>

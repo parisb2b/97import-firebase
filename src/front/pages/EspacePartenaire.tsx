@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useLocation, Redirect } from 'wouter';
-import { collection, query, where, orderBy, getDocs, doc, updateDoc } from 'firebase/firestore';
+import { collection, query, where, orderBy, getDocs, doc, updateDoc, getDoc } from 'firebase/firestore';
 import { clientAuth, db } from '../../lib/firebase';
 import { useI18n } from '../../i18n';
+import { generateDevis, downloadPDF } from '../../lib/pdf-generator';
 
 interface DevisLine {
   ref: string;
@@ -94,6 +95,18 @@ export default function EspacePartenaire() {
       alert('Devis VIP envoye au client !');
     } catch (err) {
       console.error('Error:', err);
+    }
+  };
+
+  const handlePreviewPDF = async (d: Devis) => {
+    try {
+      const emSnap = await getDoc(doc(db, 'admin_params', 'emetteur'));
+      const emetteur = emSnap.exists() ? emSnap.data() : undefined;
+      const quoteSnap = await getDoc(doc(db, 'quotes', d.id));
+      if (!quoteSnap.exists()) return;
+      downloadPDF(generateDevis(quoteSnap.data(), emetteur), `${d.numero}.pdf`);
+    } catch (err) {
+      console.error('PDF error:', err);
     }
   };
 
@@ -247,7 +260,7 @@ export default function EspacePartenaire() {
                               }}>
                                 {t('partenaire.envoyerVip')}
                               </button>
-                              <button style={{
+                              <button onClick={() => handlePreviewPDF(d)} style={{
                                 padding: '14px 24px', border: '1px solid #E5E7EB', borderRadius: 12,
                                 background: 'white', color: '#374151', fontSize: 14, cursor: 'pointer',
                               }}>
