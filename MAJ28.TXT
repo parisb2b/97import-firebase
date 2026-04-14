@@ -1,0 +1,38 @@
+=== MAJ28 — Liaison back-office + i18n + prix partenaire + ajustements ===
+Date : 2026-04-14
+
+PARTIE A — i18n :
+  fr.json créé : ✅ (244 clés, structure nested)
+  en.json créé : ✅ (traductions professionnelles)
+  zh.json créé : ✅ (traductions professionnelles)
+  I18nProvider : ✅ (nested JSON + flat admin fallback)
+  Toggle langue Header fonctionnel : ✅ (GlobeToggle inline styles FR/EN/中文)
+  Pages front traduites : 15/15 fichiers
+    - Header, Footer, GlobeToggle, SearchBar, PriceDisplay, ProductCard
+    - Home, Catalogue, Produit, Panier (+ 3 popups), Connexion, Inscription
+    - Profil, EspaceClient, EspacePartenaire, Services, Contact
+  Noms produits multilingues : ✅ (nom_fr/nom_en/nom_zh depuis Firestore)
+
+PARTIE B — PRIX PARTENAIRE :
+  PriceDisplay partner (gros orange + public barré) : ✅
+  ProductCard partner (small: barré + orange) : ✅
+
+PARTIE C — LIAISON BACK-OFFICE :
+  Format devis compatible : ✅ (quotes: numero, client_id/email/nom, lignes, total_ht, statut, partenaire_code, acomptes, createdAt)
+  Numérotation DVS-AAMM-NNN : ✅ (lib/counters.ts, transaction atomique)
+  Routes admin intactes : ✅ (aucune modification de src/admin/)
+
+PARTIE D — AJUSTEMENTS :
+  Catalogue tri machines (ordre + reference) : ✅
+  Bannière accessoires (compteur) : ✅ (déjà en place v27)
+  Header nom utilisateur : ✅ (displayName || email split)
+  Image maison hero : ✅ (hero_maison.png existe)
+
+BUILD : npm run build → ✅ (2.02s, 0 erreurs)
+
+TESTS À FAIRE :
+  Toggle FR → EN → 中文 : textes changent
+  Produit TEST-MP-R22 en chinois : nom_zh affiché
+  Prix partenaire (gros orange + barré) : visible pour partenaire@97import.com
+  Créer devis depuis front → visible dans /admin/devis
+  /admin fonctionne toujours

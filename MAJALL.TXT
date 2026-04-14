@@ -1,3 +1,13 @@
+[2026-04-14 19:30] v28 — Liaison back-office + i18n FR/EN/ZH + prix partenaire + ajustements
+  - i18n : fr.json + en.json + zh.json (244 clés), provider nested + flat admin fallback
+  - 15 pages front traduites (Header, Footer, Home, Catalogue, Produit, Panier, Connexion, etc.)
+  - Noms produits multilingues : nom_fr/nom_en/nom_zh depuis Firestore
+  - PriceDisplay partner : prix gros orange + public barré
+  - GlobeToggle : inline styles FR/EN/中文
+  - Liaison front↔back-office : format quotes compatible, DVS-AAMM-NNN
+  - Catalogue : tri par ordre + reference, accessoires exclus
+  - Header : nom utilisateur, bannière accessoires OK, hero_maison.png OK
+
 [2026-04-14 16:10] v28-fix2 — Correction root cause rôle écrasé dans profiles
   - ROOT CAUSE : Profil.tsx + Inscription.tsx (Google) écrasaient role='user' dans profiles/ à chaque save
   - Profil.tsx : retiré role:'user' du setDoc merge
