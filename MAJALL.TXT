@@ -1,3 +1,8 @@
+[2026-04-14 16:00] v28-fix — Correction rôle utilisateur dans Catalogue + Produit
+  - Produit.tsx + Catalogue.tsx : rôle hardcodé 'user' → lecture depuis Firestore profiles/{uid}
+  - Aligné avec le pattern déjà utilisé dans Header.tsx
+  - Impact : admin voit les 4 prix, partner voit le prix partenaire, vip voit le prix public
+
 [2026-04-14 15:40] v28-prep — Normalisation + 5 produits test + 5 comptes test
 =================================================
 - Normalisation catégories Firestore : 3 produits corrigés (mini-pelle→Mini-Pelle, solaire→Solaire, etc.)
