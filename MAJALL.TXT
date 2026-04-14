@@ -1,3 +1,13 @@
+[2026-04-14 21:50] fix-ux — 11 bugs parcours utilisateur corrigés
+  - Inscription écrit dans users/ + profiles/
+  - Compteur panier Header connecté (localStorage + event cart-updated)
+  - Connexion redirige selon le rôle (partner → espace-partenaire)
+  - Profil redirige vers espace-client + toast succès
+  - Système Toast global (remplace alert())
+  - Toast error sur tous les catch Firestore
+  - 3 clés i18n manquantes ajoutées (FR/EN/ZH)
+  - Bouton Rechercher connecté, panier vide → warning
+
 [2026-04-14 19:30] v28 — Liaison back-office + i18n FR/EN/ZH + prix partenaire + ajustements
   - i18n : fr.json + en.json + zh.json (244 clés), provider nested + flat admin fallback
   - 15 pages front traduites (Header, Footer, Home, Catalogue, Produit, Panier, Connexion, etc.)
