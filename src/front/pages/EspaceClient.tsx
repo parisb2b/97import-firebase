@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation, Redirect } from 'wouter';
-import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, getDoc, updateDoc } from 'firebase/firestore';
 import { clientAuth, db } from '../../lib/firebase';
 import { useI18n } from '../../i18n';
 import { generateDevis, generateFactureAcompte, downloadPDF } from '../../lib/pdf-generator';
@@ -29,6 +29,7 @@ interface Devis {
   lignes: DevisLine[];
   acomptes: Acompte[];
   partenaire_code: string | null;
+  client_nom: string;
   createdAt: any;
 }
 
@@ -52,6 +53,11 @@ export default function EspaceClient() {
   const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [activeMenu, setActiveMenu] = useState('devis');
+  const [showAcomptePopup, setShowAcomptePopup] = useState(false);
+  const [acompteDevis, setAcompteDevis] = useState<Devis | null>(null);
+  const [acompteStep, setAcompteStep] = useState<'montant' | 'rib'>('montant');
+  const [acompteMontant, setAcompteMontant] = useState(500);
+  const [acompteTypeCompte, setAcompteTypeCompte] = useState<'perso' | 'pro'>('perso');
 
   useEffect(() => {
     if (!user) return;
@@ -98,8 +104,11 @@ export default function EspaceClient() {
   };
 
   const handleVerserAcompte = (d: Devis) => {
-    // Navigate to panier-style flow with pre-filled quote info
-    window.open(`https://wa.me/33663284908?text=${encodeURIComponent(`Bonjour, je souhaite verser un acompte pour le devis ${d.numero} (${d.total_ht}€). Merci.`)}`, '_blank');
+    setAcompteDevis(d);
+    setAcompteMontant(500);
+    setAcompteTypeCompte('perso');
+    setAcompteStep('montant');
+    setShowAcomptePopup(true);
   };
 
   const handleLogout = async () => {
@@ -284,6 +293,115 @@ export default function EspaceClient() {
           )}
         </div>
       </div>
+
+      {showAcomptePopup && acompteDevis && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(11,37,69,.6)', backdropFilter: 'blur(5px)', zIndex: 9000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }} onClick={() => setShowAcomptePopup(false)}>
+          <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: 24, padding: 34, width: '100%', maxWidth: 490, boxShadow: '0 24px 64px rgba(0,0,0,.28)' }}>
+            {acompteStep === 'montant' && (
+              <>
+                <div style={{ display: 'flex', gap: 8, marginBottom: 24 }}>
+                  <div style={{ flex: 1, height: 4, borderRadius: 4, background: '#1565C0' }} />
+                  <div style={{ flex: 1, height: 4, borderRadius: 4, background: '#E8ECF4' }} />
+                </div>
+                <div style={{ fontSize: 26, marginBottom: 16 }}>💶</div>
+                <h2 style={{ fontSize: 21, fontWeight: 700, color: '#1565C0', marginBottom: 6 }}>Verser un acompte</h2>
+                <p style={{ color: '#6B7280', fontSize: 14, marginBottom: 20 }}>Devis {acompteDevis.numero} — Total : {acompteDevis.total_ht?.toLocaleString('fr-FR')} €</p>
+
+                {acompteDevis.acomptes && acompteDevis.acomptes.length > 0 && (
+                  <div style={{ background: '#F5F7FA', borderRadius: 12, padding: 14, marginBottom: 16 }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: '#1565C0', marginBottom: 8 }}>Paiements précédents</div>
+                    {acompteDevis.acomptes.map((a: any, i: number) => (
+                      <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, padding: '4px 0' }}>
+                        <span style={{ color: '#6B7280' }}>Acompte {i + 1}</span>
+                        <span style={{ fontWeight: 600, color: a.statut === 'encaisse' ? '#059669' : '#D97706' }}>{a.montant?.toLocaleString('fr-FR')} € — {a.statut === 'encaisse' ? '✅ Encaissé' : '⏳ Déclaré'}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <div style={{ fontSize: 12, fontWeight: 700, color: '#1565C0', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '.5px' }}>Type de compte</div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 14 }}>
+                  {(['perso', 'pro'] as const).map(type => (
+                    <div key={type} onClick={() => setAcompteTypeCompte(type)} style={{
+                      padding: 12, borderRadius: 12, border: `2px solid ${acompteTypeCompte === type ? '#0D9488' : '#E8ECF4'}`,
+                      background: acompteTypeCompte === type ? '#E0F2F1' : '#fff', cursor: 'pointer', textAlign: 'center',
+                    }}>
+                      <div style={{ fontSize: 24, marginBottom: 4 }}>{type === 'perso' ? '👤' : '🏢'}</div>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: '#1565C0' }}>{type === 'perso' ? 'Compte personnel' : 'Compte professionnel'}</div>
+                    </div>
+                  ))}
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: '#E0F2F1', border: '2px solid #26A69A', borderRadius: 12, padding: '12px 16px', marginBottom: 14 }}>
+                  <label style={{ fontSize: 13, color: '#00897B', fontWeight: 600, flex: 1 }}>💶 Montant</label>
+                  <input type="number" value={acompteMontant} onChange={e => setAcompteMontant(Number(e.target.value))}
+                    style={{ width: 90, padding: '7px 10px', border: 'none', background: 'rgba(255,255,255,.8)', borderRadius: 8, fontSize: 17, fontWeight: 700, color: '#00897B', textAlign: 'center' }} />
+                  <span style={{ fontSize: 10, color: '#00897B', background: 'rgba(0,137,123,.12)', padding: '2px 8px', borderRadius: 20 }}>modifiable</span>
+                </div>
+                <div style={{ fontSize: 12, color: '#6B7280', marginBottom: 16 }}>Par défaut 500€ · Virement bancaire uniquement</div>
+
+                <button onClick={() => setAcompteStep('rib')} style={{ width: '100%', padding: 14, background: 'linear-gradient(135deg, #1565C0, #1E88E5)', color: '#fff', border: 'none', borderRadius: 12, fontSize: 14, fontWeight: 700, cursor: 'pointer', marginBottom: 8 }}>
+                  J'ai effectué le virement →
+                </button>
+                <button onClick={() => setShowAcomptePopup(false)} style={{ width: '100%', padding: 14, background: 'transparent', color: '#6B7280', border: '1.5px solid #CBD5E1', borderRadius: 12, fontSize: 14, cursor: 'pointer' }}>
+                  Annuler
+                </button>
+              </>
+            )}
+
+            {acompteStep === 'rib' && (
+              <>
+                <div style={{ display: 'flex', gap: 8, marginBottom: 24 }}>
+                  <div style={{ flex: 1, height: 4, borderRadius: 4, background: '#0D9488' }} />
+                  <div style={{ flex: 1, height: 4, borderRadius: 4, background: '#1565C0' }} />
+                </div>
+                <div style={{ fontSize: 26, marginBottom: 16 }}>🏦</div>
+                <h2 style={{ fontSize: 21, fontWeight: 700, color: '#1565C0', marginBottom: 6 }}>Coordonnées bancaires</h2>
+                <p style={{ color: '#6B7280', fontSize: 14, marginBottom: 20 }}>Effectuez votre virement de <strong>{acompteMontant.toLocaleString('fr-FR')} €</strong> puis cliquez sur Confirmer.</p>
+
+                <div style={{ background: '#F5F7FA', borderRadius: 12, padding: 16, marginBottom: 16 }}>
+                  <div style={{ fontWeight: 700, color: '#1565C0', marginBottom: 12, fontSize: 14 }}>LUXENT LIMITED — Compte {acompteTypeCompte === 'pro' ? 'professionnel' : 'personnel'}</div>
+                  {[
+                    { k: 'IBAN', v: 'DE76 2022 0800 0059 5688 30' },
+                    { k: 'SWIFT', v: 'SXPYDEHH' },
+                    { k: 'Banque', v: 'Banking Circle S.A. — Munich' },
+                    { k: 'Bénéficiaire', v: 'LUXENT LIMITED' },
+                    { k: 'Référence', v: `${acompteDevis.numero} / ${acompteDevis.client_nom || ''}` },
+                    { k: 'Montant', v: `${acompteMontant.toLocaleString('fr-FR')} €`, highlight: true },
+                  ].map((row: any, i: number) => (
+                    <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'center', padding: '5px 0', borderBottom: i < 5 ? '1px solid #E8ECF4' : 'none' }}>
+                      <span style={{ color: '#6B7280', fontSize: 12, minWidth: 80 }}>{row.k}</span>
+                      <span style={{ fontWeight: 600, color: row.highlight ? '#00897B' : '#1565C0', fontSize: row.highlight ? 16 : 13 }}>{row.v}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <button onClick={async () => {
+                  try {
+                    const devisRef = doc(db, 'quotes', acompteDevis.id);
+                    const currentAcomptes = acompteDevis.acomptes || [];
+                    await updateDoc(devisRef, {
+                      acomptes: [...currentAcomptes, { montant: acompteMontant, date: new Date().toISOString(), type_compte: acompteTypeCompte, statut: 'declare' }],
+                      updatedAt: new Date(),
+                    });
+                    setShowAcomptePopup(false);
+                    showToast(`Acompte de ${acompteMontant} € déclaré sur ${acompteDevis.numero} ✅`);
+                    window.location.reload();
+                  } catch (err) {
+                    console.error(err);
+                    showToast('Erreur lors de la déclaration', 'error');
+                  }
+                }} style={{ width: '100%', padding: 14, background: 'linear-gradient(135deg, #1565C0, #1E88E5)', color: '#fff', border: 'none', borderRadius: 12, fontSize: 14, fontWeight: 700, cursor: 'pointer', marginBottom: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                  ✅ J'ai effectué le virement — Confirmer
+                </button>
+                <button onClick={() => setShowAcomptePopup(false)} style={{ width: '100%', padding: 14, background: 'transparent', color: '#6B7280', border: '1.5px solid #CBD5E1', borderRadius: 12, fontSize: 14, cursor: 'pointer' }}>
+                  Fermer — Je virerai plus tard
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
