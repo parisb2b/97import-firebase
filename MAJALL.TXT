@@ -244,3 +244,12 @@ PARTIE D — Contact :
 - Contact.tsx (NEW) : 2 colonnes (infos + formulaire), WhatsApp, sauvegarde Firestore contacts
 
 Build : ✅ SUCCÈS (0 erreurs TS)
+
+[2026-04-14 13:30] v27-fix — Corrections mini-bugs
+==================================================================================
+- PriceDisplay.tsx : refonte complète, 4 prix admin, bouton rouge visiteur, getProductPrice()
+- Champs Firestore : prix_achat_eur, prix_achat_cny, prix_public_eur (+ fallback prix_achat/prix_public)
+- /mon-compte redirigé vers /espace-client
+- Panier : post-devis → /espace-client
+- Noms produits : double tiret -- → tiret cadratin —
+- Build : ✅ SUCCÈS

@@ -1,0 +1,34 @@
+=== MAJ27-FIX — Corrections mini-bugs ===
+Date : 2026-04-14
+
+FIX 1 — Prix dynamiques :
+  Champs Firestore identifies : prix_achat_eur, prix_achat_cny, prix_public_eur, prix_achat, prix_public
+  Admin voit 4 prix (gradient navy) : ✅ (¥ achat, € achat, partenaire, public)
+  Visiteur voit bouton rouge : ✅ (gradient rouge, CTA "Se connecter")
+  Client voit prix public HT : ✅ (prix_public_eur || prix_achat * 2)
+  Partenaire voit prix x1.2 : ✅
+  getProductPrice() exporte pour reutilisation : ✅
+
+FIX 2 — Redirection /mon-compte :
+  /mon-compte/* → Redirect /espace-client : ✅
+  MonCompte.tsx plus importe : ✅
+  Panier post-devis → /espace-client : ✅ (2 occurrences corrigees)
+
+FIX 3 — Prix panier :
+  Produit.tsx addToCart utilise getProductPrice() : ✅
+  Prix calcule selon le role connecte : ✅
+
+FIX 4 — Noms produits :
+  Double tiret -- → tiret cadratin — : ✅ (ProductCard + Produit.tsx)
+
+FIX 5 — Bouton Mon compte :
+  Redirect par role (partner → /espace-partenaire, user → /espace-client) : ✅ (deja fait en v27)
+
+FICHIERS MODIFIES :
+  - src/front/components/PriceDisplay.tsx (refonte complete, export getProductPrice)
+  - src/front/components/ProductCard.tsx (cleanName --)
+  - src/front/pages/Produit.tsx (cleanName + getProductPrice)
+  - src/front/pages/Panier.tsx (/mon-compte → /espace-client)
+  - src/front/FrontApp.tsx (Redirect /mon-compte)
+
+BUILD : npm run build → ✅ (0 erreurs TS)
