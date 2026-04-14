@@ -64,24 +64,11 @@ export default function Home() {
               <SearchBar />
             </div>
           </div>
-          <div style={{ flex: '0 0 250px', textAlign: 'center' }}>
-            <div style={{
-              width: 220, height: 180, borderRadius: 16, overflow: 'hidden', margin: '0 auto',
-              boxShadow: '0 8px 30px rgba(0,0,0,0.2)',
-            }}>
-              <img src="/images/hero_maison.png" alt="Maison modulaire" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-            </div>
-            <p style={{ marginTop: 8, fontSize: 13, color: '#0B2545', fontWeight: 600 }}>Maison modulaire 20P</p>
-          </div>
         </div>
       </section>
 
       {/* CATÉGORIES */}
-      <section style={{ maxWidth: 1280, margin: '0 auto', padding: '60px 20px' }}>
-        <h2 style={{ fontSize: 28, fontWeight: 800, color: '#0B2545', textAlign: 'center', marginBottom: 8 }}>{t('categories.title')}</h2>
-        <p style={{ textAlign: 'center', color: '#6B7280', marginBottom: 40 }}>
-          {loading ? '...' : `${products.length} ${t('categories.subtitle')}`}
-        </p>
+      <section style={{ maxWidth: 1280, margin: '0 auto', padding: '48px 20px' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 20 }}>
           {categories.map(cat => (
             <Link key={cat.nom} href={`/catalogue/${cat.nom}`}>

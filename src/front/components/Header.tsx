@@ -21,7 +21,7 @@ function Clocks() {
   }, []);
 
   return (
-    <div style={{ display: 'flex', gap: 8, fontSize: 11, color: 'rgba(255,255,255,0.7)' }}>
+    <div style={{ display: 'flex', gap: 8, fontSize: 11, color: '#94A3B8' }}>
       <span>🇲🇶 {times.mq}</span>
       <span>·</span>
       <span>🇫🇷 {times.fr}</span>
@@ -82,12 +82,12 @@ export default function Header() {
 
   return (
     <header style={{
-      background: '#0B2545',
-      color: 'white',
+      background: '#FFFFFF',
+      color: '#0B2545',
       position: 'sticky',
       top: 0,
       zIndex: 100,
-      backdropFilter: 'blur(12px)',
+      borderBottom: '1px solid #E8ECF4',
     }}>
       <div style={{
         maxWidth: 1280,
@@ -119,8 +119,8 @@ export default function Header() {
                   borderRadius: 6,
                   fontSize: 12,
                   cursor: 'pointer',
-                  color: isActive ? 'white' : 'rgba(255,255,255,0.8)',
-                  background: isActive ? 'rgba(255,255,255,0.15)' : 'transparent',
+                  color: isActive ? '#0B2545' : '#6B7280',
+                  background: isActive ? '#F0F4F8' : 'transparent',
                   fontWeight: isActive ? 600 : 400,
                   transition: 'all 0.2s',
                   whiteSpace: 'nowrap',
@@ -170,26 +170,27 @@ export default function Header() {
             <Link href={userRole === 'partner' ? '/espace-partenaire' : '/espace-client'}>
               <div style={{
                 display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer',
-                border: '1px solid rgba(255,255,255,0.3)', borderRadius: 12, padding: '6px 14px',
+                border: '1px solid #E5E7EB', borderRadius: 12, padding: '6px 14px',
               }}>
                 <div style={{
-                  width: 24, height: 24, borderRadius: '50%', background: '#1E3A5F',
+                  width: 24, height: 24, borderRadius: '50%', background: '#0B2545', color: '#fff',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700,
                 }}>
                   {user.displayName?.[0]?.toUpperCase() || '👤'}
                 </div>
-                <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.8)' }}>{user.displayName || user.email?.split('@')[0]}</span>
+                <span style={{ fontSize: 12, color: '#374151' }}>{user.displayName || user.email?.split('@')[0]}</span>
               </div>
             </Link>
           ) : (
             <Link href="/connexion">
               <span style={{
-                border: '1px solid rgba(255,255,255,0.4)',
+                border: '1px solid #E5E7EB',
                 borderRadius: 12,
                 padding: '6px 16px',
                 fontSize: 13,
                 cursor: 'pointer',
-                color: 'white',
+                color: '#0B2545',
+                fontWeight: 600,
               }}>
                 {t('auth.connexion')}
               </span>

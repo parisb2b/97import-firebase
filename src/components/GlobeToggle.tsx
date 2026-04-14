@@ -15,8 +15,8 @@ export const GlobeToggle = () => {
           style={{
             padding: '2px 8px', borderRadius: 4, border: 'none', cursor: 'pointer',
             fontSize: 11, fontWeight: lang === l.code ? 700 : 400,
-            background: lang === l.code ? 'rgba(255,255,255,0.2)' : 'transparent',
-            color: lang === l.code ? 'white' : 'rgba(255,255,255,0.6)',
+            background: lang === l.code ? '#0B2545' : 'transparent',
+            color: lang === l.code ? '#fff' : '#94A3B8',
           }}>
           {l.label}
         </button>
