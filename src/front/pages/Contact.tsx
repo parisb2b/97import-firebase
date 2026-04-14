@@ -98,39 +98,39 @@ export default function Contact() {
             </div>
           ) : (
             <>
-              <h2 style={{ fontSize: 20, fontWeight: 700, color: '#0B2545', marginBottom: 24 }}>✉️ Envoyer un message</h2>
+              <h2 style={{ fontSize: 20, fontWeight: 700, color: '#0B2545', marginBottom: 24 }}>✉️ {t('contact.formulaire')}</h2>
 
               <form onSubmit={handleSubmit}>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 16 }}>
                   <div>
-                    <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 }}>Prenom</label>
+                    <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 }}>{t('auth.prenom')}</label>
                     <input type="text" value={firstName} onChange={e => setFirstName(e.target.value)} required placeholder="Jean" style={inputStyle} />
                   </div>
                   <div>
-                    <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 }}>Nom</label>
+                    <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 }}>{t('auth.nom')}</label>
                     <input type="text" value={lastName} onChange={e => setLastName(e.target.value)} required placeholder="Dupont" style={inputStyle} />
                   </div>
                 </div>
 
                 <div style={{ marginBottom: 16 }}>
-                  <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 }}>Email</label>
+                  <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 }}>{t('auth.email')}</label>
                   <input type="email" value={email} onChange={e => setEmail(e.target.value)} required placeholder="votre@email.com" style={inputStyle} />
                 </div>
 
                 <div style={{ marginBottom: 16 }}>
-                  <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 }}>Telephone</label>
+                  <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 }}>{t('contact.telephone')}</label>
                   <input type="tel" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+596 6 00 00 00 00" style={inputStyle} />
                 </div>
 
                 <div style={{ marginBottom: 16 }}>
-                  <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 }}>Sujet</label>
+                  <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 }}>{t('contact.sujet')}</label>
                   <select value={subject} onChange={e => setSubject(e.target.value)} style={inputStyle}>
                     {SUBJECTS.map(s => <option key={s} value={s}>{s}</option>)}
                   </select>
                 </div>
 
                 <div style={{ marginBottom: 20 }}>
-                  <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 }}>Message</label>
+                  <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 }}>{t('contact.message')}</label>
                   <textarea value={message} onChange={e => setMessage(e.target.value)} required
                     rows={5} placeholder="Votre message..." style={{ ...inputStyle, resize: 'vertical' }} />
                 </div>
@@ -139,7 +139,7 @@ export default function Contact() {
                   width: '100%', padding: '14px 0', background: '#0B2545', color: 'white', border: 'none',
                   borderRadius: 12, fontSize: 15, fontWeight: 700, cursor: 'pointer', opacity: sending ? 0.5 : 1,
                 }}>
-                  {sending ? 'Envoi...' : '📨 Envoyer le message'}
+                  {sending ? '...' : `📨 ${t('contact.envoyer')}`}
                 </button>
               </form>
             </>
