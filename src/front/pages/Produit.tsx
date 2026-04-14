@@ -55,8 +55,9 @@ export default function Produit() {
 
   const images = product.images_urls || [];
   const specs = [
-    product.poids_net_kg && { label: 'Poids net', value: `${product.poids_net_kg} kg` },
-    product.poids_brut_kg && { label: 'Poids brut', value: `${product.poids_brut_kg} kg` },
+    product.poids_net_kg && { label: 'Poids', value: `${product.poids_net_kg} kg` },
+    product.moteur && { label: 'Moteur', value: product.moteur },
+    product.puissance_kw && { label: 'Puissance', value: `${product.puissance_kw} kW` },
     product.longueur_cm && { label: 'Longueur', value: `${product.longueur_cm} cm` },
     product.largeur_cm && { label: 'Largeur', value: `${product.largeur_cm} cm` },
     product.hauteur_cm && { label: 'Hauteur', value: `${product.hauteur_cm} cm` },
@@ -66,6 +67,26 @@ export default function Produit() {
     product.code_hs && { label: 'Code HS', value: product.code_hs },
     product.ce_certification && { label: 'Certification', value: product.ce_certification },
   ].filter(Boolean);
+
+  const handleAddToCart = () => {
+    const saved = localStorage.getItem('cart');
+    const cart = saved ? JSON.parse(saved) : [];
+    const existing = cart.find((c: any) => c.id === product.id);
+    if (existing) {
+      existing.qte += 1;
+    } else {
+      cart.push({
+        id: product.id,
+        ref: product.numero_interne || product.id,
+        nom_fr: product.nom_fr || product.nom || product.numero_interne,
+        prix: (product.prix_achat || 0) * 2,
+        qte: 1,
+        image: product.images_urls?.[0] || '',
+      });
+    }
+    localStorage.setItem('cart', JSON.stringify(cart));
+    alert('Produit ajouté au panier !');
+  };
 
   return (
     <>
@@ -133,7 +154,7 @@ export default function Produit() {
           {/* Action buttons */}
           {userRole && (
             <div style={{ display: 'flex', gap: 12, marginBottom: 24 }}>
-              <button style={{
+              <button onClick={handleAddToCart} style={{
                 flex: 1, background: '#EA580C', color: 'white', border: 'none', borderRadius: 10,
                 padding: '14px 0', fontSize: 15, fontWeight: 700, cursor: 'pointer',
               }}>
