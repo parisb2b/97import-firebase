@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useRoute, Link, Redirect } from 'wouter';
-import { collection, query, where, getDocs, orderBy } from 'firebase/firestore';
+import { collection, query, where, getDocs } from 'firebase/firestore';
 import { clientAuth, db } from '../../lib/firebase';
 import { useI18n } from '../../i18n';
 
@@ -41,11 +41,13 @@ export default function MonCompte() {
       try {
         const q = query(
           collection(db, 'quotes'),
-          where('client_id', '==', user.uid),
-          orderBy('createdAt', 'desc')
+          where('client_id', '==', user.uid)
         );
         const snap = await getDocs(q);
-        setDevis(snap.docs.map((d) => ({ id: d.id, ...d.data() } as Devis)));
+        const list = snap.docs
+          .map((d) => ({ id: d.id, ...d.data() } as Devis))
+          .sort((a: any, b: any) => (b.createdAt?.toMillis?.() || b.createdAt?.seconds * 1000 || 0) - (a.createdAt?.toMillis?.() || a.createdAt?.seconds * 1000 || 0));
+        setDevis(list);
       } catch (err) {
         console.error('Error loading devis:', err);
       } finally {

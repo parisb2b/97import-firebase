@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation, Redirect } from 'wouter';
-import { collection, query, where, orderBy, getDocs, doc, getDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
 import { clientAuth, db } from '../../lib/firebase';
 import { useI18n } from '../../i18n';
 import { generateDevis, generateFactureAcompte, downloadPDF } from '../../lib/pdf-generator';
@@ -60,11 +60,13 @@ export default function EspaceClient() {
       try {
         const q = query(
           collection(db, 'quotes'),
-          where('client_id', '==', user.uid),
-          orderBy('createdAt', 'desc')
+          where('client_id', '==', user.uid)
         );
         const snap = await getDocs(q);
-        setDevis(snap.docs.map(d => ({ id: d.id, ...d.data() } as Devis)));
+        const list = snap.docs
+          .map(d => ({ id: d.id, ...d.data() } as Devis))
+          .sort((a, b) => (b.createdAt?.toMillis?.() || b.createdAt?.seconds * 1000 || 0) - (a.createdAt?.toMillis?.() || a.createdAt?.seconds * 1000 || 0));
+        setDevis(list);
       } catch (err) {
         console.error('Error loading devis:', err);
         showToast('Erreur de chargement des devis', 'error');

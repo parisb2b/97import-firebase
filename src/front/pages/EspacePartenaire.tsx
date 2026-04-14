@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useLocation, Redirect } from 'wouter';
-import { collection, query, where, orderBy, getDocs, doc, updateDoc, getDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, updateDoc, getDoc } from 'firebase/firestore';
 import { clientAuth, db } from '../../lib/firebase';
 import { useI18n } from '../../i18n';
 import { generateDevis, downloadPDF } from '../../lib/pdf-generator';
@@ -52,9 +52,12 @@ export default function EspacePartenaire() {
         setPartnerCode(code);
 
         // Load quotes for this partner
-        const q = query(collection(db, 'quotes'), where('partenaire_code', '==', code), orderBy('createdAt', 'desc'));
+        const q = query(collection(db, 'quotes'), where('partenaire_code', '==', code));
         const snap = await getDocs(q);
-        setDevis(snap.docs.map(d => ({ id: d.id, ...d.data() } as Devis)));
+        const list = snap.docs
+          .map(d => ({ id: d.id, ...d.data() } as Devis))
+          .sort((a: any, b: any) => (b.createdAt?.toMillis?.() || b.createdAt?.seconds * 1000 || 0) - (a.createdAt?.toMillis?.() || a.createdAt?.seconds * 1000 || 0));
+        setDevis(list);
       } catch (err) {
         console.error('Error:', err);
       } finally {
