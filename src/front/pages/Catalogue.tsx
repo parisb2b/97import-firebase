@@ -62,7 +62,7 @@ export default function Catalogue() {
     if (p.ref_parente || p.option_payante) return false;
     const isAccessoire = p.machine_id || p.machine_compatible || p.type === 'accessoire' || p.type === 'accessory';
     return !isAccessoire;
-  });
+  }).sort((a, b) => (a.ordre || 99) - (b.ordre || 99) || (a.reference || '').localeCompare(b.reference || ''));
 
   return (
     <>
