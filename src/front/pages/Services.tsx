@@ -1,11 +1,4 @@
-const SERVICES = [
-  { icon: '🚢', title: 'Fret Maritime', desc: 'Transport conteneur depuis Shanghai, Ningbo et Guangzhou vers les DOM-TOM. Groupage ou conteneur complet.' },
-  { icon: '📋', title: 'Dedouanement', desc: 'Gestion des formalites douanieres, declaration en douane, droits et taxes. Tout est inclus dans nos devis.' },
-  { icon: '🔧', title: 'Service & Coordination', desc: 'Suivi de A a Z, controle qualite en usine, interlocuteur unique. Vous ne gerez rien, on s\'occupe de tout.' },
-  { icon: '📦', title: 'Importation Sur Mesure', desc: 'Tout produit depuis la Chine sur demande. Utilisez le formulaire "produit sur mesure" dans le panier.' },
-  { icon: '💶', title: 'Devis Gratuit', desc: 'Generation automatique de devis. PDF envoye par email. Reponse sous 24h pour les demandes specifiques.' },
-  { icon: '🛠', title: 'Service Apres-Vente', desc: 'Garantie constructeur, pieces detachees disponibles, support technique. Nous restons a vos cotes apres la livraison.' },
-];
+import { useI18n } from '../../i18n';
 
 const DESTINATIONS = [
   { flag: '🇲🇶', name: 'Martinique', code: 'MQ' },
@@ -15,14 +8,24 @@ const DESTINATIONS = [
 ];
 
 export default function Services() {
+  const { t } = useI18n();
+
+  const SERVICES = [
+    { icon: '🚢', title: t('services.fret'), desc: t('services.fretDesc') },
+    { icon: '📋', title: t('services.dedouanement'), desc: t('services.dedouanementDesc') },
+    { icon: '🔧', title: t('services.coordination'), desc: t('services.coordinationDesc') },
+    { icon: '📦', title: t('services.surMesure'), desc: t('services.surMesureDesc') },
+    { icon: '💶', title: t('services.devisGratuit'), desc: t('services.devisGratuitDesc') },
+    { icon: '🛠', title: t('services.sav'), desc: t('services.savDesc') },
+  ];
   return (
     <>
       {/* Banner */}
       <div style={{ background: 'linear-gradient(135deg, #0B2545, #1E3A5F)', padding: '48px 0' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px', textAlign: 'center' }}>
-          <h1 style={{ color: 'white', fontSize: 32, fontWeight: 800, marginBottom: 8 }}>Nos Services</h1>
+          <h1 style={{ color: 'white', fontSize: 32, fontWeight: 800, marginBottom: 8 }}>{t('services.title')}</h1>
           <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 15 }}>
-            Import clef en main de la Chine vers les DOM-TOM
+            {t('services.subtitle')}
           </p>
         </div>
       </div>
@@ -51,7 +54,7 @@ export default function Services() {
       <div style={{ background: '#F9FAFB', padding: '48px 0' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px' }}>
           <h2 style={{ fontSize: 24, fontWeight: 800, color: '#0B2545', textAlign: 'center', marginBottom: 32 }}>
-            4 destinations DOM-TOM
+            {t('services.destinations')}
           </h2>
           <div style={{ display: 'flex', justifyContent: 'center', gap: 20, flexWrap: 'wrap' }}>
             {DESTINATIONS.map(d => (
@@ -73,7 +76,7 @@ export default function Services() {
           border: '1px solid #E5E7EB', borderRadius: 12, padding: 20,
           background: '#FFFBEB', fontSize: 13, color: '#92400E', lineHeight: 1.6, textAlign: 'center',
         }}>
-          ⚠️ Les prix des frais logistiques sont indicatifs. Montant definitif a confirmer avec votre partenaire 97import.
+          ⚠️ {t('services.mentionObligatoire')}
         </div>
       </div>
     </>

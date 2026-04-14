@@ -6,17 +6,6 @@ import { clientAuth, db } from '../../lib/firebase';
 import { useI18n } from '../../i18n';
 import { GlobeToggle } from '../../components/GlobeToggle';
 
-const NAV_ITEMS = [
-  { path: '/', label: 'Accueil', icon: '🏠', exact: true },
-  { path: '/catalogue/Mini-Pelle', label: 'Mini-Pelles', icon: '🚜' },
-  { path: '/catalogue/Maisons', label: 'Maisons', icon: '🏠' },
-  { path: '/catalogue/Solaire', label: 'Solaire', icon: '☀️' },
-  { path: '/catalogue/Agricole', label: 'Agricole', icon: '🌾' },
-  { path: '/catalogue/Divers', label: 'Divers', icon: '📦' },
-  { path: '/services', label: 'Services', icon: '🔧' },
-  { path: '/contact', label: 'Contact', icon: '✉️' },
-];
-
 function Clocks() {
   const [times, setTimes] = useState({ mq: '--:--', fr: '--:--', cn: '--:--' });
 
@@ -47,6 +36,17 @@ export default function Header() {
   const [userRole, setUserRole] = useState<string | null>(null);
   const { t } = useI18n();
   const [location] = useLocation();
+
+  const navItems = [
+    { path: '/', label: t('nav.accueil'), icon: '🏠', exact: true },
+    { path: '/catalogue/Mini-Pelle', label: t('nav.miniPelles'), icon: '🚜' },
+    { path: '/catalogue/Maisons', label: t('nav.maisons'), icon: '🏠' },
+    { path: '/catalogue/Solaire', label: t('nav.solaire'), icon: '☀️' },
+    { path: '/catalogue/Agricole', label: t('nav.agricole'), icon: '🌾' },
+    { path: '/catalogue/Divers', label: t('nav.divers'), icon: '📦' },
+    { path: '/services', label: t('nav.services'), icon: '🔧' },
+    { path: '/contact', label: t('nav.contact'), icon: '✉️' },
+  ];
   const [cartCount] = useState(0); // TODO: connect to cart context
 
   useEffect(() => {
@@ -94,7 +94,7 @@ export default function Header() {
 
         {/* Navigation */}
         <nav style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-          {NAV_ITEMS.map(item => {
+          {navItems.map(item => {
             const isActive = (item as any).exact ? location === item.path : location.startsWith(item.path);
             return (
               <Link key={item.path} href={item.path}>
@@ -175,7 +175,7 @@ export default function Header() {
                 cursor: 'pointer',
                 color: 'white',
               }}>
-                {t('btn.connexion')}
+                {t('auth.connexion')}
               </span>
             </Link>
           )}

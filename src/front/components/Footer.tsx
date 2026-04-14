@@ -1,28 +1,30 @@
 import { Link } from 'wouter';
-
-const CATEGORIES = [
-  { label: 'Mini-Pelles', path: '/catalogue/Mini-Pelle' },
-  { label: 'Maisons Modulaires', path: '/catalogue/Maisons' },
-  { label: 'Kits Solaires', path: '/catalogue/Solaire' },
-  { label: 'Machines Agricoles', path: '/catalogue/machines-agricoles' },
-  { label: 'Divers', path: '/catalogue/Divers' },
-];
-
-const SERVICES = [
-  { label: 'Import clé en main', path: '/services' },
-  { label: 'Transport maritime', path: '/services' },
-  { label: 'Dédouanement', path: '/services' },
-  { label: 'Livraison DOM-TOM', path: '/services' },
-];
-
-const INFO = [
-  { label: 'Mentions légales', path: '/mentions-legales' },
-  { label: 'CGV', path: '/cgv' },
-  { label: 'RGPD', path: '/rgpd' },
-  { label: 'Contact', path: '/contact' },
-];
+import { useI18n } from '../../i18n';
 
 export default function Footer() {
+  const { t } = useI18n();
+
+  const CATEGORIES = [
+    { label: t('nav.miniPelles'), path: '/catalogue/Mini-Pelle' },
+    { label: t('nav.maisons'), path: '/catalogue/Maisons' },
+    { label: t('nav.solaire'), path: '/catalogue/Solaire' },
+    { label: t('nav.agricole'), path: '/catalogue/machines-agricoles' },
+    { label: t('nav.divers'), path: '/catalogue/Divers' },
+  ];
+
+  const SERVICES = [
+    { label: t('footer.importCle'), path: '/services' },
+    { label: t('footer.transport'), path: '/services' },
+    { label: t('footer.dedouanement'), path: '/services' },
+    { label: t('footer.livraison'), path: '/services' },
+  ];
+
+  const INFO = [
+    { label: t('footer.mentions'), path: '/mentions-legales' },
+    { label: t('footer.cgv'), path: '/cgv' },
+    { label: t('footer.rgpd'), path: '/rgpd' },
+    { label: t('nav.contact'), path: '/contact' },
+  ];
   return (
     <footer style={{ background: '#0B2545', color: 'white', padding: '48px 0 24px' }}>
       <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px' }}>
@@ -33,8 +35,7 @@ export default function Footer() {
               🚢 97<span style={{ color: '#EA580C' }}>IMPORT</span>
             </div>
             <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)', lineHeight: 1.6, marginBottom: 16 }}>
-              Import direct de Chine vers les DOM-TOM. Mini-pelles, maisons modulaires, kits solaires.
-              Prix usine, livraison maritime incluse.
+              {t('footer.desc')}
             </p>
             <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
               <a href="https://wa.me/33663284908" style={{
@@ -50,7 +51,7 @@ export default function Footer() {
 
           {/* Col 2: Catégories */}
           <div>
-            <h4 style={{ fontWeight: 700, fontSize: 14, marginBottom: 16 }}>Catégories</h4>
+            <h4 style={{ fontWeight: 700, fontSize: 14, marginBottom: 16 }}>{t('footer.categories')}</h4>
             {CATEGORIES.map(c => (
               <Link key={c.path} href={c.path}>
                 <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)', cursor: 'pointer', marginBottom: 8 }}>{c.label}</div>
@@ -60,7 +61,7 @@ export default function Footer() {
 
           {/* Col 3: Services */}
           <div>
-            <h4 style={{ fontWeight: 700, fontSize: 14, marginBottom: 16 }}>Services</h4>
+            <h4 style={{ fontWeight: 700, fontSize: 14, marginBottom: 16 }}>{t('footer.services')}</h4>
             {SERVICES.map(s => (
               <Link key={s.label} href={s.path}>
                 <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)', cursor: 'pointer', marginBottom: 8 }}>{s.label}</div>
@@ -70,7 +71,7 @@ export default function Footer() {
 
           {/* Col 4: Infos */}
           <div>
-            <h4 style={{ fontWeight: 700, fontSize: 14, marginBottom: 16 }}>Informations</h4>
+            <h4 style={{ fontWeight: 700, fontSize: 14, marginBottom: 16 }}>{t('footer.informations')}</h4>
             {INFO.map(i => (
               <Link key={i.label} href={i.path}>
                 <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)', cursor: 'pointer', marginBottom: 8 }}>{i.label}</div>
@@ -88,7 +89,7 @@ export default function Footer() {
           fontSize: 12,
           color: 'rgba(255,255,255,0.4)',
         }}>
-          © {new Date().getFullYear()} 97import.com — Tous droits réservés · LUXENT LIMITED · N° 14852122
+          {t('footer.copyright')}
         </div>
       </div>
     </footer>

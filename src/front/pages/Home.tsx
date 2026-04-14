@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
 import { Link } from 'wouter';
 import { db } from '../../lib/firebase';
+import { useI18n } from '../../i18n';
 import SearchBar from '../components/SearchBar';
 
 const CAT_ICONS: Record<string, string> = {
@@ -18,6 +19,7 @@ const CAT_DESC: Record<string, string> = {
 };
 
 export default function Home() {
+  const { t } = useI18n();
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -53,10 +55,10 @@ export default function Home() {
           </div>
           <div style={{ flex: 1, textAlign: 'center' }}>
             <h1 style={{ fontSize: 36, fontWeight: 800, color: '#0B2545', lineHeight: 1.2, marginBottom: 16 }}>
-              L'importation simplifiée de la <span style={{ color: '#EA580C' }}>Chine</span> vers les Antilles.
+              {t('hero.title1')} {t('hero.title2')} <span style={{ color: '#EA580C' }}>{t('hero.titleHighlight')}</span> {t('hero.title3')}
             </h1>
             <p style={{ fontSize: 16, color: '#1E3A5F', marginBottom: 24, maxWidth: 500, margin: '0 auto 24px' }}>
-              Mini-pelles, maisons modulaires, kits solaires. Prix usine, livraison DOM-TOM incluse.
+              {t('hero.subtitle')}
             </p>
             <div style={{ maxWidth: 480, margin: '0 auto' }}>
               <SearchBar />
@@ -76,9 +78,9 @@ export default function Home() {
 
       {/* CATÉGORIES */}
       <section style={{ maxWidth: 1280, margin: '0 auto', padding: '60px 20px' }}>
-        <h2 style={{ fontSize: 28, fontWeight: 800, color: '#0B2545', textAlign: 'center', marginBottom: 8 }}>Nos catégories</h2>
+        <h2 style={{ fontSize: 28, fontWeight: 800, color: '#0B2545', textAlign: 'center', marginBottom: 8 }}>{t('categories.title')}</h2>
         <p style={{ textAlign: 'center', color: '#6B7280', marginBottom: 40 }}>
-          {loading ? 'Chargement...' : `${products.length} produits disponibles`}
+          {loading ? '...' : `${products.length} ${t('categories.subtitle')}`}
         </p>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 20 }}>
           {categories.map(cat => (
@@ -95,7 +97,7 @@ export default function Home() {
                   <h3 style={{ fontWeight: 700, fontSize: 16, color: '#0B2545', marginBottom: 4 }}>{cat.nom}</h3>
                   <p style={{ fontSize: 12, color: '#6B7280', marginBottom: 8 }}>{CAT_DESC[cat.nom] || `${cat.count} produits`}</p>
                   <span style={{ display: 'inline-block', background: '#C87F6B', color: 'white', padding: '4px 12px', borderRadius: 20, fontSize: 11, fontWeight: 700 }}>
-                    PRIX -50% vs distribution
+                    {t('categories.prixBadge')}
                   </span>
                 </div>
               </div>

@@ -9,11 +9,13 @@ const CAT_ICONS: Record<string, string> = {
 interface ProductCardProps {
   product: any;
   userRole?: string | null;
+  lang?: string;
 }
 
-export default function ProductCard({ product, userRole }: ProductCardProps) {
+export default function ProductCard({ product, userRole, lang = 'fr' }: ProductCardProps) {
   const img = product.images_urls?.[0];
   const icon = CAT_ICONS[product.categorie] || '📦';
+  const name = lang === 'zh' ? (product.nom_zh || product.nom_fr) : lang === 'en' ? (product.nom_en || product.nom_fr) : product.nom_fr;
 
   return (
     <Link href={`/produit/${product.id}`}>
@@ -44,7 +46,7 @@ export default function ProductCard({ product, userRole }: ProductCardProps) {
         <div style={{ padding: 14 }}>
           <div style={{ fontSize: 11, color: '#6B7280', marginBottom: 4 }}>{product.gamme || product.categorie}</div>
           <h3 style={{ fontWeight: 700, fontSize: 14, color: '#0B2545', marginBottom: 6, lineHeight: 1.3 }}>
-            {(product.nom_fr || product.nom || product.numero_interne || '').replace(/\s*--\s*/g, ' — ')}
+            {(name || product.nom || product.numero_interne || '').replace(/\s*--\s*/g, ' — ')}
           </h3>
 
           {/* Tags */}

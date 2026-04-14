@@ -3,6 +3,7 @@ import { Link, useLocation } from 'wouter';
 import { clientAuth, db } from '../../lib/firebase';
 import { doc, setDoc, serverTimestamp, collection, query, where, getDocs } from 'firebase/firestore';
 import { getNextNumber } from '../../lib/counters';
+import { useI18n } from '../../i18n';
 
 interface CartItem {
   id: string;
@@ -64,6 +65,7 @@ function Steps({ current }: { current: number }) {
 }
 
 export default function Panier() {
+  const { t } = useI18n();
   const [, setLocation] = useLocation();
   const [cart, setCart] = useState<CartItem[]>([]);
   const [submitting, setSubmitting] = useState(false);
@@ -236,9 +238,9 @@ export default function Panier() {
       {/* Banner */}
       <div style={{ background: 'linear-gradient(135deg, #0B2545, #1E3A5F)', padding: '32px 0' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px' }}>
-          <h1 style={{ color: 'white', fontSize: 28, fontWeight: 800 }}>🛒 Mon Panier</h1>
+          <h1 style={{ color: 'white', fontSize: 28, fontWeight: 800 }}>{t('cart.title')}</h1>
           <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 14, marginTop: 4 }}>
-            {cart.length === 0 ? 'Votre panier est vide' : `${cart.length} article${cart.length > 1 ? 's' : ''}`}
+            {cart.length === 0 ? t('cart.panierVide') : `${cart.length} ${t('cart.articles')}`}
           </p>
         </div>
       </div>
@@ -318,7 +320,7 @@ export default function Panier() {
                 marginTop: 24, border: '2px dashed #EA580C', borderRadius: 16, padding: 24, background: '#FFF7ED',
               }}>
                 <h3 style={{ fontSize: 16, fontWeight: 700, color: '#0B2545', marginBottom: 16 }}>
-                  📦 Ajouter un produit sur mesure
+                  {t('cart.customProduct')}
                 </h3>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 12, marginBottom: 12 }}>
                   <input value={customNom} onChange={e => setCustomNom(e.target.value)}
@@ -349,7 +351,7 @@ export default function Panier() {
               <div style={{
                 background: 'white', borderRadius: 16, boxShadow: '0 2px 12px rgba(0,0,0,0.06)', padding: 24,
               }}>
-                <h2 style={{ fontSize: 18, fontWeight: 700, color: '#0B2545', marginBottom: 16 }}>Recapitulatif</h2>
+                <h2 style={{ fontSize: 18, fontWeight: 700, color: '#0B2545', marginBottom: 16 }}>{t('cart.recap')}</h2>
 
                 {cart.map(item => (
                   <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: 13 }}>
@@ -361,21 +363,21 @@ export default function Panier() {
                 ))}
 
                 <div style={{ borderTop: '2px solid #0B2545', marginTop: 16, paddingTop: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: 16, fontWeight: 700, color: '#0B2545' }}>Total HT</span>
+                  <span style={{ fontSize: 16, fontWeight: 700, color: '#0B2545' }}>{t('cart.totalHT')}</span>
                   <span style={{ fontSize: 24, fontWeight: 800, color: '#0B2545' }}>{total.toLocaleString('fr-FR')} €</span>
                 </div>
 
                 <p style={{ fontSize: 11, color: '#9CA3AF', marginTop: 8 }}>
-                  Hors livraison · TVA non applicable art. 293B CGI
+                  {t('cart.horsLivraison')}
                 </p>
 
                 <button onClick={handleOpenPopup} disabled={submitting}
                   style={{ ...btnStyle('#EA580C'), marginTop: 20, opacity: submitting ? 0.5 : 1 }}>
-                  📋 Generer mon devis gratuit
+                  {t('cart.genererDevis')}
                 </button>
 
                 <p style={{ fontSize: 11, color: '#9CA3AF', textAlign: 'center', marginTop: 8 }}>
-                  Le devis est envoye par email et disponible dans votre espace client
+                  {t('cart.devisNote')}
                 </p>
               </div>
             </div>
@@ -391,9 +393,9 @@ export default function Panier() {
           <Steps current={0} />
           <div style={{ textAlign: 'center', marginBottom: 20 }}>
             <span style={{ fontSize: 48 }}>🤝</span>
-            <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0B2545', marginTop: 8 }}>Attribuer un partenaire</h2>
+            <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0B2545', marginTop: 8 }}>{t('popup.partenaireTitle')}</h2>
             <p style={{ fontSize: 14, color: '#6B7280', marginTop: 4 }}>
-              Selectionnez le partenaire qui vous a recommande (optionnel)
+              {t('popup.partenaireDesc')}
             </p>
           </div>
 
@@ -416,13 +418,13 @@ export default function Panier() {
               width: '100%', padding: '12px 0', border: '2px dashed #E5E7EB', borderRadius: 10,
               background: 'white', color: '#6B7280', fontSize: 14, cursor: 'pointer', marginBottom: 12,
             }}>
-            Continuer sans partenaire →
+            {t('popup.sansPartenaire')} →
           </button>
 
           <button onClick={() => setPopupStep(1)}
             disabled={!selectedPartner}
             style={{ ...btnStyle(selectedPartner ? '#0B2545' : '#D1D5DB'), opacity: selectedPartner ? 1 : 0.5 }}>
-            Confirmer la selection →
+            {t('popup.confirmer')} →
           </button>
         </Overlay>
       )}
@@ -435,7 +437,7 @@ export default function Panier() {
           <Steps current={1} />
           <div style={{ textAlign: 'center', marginBottom: 20 }}>
             <span style={{ fontSize: 48 }}>💰</span>
-            <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0B2545', marginTop: 8 }}>Acompte</h2>
+            <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0B2545', marginTop: 8 }}>{t('popup.acompteTitle')}</h2>
           </div>
 
           {/* Recap */}
@@ -447,13 +449,13 @@ export default function Panier() {
               </div>
             ))}
             <div style={{ borderTop: '1px solid #E5E7EB', marginTop: 8, paddingTop: 8, display: 'flex', justifyContent: 'space-between', fontWeight: 700 }}>
-              <span>Total HT</span>
+              <span>{t('cart.totalHT')}</span>
               <span>{total.toLocaleString('fr-FR')} €</span>
             </div>
           </div>
 
           {/* Type de compte */}
-          <p style={{ fontSize: 13, fontWeight: 600, color: '#0B2545', marginBottom: 8 }}>Type de compte</p>
+          <p style={{ fontSize: 13, fontWeight: 600, color: '#0B2545', marginBottom: 8 }}>{t('popup.typeCompte')}</p>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 20 }}>
             <button onClick={() => setTypeCompte('personnel')}
               style={{
@@ -462,7 +464,7 @@ export default function Panier() {
                 background: typeCompte === 'personnel' ? '#EFF6FF' : 'white',
               }}>
               <div style={{ fontSize: 24 }}>👤</div>
-              <div style={{ fontSize: 13, fontWeight: 600, marginTop: 4 }}>Compte personnel</div>
+              <div style={{ fontSize: 13, fontWeight: 600, marginTop: 4 }}>{t('popup.comptePerso')}</div>
             </button>
             <button onClick={() => setTypeCompte('professionnel')}
               style={{
@@ -471,7 +473,7 @@ export default function Panier() {
                 background: typeCompte === 'professionnel' ? '#EFF6FF' : 'white',
               }}>
               <div style={{ fontSize: 24 }}>🏢</div>
-              <div style={{ fontSize: 13, fontWeight: 600, marginTop: 4 }}>Compte professionnel</div>
+              <div style={{ fontSize: 13, fontWeight: 600, marginTop: 4 }}>{t('popup.comptePro')}</div>
             </button>
           </div>
 
@@ -482,7 +484,7 @@ export default function Panier() {
 
           <button onClick={() => setPopupStep(2)}
             style={btnStyle('#0B2545')}>
-            J'ai effectue le virement →
+            {t('popup.jaiVire')} →
           </button>
 
           <button onClick={handleSansAcompte} disabled={submitting}
@@ -491,7 +493,7 @@ export default function Panier() {
               background: 'transparent', color: '#6B7280', fontSize: 13, cursor: 'pointer', marginTop: 8,
               textDecoration: 'underline',
             }}>
-            Telecharger le devis sans acompte
+            {t('popup.sansAcompte')}
           </button>
         </Overlay>
       )}
@@ -504,7 +506,7 @@ export default function Panier() {
           <Steps current={2} />
           <div style={{ textAlign: 'center', marginBottom: 20 }}>
             <span style={{ fontSize: 48 }}>🏦</span>
-            <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0B2545', marginTop: 8 }}>Coordonnees bancaires</h2>
+            <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0B2545', marginTop: 8 }}>{t('popup.ribTitle')}</h2>
           </div>
 
           {/* RIB Card */}
@@ -544,7 +546,7 @@ export default function Panier() {
 
           <button onClick={handleConfirmVirement} disabled={submitting}
             style={{ ...btnStyle('#16A34A'), opacity: submitting ? 0.5 : 1 }}>
-            {submitting ? 'Envoi en cours...' : "✅ J'ai effectue le virement — Confirmer"}
+            {submitting ? '...' : t('popup.confirmerVirement')}
           </button>
 
           <button onClick={closePopup}
@@ -552,7 +554,7 @@ export default function Panier() {
               width: '100%', padding: '12px 0', border: 'none', borderRadius: 10,
               background: 'transparent', color: '#6B7280', fontSize: 13, cursor: 'pointer', marginTop: 8,
             }}>
-            Fermer — Je virerai plus tard
+            {t('popup.plusTard')}
           </button>
         </Overlay>
       )}

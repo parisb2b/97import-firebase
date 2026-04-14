@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useLocation, Redirect } from 'wouter';
 import { collection, query, where, orderBy, getDocs, doc, updateDoc } from 'firebase/firestore';
 import { clientAuth, db } from '../../lib/firebase';
+import { useI18n } from '../../i18n';
 
 interface DevisLine {
   ref: string;
@@ -26,6 +27,7 @@ interface Devis {
 }
 
 export default function EspacePartenaire() {
+  const { t } = useI18n();
   const [, setLocation] = useLocation();
   const user = clientAuth.currentUser;
   const [partnerCode, setPartnerCode] = useState<string | null>(null);
@@ -160,18 +162,18 @@ export default function EspacePartenaire() {
           </div>
 
           {/* Menu */}
-          <div style={sectionLabel}>Mon espace client</div>
-          {menuBtn('mes_devis', '📋', 'Mes devis')}
-          {menuBtn('profil', '👤', 'Mon profil')}
-          {menuBtn('achats', '🛍', 'Continuer mes achats')}
+          <div style={sectionLabel}>{t('partenaire.monEspaceClient')}</div>
+          {menuBtn('mes_devis', '📋', t('espace.mesDevis'))}
+          {menuBtn('profil', '👤', t('espace.monProfil'))}
+          {menuBtn('achats', '🛍', t('espace.continuerAchats'))}
 
-          <div style={sectionLabel}>Espace partenaire</div>
-          {menuBtn('mes_clients', '👥', 'Mes clients')}
-          {menuBtn('devis_recus', '📄', 'Devis recus')}
-          {menuBtn('commissions', '💰', 'Commissions')}
+          <div style={sectionLabel}>{t('partenaire.espacePartenaire')}</div>
+          {menuBtn('mes_clients', '👥', t('partenaire.mesClients'))}
+          {menuBtn('devis_recus', '📄', t('partenaire.devisRecus'))}
+          {menuBtn('commissions', '💰', t('partenaire.commissions'))}
 
           <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', marginTop: 8 }} />
-          {menuBtn('logout', '🚪', 'Deconnexion')}
+          {menuBtn('logout', '🚪', t('auth.deconnexion'))}
         </div>
 
         {/* Content */}
@@ -179,7 +181,7 @@ export default function EspacePartenaire() {
           {/* Devis recus */}
           {activeView === 'devis_recus' && (
             <>
-              <h1 style={{ fontSize: 24, fontWeight: 800, color: '#0B2545', marginBottom: 4 }}>Devis recus</h1>
+              <h1 style={{ fontSize: 24, fontWeight: 800, color: '#0B2545', marginBottom: 4 }}>{t('partenaire.devisRecus')}</h1>
               <p style={{ fontSize: 14, color: '#6B7280', marginBottom: 24 }}>Gerez les devis de vos clients et negociez les prix VIP</p>
 
               {loading ? (
@@ -223,7 +225,7 @@ export default function EspacePartenaire() {
                                   <p style={{ fontSize: 12, color: '#9CA3AF' }}>x{l.qte} · Prix public: {l.prix_unitaire?.toLocaleString('fr-FR')} €</p>
                                 </div>
                                 <div>
-                                  <label style={{ fontSize: 10, color: '#7C3AED', fontWeight: 600 }}>Prix negocie</label>
+                                  <label style={{ fontSize: 10, color: '#7C3AED', fontWeight: 600 }}>{t('partenaire.prixNegocie')}</label>
                                   <input type="number"
                                     value={prices[i] !== undefined ? prices[i] : (l.prix_negocie || l.prix_unitaire)}
                                     onChange={e => updatePrixNegocie(d.id, i, Number(e.target.value))}
@@ -243,13 +245,13 @@ export default function EspacePartenaire() {
                                 background: 'linear-gradient(135deg, #4C1D95, #7C3AED)', color: 'white',
                                 fontSize: 14, fontWeight: 700, cursor: 'pointer',
                               }}>
-                                📨 Envoyer le devis VIP au client
+                                {t('partenaire.envoyerVip')}
                               </button>
                               <button style={{
                                 padding: '14px 24px', border: '1px solid #E5E7EB', borderRadius: 12,
                                 background: 'white', color: '#374151', fontSize: 14, cursor: 'pointer',
                               }}>
-                                Apercu PDF
+                                {t('partenaire.apercuPdf')}
                               </button>
                             </div>
 
@@ -258,7 +260,7 @@ export default function EspacePartenaire() {
                               marginTop: 16, background: '#F0FDFA', borderRadius: 12, padding: 14,
                               fontSize: 12, color: '#0D9488', lineHeight: 1.5,
                             }}>
-                              💡 Le client recevra le devis VIP par email et dans son espace client. Les prix publics seront barres, les prix negocies affiches en violet.
+                              {t('partenaire.noteVip')}
                             </div>
                           </div>
                         )}
@@ -273,7 +275,7 @@ export default function EspacePartenaire() {
           {/* Mes clients */}
           {activeView === 'mes_clients' && (
             <>
-              <h1 style={{ fontSize: 24, fontWeight: 800, color: '#0B2545', marginBottom: 24 }}>Mes clients</h1>
+              <h1 style={{ fontSize: 24, fontWeight: 800, color: '#0B2545', marginBottom: 24 }}>{t('partenaire.mesClients')}</h1>
               <div style={{ background: 'white', borderRadius: 16, overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
                 {clients.length === 0 ? (
                   <div style={{ padding: 60, textAlign: 'center', color: '#6B7280' }}>Aucun client pour le moment</div>
@@ -309,15 +311,15 @@ export default function EspacePartenaire() {
           {/* Commissions */}
           {activeView === 'commissions' && (
             <>
-              <h1 style={{ fontSize: 24, fontWeight: 800, color: '#0B2545', marginBottom: 24 }}>Commissions</h1>
+              <h1 style={{ fontSize: 24, fontWeight: 800, color: '#0B2545', marginBottom: 24 }}>{t('partenaire.commissions')}</h1>
               <div style={{ background: '#DCFCE7', borderRadius: 16, padding: 24, marginBottom: 24, textAlign: 'center' }}>
-                <p style={{ fontSize: 13, color: '#166534' }}>Total commissions estimees</p>
+                <p style={{ fontSize: 13, color: '#166534' }}>{t('partenaire.totalCommissions')}</p>
                 <p style={{ fontSize: 36, fontWeight: 800, color: '#166534' }}>{Math.round(totalCommissions).toLocaleString('fr-FR')} €</p>
                 <p style={{ fontSize: 12, color: '#166534', opacity: 0.7, marginTop: 4 }}>5% sur les devis acceptes/livres</p>
               </div>
               <div style={{ background: 'white', borderRadius: 16, overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
                 {devis.filter(d => d.statut === 'accepte' || d.statut === 'livre').length === 0 ? (
-                  <div style={{ padding: 40, textAlign: 'center', color: '#6B7280' }}>Aucune commission pour le moment</div>
+                  <div style={{ padding: 40, textAlign: 'center', color: '#6B7280' }}>{t('partenaire.aucuneCommission')}</div>
                 ) : (
                   devis.filter(d => d.statut === 'accepte' || d.statut === 'livre').map(d => (
                     <div key={d.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 20px', borderBottom: '1px solid #F3F4F6' }}>

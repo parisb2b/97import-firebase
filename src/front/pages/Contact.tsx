@@ -1,17 +1,18 @@
 import { useState } from 'react';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
-
-const SUBJECTS = [
-  'Demande de devis',
-  'Question sur un produit',
-  'Suivi de commande',
-  'Service apres-vente',
-  'Devenir partenaire',
-  'Autre',
-];
+import { useI18n } from '../../i18n';
 
 export default function Contact() {
+  const { t } = useI18n();
+
+  const SUBJECTS = [
+    t('contact.sujets.info'),
+    t('contact.sujets.devis'),
+    t('contact.sujets.sav'),
+    t('contact.sujets.partenaire'),
+    t('contact.sujets.autre'),
+  ];
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
@@ -48,8 +49,8 @@ export default function Contact() {
       {/* Banner */}
       <div style={{ background: 'linear-gradient(135deg, #0B2545, #1E3A5F)', padding: '48px 0' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px', textAlign: 'center' }}>
-          <h1 style={{ color: 'white', fontSize: 32, fontWeight: 800, marginBottom: 8 }}>Contact</h1>
-          <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 15 }}>Une question ? Contactez-nous</p>
+          <h1 style={{ color: 'white', fontSize: 32, fontWeight: 800, marginBottom: 8 }}>{t('contact.title')}</h1>
+          <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 15 }}>{t('contact.subtitle')}</p>
         </div>
       </div>
 
@@ -58,10 +59,10 @@ export default function Contact() {
         {/* Left — Info */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           {[
-            { icon: '📍', title: 'Adresse', content: 'LUXENT LIMITED\n2nd Floor College House\n17 King Edwards Road\nRuislip HA4 7AE, London' },
-            { icon: '📧', title: 'Email', content: 'contact@97import.com' },
-            { icon: '📱', title: 'Telephone', content: 'France : +33 6 63 28 49 08\nAntilles : +596 6 96 XX XX XX' },
-            { icon: '🕐', title: 'Horaires', content: 'Lundi - Vendredi : 9h - 18h\nSamedi : 9h - 12h' },
+            { icon: '📍', title: t('contact.adresse'), content: 'LUXENT LIMITED\n2nd Floor College House\n17 King Edwards Road\nRuislip HA4 7AE, London' },
+            { icon: '📧', title: t('contact.email'), content: 'contact@97import.com' },
+            { icon: '📱', title: t('contact.telephone'), content: 'France : +33 6 63 28 49 08\nAntilles : +596 6 96 XX XX XX' },
+            { icon: '🕐', title: t('contact.horaires'), content: 'Lundi - Vendredi : 9h - 18h\nSamedi : 9h - 12h' },
           ].map(item => (
             <div key={item.title} style={{
               background: 'white', borderRadius: 16, padding: 20,
@@ -92,8 +93,8 @@ export default function Contact() {
           {sent ? (
             <div style={{ textAlign: 'center', padding: 40 }}>
               <span style={{ fontSize: 48 }}>✅</span>
-              <h2 style={{ fontSize: 20, fontWeight: 700, color: '#0B2545', marginTop: 16 }}>Message envoye !</h2>
-              <p style={{ fontSize: 14, color: '#6B7280', marginTop: 8 }}>Nous vous repondrons dans les plus brefs delais.</p>
+              <h2 style={{ fontSize: 20, fontWeight: 700, color: '#0B2545', marginTop: 16 }}>Message OK!</h2>
+              <p style={{ fontSize: 14, color: '#6B7280', marginTop: 8 }}>&#10003;</p>
             </div>
           ) : (
             <>

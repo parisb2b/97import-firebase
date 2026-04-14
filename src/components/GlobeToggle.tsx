@@ -2,18 +2,23 @@ import { useI18n, Lang } from '../i18n';
 
 export const GlobeToggle = () => {
   const { lang, setLang } = useI18n();
+  const langs: { code: Lang; label: string }[] = [
+    { code: 'fr', label: 'FR' },
+    { code: 'en', label: 'EN' },
+    { code: 'zh', label: '中文' },
+  ];
   return (
-    <div className="flex items-center gap-1 text-sm">
-      <span>🌐</span>
-      {(['fr', 'zh', 'en'] as Lang[]).map((l) => (
-        <button
-          key={l}
-          onClick={() => setLang(l)}
-          className={`px-2 py-0.5 rounded ${
-            lang === l ? 'bg-navy text-white' : 'text-gray-500 hover:bg-gray-100'
-          }`}
-        >
-          {l === 'fr' ? 'FR' : l === 'zh' ? '中文' : 'EN'}
+    <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+      <span style={{ fontSize: 14 }}>🌐</span>
+      {langs.map(l => (
+        <button key={l.code} onClick={() => setLang(l.code)}
+          style={{
+            padding: '2px 8px', borderRadius: 4, border: 'none', cursor: 'pointer',
+            fontSize: 11, fontWeight: lang === l.code ? 700 : 400,
+            background: lang === l.code ? 'rgba(255,255,255,0.2)' : 'transparent',
+            color: lang === l.code ? 'white' : 'rgba(255,255,255,0.6)',
+          }}>
+          {l.label}
         </button>
       ))}
     </div>

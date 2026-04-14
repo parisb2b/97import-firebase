@@ -2,8 +2,10 @@ import { useState, useEffect, useRef } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { useLocation } from 'wouter';
+import { useI18n } from '../../i18n';
 
 export default function SearchBar() {
+  const { t, lang } = useI18n();
   const [q, setQ] = useState('');
   const [results, setResults] = useState<any[]>([]);
   const [allProducts, setAllProducts] = useState<any[]>([]);
@@ -52,7 +54,7 @@ export default function SearchBar() {
         <input
           value={q}
           onChange={e => setQ(e.target.value)}
-          placeholder="Rechercher un produit, une categorie..."
+          placeholder={t('hero.searchPlaceholder')}
           style={{
             flex: 1, border: 'none', padding: '14px 18px', fontSize: 14,
             outline: 'none', fontFamily: 'inherit', color: '#0B2545',
@@ -87,7 +89,7 @@ export default function SearchBar() {
                 <div style={{ width: 40, height: 40, borderRadius: 8, background: '#E2E8F0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>📦</div>
               )}
               <div>
-                <div style={{ fontSize: 13, fontWeight: 600, color: '#0B2545' }}>{p.nom_fr || p.nom}</div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: '#0B2545' }}>{lang === 'zh' ? (p.nom_zh || p.nom_fr) : lang === 'en' ? (p.nom_en || p.nom_fr) : p.nom_fr || p.nom}</div>
                 <div style={{ fontSize: 11, color: '#94A3B8' }}>{p.categorie}{p.gamme ? ` · ${p.gamme}` : ''}{p.reference ? ` · ${p.reference}` : ''}</div>
               </div>
             </div>

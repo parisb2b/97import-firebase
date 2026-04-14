@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation, Redirect } from 'wouter';
 import { collection, query, where, orderBy, getDocs } from 'firebase/firestore';
 import { clientAuth, db } from '../../lib/firebase';
+import { useI18n } from '../../i18n';
 
 interface DevisLine {
   ref: string;
@@ -41,6 +42,7 @@ const STATUT_COLORS: Record<string, { bg: string; color: string }> = {
 };
 
 export default function EspaceClient() {
+  const { t } = useI18n();
   const [, setLocation] = useLocation();
   const user = clientAuth.currentUser;
   const [devis, setDevis] = useState<Devis[]>([]);
@@ -82,10 +84,10 @@ export default function EspaceClient() {
     (d.acomptes || []).filter(a => a.statut === 'declare').reduce((s, a) => s + a.montant, 0);
 
   const menuItems = [
-    { id: 'devis', icon: '📋', label: 'Mes devis' },
-    { id: 'profil', icon: '👤', label: 'Mon profil' },
-    { id: 'achats', icon: '🛍', label: 'Continuer mes achats' },
-    { id: 'logout', icon: '🚪', label: 'Deconnexion' },
+    { id: 'devis', icon: '📋', label: t('espace.mesDevis') },
+    { id: 'profil', icon: '👤', label: t('espace.monProfil') },
+    { id: 'achats', icon: '🛍', label: t('espace.continuerAchats') },
+    { id: 'logout', icon: '🚪', label: t('auth.deconnexion') },
   ];
 
   const statutStyle = (statut: string) => {
@@ -142,18 +144,18 @@ export default function EspaceClient() {
 
         {/* ═══ Content ═══ */}
         <div>
-          <h1 style={{ fontSize: 24, fontWeight: 800, color: '#0B2545', marginBottom: 4 }}>Mes devis</h1>
+          <h1 style={{ fontSize: 24, fontWeight: 800, color: '#0B2545', marginBottom: 4 }}>{t('espace.mesDevis')}</h1>
           <p style={{ fontSize: 14, color: '#6B7280', marginBottom: 24 }}>
-            Suivez vos devis, telechargez vos documents et gerez vos acomptes
+            {t('espace.mesDevisDesc')}
           </p>
 
           {loading ? (
             <div style={{ padding: 60, textAlign: 'center', color: '#6B7280' }}>Chargement...</div>
           ) : devis.length === 0 ? (
             <div style={{ background: 'white', borderRadius: 16, padding: 60, textAlign: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
-              <p style={{ color: '#6B7280', marginBottom: 16 }}>Aucun devis pour le moment</p>
+              <p style={{ color: '#6B7280', marginBottom: 16 }}>{t('espace.aucunDevis')}</p>
               <Link href="/catalogue">
-                <span style={{ color: '#0B2545', fontWeight: 600, cursor: 'pointer' }}>Parcourir le catalogue</span>
+                <span style={{ color: '#0B2545', fontWeight: 600, cursor: 'pointer' }}>{t('espace.parcourirCatalogue')}</span>
               </Link>
             </div>
           ) : (
@@ -190,7 +192,7 @@ export default function EspaceClient() {
                     {isOpen && (
                       <div style={{ borderTop: '1px solid #F3F4F6', padding: '20px' }}>
                         {/* Documents */}
-                        <h4 style={{ fontSize: 13, fontWeight: 700, color: '#0B2545', marginBottom: 12 }}>Documents</h4>
+                        <h4 style={{ fontSize: 13, fontWeight: 700, color: '#0B2545', marginBottom: 12 }}>{t('espace.documents')}</h4>
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 20 }}>
                           {[
                             { icon: '📄', label: 'Devis', status: 'Disponible', active: true },
@@ -219,7 +221,7 @@ export default function EspaceClient() {
                         </div>
 
                         {/* Suivi paiements */}
-                        <h4 style={{ fontSize: 13, fontWeight: 700, color: '#0B2545', marginBottom: 12 }}>Suivi des paiements</h4>
+                        <h4 style={{ fontSize: 13, fontWeight: 700, color: '#0B2545', marginBottom: 12 }}>{t('espace.paiements')}</h4>
                         <div style={{ display: 'flex', gap: 12, marginBottom: 16 }}>
                           <div style={{ flex: 1, background: '#DCFCE7', borderRadius: 12, padding: 12, textAlign: 'center' }}>
                             <p style={{ fontSize: 11, color: '#166534' }}>Encaisse</p>
@@ -241,7 +243,7 @@ export default function EspaceClient() {
                             width: '100%', padding: '12px 0', background: '#0D9488', color: 'white',
                             border: 'none', borderRadius: 12, fontSize: 14, fontWeight: 700, cursor: 'pointer',
                           }}>
-                            💰 Verser un acompte
+                            {t('espace.verserAcompte')}
                           </button>
                         )}
                       </div>

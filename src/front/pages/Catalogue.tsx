@@ -3,6 +3,7 @@ import { useRoute } from 'wouter';
 import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { db, clientAuth } from '../../lib/firebase';
+import { useI18n } from '../../i18n';
 import Breadcrumb from '../components/Breadcrumb';
 import ProductCard from '../components/ProductCard';
 
@@ -14,6 +15,7 @@ export default function Catalogue() {
   const [_user, setUser] = useState<User | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
   const [filterGamme, setFilterGamme] = useState('');
+  const { t, lang } = useI18n();
 
   useEffect(() => {
     const unsub = onAuthStateChanged(clientAuth, async (u) => {
@@ -71,8 +73,8 @@ export default function Catalogue() {
       }}>
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px' }}>
           <Breadcrumb items={[
-            { label: 'Accueil', href: '/' },
-            ...(categorie ? [{ label: categorie }] : [{ label: 'Tous les produits' }]),
+            { label: t('nav.accueil'), href: '/' },
+            ...(categorie ? [{ label: categorie }] : [{ label: 'Catalogue' }]),
           ]} />
           <h1 style={{ color: 'white', fontSize: 28, fontWeight: 800, marginTop: 12 }}>
             {categorie || 'Catalogue'}
@@ -116,7 +118,7 @@ export default function Catalogue() {
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 20 }}>
             {mainProducts.map(p => (
-              <ProductCard key={p.id} product={p} userRole={userRole} />
+              <ProductCard key={p.id} product={p} userRole={userRole} lang={lang} />
             ))}
           </div>
         )}
