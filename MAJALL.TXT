@@ -199,3 +199,26 @@ PARTIE D :
 - Popup 3/3 RIB : LUXENT LIMITED, IBAN DE76..., Banking Circle Munich
 - Création devis Firestore (quotes) avec acomptes[] et partenaire_code
 - Build : ✅ SUCCÈS (0 erreurs TS)
+
+[2026-04-14 10:45] v26 — Inscription + Profil + Espace client + Corrections esthétiques
+==================================================================================
+PARTIE A — Corrections esthétiques :
+- Coins arrondis uniformes (ProductCard 16px, boutons 12px, badges 20px, popups 24px)
+- Catalogue : accessoires filtrés (machine_id/type=accessoire exclus du listing principal)
+- Produit.tsx : référence interne affichée, galerie fond gradient, thumbnails 12px
+- PriceDisplay : borderRadius 12px
+
+PARTIE B — Script renommage images :
+- scripts/rename-images.mjs (convention REFERENCE_01.ext, copie dans images-renamed/)
+
+PARTIE C — Inscription/Connexion :
+- Connexion.tsx : refonte + Google Auth + redirect /profil si incomplet
+- Inscription.tsx : refonte + nom/prénom/confirm mdp + Google Auth
+- Profil.tsx (NEW) : formulaire obligatoire (tel, adresse, CP, ville, pays)
+
+PARTIE D — Espace client :
+- EspaceClient.tsx (NEW) : sidebar navy + accordéon devis + documents grisés + suivi paiements
+- Header.tsx : lien espace-client pour utilisateur connecté
+- FrontApp.tsx : routes /profil + /espace-client
+
+Build : ✅ SUCCÈS (0 erreurs TS)

@@ -1,30 +1,43 @@
-============================================================
-MAJ26 — Import catalogue v4 + photos + pricing
-Date : 2026-04-13
-============================================================
+=== MAJ26 — Inscription + Profil + Espace client + Corrections ===
+Date : 2026-04-14
 
-## Catalogue v4
-- Source : ~/Downloads/97import-catalogue-v4.xlsx → ~/97import-OK/data/
-- Feuille : "Catalogue Produits" (headers row 6, données row 7+)
-- 69 colonnes mappées vers champs Firestore
+PARTIE A — CORRECTIONS ESTHETIQUES :
+  Coins arrondis uniformes : ✅ (ProductCard 16px, boutons 12px, badges 20px, popups 24px, galerie 20px, thumbnails 12px)
+  Catalogue machines only : ✅ (accessoires filtres par machine_id/machine_compatible/type)
+  Reference interne visible : ✅ (sous le nom du produit)
+  Galerie fond uniforme : ✅ (gradient #F0F4F8 → #E2E8F0, borderRadius 20px)
 
-## Import Firestore
-- Script : scripts/import-catalogue-v4.mjs
-- 93 produits importés dans collection products
-- 0 erreurs
-- Conversions : OUI/NON → boolean, prix → number, vides ignorés
-- ID document = numero_interne (colonne A)
+PARTIE B — RENOMMAGE IMAGES :
+  Script cree : ✅ (scripts/rename-images.mjs)
+  Copie dans ~/97import-OK/images-renamed/ sans toucher aux originaux
 
-## Photos
-- 119 images copiées dans ~/97import-OK/images/
-  products: 49 | accessories: 32 | maisons: 28 | solaire: 10
+PARTIE C — INSCRIPTION/CONNEXION :
+  Connexion.tsx (email + Google) : ✅ (design card centree, redirect profil si incomplet)
+  Inscription.tsx (nom + prenom + email + mdp + confirm + Google) : ✅
+  Profil.tsx (formulaire obligatoire) : ✅ (tel, adresse, CP, ville, pays)
+  Redirection post-connexion : ✅ (check profil Firestore → /profil si incomplet)
 
-## Pricing
-- admin_params/pricing créé dans Firestore :
-  multiplicateur_public: 2.0
-  multiplicateur_partenaire: 1.2
-  devise: EUR
-  taux_rmb_eur: 7.82
+PARTIE D — ESPACE CLIENT :
+  EspaceClient.tsx : ✅
+  Sidebar navy + avatar + menu : ✅
+  Liste devis (Firestore quotes) : ✅
+  Accordeon devis : ✅ (click pour deplier)
+  Documents grises progressifs : ✅ (4 docs avec opacity)
+  Suivi paiements (encaisse/declare/solde) : ✅
+  Bouton verser acompte : ✅ (teal, visible si solde > 0)
+  Deconnexion : ✅
 
-## PUSH
-git push origin v2 : ✅ 53e7b80
+FICHIERS MODIFIES :
+  - src/front/components/ProductCard.tsx (borderRadius 16px)
+  - src/front/components/Header.tsx (borderRadius 12px, lien espace-client)
+  - src/front/components/PriceDisplay.tsx (borderRadius 12px)
+  - src/front/pages/Produit.tsx (galerie, ref interne, borderRadius)
+  - src/front/pages/Catalogue.tsx (filtre accessoires)
+  - src/front/pages/Connexion.tsx (refonte complete + Google)
+  - src/front/pages/Inscription.tsx (refonte complete + Google + confirm mdp)
+  - src/front/pages/Profil.tsx (NEW)
+  - src/front/pages/EspaceClient.tsx (NEW)
+  - src/front/FrontApp.tsx (routes profil + espace-client)
+  - scripts/rename-images.mjs (NEW)
+
+BUILD : npm run build → ✅ (0 erreurs TS)
