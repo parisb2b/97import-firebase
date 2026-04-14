@@ -18,7 +18,7 @@ export default function ProductCard({ product, userRole }: ProductCardProps) {
   return (
     <Link href={`/produit/${product.id}`}>
       <div style={{
-        borderRadius: 14, overflow: 'hidden', cursor: 'pointer', background: 'white',
+        borderRadius: 16, overflow: 'hidden', cursor: 'pointer', background: 'white',
         boxShadow: '0 2px 10px rgba(0,0,0,0.06)', transition: 'transform 0.2s, box-shadow 0.2s',
         border: '1px solid #F3F4F6',
       }}
@@ -26,7 +26,7 @@ export default function ProductCard({ product, userRole }: ProductCardProps) {
         onMouseOut={e => { (e.currentTarget as HTMLElement).style.transform = ''; }}
       >
         {/* Image */}
-        <div style={{ height: 180, background: '#F9FAFB', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', position: 'relative' }}>
+        <div style={{ height: 180, background: '#F9FAFB', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', position: 'relative', borderRadius: '12px 12px 0 0' }}>
           {img ? (
             <img src={img} alt={product.nom_fr || product.nom} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           ) : (

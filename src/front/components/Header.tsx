@@ -107,7 +107,7 @@ export default function Header() {
           <Link href="/panier">
             <div style={{
               background: '#EA580C',
-              borderRadius: 8,
+              borderRadius: 12,
               padding: '6px 14px',
               cursor: 'pointer',
               display: 'flex',
@@ -144,7 +144,7 @@ export default function Header() {
             <Link href="/connexion">
               <span style={{
                 border: '1px solid rgba(255,255,255,0.4)',
-                borderRadius: 8,
+                borderRadius: 12,
                 padding: '6px 16px',
                 fontSize: 13,
                 cursor: 'pointer',

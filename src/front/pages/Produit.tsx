@@ -106,9 +106,9 @@ export default function Produit() {
 
         {/* Left — Gallery */}
         <div>
-          <div style={{ borderRadius: 16, overflow: 'hidden', background: '#F9FAFB', height: 400, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ borderRadius: 20, overflow: 'hidden', background: 'linear-gradient(145deg, #F0F4F8, #E2E8F0)', minHeight: 380, padding: 20, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             {images[selectedImg] ? (
-              <img src={images[selectedImg]} alt={product.nom_fr} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
+              <img src={images[selectedImg]} alt={product.nom_fr} style={{ maxHeight: 340, maxWidth: '100%', objectFit: 'contain' }} />
             ) : (
               <span style={{ fontSize: 80, color: '#D1D5DB' }}>📦</span>
             )}
@@ -118,7 +118,7 @@ export default function Produit() {
               {images.map((img: string, i: number) => (
                 <div key={i} onClick={() => setSelectedImg(i)}
                   style={{
-                    width: 64, height: 64, borderRadius: 8, overflow: 'hidden', cursor: 'pointer',
+                    width: 64, height: 64, borderRadius: 12, overflow: 'hidden', cursor: 'pointer',
                     border: selectedImg === i ? '2px solid #0B2545' : '2px solid transparent',
                   }}>
                   <img src={img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -136,9 +136,14 @@ export default function Produit() {
             </div>
           )}
 
-          <h1 style={{ fontSize: 28, fontWeight: 800, color: '#0B2545', marginBottom: 8, lineHeight: 1.2 }}>
+          <h1 style={{ fontSize: 28, fontWeight: 800, color: '#0B2545', marginBottom: 4, lineHeight: 1.2 }}>
             {product.nom_fr || product.nom || product.numero_interne}
           </h1>
+          {(product.reference || product.numero_interne) && (
+            <span style={{ fontSize: 13, color: '#94A3B8', fontWeight: 500 }}>
+              Ref : {product.reference || product.numero_interne}
+            </span>
+          )}
 
           {product.gamme && (
             <p style={{ fontSize: 15, color: '#6B7280', marginBottom: 20 }}>
@@ -147,7 +152,7 @@ export default function Produit() {
           )}
 
           {/* Price block */}
-          <div style={{ background: '#F9FAFB', borderRadius: 12, padding: 20, marginBottom: 24 }}>
+          <div style={{ background: '#F9FAFB', borderRadius: 16, padding: 20, marginBottom: 24 }}>
             <PriceDisplay product={product} userRole={userRole} size="lg" />
           </div>
 
@@ -155,14 +160,14 @@ export default function Produit() {
           {userRole && (
             <div style={{ display: 'flex', gap: 12, marginBottom: 24 }}>
               <button onClick={handleAddToCart} style={{
-                flex: 1, background: '#EA580C', color: 'white', border: 'none', borderRadius: 10,
+                flex: 1, background: '#EA580C', color: 'white', border: 'none', borderRadius: 12,
                 padding: '14px 0', fontSize: 15, fontWeight: 700, cursor: 'pointer',
               }}>
                 🛒 Ajouter au panier
               </button>
               <Link href="/panier">
                 <button style={{
-                  background: '#0B2545', color: 'white', border: 'none', borderRadius: 10,
+                  background: '#0B2545', color: 'white', border: 'none', borderRadius: 12,
                   padding: '14px 24px', fontSize: 15, fontWeight: 600, cursor: 'pointer',
                 }}>
                   📋 Devis
@@ -198,7 +203,7 @@ export default function Produit() {
           {hasAccessoires && (
             <Link href={`/catalogue/${product.categorie}`}>
               <div style={{
-                background: 'linear-gradient(135deg, #1E3A5F, #0B2545)', borderRadius: 12,
+                background: 'linear-gradient(135deg, #1E3A5F, #0B2545)', borderRadius: 16,
                 padding: 20, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
               }}>
                 <div>

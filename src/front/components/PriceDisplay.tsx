@@ -8,7 +8,7 @@ export default function PriceDisplay({ product, userRole, size = 'md' }: PriceDi
   if (!userRole) {
     return (
       <div style={{
-        background: '#DC2626', color: 'white', borderRadius: 10,
+        background: '#DC2626', color: 'white', borderRadius: 12,
         padding: size === 'sm' ? '6px 12px' : '10px 16px',
         fontSize: size === 'sm' ? 11 : 13, fontWeight: 600, textAlign: 'center',
       }}>
