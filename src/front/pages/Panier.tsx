@@ -177,7 +177,7 @@ export default function Panier() {
       localStorage.removeItem('cart');
       setCart([]);
       setPopupStep(null);
-      setLocation('/mon-compte/devis');
+      setLocation('/espace-client');
     } catch (err) {
       console.error('Error creating quote:', err);
     } finally {
@@ -216,7 +216,7 @@ export default function Panier() {
       localStorage.removeItem('cart');
       setCart([]);
       setPopupStep(null);
-      setLocation('/mon-compte/devis');
+      setLocation('/espace-client');
     } catch (err) {
       console.error('Error creating quote:', err);
     } finally {

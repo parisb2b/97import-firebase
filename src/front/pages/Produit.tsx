@@ -4,7 +4,7 @@ import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firesto
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { db, clientAuth } from '../../lib/firebase';
 import Breadcrumb from '../components/Breadcrumb';
-import PriceDisplay from '../components/PriceDisplay';
+import PriceDisplay, { getProductPrice } from '../components/PriceDisplay';
 
 export default function Produit() {
   const [, params] = useRoute('/produit/:id');
@@ -79,7 +79,7 @@ export default function Produit() {
         id: product.id,
         ref: product.numero_interne || product.id,
         nom_fr: product.nom_fr || product.nom || product.numero_interne,
-        prix: (product.prix_achat || 0) * 2,
+        prix: getProductPrice(product, userRole),
         qte: 1,
         image: product.images_urls?.[0] || '',
       });
@@ -137,7 +137,7 @@ export default function Produit() {
           )}
 
           <h1 style={{ fontSize: 28, fontWeight: 800, color: '#0B2545', marginBottom: 4, lineHeight: 1.2 }}>
-            {product.nom_fr || product.nom || product.numero_interne}
+            {(product.nom_fr || product.nom || product.numero_interne || '').replace(/\s*--\s*/g, ' — ')}
           </h1>
           {(product.reference || product.numero_interne) && (
             <span style={{ fontSize: 13, color: '#94A3B8', fontWeight: 500 }}>

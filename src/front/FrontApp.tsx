@@ -9,8 +9,8 @@ import Produit from './pages/Produit';
 import Connexion from './pages/Connexion';
 import Inscription from './pages/Inscription';
 import Panier from './pages/Panier';
-import MonCompte from './pages/MonCompte';
 import Profil from './pages/Profil';
+import { Redirect } from 'wouter';
 import EspaceClient from './pages/EspaceClient';
 import EspacePartenaire from './pages/EspacePartenaire';
 import Services from './pages/Services';
@@ -35,7 +35,7 @@ export default function FrontApp() {
           <Route path="/connexion" component={Connexion} />
           <Route path="/inscription" component={Inscription} />
           <Route path="/panier" component={Panier} />
-          <Route path="/mon-compte/:tab?" component={MonCompte} />
+          <Route path="/mon-compte/:tab?">{() => <Redirect to="/espace-client" />}</Route>
           <Route path="/services" component={Services} />
           <Route path="/contact" component={Contact} />
           <Route path="/espace-client" component={EspaceClient} />

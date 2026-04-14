@@ -44,7 +44,7 @@ export default function ProductCard({ product, userRole }: ProductCardProps) {
         <div style={{ padding: 14 }}>
           <div style={{ fontSize: 11, color: '#6B7280', marginBottom: 4 }}>{product.gamme || product.categorie}</div>
           <h3 style={{ fontWeight: 700, fontSize: 14, color: '#0B2545', marginBottom: 6, lineHeight: 1.3 }}>
-            {product.nom_fr || product.nom || product.numero_interne}
+            {(product.nom_fr || product.nom || product.numero_interne || '').replace(/\s*--\s*/g, ' — ')}
           </h3>
 
           {/* Tags */}
