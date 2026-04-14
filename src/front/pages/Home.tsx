@@ -48,7 +48,7 @@ export default function Home() {
       }}>
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px', display: 'flex', alignItems: 'center', gap: 40 }}>
           <div style={{ flex: '0 0 280px' }}>
-            <img src="/images/globe_accueil.png" alt="Globe" style={{ width: 280, filter: 'drop-shadow(0 10px 30px rgba(0,0,0,0.2))' }} />
+            <img src="/images/hero_cargo_97import.png" alt="97import cargo" style={{ width: 280, filter: 'drop-shadow(0 10px 30px rgba(0,0,0,0.3))' }} />
           </div>
           <div style={{ flex: 1, textAlign: 'center' }}>
             <h1 style={{ fontSize: 36, fontWeight: 800, color: '#0B2545', lineHeight: 1.2, marginBottom: 16 }}>
@@ -66,9 +66,11 @@ export default function Home() {
           </div>
           <div style={{ flex: '0 0 250px', textAlign: 'center' }}>
             <div style={{
-              width: 220, height: 180, borderRadius: 16, background: 'rgba(255,255,255,0.3)',
-              backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 48, margin: '0 auto',
-            }}>🏠</div>
+              width: 220, height: 180, borderRadius: 16, overflow: 'hidden', margin: '0 auto',
+              boxShadow: '0 8px 30px rgba(0,0,0,0.2)',
+            }}>
+              <img src="/images/hero_maison.jpg" alt="Maison modulaire" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            </div>
             <p style={{ marginTop: 8, fontSize: 13, color: '#0B2545', fontWeight: 600 }}>Maison modulaire 20P</p>
           </div>
         </div>
