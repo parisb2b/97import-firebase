@@ -67,7 +67,6 @@ export default function Profil() {
         codePostal,
         ville,
         pays,
-        role: 'user',
         updatedAt: serverTimestamp(),
       }, { merge: true });
 

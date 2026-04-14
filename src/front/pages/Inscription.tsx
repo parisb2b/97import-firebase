@@ -53,12 +53,11 @@ export default function Inscription() {
       const provider = new GoogleAuthProvider();
       const cred = await signInWithPopup(clientAuth, provider);
 
-      // Create profile if first time
+      // Create profile if first time (merge: don't overwrite existing role)
       await setDoc(doc(db, 'profiles', cred.user.uid), {
         uid: cred.user.uid,
         email: cred.user.email,
         nom: cred.user.displayName || '',
-        role: 'user',
         createdAt: serverTimestamp(),
       }, { merge: true });
 

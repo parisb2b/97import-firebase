@@ -54,7 +54,7 @@ export default function Header() {
       setUser(u);
       if (u) {
         try {
-          const snap = await getDoc(doc(db, 'profiles', u.uid));
+          const snap = await getDoc(doc(db, 'users', u.uid));
           setUserRole(snap.data()?.role || 'user');
         } catch { setUserRole('user'); }
       } else {

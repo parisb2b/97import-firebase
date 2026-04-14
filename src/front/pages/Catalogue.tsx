@@ -20,7 +20,7 @@ export default function Catalogue() {
       setUser(u);
       if (u) {
         try {
-          const snap = await getDoc(doc(db, 'profiles', u.uid));
+          const snap = await getDoc(doc(db, 'users', u.uid));
           setUserRole(snap.data()?.role || 'user');
         } catch { setUserRole('user'); }
       } else {
