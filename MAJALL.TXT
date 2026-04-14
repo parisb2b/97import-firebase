@@ -222,3 +222,25 @@ PARTIE D — Espace client :
 - FrontApp.tsx : routes /profil + /espace-client
 
 Build : ✅ SUCCÈS (0 erreurs TS)
+
+[2026-04-14 13:15] v27 — Espace partenaire + Services + Contact + Header + Recherche
+==================================================================================
+PARTIE A — Header + Recherche :
+- Nav : Accueil ajouté en 1er, Services et Contact ajoutés
+- SearchBar.tsx (NEW) : recherche temps réel avec dropdown, max 8 résultats
+- Home.tsx : SearchBar intégré dans le hero
+
+PARTIE B — Espace partenaire :
+- EspacePartenaire.tsx (NEW) : sidebar double casquette (client + partenaire)
+- Devis reçus : accordéon avec modification prix VIP (input violet)
+- Mes clients : tableau depuis devis du partenaire
+- Commissions : 5% sur devis acceptés/livrés
+- Header : redirection /espace-partenaire si role === partner
+
+PARTIE C — Services :
+- Services.tsx (NEW) : 6 cards + 4 destinations DOM-TOM + mention obligatoire
+
+PARTIE D — Contact :
+- Contact.tsx (NEW) : 2 colonnes (infos + formulaire), WhatsApp, sauvegarde Firestore contacts
+
+Build : ✅ SUCCÈS (0 erreurs TS)

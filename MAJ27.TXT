@@ -1,0 +1,44 @@
+=== MAJ27 — Espace partenaire + Services + Contact + Header + Recherche ===
+Date : 2026-04-14
+
+PARTIE A — HEADER :
+  Onglet Accueil ajoute : ✅ (premier item nav, exact match sur /)
+  Nav items : Accueil, Mini-Pelles, Maisons, Solaire, Agricole, Divers, Services, Contact
+  SearchBar.tsx fonctionnelle : ✅ (composant dedie)
+  Recherche temps reel : ✅ (filtre nom_fr, reference, categorie, gamme, description, marque, moteur)
+  Dropdown max 8 resultats avec thumbnails : ✅
+
+PARTIE B — ESPACE PARTENAIRE :
+  EspacePartenaire.tsx : ✅
+  Sidebar double casquette : ✅ (section client + section partenaire, labels uppercase)
+  Devis recus + modification prix : ✅ (input violet #7C3AED, fond #EDE9FE)
+  Bouton envoyer devis VIP : ✅ (gradient violet, sauvegarde Firestore statut vip_envoye)
+  Note info teal : ✅
+  Vue Mes clients : ✅ (tableau nom/email/nb devis/total)
+  Vue Commissions : ✅ (5% sur devis acceptes/livres)
+  Redirection Mon compte par role : ✅ (Header detecte role depuis profiles Firestore)
+
+PARTIE C — SERVICES :
+  Services.tsx : ✅
+  6 cards services : ✅ (Fret, Dedouanement, Coordination, Sur Mesure, Devis, SAV)
+  4 destinations DOM-TOM : ✅ (MQ, GP, RE, GF avec drapeaux)
+  Mention obligatoire : ✅ (encadre jaune)
+
+PARTIE D — CONTACT :
+  Contact.tsx : ✅
+  Layout 2 colonnes (infos + formulaire) : ✅
+  Formulaire (prenom, nom, email, tel, sujet, message) : ✅
+  Sauvegarde Firestore collection contacts : ✅
+  Bouton WhatsApp : ✅ (vert, pleine largeur)
+  Message de confirmation : ✅
+
+FICHIERS :
+  - src/front/components/Header.tsx (nav items + role detection)
+  - src/front/components/SearchBar.tsx (NEW)
+  - src/front/pages/Home.tsx (SearchBar integre)
+  - src/front/pages/EspacePartenaire.tsx (NEW)
+  - src/front/pages/Services.tsx (NEW)
+  - src/front/pages/Contact.tsx (NEW)
+  - src/front/FrontApp.tsx (routes services, contact, espace-partenaire)
+
+BUILD : npm run build → ✅ (0 erreurs TS)
