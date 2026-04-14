@@ -4,9 +4,11 @@ import { createUserWithEmailAndPassword, updateProfile, signInWithPopup, GoogleA
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { clientAuth, db } from '../../lib/firebase';
 import { useI18n } from '../../i18n';
+import { useToast } from '../components/Toast';
 
 export default function Inscription() {
   const { t } = useI18n();
+  const { showToast } = useToast();
   const [, setLocation] = useLocation();
   const [nom, setNom] = useState('');
   const [prenom, setPrenom] = useState('');
@@ -30,7 +32,7 @@ export default function Inscription() {
       const cred = await createUserWithEmailAndPassword(clientAuth, email, password);
       await updateProfile(cred.user, { displayName: `${prenom} ${nom}` });
 
-      await setDoc(doc(db, 'profiles', cred.user.uid), {
+      const profileData = {
         uid: cred.user.uid,
         email,
         firstName: prenom,
@@ -38,8 +40,11 @@ export default function Inscription() {
         nom: `${prenom} ${nom}`,
         role: 'user',
         createdAt: serverTimestamp(),
-      });
+      };
+      await setDoc(doc(db, 'users', cred.user.uid), profileData);
+      await setDoc(doc(db, 'profiles', cred.user.uid), profileData);
 
+      showToast('Compte créé avec succès !');
       setLocation('/profil');
     } catch (err) {
       setError((err as Error).message);
@@ -62,7 +67,14 @@ export default function Inscription() {
         nom: cred.user.displayName || '',
         createdAt: serverTimestamp(),
       }, { merge: true });
+      await setDoc(doc(db, 'users', cred.user.uid), {
+        uid: cred.user.uid,
+        email: cred.user.email,
+        nom: cred.user.displayName || '',
+        createdAt: serverTimestamp(),
+      }, { merge: true });
 
+      showToast('Compte créé avec succès !');
       setLocation('/profil');
     } catch (err) {
       setError((err as Error).message);

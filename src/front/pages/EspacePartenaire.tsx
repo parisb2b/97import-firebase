@@ -4,6 +4,7 @@ import { collection, query, where, orderBy, getDocs, doc, updateDoc, getDoc } fr
 import { clientAuth, db } from '../../lib/firebase';
 import { useI18n } from '../../i18n';
 import { generateDevis, downloadPDF } from '../../lib/pdf-generator';
+import { useToast } from '../components/Toast';
 
 interface DevisLine {
   ref: string;
@@ -29,6 +30,7 @@ interface Devis {
 
 export default function EspacePartenaire() {
   const { t } = useI18n();
+  const { showToast } = useToast();
   const [, setLocation] = useLocation();
   const user = clientAuth.currentUser;
   const [partnerCode, setPartnerCode] = useState<string | null>(null);
@@ -92,7 +94,7 @@ export default function EspacePartenaire() {
       });
       // Update local state
       setDevis(prev => prev.map(dd => dd.id === d.id ? { ...dd, lignes: updatedLignes, statut: 'vip_envoye' } : dd));
-      alert('Devis VIP envoye au client !');
+      showToast('Devis VIP envoyé au client !');
     } catch (err) {
       console.error('Error:', err);
     }

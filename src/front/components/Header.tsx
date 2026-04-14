@@ -47,7 +47,23 @@ export default function Header() {
     { path: '/services', label: t('nav.services'), icon: '🔧' },
     { path: '/contact', label: t('nav.contact'), icon: '✉️' },
   ];
-  const [cartCount] = useState(0); // TODO: connect to cart context
+  const [cartCount, setCartCount] = useState(0);
+
+  useEffect(() => {
+    const updateCount = () => {
+      try {
+        const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+        setCartCount(cart.reduce((sum: number, item: any) => sum + (item.qte || 1), 0));
+      } catch { setCartCount(0); }
+    };
+    updateCount();
+    window.addEventListener('cart-updated', updateCount);
+    window.addEventListener('storage', updateCount);
+    return () => {
+      window.removeEventListener('cart-updated', updateCount);
+      window.removeEventListener('storage', updateCount);
+    };
+  }, []);
 
   useEffect(() => {
     const unsub = onAuthStateChanged(clientAuth, async (u) => {

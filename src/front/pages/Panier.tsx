@@ -4,6 +4,7 @@ import { clientAuth, db } from '../../lib/firebase';
 import { doc, setDoc, serverTimestamp, collection, query, where, getDocs } from 'firebase/firestore';
 import { getNextNumber } from '../../lib/counters';
 import { useI18n } from '../../i18n';
+import { useToast } from '../components/Toast';
 
 interface CartItem {
   id: string;
@@ -66,6 +67,7 @@ function Steps({ current }: { current: number }) {
 
 export default function Panier() {
   const { t } = useI18n();
+  const { showToast } = useToast();
   const [, setLocation] = useLocation();
   const [cart, setCart] = useState<CartItem[]>([]);
   const [submitting, setSubmitting] = useState(false);
@@ -98,6 +100,7 @@ export default function Panier() {
   const saveCart = (newCart: CartItem[]) => {
     setCart(newCart);
     localStorage.setItem('cart', JSON.stringify(newCart));
+    window.dispatchEvent(new Event('cart-updated'));
   };
 
   const updateQte = (id: string, qte: number) => {
@@ -127,7 +130,10 @@ export default function Panier() {
   const handleOpenPopup = async () => {
     const user = clientAuth.currentUser;
     if (!user) { setLocation('/connexion'); return; }
-    if (cart.length === 0) return;
+    if (cart.length === 0) {
+      showToast('Votre panier est vide', 'warning');
+      return;
+    }
 
     // Load partners
     try {
@@ -177,11 +183,14 @@ export default function Panier() {
       });
 
       localStorage.removeItem('cart');
+      window.dispatchEvent(new Event('cart-updated'));
       setCart([]);
       setPopupStep(null);
+      showToast('Devis ' + numero + ' créé avec succès !');
       setLocation('/espace-client');
     } catch (err) {
       console.error('Error creating quote:', err);
+      showToast('Erreur lors de la création du devis', 'error');
     } finally {
       setSubmitting(false);
     }
@@ -216,11 +225,14 @@ export default function Panier() {
       });
 
       localStorage.removeItem('cart');
+      window.dispatchEvent(new Event('cart-updated'));
       setCart([]);
       setPopupStep(null);
+      showToast('Devis créé — sans acompte');
       setLocation('/espace-client');
     } catch (err) {
       console.error('Error creating quote:', err);
+      showToast('Erreur lors de la création du devis', 'error');
     } finally {
       setSubmitting(false);
     }

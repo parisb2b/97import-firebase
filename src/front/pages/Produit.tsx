@@ -6,9 +6,11 @@ import { db, clientAuth } from '../../lib/firebase';
 import { useI18n } from '../../i18n';
 import Breadcrumb from '../components/Breadcrumb';
 import PriceDisplay, { getProductPrice } from '../components/PriceDisplay';
+import { useToast } from '../components/Toast';
 
 export default function Produit() {
   const { t, lang } = useI18n();
+  const { showToast } = useToast();
   const [, params] = useRoute('/produit/:id');
   const [product, setProduct] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -103,7 +105,8 @@ export default function Produit() {
       });
     }
     localStorage.setItem('cart', JSON.stringify(cart));
-    alert('OK!');
+    window.dispatchEvent(new Event('cart-updated'));
+    showToast(t('product.addToCart') + ' ✅');
   };
 
   return (

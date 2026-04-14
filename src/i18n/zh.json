@@ -63,6 +63,7 @@
     "articles": "件商品",
     "recap": "订单摘要",
     "totalHT": "合计（不含税）",
+    "panierVide": "购物车是空的",
     "horsLivraison": "不含运费 · 不适用增值税 art. 293B CGI",
     "genererDevis": "生成免费报价",
     "devisNote": "报价将通过邮件发送，并可在您的客户空间中查看",
@@ -89,7 +90,8 @@
     "pasDeCompte": "还没有账户？",
     "dejaCompte": "已有账户？",
     "deconnexion": "退出登录",
-    "monCompte": "我的账户"
+    "monCompte": "我的账户",
+    "accesEspace": "进入您的客户空间"
   },
   "profil": {
     "title": "完善个人资料",
@@ -100,7 +102,9 @@
     "codePostal": "邮编",
     "ville": "城市",
     "pays": "国家",
-    "sauvegarder": "保存并继续"
+    "sauvegarder": "保存并继续",
+    "subtitleDesc": "这些信息用于生成报价和发货",
+    "sauvegardeOk": "个人资料已成功保存！"
   },
   "espace": {
     "mesDevis": "我的报价",

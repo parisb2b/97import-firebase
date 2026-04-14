@@ -63,6 +63,7 @@
     "articles": "item(s)",
     "recap": "Summary",
     "totalHT": "Total excl. VAT",
+    "panierVide": "Your cart is empty",
     "horsLivraison": "Excl. delivery · VAT not applicable art. 293B CGI",
     "genererDevis": "Generate my free quote",
     "devisNote": "The quote is sent by email and available in your client area",
@@ -89,7 +90,8 @@
     "pasDeCompte": "Don't have an account?",
     "dejaCompte": "Already have an account?",
     "deconnexion": "Log out",
-    "monCompte": "My account"
+    "monCompte": "My account",
+    "accesEspace": "Access your client area"
   },
   "profil": {
     "title": "Complete my profile",
@@ -100,7 +102,9 @@
     "codePostal": "Postal code",
     "ville": "City",
     "pays": "Country",
-    "sauvegarder": "Save and continue"
+    "sauvegarder": "Save and continue",
+    "subtitleDesc": "This information is required to generate your quotes and deliver",
+    "sauvegardeOk": "Profile saved successfully!"
   },
   "espace": {
     "mesDevis": "My quotes",

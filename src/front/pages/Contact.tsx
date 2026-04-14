@@ -2,9 +2,11 @@ import { useState } from 'react';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { useI18n } from '../../i18n';
+import { useToast } from '../components/Toast';
 
 export default function Contact() {
   const { t } = useI18n();
+  const { showToast } = useToast();
 
   const SUBJECTS = [
     t('contact.sujets.info'),
@@ -34,6 +36,7 @@ export default function Contact() {
       setSent(true);
     } catch (err) {
       console.error('Error:', err);
+      showToast('Erreur lors de l\'envoi', 'error');
     } finally {
       setSending(false);
     }

@@ -15,12 +15,20 @@ export default function Connexion() {
 
   const checkProfileAndRedirect = async (uid: string) => {
     try {
-      const snap = await getDoc(doc(db, 'profiles', uid));
-      const data = snap.data();
-      if (!data?.telephone || !data?.adresse) {
+      const userSnap = await getDoc(doc(db, 'users', uid));
+      const userData = userSnap.data();
+      if (!userData) {
         setLocation('/profil');
+        return;
+      }
+      const role = userData.role || 'user';
+      const profilComplet = userData.phone || userData.telephone;
+      if (!profilComplet) {
+        setLocation('/profil');
+      } else if (role === 'partner') {
+        setLocation('/espace-partenaire');
       } else {
-        setLocation('/');
+        setLocation('/espace-client');
       }
     } catch {
       setLocation('/');

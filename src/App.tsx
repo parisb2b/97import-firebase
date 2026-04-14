@@ -1,4 +1,5 @@
 import { I18nProvider } from './i18n';
+import { ToastProvider } from './front/components/Toast';
 import AdminApp from './admin/AdminApp';
 import FrontApp from './front/FrontApp';
 
@@ -11,7 +12,9 @@ const isAdmin =
 export default function App() {
   return (
     <I18nProvider>
-      {isAdmin ? <AdminApp /> : <FrontApp />}
+      <ToastProvider>
+        {isAdmin ? <AdminApp /> : <FrontApp />}
+      </ToastProvider>
     </I18nProvider>
   );
 }

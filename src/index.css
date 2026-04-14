@@ -44,3 +44,8 @@ body {
 .tooltip-wrapper:hover .tooltip-text {
   display: block;
 }
+
+@keyframes slideInToast {
+  from { opacity: 0; transform: translateX(100px); }
+  to { opacity: 1; transform: translateX(0); }
+}

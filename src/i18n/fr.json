@@ -63,6 +63,7 @@
     "articles": "article(s)",
     "recap": "Récapitulatif",
     "totalHT": "Total HT",
+    "panierVide": "Votre panier est vide",
     "horsLivraison": "Hors livraison · TVA non applicable art. 293B CGI",
     "genererDevis": "Générer mon devis gratuit",
     "devisNote": "Le devis est envoyé par email et disponible dans votre espace client",
@@ -89,7 +90,8 @@
     "pasDeCompte": "Pas encore de compte ?",
     "dejaCompte": "Déjà un compte ?",
     "deconnexion": "Déconnexion",
-    "monCompte": "Mon compte"
+    "monCompte": "Mon compte",
+    "accesEspace": "Accédez à votre espace client"
   },
   "profil": {
     "title": "Compléter mon profil",
@@ -100,7 +102,9 @@
     "codePostal": "Code postal",
     "ville": "Ville",
     "pays": "Pays",
-    "sauvegarder": "Enregistrer et continuer"
+    "sauvegarder": "Enregistrer et continuer",
+    "subtitleDesc": "Ces informations sont nécessaires pour générer vos devis et vous livrer",
+    "sauvegardeOk": "Profil enregistré avec succès !"
   },
   "espace": {
     "mesDevis": "Mes devis",

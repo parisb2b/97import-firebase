@@ -3,7 +3,6 @@ import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { useLocation } from 'wouter';
 import { useI18n } from '../../i18n';
-
 export default function SearchBar() {
   const { t, lang } = useI18n();
   const [q, setQ] = useState('');
@@ -60,7 +59,7 @@ export default function SearchBar() {
             outline: 'none', fontFamily: 'inherit', color: '#0B2545',
           }}
         />
-        <button style={{
+        <button onClick={() => { if (results.length > 0) handleSelect(results[0]); }} style={{
           background: '#0B2545', color: '#fff', border: 'none',
           padding: '14px 22px', fontSize: 13, fontWeight: 700,
           cursor: 'pointer', letterSpacing: 0.5,

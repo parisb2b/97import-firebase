@@ -3,9 +3,11 @@ import { useLocation, Redirect } from 'wouter';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { clientAuth, db } from '../../lib/firebase';
 import { useI18n } from '../../i18n';
+import { useToast } from '../components/Toast';
 
 export default function Profil() {
   const { t } = useI18n();
+  const { showToast } = useToast();
   const [, setLocation] = useLocation();
   const user = clientAuth.currentUser;
 
@@ -72,9 +74,29 @@ export default function Profil() {
         updatedAt: serverTimestamp(),
       }, { merge: true });
 
-      setLocation('/');
+      await setDoc(doc(db, 'users', user.uid), {
+        uid: user.uid,
+        email: user.email,
+        firstName: prenom,
+        lastName: nom,
+        nom: `${prenom} ${nom}`,
+        telephone,
+        adresse,
+        codePostal,
+        ville,
+        pays,
+        updatedAt: serverTimestamp(),
+      }, { merge: true });
+
+      showToast('Profil enregistré avec succès !');
+      const userSnap = await getDoc(doc(db, 'users', user.uid));
+      const role = userSnap.data()?.role || 'user';
+      setTimeout(() => {
+        setLocation(role === 'partner' ? '/espace-partenaire' : '/espace-client');
+      }, 1500);
     } catch (err) {
       console.error('Error saving profile:', err);
+      showToast('Erreur lors de la sauvegarde', 'error');
     } finally {
       setSaving(false);
     }

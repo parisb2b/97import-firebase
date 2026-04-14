@@ -4,6 +4,7 @@ import { collection, query, where, orderBy, getDocs, doc, getDoc } from 'firebas
 import { clientAuth, db } from '../../lib/firebase';
 import { useI18n } from '../../i18n';
 import { generateDevis, generateFactureAcompte, downloadPDF } from '../../lib/pdf-generator';
+import { useToast } from '../components/Toast';
 
 interface DevisLine {
   ref: string;
@@ -44,6 +45,7 @@ const STATUT_COLORS: Record<string, { bg: string; color: string }> = {
 
 export default function EspaceClient() {
   const { t } = useI18n();
+  const { showToast } = useToast();
   const [, setLocation] = useLocation();
   const user = clientAuth.currentUser;
   const [devis, setDevis] = useState<Devis[]>([]);
@@ -65,6 +67,7 @@ export default function EspaceClient() {
         setDevis(snap.docs.map(d => ({ id: d.id, ...d.data() } as Devis)));
       } catch (err) {
         console.error('Error loading devis:', err);
+        showToast('Erreur de chargement des devis', 'error');
       } finally {
         setLoading(false);
       }
@@ -88,6 +91,7 @@ export default function EspaceClient() {
       }
     } catch (err) {
       console.error('PDF error:', err);
+      showToast('Erreur de génération PDF', 'error');
     }
   };
 
