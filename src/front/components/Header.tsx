@@ -6,12 +6,14 @@ import { useI18n } from '../../i18n';
 import { GlobeToggle } from '../../components/GlobeToggle';
 
 const NAV_ITEMS = [
-  { path: '/catalogue/Mini-Pelle', label: 'Mini-Pelles', icon: '🏗️' },
+  { path: '/', label: 'Accueil', icon: '🏠', exact: true },
+  { path: '/catalogue/Mini-Pelle', label: 'Mini-Pelles', icon: '🚜' },
   { path: '/catalogue/Maisons', label: 'Maisons', icon: '🏠' },
   { path: '/catalogue/Solaire', label: 'Solaire', icon: '☀️' },
-  { path: '/catalogue/machines-agricoles', label: 'Agricole', icon: '🚜' },
+  { path: '/catalogue/Agricole', label: 'Agricole', icon: '🌾' },
   { path: '/catalogue/Divers', label: 'Divers', icon: '📦' },
-  { path: '/contact', label: 'Contact', icon: '📞' },
+  { path: '/services', label: 'Services', icon: '🔧' },
+  { path: '/contact', label: 'Contact', icon: '✉️' },
 ];
 
 function Clocks() {
@@ -80,22 +82,26 @@ export default function Header() {
 
         {/* Navigation */}
         <nav style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-          {NAV_ITEMS.map(item => (
-            <Link key={item.path} href={item.path}>
-              <span style={{
-                padding: '6px 12px',
-                borderRadius: 6,
-                fontSize: 13,
-                cursor: 'pointer',
-                color: location.startsWith(item.path) ? 'white' : 'rgba(255,255,255,0.8)',
-                background: location.startsWith(item.path) ? 'rgba(255,255,255,0.15)' : 'transparent',
-                fontWeight: location.startsWith(item.path) ? 600 : 400,
-                transition: 'all 0.2s',
-              }}>
-                {item.icon} {item.label}
-              </span>
-            </Link>
-          ))}
+          {NAV_ITEMS.map(item => {
+            const isActive = (item as any).exact ? location === item.path : location.startsWith(item.path);
+            return (
+              <Link key={item.path} href={item.path}>
+                <span style={{
+                  padding: '6px 10px',
+                  borderRadius: 6,
+                  fontSize: 12,
+                  cursor: 'pointer',
+                  color: isActive ? 'white' : 'rgba(255,255,255,0.8)',
+                  background: isActive ? 'rgba(255,255,255,0.15)' : 'transparent',
+                  fontWeight: isActive ? 600 : 400,
+                  transition: 'all 0.2s',
+                  whiteSpace: 'nowrap',
+                }}>
+                  {item.icon} {item.label}
+                </span>
+              </Link>
+            );
+          })}
         </nav>
 
         {/* Right section */}

@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
 import { Link } from 'wouter';
 import { db } from '../../lib/firebase';
+import SearchBar from '../components/SearchBar';
 
 const CAT_ICONS: Record<string, string> = {
   'Mini-Pelle': '🏗️', 'Maisons': '🏠', 'Solaire': '☀️',
@@ -58,10 +59,7 @@ export default function Home() {
               Mini-pelles, maisons modulaires, kits solaires. Prix usine, livraison DOM-TOM incluse.
             </p>
             <div style={{ maxWidth: 480, margin: '0 auto' }}>
-              <input type="text" placeholder="Rechercher un produit, une catégorie..." style={{
-                width: '100%', padding: '14px 20px', borderRadius: 12, border: 'none',
-                fontSize: 15, boxShadow: '0 4px 20px rgba(0,0,0,0.1)', outline: 'none',
-              }} />
+              <SearchBar />
             </div>
           </div>
           <div style={{ flex: '0 0 250px', textAlign: 'center' }}>
