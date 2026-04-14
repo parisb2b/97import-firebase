@@ -54,10 +54,10 @@ export default function Home() {
             <img src="/images/hero_cargo_97import.png" alt="97import cargo" style={{ width: 280, filter: 'drop-shadow(0 10px 30px rgba(0,0,0,0.3))' }} />
           </div>
           <div style={{ flex: 1, textAlign: 'center' }}>
-            <h1 style={{ fontSize: 36, fontWeight: 800, color: '#0B2545', lineHeight: 1.2, marginBottom: 16 }}>
+            <h1 style={{ fontSize: 36, fontWeight: 800, color: '#1565C0', lineHeight: 1.2, marginBottom: 16 }}>
               {t('hero.title1')} {t('hero.title2')} <span style={{ color: '#EA580C' }}>{t('hero.titleHighlight')}</span> {t('hero.title3')}
             </h1>
-            <p style={{ fontSize: 16, color: '#1E3A5F', marginBottom: 24, maxWidth: 500, margin: '0 auto 24px' }}>
+            <p style={{ fontSize: 16, color: '#1565C0', marginBottom: 24, maxWidth: 500, margin: '0 auto 24px' }}>
               {t('hero.subtitle')}
             </p>
             <div style={{ maxWidth: 480, margin: '0 auto' }}>
@@ -81,7 +81,7 @@ export default function Home() {
                     : <span style={{ fontSize: 48 }}>{CAT_ICONS[cat.nom] || '📦'}</span>}
                 </div>
                 <div style={{ padding: 16 }}>
-                  <h3 style={{ fontWeight: 700, fontSize: 16, color: '#0B2545', marginBottom: 4 }}>{cat.nom}</h3>
+                  <h3 style={{ fontWeight: 700, fontSize: 16, color: '#1565C0', marginBottom: 4 }}>{cat.nom}</h3>
                   <p style={{ fontSize: 12, color: '#6B7280', marginBottom: 8 }}>{CAT_DESC[cat.nom] || `${cat.count} produits`}</p>
                   <span style={{ display: 'inline-block', background: '#C87F6B', color: 'white', padding: '4px 12px', borderRadius: 20, fontSize: 11, fontWeight: 700 }}>
                     {t('categories.prixBadge')}
@@ -94,7 +94,7 @@ export default function Home() {
       </section>
 
       {/* STATS */}
-      <section style={{ background: 'linear-gradient(135deg, #0B2545, #1E3A5F)', padding: '48px 0' }}>
+      <section style={{ background: 'linear-gradient(135deg, #1565C0, #1565C0)', padding: '48px 0' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 20, textAlign: 'center', color: 'white' }}>
           <div><div style={{ fontSize: 36, fontWeight: 800 }}>{loading ? '...' : products.length}</div><div style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)' }}>Produits catalogue</div></div>
           <div><div style={{ fontSize: 36, fontWeight: 800, color: '#EA580C' }}>-50%</div><div style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)' }}>vs distribution locale</div></div>

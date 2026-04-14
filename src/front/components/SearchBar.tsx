@@ -56,11 +56,11 @@ export default function SearchBar() {
           placeholder={t('hero.searchPlaceholder')}
           style={{
             flex: 1, border: 'none', padding: '14px 18px', fontSize: 14,
-            outline: 'none', fontFamily: 'inherit', color: '#0B2545',
+            outline: 'none', fontFamily: 'inherit', color: '#1565C0',
           }}
         />
         <button onClick={() => { if (results.length > 0) handleSelect(results[0]); }} style={{
-          background: '#0B2545', color: '#fff', border: 'none',
+          background: '#1565C0', color: '#fff', border: 'none',
           padding: '14px 22px', fontSize: 13, fontWeight: 700,
           cursor: 'pointer', letterSpacing: 0.5,
         }}>
@@ -88,7 +88,7 @@ export default function SearchBar() {
                 <div style={{ width: 40, height: 40, borderRadius: 8, background: '#E2E8F0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>📦</div>
               )}
               <div>
-                <div style={{ fontSize: 13, fontWeight: 600, color: '#0B2545' }}>{lang === 'zh' ? (p.nom_zh || p.nom_fr) : lang === 'en' ? (p.nom_en || p.nom_fr) : p.nom_fr || p.nom}</div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: '#1565C0' }}>{lang === 'zh' ? (p.nom_zh || p.nom_fr) : lang === 'en' ? (p.nom_en || p.nom_fr) : p.nom_fr || p.nom}</div>
                 <div style={{ fontSize: 11, color: '#94A3B8' }}>{p.categorie}{p.gamme ? ` · ${p.gamme}` : ''}{p.reference ? ` · ${p.reference}` : ''}</div>
               </div>
             </div>

@@ -50,7 +50,7 @@ export default function Contact() {
   return (
     <>
       {/* Banner */}
-      <div style={{ background: 'linear-gradient(135deg, #0B2545, #1E3A5F)', padding: '48px 0' }}>
+      <div style={{ background: 'linear-gradient(135deg, #1565C0, #1565C0)', padding: '48px 0' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px', textAlign: 'center' }}>
           <h1 style={{ color: 'white', fontSize: 32, fontWeight: 800, marginBottom: 8 }}>{t('contact.title')}</h1>
           <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 15 }}>{t('contact.subtitle')}</p>
@@ -73,7 +73,7 @@ export default function Contact() {
             }}>
               <span style={{ fontSize: 28 }}>{item.icon}</span>
               <div>
-                <h3 style={{ fontSize: 15, fontWeight: 700, color: '#0B2545', marginBottom: 6 }}>{item.title}</h3>
+                <h3 style={{ fontSize: 15, fontWeight: 700, color: '#1565C0', marginBottom: 6 }}>{item.title}</h3>
                 <p style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.6, whiteSpace: 'pre-line' }}>{item.content}</p>
               </div>
             </div>
@@ -96,12 +96,12 @@ export default function Contact() {
           {sent ? (
             <div style={{ textAlign: 'center', padding: 40 }}>
               <span style={{ fontSize: 48 }}>✅</span>
-              <h2 style={{ fontSize: 20, fontWeight: 700, color: '#0B2545', marginTop: 16 }}>Message OK!</h2>
+              <h2 style={{ fontSize: 20, fontWeight: 700, color: '#1565C0', marginTop: 16 }}>Message OK!</h2>
               <p style={{ fontSize: 14, color: '#6B7280', marginTop: 8 }}>&#10003;</p>
             </div>
           ) : (
             <>
-              <h2 style={{ fontSize: 20, fontWeight: 700, color: '#0B2545', marginBottom: 24 }}>✉️ {t('contact.formulaire')}</h2>
+              <h2 style={{ fontSize: 20, fontWeight: 700, color: '#1565C0', marginBottom: 24 }}>✉️ {t('contact.formulaire')}</h2>
 
               <form onSubmit={handleSubmit}>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 16 }}>
@@ -139,7 +139,7 @@ export default function Contact() {
                 </div>
 
                 <button type="submit" disabled={sending} style={{
-                  width: '100%', padding: '14px 0', background: '#0B2545', color: 'white', border: 'none',
+                  width: '100%', padding: '14px 0', background: '#1565C0', color: 'white', border: 'none',
                   borderRadius: 12, fontSize: 15, fontWeight: 700, cursor: 'pointer', opacity: sending ? 0.5 : 1,
                 }}>
                   {sending ? '...' : `📨 ${t('contact.envoyer')}`}

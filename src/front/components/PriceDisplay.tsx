@@ -73,7 +73,7 @@ export default function PriceDisplay({ product, userRole, size = 'md' }: PriceDi
     if (size === 'sm') {
       return (
         <div>
-          <div style={{ fontSize: 14, fontWeight: 800, color: '#0B2545' }}>{achat.toLocaleString('fr-FR')} €</div>
+          <div style={{ fontSize: 14, fontWeight: 800, color: '#1565C0' }}>{achat.toLocaleString('fr-FR')} €</div>
           <div style={{ fontSize: 10, color: '#9CA3AF' }}>{t('price.achatEur')} · {t('price.publicSmall')}: {pub.toLocaleString('fr-FR')}€</div>
         </div>
       );
@@ -87,7 +87,7 @@ export default function PriceDisplay({ product, userRole, size = 'md' }: PriceDi
 
     return (
       <div style={{
-        background: 'linear-gradient(135deg, #0B2545, #1565C0)', borderRadius: 16, padding: 20,
+        background: 'linear-gradient(135deg, #1565C0, #1565C0)', borderRadius: 16, padding: 20,
       }}>
         {prices.map((p, i) => (
           <div key={i} style={{
@@ -120,7 +120,7 @@ export default function PriceDisplay({ product, userRole, size = 'md' }: PriceDi
     }
     return (
       <div style={{
-        background: 'linear-gradient(135deg, #0B2545, #1565C0)', borderRadius: 16, padding: 20,
+        background: 'linear-gradient(135deg, #1565C0, #1565C0)', borderRadius: 16, padding: 20,
       }}>
         <div style={{ textDecoration: 'line-through', color: 'rgba(255,255,255,0.45)', fontSize: 14, marginBottom: 4 }}>
           {t('price.publicSmall')} : {pub.toLocaleString('fr-FR')} €
@@ -142,7 +142,7 @@ export default function PriceDisplay({ product, userRole, size = 'md' }: PriceDi
   const fontSize = size === 'lg' ? 28 : size === 'md' ? 20 : 14;
   return (
     <div>
-      <div style={{ fontSize, fontWeight: 800, color: '#0B2545' }}>
+      <div style={{ fontSize, fontWeight: 800, color: '#1565C0' }}>
         {pub.toLocaleString('fr-FR')} € <span style={{ fontSize: 12, fontWeight: 400, color: '#6B7280' }}>HT</span>
       </div>
       {size !== 'sm' && <div style={{ fontSize: 11, color: '#6B7280' }}>{t('price.public')} · {t('price.horsLivraison')}</div>}

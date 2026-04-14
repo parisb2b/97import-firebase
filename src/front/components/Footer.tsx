@@ -26,7 +26,7 @@ export default function Footer() {
     { label: t('nav.contact'), path: '/contact' },
   ];
   return (
-    <footer style={{ background: '#0B2545', color: 'white', padding: '48px 0 24px' }}>
+    <footer style={{ background: '#1565C0', color: 'white', padding: '48px 0 24px' }}>
       <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 40 }}>
           {/* Col 1: Logo + Contact */}

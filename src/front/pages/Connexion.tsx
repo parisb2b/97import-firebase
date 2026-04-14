@@ -71,7 +71,7 @@ export default function Connexion() {
   return (
     <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '48px 20px', background: '#F9FAFB' }}>
       <div style={{ background: 'white', borderRadius: 24, boxShadow: '0 4px 24px rgba(0,0,0,0.08)', padding: 40, width: '100%', maxWidth: 440 }}>
-        <h1 style={{ fontSize: 24, fontWeight: 800, color: '#0B2545', textAlign: 'center', marginBottom: 8 }}>{t('auth.connexion')}</h1>
+        <h1 style={{ fontSize: 24, fontWeight: 800, color: '#1565C0', textAlign: 'center', marginBottom: 8 }}>{t('auth.connexion')}</h1>
         <p style={{ fontSize: 14, color: '#6B7280', textAlign: 'center', marginBottom: 28 }}>{t('auth.accesEspace')}</p>
 
         <form onSubmit={handleSubmit}>
@@ -89,7 +89,7 @@ export default function Connexion() {
           {error && <p style={{ color: '#DC2626', fontSize: 13, marginBottom: 16 }}>{error}</p>}
 
           <button type="submit" disabled={loading} style={{
-            width: '100%', padding: '14px 0', background: '#0B2545', color: 'white', border: 'none',
+            width: '100%', padding: '14px 0', background: '#1565C0', color: 'white', border: 'none',
             borderRadius: 12, fontSize: 15, fontWeight: 700, cursor: 'pointer', opacity: loading ? 0.5 : 1,
           }}>
             {loading ? '...' : t('auth.seConnecter')}
@@ -115,7 +115,7 @@ export default function Connexion() {
         <p style={{ textAlign: 'center', marginTop: 24, fontSize: 14, color: '#6B7280' }}>
           {t('auth.pasDeCompte')}{' '}
           <Link href="/inscription">
-            <span style={{ color: '#0B2545', fontWeight: 600, cursor: 'pointer' }}>{t('auth.inscription')}</span>
+            <span style={{ color: '#1565C0', fontWeight: 600, cursor: 'pointer' }}>{t('auth.inscription')}</span>
           </Link>
         </p>
       </div>

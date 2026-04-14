@@ -21,7 +21,7 @@ export default function Services() {
   return (
     <>
       {/* Banner */}
-      <div style={{ background: 'linear-gradient(135deg, #0B2545, #1E3A5F)', padding: '48px 0' }}>
+      <div style={{ background: 'linear-gradient(135deg, #1565C0, #1565C0)', padding: '48px 0' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px', textAlign: 'center' }}>
           <h1 style={{ color: 'white', fontSize: 32, fontWeight: 800, marginBottom: 8 }}>{t('services.title')}</h1>
           <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 15 }}>
@@ -43,7 +43,7 @@ export default function Services() {
             onMouseLeave={e => (e.currentTarget.style.transform = '')}
             >
               <span style={{ fontSize: 36 }}>{s.icon}</span>
-              <h3 style={{ fontSize: 18, fontWeight: 700, color: '#0B2545', marginTop: 12, marginBottom: 8 }}>{s.title}</h3>
+              <h3 style={{ fontSize: 18, fontWeight: 700, color: '#1565C0', marginTop: 12, marginBottom: 8 }}>{s.title}</h3>
               <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.6 }}>{s.desc}</p>
             </div>
           ))}
@@ -53,7 +53,7 @@ export default function Services() {
       {/* Destinations */}
       <div style={{ background: '#F9FAFB', padding: '48px 0' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px' }}>
-          <h2 style={{ fontSize: 24, fontWeight: 800, color: '#0B2545', textAlign: 'center', marginBottom: 32 }}>
+          <h2 style={{ fontSize: 24, fontWeight: 800, color: '#1565C0', textAlign: 'center', marginBottom: 32 }}>
             {t('services.destinations')}
           </h2>
           <div style={{ display: 'flex', justifyContent: 'center', gap: 20, flexWrap: 'wrap' }}>
@@ -63,7 +63,7 @@ export default function Services() {
                 boxShadow: '0 2px 8px rgba(0,0,0,0.04)', minWidth: 160,
               }}>
                 <span style={{ fontSize: 40 }}>{d.flag}</span>
-                <p style={{ fontSize: 15, fontWeight: 700, color: '#0B2545', marginTop: 8 }}>{d.name}</p>
+                <p style={{ fontSize: 15, fontWeight: 700, color: '#1565C0', marginTop: 8 }}>{d.name}</p>
               </div>
             ))}
           </div>

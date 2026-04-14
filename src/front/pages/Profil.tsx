@@ -112,7 +112,7 @@ export default function Profil() {
   return (
     <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '48px 20px', background: '#F9FAFB' }}>
       <div style={{ background: 'white', borderRadius: 24, boxShadow: '0 4px 24px rgba(0,0,0,0.08)', padding: 40, width: '100%', maxWidth: 520 }}>
-        <h1 style={{ fontSize: 24, fontWeight: 800, color: '#0B2545', textAlign: 'center', marginBottom: 8 }}>{t('profil.title')}</h1>
+        <h1 style={{ fontSize: 24, fontWeight: 800, color: '#1565C0', textAlign: 'center', marginBottom: 8 }}>{t('profil.title')}</h1>
 
         {isIncomplete && (
           <div style={{
@@ -181,7 +181,7 @@ export default function Profil() {
           </div>
 
           <button type="submit" disabled={saving} style={{
-            width: '100%', padding: '14px 0', background: '#0B2545', color: 'white', border: 'none',
+            width: '100%', padding: '14px 0', background: '#1565C0', color: 'white', border: 'none',
             borderRadius: 12, fontSize: 15, fontWeight: 700, cursor: 'pointer', opacity: saving ? 0.5 : 1,
           }}>
             {saving ? '...' : t('profil.sauvegarder')}

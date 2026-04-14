@@ -66,13 +66,13 @@ export default function MonCompte() {
 
   return (
     <div style={{ maxWidth: 1100, margin: '0 auto', padding: '32px 16px' }}>
-      <h1 style={{ fontSize: 28, fontWeight: 800, color: '#0B2545', marginBottom: 32 }}>{t('auth.monCompte')}</h1>
+      <h1 style={{ fontSize: 28, fontWeight: 800, color: '#1565C0', marginBottom: 32 }}>{t('auth.monCompte')}</h1>
 
       <div style={{ display: 'flex', gap: 32, alignItems: 'flex-start' }}>
         {/* Sidebar */}
         <aside style={{ width: 240, flexShrink: 0 }}>
           <div style={{ background: 'white', borderRadius: 16, boxShadow: '0 2px 8px rgba(0,0,0,0.04)', padding: 16, marginBottom: 16 }}>
-            <p style={{ fontWeight: 600, color: '#0B2545' }}>{user.displayName || 'Client'}</p>
+            <p style={{ fontWeight: 600, color: '#1565C0' }}>{user.displayName || 'Client'}</p>
             <p style={{ fontSize: 13, color: '#6B7280', marginTop: 2 }}>{user.email}</p>
           </div>
 
@@ -82,7 +82,7 @@ export default function MonCompte() {
                 <div style={{
                   display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px',
                   borderBottom: '1px solid #F3F4F6', cursor: 'pointer',
-                  background: currentTab === tab.id ? '#0B2545' : 'white',
+                  background: currentTab === tab.id ? '#1565C0' : 'white',
                   color: currentTab === tab.id ? 'white' : '#374151',
                   fontWeight: currentTab === tab.id ? 600 : 400, fontSize: 14,
                 }}>
@@ -99,7 +99,7 @@ export default function MonCompte() {
           {currentTab === 'devis' && (
             <div style={{ background: 'white', borderRadius: 16, boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
               <div style={{ padding: 16, borderBottom: '1px solid #F3F4F6' }}>
-                <h2 style={{ fontWeight: 700, fontSize: 18, color: '#0B2545' }}>{t('espace.mesDevis')}</h2>
+                <h2 style={{ fontWeight: 700, fontSize: 18, color: '#1565C0' }}>{t('espace.mesDevis')}</h2>
               </div>
               {loading ? (
                 <div style={{ padding: 32, textAlign: 'center', color: '#6B7280' }}>{t('loading')}</div>
@@ -113,14 +113,14 @@ export default function MonCompte() {
                       padding: '14px 16px', borderBottom: '1px solid #F3F4F6',
                     }}>
                       <div>
-                        <p style={{ fontWeight: 600, color: '#0B2545', fontSize: 14 }}>{d.numero}</p>
+                        <p style={{ fontWeight: 600, color: '#1565C0', fontSize: 14 }}>{d.numero}</p>
                         <p style={{ fontSize: 12, color: '#9CA3AF', marginTop: 2 }}>
                           {d.createdAt?.toDate?.()?.toLocaleDateString('fr-FR')}
                         </p>
                       </div>
                       <div style={{ textAlign: 'right' }}>
                         <span style={statutStyle(d.statut)}>{t(`statut.${d.statut}`)}</span>
-                        <p style={{ fontWeight: 700, color: '#0B2545', marginTop: 4, fontSize: 14 }}>
+                        <p style={{ fontWeight: 700, color: '#1565C0', marginTop: 4, fontSize: 14 }}>
                           {d.total_ht?.toLocaleString('fr-FR')} €
                         </p>
                       </div>
@@ -145,12 +145,12 @@ export default function MonCompte() {
 
           {currentTab === 'sav' && (
             <div style={{ background: 'white', borderRadius: 16, boxShadow: '0 2px 8px rgba(0,0,0,0.04)', padding: 32 }}>
-              <h2 style={{ fontWeight: 700, fontSize: 18, color: '#0B2545', marginBottom: 16 }}>Service apres-vente</h2>
+              <h2 style={{ fontWeight: 700, fontSize: 18, color: '#1565C0', marginBottom: 16 }}>Service apres-vente</h2>
               <p style={{ color: '#6B7280', marginBottom: 16 }}>
                 Pour toute demande SAV, contactez-nous :
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                <p>📧 <a href="mailto:luxent@ltd-uk.eu" style={{ color: '#0B2545', textDecoration: 'underline' }}>luxent@ltd-uk.eu</a></p>
+                <p>📧 <a href="mailto:luxent@ltd-uk.eu" style={{ color: '#1565C0', textDecoration: 'underline' }}>luxent@ltd-uk.eu</a></p>
                 <p>📞 France: +33 620 607 448</p>
                 <p>📞 Chine: +86 135 6627 1902</p>
               </div>

@@ -68,7 +68,7 @@ export default function Catalogue() {
     <>
       {/* Banner */}
       <div style={{
-        background: 'linear-gradient(135deg, #0B2545, #1E3A5F)',
+        background: 'linear-gradient(135deg, #1565C0, #1565C0)',
         padding: '32px 0',
       }}>
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px' }}>
@@ -91,7 +91,7 @@ export default function Catalogue() {
           <button onClick={() => setFilterGamme('')}
             style={{
               padding: '6px 16px', borderRadius: 20, border: '1px solid #E5E7EB', cursor: 'pointer',
-              background: !filterGamme ? '#0B2545' : 'white', color: !filterGamme ? 'white' : '#374151',
+              background: !filterGamme ? '#1565C0' : 'white', color: !filterGamme ? 'white' : '#374151',
               fontSize: 13, fontWeight: 500,
             }}>
             Tous
@@ -100,7 +100,7 @@ export default function Catalogue() {
             <button key={g} onClick={() => setFilterGamme(g)}
               style={{
                 padding: '6px 16px', borderRadius: 20, border: '1px solid #E5E7EB', cursor: 'pointer',
-                background: filterGamme === g ? '#0B2545' : 'white', color: filterGamme === g ? 'white' : '#374151',
+                background: filterGamme === g ? '#1565C0' : 'white', color: filterGamme === g ? 'white' : '#374151',
                 fontSize: 13, fontWeight: 500,
               }}>
               {g}

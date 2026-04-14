@@ -161,7 +161,7 @@ export default function EspacePartenaire() {
       <div style={{ maxWidth: 1280, margin: '0 auto', padding: '32px 20px', display: 'grid', gridTemplateColumns: '260px 1fr', gap: 32, alignItems: 'start' }}>
 
         {/* Sidebar */}
-        <div style={{ position: 'sticky', top: 80, background: '#0B2545', borderRadius: 16, overflow: 'hidden' }}>
+        <div style={{ position: 'sticky', top: 80, background: '#1565C0', borderRadius: 16, overflow: 'hidden' }}>
           {/* User card */}
           <div style={{ padding: 24 }}>
             <div style={{
@@ -199,7 +199,7 @@ export default function EspacePartenaire() {
           {/* Devis recus */}
           {activeView === 'devis_recus' && (
             <>
-              <h1 style={{ fontSize: 24, fontWeight: 800, color: '#0B2545', marginBottom: 4 }}>{t('partenaire.devisRecus')}</h1>
+              <h1 style={{ fontSize: 24, fontWeight: 800, color: '#1565C0', marginBottom: 4 }}>{t('partenaire.devisRecus')}</h1>
               <p style={{ fontSize: 14, color: '#6B7280', marginBottom: 24 }}>Gerez les devis de vos clients et negociez les prix VIP</p>
 
               {loading ? (
@@ -221,14 +221,14 @@ export default function EspacePartenaire() {
                           style={{ display: 'flex', alignItems: 'center', padding: '16px 20px', cursor: 'pointer', gap: 16 }}>
                           <div style={{ flex: 1 }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
-                              <span style={{ fontWeight: 700, color: '#0B2545', fontSize: 15 }}>{d.numero}</span>
+                              <span style={{ fontWeight: 700, color: '#1565C0', fontSize: 15 }}>{d.numero}</span>
                               <span style={statutStyle(d.statut)}>{d.statut}</span>
                             </div>
                             <p style={{ fontSize: 12, color: '#9CA3AF' }}>
                               {d.createdAt?.toDate?.()?.toLocaleDateString('fr-FR') || '—'} · <span style={{ color: '#1E40AF', fontWeight: 600 }}>{d.client_nom || d.client_email}</span> · {d.lignes?.[0]?.nom_fr}
                             </p>
                           </div>
-                          <span style={{ fontSize: 18, fontWeight: 800, color: '#0B2545' }}>{d.total_ht?.toLocaleString('fr-FR')} €</span>
+                          <span style={{ fontSize: 18, fontWeight: 800, color: '#1565C0' }}>{d.total_ht?.toLocaleString('fr-FR')} €</span>
                           <span style={{ fontSize: 18, color: '#9CA3AF', transform: isOpen ? 'rotate(180deg)' : '', transition: 'transform 0.2s' }}>▾</span>
                         </div>
 
@@ -239,7 +239,7 @@ export default function EspacePartenaire() {
                             {d.lignes?.map((l, i) => (
                               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '10px 0', borderBottom: '1px solid #F9FAFB' }}>
                                 <div style={{ flex: 1 }}>
-                                  <p style={{ fontSize: 14, fontWeight: 600, color: '#0B2545' }}>{l.nom_fr}</p>
+                                  <p style={{ fontSize: 14, fontWeight: 600, color: '#1565C0' }}>{l.nom_fr}</p>
                                   <p style={{ fontSize: 12, color: '#9CA3AF' }}>x{l.qte} · Prix public: {l.prix_unitaire?.toLocaleString('fr-FR')} €</p>
                                 </div>
                                 <div>
@@ -293,7 +293,7 @@ export default function EspacePartenaire() {
           {/* Mes clients */}
           {activeView === 'mes_clients' && (
             <>
-              <h1 style={{ fontSize: 24, fontWeight: 800, color: '#0B2545', marginBottom: 24 }}>{t('partenaire.mesClients')}</h1>
+              <h1 style={{ fontSize: 24, fontWeight: 800, color: '#1565C0', marginBottom: 24 }}>{t('partenaire.mesClients')}</h1>
               <div style={{ background: 'white', borderRadius: 16, overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
                 {clients.length === 0 ? (
                   <div style={{ padding: 60, textAlign: 'center', color: '#6B7280' }}>Aucun client pour le moment</div>
@@ -312,10 +312,10 @@ export default function EspacePartenaire() {
                         const totalCmd = cDevis.reduce((s, d) => s + (d.total_ht || 0), 0);
                         return (
                           <tr key={c.id} style={{ borderBottom: '1px solid #F3F4F6' }}>
-                            <td style={{ padding: '12px 16px', fontSize: 14, fontWeight: 600, color: '#0B2545' }}>{c.nom || '—'}</td>
+                            <td style={{ padding: '12px 16px', fontSize: 14, fontWeight: 600, color: '#1565C0' }}>{c.nom || '—'}</td>
                             <td style={{ padding: '12px 16px', fontSize: 13, color: '#6B7280' }}>{c.email}</td>
                             <td style={{ padding: '12px 16px', fontSize: 14, fontWeight: 600 }}>{cDevis.length}</td>
-                            <td style={{ padding: '12px 16px', fontSize: 14, fontWeight: 700, color: '#0B2545' }}>{totalCmd.toLocaleString('fr-FR')} €</td>
+                            <td style={{ padding: '12px 16px', fontSize: 14, fontWeight: 700, color: '#1565C0' }}>{totalCmd.toLocaleString('fr-FR')} €</td>
                           </tr>
                         );
                       })}
@@ -329,7 +329,7 @@ export default function EspacePartenaire() {
           {/* Commissions */}
           {activeView === 'commissions' && (
             <>
-              <h1 style={{ fontSize: 24, fontWeight: 800, color: '#0B2545', marginBottom: 24 }}>{t('partenaire.commissions')}</h1>
+              <h1 style={{ fontSize: 24, fontWeight: 800, color: '#1565C0', marginBottom: 24 }}>{t('partenaire.commissions')}</h1>
               <div style={{ background: '#DCFCE7', borderRadius: 16, padding: 24, marginBottom: 24, textAlign: 'center' }}>
                 <p style={{ fontSize: 13, color: '#166534' }}>{t('partenaire.totalCommissions')}</p>
                 <p style={{ fontSize: 36, fontWeight: 800, color: '#166534' }}>{Math.round(totalCommissions).toLocaleString('fr-FR')} €</p>
@@ -342,7 +342,7 @@ export default function EspacePartenaire() {
                   devis.filter(d => d.statut === 'accepte' || d.statut === 'livre').map(d => (
                     <div key={d.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 20px', borderBottom: '1px solid #F3F4F6' }}>
                       <div>
-                        <p style={{ fontSize: 14, fontWeight: 600, color: '#0B2545' }}>{d.numero} — {d.client_nom}</p>
+                        <p style={{ fontSize: 14, fontWeight: 600, color: '#1565C0' }}>{d.numero} — {d.client_nom}</p>
                         <p style={{ fontSize: 12, color: '#9CA3AF' }}>{d.createdAt?.toDate?.()?.toLocaleDateString('fr-FR')}</p>
                       </div>
                       <div style={{ textAlign: 'right' }}>

@@ -141,10 +141,10 @@ export default function EspaceClient() {
         <div style={{ position: 'sticky', top: 80 }}>
           {/* User card */}
           <div style={{
-            background: '#0B2545', borderRadius: 16, padding: 24, color: 'white', marginBottom: 16,
+            background: '#1565C0', borderRadius: 16, padding: 24, color: 'white', marginBottom: 16,
           }}>
             <div style={{
-              width: 56, height: 56, borderRadius: '50%', background: '#1E3A5F',
+              width: 56, height: 56, borderRadius: '50%', background: '#1565C0',
               display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, marginBottom: 12,
             }}>
               {user.displayName?.[0]?.toUpperCase() || '👤'}
@@ -169,7 +169,7 @@ export default function EspaceClient() {
                 style={{
                   width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '14px 20px',
                   border: 'none', borderBottom: '1px solid #F3F4F6', cursor: 'pointer', fontSize: 14,
-                  background: activeMenu === item.id ? '#0B2545' : 'white',
+                  background: activeMenu === item.id ? '#1565C0' : 'white',
                   color: activeMenu === item.id ? 'white' : '#374151',
                   fontWeight: activeMenu === item.id ? 600 : 400,
                 }}>
@@ -182,7 +182,7 @@ export default function EspaceClient() {
 
         {/* ═══ Content ═══ */}
         <div>
-          <h1 style={{ fontSize: 24, fontWeight: 800, color: '#0B2545', marginBottom: 4 }}>{t('espace.mesDevis')}</h1>
+          <h1 style={{ fontSize: 24, fontWeight: 800, color: '#1565C0', marginBottom: 4 }}>{t('espace.mesDevis')}</h1>
           <p style={{ fontSize: 14, color: '#6B7280', marginBottom: 24 }}>
             {t('espace.mesDevisDesc')}
           </p>
@@ -193,7 +193,7 @@ export default function EspaceClient() {
             <div style={{ background: 'white', borderRadius: 16, padding: 60, textAlign: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
               <p style={{ color: '#6B7280', marginBottom: 16 }}>{t('espace.aucunDevis')}</p>
               <Link href="/catalogue">
-                <span style={{ color: '#0B2545', fontWeight: 600, cursor: 'pointer' }}>{t('espace.parcourirCatalogue')}</span>
+                <span style={{ color: '#1565C0', fontWeight: 600, cursor: 'pointer' }}>{t('espace.parcourirCatalogue')}</span>
               </Link>
             </div>
           ) : (
@@ -212,7 +212,7 @@ export default function EspaceClient() {
                       style={{ display: 'flex', alignItems: 'center', padding: '16px 20px', cursor: 'pointer', gap: 16 }}>
                       <div style={{ flex: 1 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
-                          <span style={{ fontWeight: 700, color: '#0B2545', fontSize: 15 }}>{d.numero}</span>
+                          <span style={{ fontWeight: 700, color: '#1565C0', fontSize: 15 }}>{d.numero}</span>
                           <span style={statutStyle(d.statut)}>{d.statut}</span>
                         </div>
                         <p style={{ fontSize: 12, color: '#9CA3AF' }}>
@@ -220,7 +220,7 @@ export default function EspaceClient() {
                           {d.lignes?.length > 1 ? ` +${d.lignes.length - 1}` : ''}
                         </p>
                       </div>
-                      <span style={{ fontSize: 18, fontWeight: 800, color: '#0B2545' }}>
+                      <span style={{ fontSize: 18, fontWeight: 800, color: '#1565C0' }}>
                         {d.total_ht?.toLocaleString('fr-FR')} €
                       </span>
                       <span style={{ fontSize: 18, color: '#9CA3AF', transition: 'transform 0.2s', transform: isOpen ? 'rotate(180deg)' : '' }}>▾</span>
@@ -230,7 +230,7 @@ export default function EspaceClient() {
                     {isOpen && (
                       <div style={{ borderTop: '1px solid #F3F4F6', padding: '20px' }}>
                         {/* Documents */}
-                        <h4 style={{ fontSize: 13, fontWeight: 700, color: '#0B2545', marginBottom: 12 }}>{t('espace.documents')}</h4>
+                        <h4 style={{ fontSize: 13, fontWeight: 700, color: '#1565C0', marginBottom: 12 }}>{t('espace.documents')}</h4>
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 20 }}>
                           {[
                             { icon: '📄', label: 'Devis', status: 'Disponible', active: true, action: () => handleDownloadDoc(d, 'devis') },
@@ -245,7 +245,7 @@ export default function EspaceClient() {
                             }}>
                               <span style={{ fontSize: 18 }}>{docItem.icon}</span>
                               <div style={{ flex: 1 }}>
-                                <p style={{ fontSize: 13, fontWeight: 600, color: '#0B2545' }}>{docItem.label}</p>
+                                <p style={{ fontSize: 13, fontWeight: 600, color: '#1565C0' }}>{docItem.label}</p>
                                 <p style={{ fontSize: 11, color: '#9CA3AF' }}>{docItem.status}</p>
                               </div>
                               {docItem.active && (
@@ -259,7 +259,7 @@ export default function EspaceClient() {
                         </div>
 
                         {/* Suivi paiements */}
-                        <h4 style={{ fontSize: 13, fontWeight: 700, color: '#0B2545', marginBottom: 12 }}>{t('espace.paiements')}</h4>
+                        <h4 style={{ fontSize: 13, fontWeight: 700, color: '#1565C0', marginBottom: 12 }}>{t('espace.paiements')}</h4>
                         <div style={{ display: 'flex', gap: 12, marginBottom: 16 }}>
                           <div style={{ flex: 1, background: '#DCFCE7', borderRadius: 12, padding: 12, textAlign: 'center' }}>
                             <p style={{ fontSize: 11, color: '#166534' }}>Encaisse</p>
@@ -386,7 +386,10 @@ export default function EspaceClient() {
                     });
                     setShowAcomptePopup(false);
                     showToast(`Acompte de ${acompteMontant} € déclaré sur ${acompteDevis.numero} ✅`);
-                    window.location.reload();
+                    // Recharger les devis sans reload page
+                    const rq = query(collection(db, 'quotes'), where('client_id', '==', user.uid));
+                    const rsnap = await getDocs(rq);
+                    setDevis(rsnap.docs.map(d => ({ id: d.id, ...d.data() } as Devis)).sort((a: any, b: any) => (b.createdAt?.toMillis?.() || b.createdAt?.seconds * 1000 || 0) - (a.createdAt?.toMillis?.() || a.createdAt?.seconds * 1000 || 0)));
                   } catch (err) {
                     console.error(err);
                     showToast('Erreur lors de la déclaration', 'error');

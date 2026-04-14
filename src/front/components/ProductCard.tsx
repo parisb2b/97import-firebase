@@ -45,7 +45,7 @@ export default function ProductCard({ product, userRole, lang = 'fr' }: ProductC
         {/* Info */}
         <div style={{ padding: 14 }}>
           <div style={{ fontSize: 11, color: '#6B7280', marginBottom: 4 }}>{product.gamme || product.categorie}</div>
-          <h3 style={{ fontWeight: 700, fontSize: 14, color: '#0B2545', marginBottom: 6, lineHeight: 1.3 }}>
+          <h3 style={{ fontWeight: 700, fontSize: 14, color: '#1565C0', marginBottom: 6, lineHeight: 1.3 }}>
             {(name || product.nom || product.numero_interne || '').replace(/\s*--\s*/g, ' — ')}
           </h3>
 

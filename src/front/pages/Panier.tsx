@@ -53,12 +53,12 @@ function Steps({ current }: { current: number }) {
           <div style={{
             width: 28, height: 28, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
             fontSize: 13, fontWeight: 700,
-            background: i < current ? '#16A34A' : i === current ? '#0B2545' : '#E5E7EB',
+            background: i < current ? '#16A34A' : i === current ? '#1565C0' : '#E5E7EB',
             color: i <= current ? 'white' : '#9CA3AF',
           }}>
             {i < current ? '✓' : i + 1}
           </div>
-          <span style={{ fontSize: 12, color: i === current ? '#0B2545' : '#9CA3AF', fontWeight: i === current ? 600 : 400 }}>{l}</span>
+          <span style={{ fontSize: 12, color: i === current ? '#1565C0' : '#9CA3AF', fontWeight: i === current ? 600 : 400 }}>{l}</span>
         </div>
       ))}
     </div>
@@ -252,7 +252,7 @@ export default function Panier() {
   return (
     <>
       {/* Banner */}
-      <div style={{ background: 'linear-gradient(135deg, #0B2545, #1E3A5F)', padding: '32px 0' }}>
+      <div style={{ background: 'linear-gradient(135deg, #1565C0, #1565C0)', padding: '32px 0' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px' }}>
           <h1 style={{ color: 'white', fontSize: 28, fontWeight: 800 }}>{t('cart.title')}</h1>
           <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 14, marginTop: 4 }}>
@@ -266,7 +266,7 @@ export default function Panier() {
           <div style={{ textAlign: 'center', padding: 60 }}>
             <p style={{ color: '#6B7280', marginBottom: 16 }}>Votre panier est vide</p>
             <Link href="/catalogue">
-              <span style={{ color: '#0B2545', fontWeight: 600, cursor: 'pointer' }}>Voir le catalogue</span>
+              <span style={{ color: '#1565C0', fontWeight: 600, cursor: 'pointer' }}>Voir le catalogue</span>
             </Link>
           </div>
         ) : (
@@ -296,7 +296,7 @@ export default function Panier() {
                     {/* Info */}
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <p style={{ fontSize: 12, color: '#9CA3AF' }}>{item.ref}</p>
-                      <p style={{ fontWeight: 600, color: '#0B2545', fontSize: 14 }}>{item.nom_fr}</p>
+                      <p style={{ fontWeight: 600, color: '#1565C0', fontSize: 14 }}>{item.nom_fr}</p>
                       {item.type === 'custom' && (
                         <p style={{ fontSize: 11, color: '#EA580C', fontWeight: 500 }}>Produit sur mesure</p>
                       )}
@@ -314,7 +314,7 @@ export default function Panier() {
                     {/* Price */}
                     <div style={{ width: 90, textAlign: 'right' }}>
                       {item.prix > 0 ? (
-                        <p style={{ fontWeight: 700, color: '#0B2545', fontSize: 14 }}>
+                        <p style={{ fontWeight: 700, color: '#1565C0', fontSize: 14 }}>
                           {(item.prix * item.qte).toLocaleString('fr-FR')} €
                         </p>
                       ) : (
@@ -335,7 +335,7 @@ export default function Panier() {
               <div style={{
                 marginTop: 24, border: '2px dashed #EA580C', borderRadius: 16, padding: 24, background: '#FFF7ED',
               }}>
-                <h3 style={{ fontSize: 16, fontWeight: 700, color: '#0B2545', marginBottom: 16 }}>
+                <h3 style={{ fontSize: 16, fontWeight: 700, color: '#1565C0', marginBottom: 16 }}>
                   {t('cart.customProduct')}
                 </h3>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 12, marginBottom: 12 }}>
@@ -367,20 +367,20 @@ export default function Panier() {
               <div style={{
                 background: 'white', borderRadius: 16, boxShadow: '0 2px 12px rgba(0,0,0,0.06)', padding: 24,
               }}>
-                <h2 style={{ fontSize: 18, fontWeight: 700, color: '#0B2545', marginBottom: 16 }}>{t('cart.recap')}</h2>
+                <h2 style={{ fontSize: 18, fontWeight: 700, color: '#1565C0', marginBottom: 16 }}>{t('cart.recap')}</h2>
 
                 {cart.map(item => (
                   <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: 13 }}>
                     <span style={{ color: '#4B5563' }}>{item.nom_fr} x{item.qte}</span>
-                    <span style={{ fontWeight: 600, color: '#0B2545' }}>
+                    <span style={{ fontWeight: 600, color: '#1565C0' }}>
                       {item.prix > 0 ? `${(item.prix * item.qte).toLocaleString('fr-FR')} €` : 'Sur devis'}
                     </span>
                   </div>
                 ))}
 
-                <div style={{ borderTop: '2px solid #0B2545', marginTop: 16, paddingTop: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: 16, fontWeight: 700, color: '#0B2545' }}>{t('cart.totalHT')}</span>
-                  <span style={{ fontSize: 24, fontWeight: 800, color: '#0B2545' }}>{total.toLocaleString('fr-FR')} €</span>
+                <div style={{ borderTop: '2px solid #1565C0', marginTop: 16, paddingTop: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: 16, fontWeight: 700, color: '#1565C0' }}>{t('cart.totalHT')}</span>
+                  <span style={{ fontSize: 24, fontWeight: 800, color: '#1565C0' }}>{total.toLocaleString('fr-FR')} €</span>
                 </div>
 
                 <p style={{ fontSize: 11, color: '#9CA3AF', marginTop: 8 }}>
@@ -409,7 +409,7 @@ export default function Panier() {
           <Steps current={0} />
           <div style={{ textAlign: 'center', marginBottom: 20 }}>
             <span style={{ fontSize: 48 }}>🤝</span>
-            <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0B2545', marginTop: 8 }}>{t('popup.partenaireTitle')}</h2>
+            <h2 style={{ fontSize: 22, fontWeight: 800, color: '#1565C0', marginTop: 8 }}>{t('popup.partenaireTitle')}</h2>
             <p style={{ fontSize: 14, color: '#6B7280', marginTop: 4 }}>
               {t('popup.partenaireDesc')}
             </p>
@@ -420,10 +420,10 @@ export default function Panier() {
               <button key={p.id} onClick={() => setSelectedPartner(p.code)}
                 style={{
                   padding: 16, borderRadius: 12, cursor: 'pointer', textAlign: 'center',
-                  border: selectedPartner === p.code ? '2px solid #0B2545' : '2px solid #E5E7EB',
+                  border: selectedPartner === p.code ? '2px solid #1565C0' : '2px solid #E5E7EB',
                   background: selectedPartner === p.code ? '#EFF6FF' : 'white',
                 }}>
-                <div style={{ fontSize: 18, fontWeight: 800, color: '#0B2545' }}>{p.code}</div>
+                <div style={{ fontSize: 18, fontWeight: 800, color: '#1565C0' }}>{p.code}</div>
                 <div style={{ fontSize: 13, color: '#6B7280' }}>{p.nom}</div>
               </button>
             ))}
@@ -439,7 +439,7 @@ export default function Panier() {
 
           <button onClick={() => setPopupStep(1)}
             disabled={!selectedPartner}
-            style={{ ...btnStyle(selectedPartner ? '#0B2545' : '#D1D5DB'), opacity: selectedPartner ? 1 : 0.5 }}>
+            style={{ ...btnStyle(selectedPartner ? '#1565C0' : '#D1D5DB'), opacity: selectedPartner ? 1 : 0.5 }}>
             {t('popup.confirmer')} →
           </button>
         </Overlay>
@@ -453,7 +453,7 @@ export default function Panier() {
           <Steps current={1} />
           <div style={{ textAlign: 'center', marginBottom: 20 }}>
             <span style={{ fontSize: 48 }}>💰</span>
-            <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0B2545', marginTop: 8 }}>{t('popup.acompteTitle')}</h2>
+            <h2 style={{ fontSize: 22, fontWeight: 800, color: '#1565C0', marginTop: 8 }}>{t('popup.acompteTitle')}</h2>
           </div>
 
           {/* Recap */}
@@ -471,12 +471,12 @@ export default function Panier() {
           </div>
 
           {/* Type de compte */}
-          <p style={{ fontSize: 13, fontWeight: 600, color: '#0B2545', marginBottom: 8 }}>{t('popup.typeCompte')}</p>
+          <p style={{ fontSize: 13, fontWeight: 600, color: '#1565C0', marginBottom: 8 }}>{t('popup.typeCompte')}</p>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 20 }}>
             <button onClick={() => setTypeCompte('personnel')}
               style={{
                 padding: 14, borderRadius: 10, cursor: 'pointer', textAlign: 'center',
-                border: typeCompte === 'personnel' ? '2px solid #0B2545' : '2px solid #E5E7EB',
+                border: typeCompte === 'personnel' ? '2px solid #1565C0' : '2px solid #E5E7EB',
                 background: typeCompte === 'personnel' ? '#EFF6FF' : 'white',
               }}>
               <div style={{ fontSize: 24 }}>👤</div>
@@ -485,7 +485,7 @@ export default function Panier() {
             <button onClick={() => setTypeCompte('professionnel')}
               style={{
                 padding: 14, borderRadius: 10, cursor: 'pointer', textAlign: 'center',
-                border: typeCompte === 'professionnel' ? '2px solid #0B2545' : '2px solid #E5E7EB',
+                border: typeCompte === 'professionnel' ? '2px solid #1565C0' : '2px solid #E5E7EB',
                 background: typeCompte === 'professionnel' ? '#EFF6FF' : 'white',
               }}>
               <div style={{ fontSize: 24 }}>🏢</div>
@@ -494,12 +494,12 @@ export default function Panier() {
           </div>
 
           {/* Montant acompte */}
-          <p style={{ fontSize: 13, fontWeight: 600, color: '#0B2545', marginBottom: 8 }}>Montant de l'acompte (€)</p>
+          <p style={{ fontSize: 13, fontWeight: 600, color: '#1565C0', marginBottom: 8 }}>Montant de l'acompte (€)</p>
           <input type="number" value={montantAcompte} onChange={e => setMontantAcompte(Number(e.target.value) || 0)}
             style={{ width: '100%', padding: '12px 14px', borderRadius: 8, border: '1px solid #E5E7EB', fontSize: 16, fontWeight: 700, textAlign: 'center', marginBottom: 20, outline: 'none', boxSizing: 'border-box' }} />
 
           <button onClick={() => setPopupStep(2)}
-            style={btnStyle('#0B2545')}>
+            style={btnStyle('#1565C0')}>
             {t('popup.jaiVire')} →
           </button>
 
@@ -522,12 +522,12 @@ export default function Panier() {
           <Steps current={2} />
           <div style={{ textAlign: 'center', marginBottom: 20 }}>
             <span style={{ fontSize: 48 }}>🏦</span>
-            <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0B2545', marginTop: 8 }}>{t('popup.ribTitle')}</h2>
+            <h2 style={{ fontSize: 22, fontWeight: 800, color: '#1565C0', marginTop: 8 }}>{t('popup.ribTitle')}</h2>
           </div>
 
           {/* RIB Card */}
           <div style={{
-            background: 'linear-gradient(135deg, #0B2545, #1E3A5F)', borderRadius: 16, padding: 24, color: 'white', marginBottom: 24,
+            background: 'linear-gradient(135deg, #1565C0, #1565C0)', borderRadius: 16, padding: 24, color: 'white', marginBottom: 24,
           }}>
             <p style={{ fontSize: 16, fontWeight: 700, marginBottom: 16 }}>
               LUXENT LIMITED — Compte {typeCompte}
