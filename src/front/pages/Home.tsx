@@ -69,7 +69,7 @@ export default function Home() {
               width: 220, height: 180, borderRadius: 16, overflow: 'hidden', margin: '0 auto',
               boxShadow: '0 8px 30px rgba(0,0,0,0.2)',
             }}>
-              <img src="/images/hero_maison.jpg" alt="Maison modulaire" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              <img src="/images/hero_maison.png" alt="Maison modulaire" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             </div>
             <p style={{ marginTop: 8, fontSize: 13, color: '#0B2545', fontWeight: 600 }}>Maison modulaire 20P</p>
           </div>
