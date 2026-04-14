@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'wouter';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { clientAuth, db } from '../../lib/firebase';
 import { useI18n } from '../../i18n';
-import { GlobeToggle } from '../../components/GlobeToggle';
+
+const B = '#1565C0'; // bleu hero
 
 function Clocks() {
   const [times, setTimes] = useState({ mq: '--:--', fr: '--:--', cn: '--:--' });
@@ -27,6 +28,62 @@ function Clocks() {
       <span>🇫🇷 {times.fr}</span>
       <span>·</span>
       <span>🇨🇳 {times.cn}</span>
+    </div>
+  );
+}
+
+function LangDropdown() {
+  const { lang, setLang } = useI18n();
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  const labels: Record<string, string> = { fr: 'FR', en: 'EN', zh: 'CN' };
+  const options = [
+    { code: 'fr' as const, flag: '🇫🇷', label: 'Français (FR)' },
+    { code: 'zh' as const, flag: '🇨🇳', label: '中文 (CN)' },
+    { code: 'en' as const, flag: '🇬🇧', label: 'English (EN)' },
+  ];
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  return (
+    <div ref={ref} style={{ position: 'relative' }}>
+      <button onClick={() => setOpen(!open)} style={{
+        display: 'flex', alignItems: 'center', gap: 6,
+        border: '1px solid #E8ECF4', borderRadius: 20, padding: '4px 12px',
+        background: 'transparent', cursor: 'pointer', fontSize: 12, color: B, fontWeight: 600,
+      }}>
+        🌐 {labels[lang]} ▾
+      </button>
+      {open && (
+        <div style={{
+          position: 'absolute', top: 'calc(100% + 6px)', right: 0,
+          background: '#fff', borderRadius: 12, boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+          padding: 6, zIndex: 200, minWidth: 160,
+        }}>
+          {options.map(o => (
+            <div key={o.code} onClick={() => { setLang(o.code); setOpen(false); }}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px',
+                borderRadius: 8, cursor: 'pointer', fontSize: 13, color: '#374151',
+                background: lang === o.code ? '#F0F4F8' : 'transparent',
+                fontWeight: lang === o.code ? 600 : 400,
+              }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#F5F7FA'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = lang === o.code ? '#F0F4F8' : 'transparent'; }}
+            >
+              <span style={{ fontSize: 16 }}>{o.flag}</span>
+              <span>{o.label}</span>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -83,7 +140,7 @@ export default function Header() {
   return (
     <header style={{
       background: '#FFFFFF',
-      color: '#0B2545',
+      color: B,
       position: 'sticky',
       top: 0,
       zIndex: 100,
@@ -102,7 +159,7 @@ export default function Header() {
         <Link href="/">
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
             <span style={{ fontSize: 24 }}>🚢</span>
-            <span style={{ fontWeight: 800, fontSize: 20, letterSpacing: -0.5 }}>
+            <span style={{ fontWeight: 800, fontSize: 20, letterSpacing: -0.5, color: B }}>
               97<span style={{ color: '#EA580C' }}>IMPORT</span>
             </span>
           </div>
@@ -119,8 +176,8 @@ export default function Header() {
                   borderRadius: 6,
                   fontSize: 12,
                   cursor: 'pointer',
-                  color: isActive ? '#0B2545' : '#6B7280',
-                  background: isActive ? '#F0F4F8' : 'transparent',
+                  color: isActive ? B : '#6B7280',
+                  background: isActive ? '#EFF6FF' : 'transparent',
                   fontWeight: isActive ? 600 : 400,
                   transition: 'all 0.2s',
                   whiteSpace: 'nowrap',
@@ -135,32 +192,38 @@ export default function Header() {
         {/* Right section */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <Clocks />
-          <GlobeToggle />
+          <LangDropdown />
 
           {/* Panier */}
           <Link href="/panier">
             <div style={{
-              background: '#EA580C',
-              borderRadius: 12,
-              padding: '6px 14px',
+              position: 'relative',
+              background: '#FFFFFF',
+              border: `1px solid ${B}`,
+              borderRadius: 10,
+              padding: '8px 16px',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               gap: 6,
               fontSize: 14,
               fontWeight: 600,
+              color: B,
             }}>
-              🛒 {cartCount > 0 && <span style={{
-                background: 'white',
-                color: '#EA580C',
+              🛒
+              {cartCount > 0 && <span style={{
+                position: 'absolute', top: -6, right: -6,
+                background: '#EF4444',
+                color: '#fff',
                 borderRadius: '50%',
-                width: 20,
-                height: 20,
+                width: 18,
+                height: 18,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: 11,
+                fontSize: 10,
                 fontWeight: 700,
+                border: '2px solid #fff',
               }}>{cartCount}</span>}
             </div>
           </Link>
@@ -173,7 +236,7 @@ export default function Header() {
                 border: '1px solid #E5E7EB', borderRadius: 12, padding: '6px 14px',
               }}>
                 <div style={{
-                  width: 24, height: 24, borderRadius: '50%', background: '#0B2545', color: '#fff',
+                  width: 24, height: 24, borderRadius: '50%', background: B, color: '#fff',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700,
                 }}>
                   {user.displayName?.[0]?.toUpperCase() || '👤'}
@@ -184,12 +247,12 @@ export default function Header() {
           ) : (
             <Link href="/connexion">
               <span style={{
-                border: '1px solid #E5E7EB',
+                border: `1px solid ${B}`,
                 borderRadius: 12,
                 padding: '6px 16px',
                 fontSize: 13,
                 cursor: 'pointer',
-                color: '#0B2545',
+                color: B,
                 fontWeight: 600,
               }}>
                 {t('auth.connexion')}
