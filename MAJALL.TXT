@@ -1,3 +1,9 @@
+[2026-04-15 00:15] fix-final — Acompte popup RIB + fiche produit redesign + vidéo
+  - EspaceClient: popup acompte complet (2 étapes: montant → RIB LUXENT)
+  - Produit: carrousel flèches, badges specs, tableau détaillé, bleu #1565C0
+  - Vidéo: thumbnail ▶, YouTube embed, vidéo native, bouton fermer
+  - Fiche PDF thumbnail si disponible
+
 [2026-04-14 22:10] fix-ux-admin — 15 bugs parcours admin corrigés
   - Dashboard KPI Firestore (plus de hardcode 34200€)
   - Formulaire Ajouter partenaire (modal)
