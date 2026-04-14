@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useRoute } from 'wouter';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { db, clientAuth } from '../../lib/firebase';
 import Breadcrumb from '../components/Breadcrumb';
@@ -16,9 +16,16 @@ export default function Catalogue() {
   const [filterGamme, setFilterGamme] = useState('');
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(clientAuth, (u) => {
+    const unsub = onAuthStateChanged(clientAuth, async (u) => {
       setUser(u);
-      setUserRole(u ? 'user' : null); // TODO: fetch role from profiles
+      if (u) {
+        try {
+          const snap = await getDoc(doc(db, 'profiles', u.uid));
+          setUserRole(snap.data()?.role || 'user');
+        } catch { setUserRole('user'); }
+      } else {
+        setUserRole(null);
+      }
     });
     return () => unsub();
   }, []);

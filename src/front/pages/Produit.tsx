@@ -17,9 +17,16 @@ export default function Produit() {
   const [accCount, setAccCount] = useState(0);
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(clientAuth, (u) => {
+    const unsub = onAuthStateChanged(clientAuth, async (u) => {
       setUser(u);
-      setUserRole(u ? 'user' : null);
+      if (u) {
+        try {
+          const snap = await getDoc(doc(db, 'profiles', u.uid));
+          setUserRole(snap.data()?.role || 'user');
+        } catch { setUserRole('user'); }
+      } else {
+        setUserRole(null);
+      }
     });
     return () => unsub();
   }, []);
