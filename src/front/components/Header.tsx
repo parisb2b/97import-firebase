@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'wouter';
 import { onAuthStateChanged, User } from 'firebase/auth';
-import { clientAuth } from '../../lib/firebase';
+import { doc, getDoc } from 'firebase/firestore';
+import { clientAuth, db } from '../../lib/firebase';
 import { useI18n } from '../../i18n';
 import { GlobeToggle } from '../../components/GlobeToggle';
 
@@ -43,12 +44,23 @@ function Clocks() {
 
 export default function Header() {
   const [user, setUser] = useState<User | null>(null);
+  const [userRole, setUserRole] = useState<string | null>(null);
   const { t } = useI18n();
   const [location] = useLocation();
   const [cartCount] = useState(0); // TODO: connect to cart context
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(clientAuth, setUser);
+    const unsub = onAuthStateChanged(clientAuth, async (u) => {
+      setUser(u);
+      if (u) {
+        try {
+          const snap = await getDoc(doc(db, 'profiles', u.uid));
+          setUserRole(snap.data()?.role || 'user');
+        } catch { setUserRole('user'); }
+      } else {
+        setUserRole(null);
+      }
+    });
     return () => unsub();
   }, []);
 
@@ -139,7 +151,7 @@ export default function Header() {
 
           {/* Connexion */}
           {user ? (
-            <Link href="/espace-client">
+            <Link href={userRole === 'partner' ? '/espace-partenaire' : '/espace-client'}>
               <div style={{
                 display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer',
                 border: '1px solid rgba(255,255,255,0.3)', borderRadius: 12, padding: '6px 14px',
