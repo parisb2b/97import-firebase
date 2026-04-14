@@ -175,3 +175,27 @@ Build OK — Commit pushé sur v2
 - src/admin/pages/CatalogueProduits.tsx : Export Excel connecté
 - src/lib/excel-generator.ts : ajout exportCatalogueExcel()
 - Build : ✅ SUCCÈS | CSS : ✅ toutes classes présentes
+
+[2026-04-14 10:30] v25 — Images hero + Panier complet + Popups partenaire/acompte/RIB
+==================================================================================
+PARTIE A :
+- public/images/hero_cargo_97import.png (NEW — logo cargo)
+- public/images/hero_maison.jpg (NEW — fallback exterior, image PNG manquante)
+- src/front/pages/Home.tsx : hero images remplacées (globe → cargo, emoji → maison)
+
+PARTIE B :
+- src/front/pages/Produit.tsx : specs moteur/puissance ajoutées + bouton addToCart fonctionnel (localStorage)
+
+PARTIE C :
+- src/front/pages/Panier.tsx : refonte complète
+  - Layout 2 colonnes (produits + récapitulatif sticky)
+  - Thumbnails produits dans le panier
+  - Zone "produit sur mesure" (formulaire dashed orange)
+  - Boutons quantité +/- et suppression
+
+PARTIE D :
+- Popup 1/3 Partenaire : grille 2x2 depuis Firestore partners (actif==true)
+- Popup 2/3 Acompte : choix perso/pro, montant 500€ modifiable
+- Popup 3/3 RIB : LUXENT LIMITED, IBAN DE76..., Banking Circle Munich
+- Création devis Firestore (quotes) avec acomptes[] et partenaire_code
+- Build : ✅ SUCCÈS (0 erreurs TS)

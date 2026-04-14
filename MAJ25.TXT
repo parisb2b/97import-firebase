@@ -1,0 +1,38 @@
+=== MAJ25 — Images hero + Panier + Popups + Fiche produit ===
+Date : 2026-04-14
+
+PARTIE A — IMAGES HERO :
+  hero_cargo_97import.png copie : ✅ (depuis Downloads/image-removebg-preview.png)
+  hero_maison.jpg copie : ✅ (fallback: exterior_1.jpeg — image_maison_.png introuvable)
+  Home.tsx modifie : ✅
+
+PARTIE B — FICHE PRODUIT :
+  Specs techniques : ✅ (ajout moteur + puissance_kw)
+  Boutons action (panier/devis) : ✅ (addToCart via localStorage)
+  Banniere accessoires : ✅ (deja present v24)
+  Galerie thumbnails : ✅ (deja present v24)
+
+PARTIE C — PANIER :
+  Cart via localStorage : ✅ (pas de CartContext, utilise localStorage directement)
+  Panier.tsx refait : ✅ (layout 2 colonnes)
+  Zone produit sur mesure : ✅ (formulaire dashed orange)
+  Recapitulatif sticky : ✅
+
+PARTIE D — POPUPS :
+  Popup Partenaire (Firestore) : ✅ (grille 2x2 depuis collection partners)
+  Popup Acompte (500€ defaut) : ✅ (choix perso/pro + montant modifiable)
+  Popup RIB (LUXENT) : ✅ (IBAN DE76... en dur — Firestore admin_params possible plus tard)
+  Creation devis Firestore : ✅ (collection quotes avec statut nouveau/brouillon)
+
+BUILD : npm run build → ✅ (0 erreurs)
+
+FICHIERS MODIFIES :
+  - public/images/hero_cargo_97import.png (NEW)
+  - public/images/hero_maison.jpg (NEW)
+  - src/front/pages/Home.tsx (hero images)
+  - src/front/pages/Produit.tsx (specs + addToCart)
+  - src/front/pages/Panier.tsx (refonte complete)
+
+NOTE : image_maison_.png n'existait pas dans ~/Downloads.
+       Fallback utilise : public/images/maisons/modular_standard/exterior_1.jpeg
+       Quand l'image PNG avec fond transparent sera disponible, remplacer hero_maison.jpg
