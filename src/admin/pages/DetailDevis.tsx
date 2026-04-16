@@ -105,15 +105,42 @@ export default function DetailDevis() {
           const snap = await getDoc(docRef);
           if (snap.exists()) {
             const data = snap.data();
+
+            // Pré-remplir depuis le devis
+            let clientNom = data.client_nom || '';
+            let clientEmail = data.client_email || '';
+            let clientTel = data.client_tel || data.telephone || '';
+            let clientAdresse = data.client_adresse || data.adresse || '';
+            let clientSiret = data.client_siret || data.siret || '';
+            let destination = data.destination || 'MQ';
+
+            // Si des champs sont vides, charger depuis users/{client_id}
+            if (data.client_id && (!clientNom || !clientTel || !clientAdresse)) {
+              try {
+                const userSnap = await getDoc(doc(db, 'users', data.client_id));
+                if (userSnap.exists()) {
+                  const u = userSnap.data();
+                  clientNom = clientNom || `${u.firstName || u.prenom || ''} ${u.lastName || u.nom || ''}`.trim();
+                  clientEmail = clientEmail || u.email || '';
+                  clientTel = clientTel || u.phone || u.telephone || '';
+                  clientAdresse = clientAdresse || [u.adresse, u.codePostal, u.ville, u.pays].filter(Boolean).join(', ');
+                  clientSiret = clientSiret || u.siret || '';
+                  destination = destination || u.pays || 'MQ';
+                }
+              } catch (e) {
+                console.error('Erreur chargement profil client:', e);
+              }
+            }
+
             setDevis({
               id: snap.id,
               numero: data.numero || snap.id,
               client_id: data.client_id || '',
-              client_nom: data.client_nom || '',
-              client_email: data.client_email || '',
-              client_tel: data.client_tel || '',
-              client_adresse: data.client_adresse || '',
-              client_siret: data.client_siret || '',
+              client_nom: clientNom,
+              client_email: clientEmail,
+              client_tel: clientTel,
+              client_adresse: clientAdresse,
+              client_siret: clientSiret,
               partenaire_id: data.partenaire_id || null,
               statut: data.statut || 'brouillon',
               lignes: data.lignes || [],
@@ -122,7 +149,7 @@ export default function DetailDevis() {
               acomptes: data.acomptes || [],
               total_encaisse: data.total_encaisse || 0,
               solde_restant: data.solde_restant || 0,
-              destination: data.destination || 'MQ',
+              destination,
             });
           } else {
             setError(`Devis ${params.id} introuvable`);
@@ -152,6 +179,12 @@ export default function DetailDevis() {
         ...devis,
         total_ht,
         solde_restant: total_ht - devis.total_encaisse,
+        // Persister les infos client dans le devis pour les prochaines ouvertures
+        client_nom: devis.client_nom,
+        client_email: devis.client_email,
+        client_tel: devis.client_tel,
+        client_adresse: devis.client_adresse,
+        client_siret: devis.client_siret,
         updatedAt: serverTimestamp(),
       };
 

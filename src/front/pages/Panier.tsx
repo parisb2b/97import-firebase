@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'wouter';
 import { clientAuth, db } from '../../lib/firebase';
-import { doc, setDoc, serverTimestamp, collection, query, where, getDocs } from 'firebase/firestore';
+import { doc, setDoc, getDoc, serverTimestamp, collection, query, where, getDocs } from 'firebase/firestore';
 import { getNextNumber } from '../../lib/counters';
 import { useI18n } from '../../i18n';
 import { useToast } from '../components/Toast';
@@ -163,13 +163,23 @@ export default function Panier() {
         ...(item.lien ? { lien: item.lien } : {}),
       }));
 
+      // Charger le profil client pour inclure toutes les infos
+      let userProfile: any = {};
+      try {
+        const userSnap = await getDoc(doc(db, 'users', user.uid));
+        if (userSnap.exists()) userProfile = userSnap.data();
+      } catch {}
+
       await setDoc(doc(db, 'quotes', devisId), {
         numero,
         client_id: user.uid,
-        client_email: user.email,
-        client_nom: user.displayName || '',
+        client_email: userProfile.email || user.email,
+        client_nom: user.displayName || `${userProfile.firstName || ''} ${userProfile.lastName || ''}`.trim(),
+        client_tel: userProfile.phone || userProfile.telephone || '',
+        client_adresse: [userProfile.adresse, userProfile.codePostal, userProfile.ville, userProfile.pays].filter(Boolean).join(', '),
+        client_siret: userProfile.siret || '',
         statut: 'nouveau',
-        destination: 'Martinique',
+        destination: userProfile.pays || 'Martinique',
         is_vip: false,
         lignes,
         total_ht: total,
@@ -212,13 +222,23 @@ export default function Panier() {
         type: item.type || 'product',
       }));
 
+      // Charger le profil client pour inclure toutes les infos
+      let userProfile: any = {};
+      try {
+        const userSnap = await getDoc(doc(db, 'users', user.uid));
+        if (userSnap.exists()) userProfile = userSnap.data();
+      } catch {}
+
       await setDoc(doc(db, 'quotes', devisId), {
         numero,
         client_id: user.uid,
-        client_email: user.email,
-        client_nom: user.displayName || '',
+        client_email: userProfile.email || user.email,
+        client_nom: user.displayName || `${userProfile.firstName || ''} ${userProfile.lastName || ''}`.trim(),
+        client_tel: userProfile.phone || userProfile.telephone || '',
+        client_adresse: [userProfile.adresse, userProfile.codePostal, userProfile.ville, userProfile.pays].filter(Boolean).join(', '),
+        client_siret: userProfile.siret || '',
         statut: 'brouillon',
-        destination: 'Martinique',
+        destination: userProfile.pays || 'Martinique',
         is_vip: false,
         lignes,
         total_ht: total,
