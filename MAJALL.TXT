@@ -1,3 +1,17 @@
+[2026-04-16 13:15] v29 — Refonte complète Espace Client v12 (9 onglets)
+  - EspaceClient.tsx refactoré : sidebar bleu ciel #ACDBF7 + 9 onglets
+  - MesDevis : accordéons Firestore, recherche, PDF
+  - MesCommandes : 5 documents (DVS/FA/FF/FL/BL), 3 cartes paiements, historique
+  - MesVirements : tableau complet, détail par devis
+  - MesFactures : 3 types (acompte/finale/logistique)
+  - SuiviAchats : timeline 5 étapes (conteneur)
+  - ContinuerAchats : grille catégories
+  - MesInfos : formulaire + changement mot de passe
+  - MesAdresses : CRUD complet + par défaut
+  - SAV : KPIs, liste, détail, PopupSAV avec upload photos
+  - PopupAcompte : 2 RIB (N26 perso / Banking Circle pro), sans reload
+  - Build : 0 erreurs
+
 [2026-04-15 00:15] fix-final — Acompte popup RIB + fiche produit redesign + vidéo
   - EspaceClient: popup acompte complet (2 étapes: montant → RIB LUXENT)
   - Produit: carrousel flèches, badges specs, tableau détaillé, bleu #1565C0

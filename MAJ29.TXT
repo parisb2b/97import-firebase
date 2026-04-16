@@ -1,0 +1,66 @@
+=== MAJ29 — Refonte Espace Client v12 ===
+Date : 2026-04-16
+
+PARTIE A — ARCHITECTURE :
+  EspaceClient.tsx (layout + sidebar bleu ciel) : ✅
+  9 onglets créés dans espace-client/ : ✅
+
+PARTIE B — MES DEVIS :
+  MesDevis.tsx : ✅
+  Accordéons Firestore (lignes, total) : ✅
+  Recherche par numéro/produit/statut : ✅
+  Télécharger PDF : ✅
+
+PARTIE C — MES COMMANDES :
+  MesCommandes.tsx : ✅
+  5 documents (DVS/FA/FF/FL/BL) : ✅
+  Suivi paiements 3 cartes (encaissé/déclaré/solde) : ✅
+  Détail commande 3 colonnes : ✅
+  Historique acomptes : ✅
+
+PARTIE D — MES VIREMENTS :
+  MesVirements.tsx : ✅
+  Tableau cliquable avec détail par devis : ✅
+  3 cartes paiements + bouton acompte : ✅
+
+PARTIE E — MES FACTURES :
+  MesFactures.tsx : ✅
+  3 types factures (FA/FF/FL) : ✅
+  Aperçu dépliable + télécharger PDF : ✅
+
+PARTIE F — ONGLETS SIMPLES :
+  SuiviAchats.tsx (timeline 5 étapes) : ✅
+  ContinuerAchats.tsx (grille catégories) : ✅
+  MesInfos.tsx (formulaire + changer mdp) : ✅
+  MesAdresses.tsx (CRUD + par défaut) : ✅
+
+PARTIE G — SAV :
+  SAV.tsx (KPIs + liste + détail) : ✅
+  PopupSAV.tsx (formulaire complet) : ✅
+  Création Firestore sav/{id} : ✅
+  Upload photos Storage : ✅
+  Numérotation SAV via getNextNumber : ✅
+
+PARTIE H — POPUP ACOMPTE :
+  PopupAcompte.tsx : ✅
+  2 RIB (perso N26 / pro Banking Circle) : ✅
+  Mise à jour Firestore sans reload : ✅
+
+PARTIE I — INTÉGRATION :
+  Routes OK (/espace-client + redirect /mon-compte) : ✅
+  Header redirige selon role : ✅
+  Build : npm run build → ✅ (0 erreurs)
+
+Fichiers créés/modifiés :
+  src/front/pages/EspaceClient.tsx (refonte complète)
+  src/front/pages/espace-client/MesDevis.tsx
+  src/front/pages/espace-client/MesCommandes.tsx
+  src/front/pages/espace-client/MesVirements.tsx
+  src/front/pages/espace-client/MesFactures.tsx
+  src/front/pages/espace-client/SuiviAchats.tsx
+  src/front/pages/espace-client/ContinuerAchats.tsx
+  src/front/pages/espace-client/MesInfos.tsx
+  src/front/pages/espace-client/MesAdresses.tsx
+  src/front/pages/espace-client/SAV.tsx
+  src/front/pages/espace-client/PopupAcompte.tsx
+  src/front/pages/espace-client/PopupSAV.tsx
