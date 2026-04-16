@@ -1,0 +1,26 @@
+=== MAJ31 — Fix auto-remplissage infos client AdminDetailDevis ===
+Date : 2026-04-16
+
+PARTIE A — DIAGNOSTIC :
+  Champs devis DVS-2604008 analysés : ✅
+  Cause : client_tel, client_adresse, client_siret non remplis à la création
+
+PARTIE B — ADMIN DETAIL DEVIS :
+  Fichier modifié : src/admin/pages/DetailDevis.tsx
+  Auto-chargement users/{client_id} au mount si champs vides : ✅
+  Fallback : devis → profil client → champs vides
+  Enregistrement persiste les infos client dans le devis : ✅
+
+PARTIE C — CRÉATION DEVIS FRONT :
+  Fichier modifié : src/front/pages/Panier.tsx
+  getDoc(users/{uid}) avant création du devis : ✅
+  Champs ajoutés : client_tel, client_adresse, client_siret, destination
+  Appliqué aux 2 flux : handleConfirmVirement + handleSansAcompte : ✅
+
+PARTIE D — BACKFILL :
+  Script exécuté : backfill-devis-client-infos.mjs
+  8 devis existants mis à jour : ✅
+  Champs remplis : client_nom, client_tel, client_adresse
+
+PARTIE E — BUILD :
+  npm run build → ✅ (0 erreurs)

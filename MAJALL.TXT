@@ -1,3 +1,8 @@
+[2026-04-16 13:45] v31 — Fix auto-remplissage infos client AdminDetailDevis
+  - DetailDevis: charge users/{client_id} si client_tel/adresse/siret vides
+  - Panier: inclut profil complet (tel, adresse, siret) à la création du devis
+  - Backfill: 8 devis existants mis à jour (client_nom, client_tel, client_adresse)
+
 [2026-04-16 13:30] v30 — Refonte complète Espace Partenaire v12 (double casquette)
   - EspacePartenaire: sidebar 9+3 onglets, réutilise composants client v29
   - MesClientsPartner: KPIs, tableau clients, détail dépliable
