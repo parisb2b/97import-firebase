@@ -1,3 +1,9 @@
+[2026-04-16 16:15] v32-bis — Préparation Home : collection categories + images hero
+  - Collection Firestore 'categories' créée (5 documents trilingues FR/EN/ZH)
+  - 3 images Unsplash uploadées dans Storage (solaire, agricole, divers)
+  - R57 PRO et Maison Standard liés comme images hero
+  - 5/5 catégories avec hero_image_url ✅
+
 [2026-04-16 13:45] v31 — Fix auto-remplissage infos client AdminDetailDevis
   - DetailDevis: charge users/{client_id} si client_tel/adresse/siret vides
   - Panier: inclut profil complet (tel, adresse, siret) à la création du devis

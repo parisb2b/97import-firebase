@@ -1,0 +1,26 @@
+=== MAJ32-BIS — Préparation Home : collection categories ===
+Date : 2026-04-16
+
+PARTIE A — FIRESTORE :
+  Collection categories créée : ✅
+  5 documents (mini-pelle, maisons, solaire, agricole, divers) : ✅
+  Champs : id, nom_fr, nom_en, nom_zh, slug, icon, description_fr/en/zh, badge_promo, hero_image_url, ordre, actif
+
+PARTIE B — IMAGES UNSPLASH :
+  hero-solaire.jpg uploadée (Storage categories/) : ✅
+  hero-agricole.jpg uploadée (Storage categories/) : ✅
+  hero-divers.jpg uploadée (Storage categories/) : ✅
+
+PARTIE C — LIAISON PRODUITS :
+  Mini-Pelle → R57 PRO image (MP-R57-001) : ✅
+  Maisons → Maison Standard 20 pieds (MS-20-001) : ✅
+
+PARTIE D — VÉRIFICATION FINALE :
+  5 catégories avec image : ✅ (5/5 OK)
+
+URLS IMAGES :
+  mini-pelle : /images/r57_pro/r57_pro_main_view.png
+  maisons : /images/maisons/modular_standard/exterior_1.jpeg
+  solaire : https://firebasestorage.googleapis.com/v0/b/importok-6ef77.firebasestorage.app/o/categories%2Fhero-solaire.jpg?alt=media&token=f59ee6ad-f1f2-446d-9f1f-7ee27cdb2fc6
+  agricole : https://firebasestorage.googleapis.com/v0/b/importok-6ef77.firebasestorage.app/o/categories%2Fhero-agricole.jpg?alt=media&token=efc9cfba-e31e-4a8f-9a6b-c319602fd301
+  divers : https://firebasestorage.googleapis.com/v0/b/importok-6ef77.firebasestorage.app/o/categories%2Fhero-divers.jpg?alt=media&token=835ef890-c326-4782-8260-74d5192da0ab
