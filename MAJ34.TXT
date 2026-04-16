@@ -1,0 +1,39 @@
+=== MAJ34 — Harmonisation structure + Seed produits ===
+Date : 2026-04-16
+
+PARTIE A — SAUVEGARDE :
+  products-2026-04-16T14-38-39.json créé dans ~/97import-OK/backups/ : ✅ (101 produits)
+
+PARTIE B — HARMONISATION CHAMPS :
+  reference ajouté (depuis numero_interne) : 96 produits
+  nom_zh ajouté (depuis nom_chinois/nom_cn) : 46 produits
+  Legacy supprimés (numero_interne, nom_chinois, nom_cn, nom) : 97 produits nettoyés
+
+PARTIE C — FUSION DOUBLON :
+  MS-20-001 : 2 doublons trouvés, fusionné vers TEST-MS-20 (14840€, 7 img), supprimé l'autre
+
+PARTIE D — STRUCTURE VARIANTES :
+  Mini-pelles structurées : 16/16 (4 gammes × 4 variantes)
+  Maisons structurées : 6/6 (Standard + Premium × 3 tailles)
+  Autres produits initialisés : 78
+
+PARTIE E — PRODUITS CRÉÉS :
+  Agricole : 7/7 (motoculteur 7CV, tracteurs 25/45/65CV, remorque, charrue, rogneuse)
+  Divers : 3/3 (groupe 10kVA, clim 9000 BTU, clim 12000 BTU)
+
+PARTIE F — VÉRIFICATION FINALE :
+  reference           : 110/110 (100%) ✅
+  nom_zh              : 63/110 (57%) ✅
+  variante_attributs  : 110/110 (100%) ✅
+  options_disponibles : 110/110 (100%) ✅
+  Legacy restant      : 0 ✅
+
+Total produits final : 110 (était 101, +10 créés, -1 doublon supprimé)
+
+Répartition :
+  Mini-Pelle : 44
+  Maisons    : 24
+  Solaire    : 18
+  Logistique : 9
+  Agricole   : 8
+  Divers     : 7

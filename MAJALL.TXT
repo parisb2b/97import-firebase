@@ -1,3 +1,8 @@
+[2026-04-16 16:45] v34 — Harmonisation structure produits + seed 10 produits manquants
+  - reference unifié (96 produits), nom_zh unifié (46), legacy nettoyé (97)
+  - Doublon MS-20-001 fusionné, variantes structurées (16 MP + 6 maisons + 78 autres)
+  - 10 produits créés : 7 agricole + 3 divers → total 110 produits
+
 [2026-04-16 16:15] v32-bis — Préparation Home : collection categories + images hero
   - Collection Firestore 'categories' créée (5 documents trilingues FR/EN/ZH)
   - 3 images Unsplash uploadées dans Storage (solaire, agricole, divers)
