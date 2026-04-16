@@ -1,3 +1,10 @@
+[2026-04-16 13:30] v30 — Refonte complète Espace Partenaire v12 (double casquette)
+  - EspacePartenaire: sidebar 9+3 onglets, réutilise composants client v29
+  - MesClientsPartner: KPIs, tableau clients, détail dépliable
+  - GestionDevisPartner: prix VIP violet #7C3AED, envoi Firestore
+  - MesCommissionsPartner: calcul 5%, KPIs, détail, note PDF
+  - Badge PARTENAIRE violet, séparateur "ESPACE PARTENAIRE"
+
 [2026-04-16 13:15] v29 — Refonte complète Espace Client v12 (9 onglets)
   - EspaceClient.tsx refactoré : sidebar bleu ciel #ACDBF7 + 9 onglets
   - MesDevis : accordéons Firestore, recherche, PDF

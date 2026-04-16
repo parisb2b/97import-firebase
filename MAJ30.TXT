@@ -1,0 +1,44 @@
+=== MAJ30 — Refonte Espace Partenaire v12 ===
+Date : 2026-04-16
+
+PARTIE A — ARCHITECTURE :
+  EspacePartenaire.tsx (double casquette) : ✅
+  Sidebar 9+3 onglets (client + partenaire) : ✅
+  Réutilisation composants client v29 : ✅
+  Badge PARTENAIRE violet + code : ✅
+  Séparateur "ESPACE PARTENAIRE" : ✅
+
+PARTIE B — MES CLIENTS :
+  MesClientsPartner.tsx : ✅
+  KPIs (total clients / devis actifs / CA) : ✅
+  Tableau clients avec détail dépliable : ✅
+  KPIs par client (devis en cours / commandes / encaissé / solde) : ✅
+  Recherche : ✅
+
+PARTIE C — GESTION DES DEVIS :
+  GestionDevisPartner.tsx : ✅
+  Inputs prix VIP violet #7C3AED : ✅
+  Prix public barré en gris : ✅
+  Bouton "Envoyer devis VIP" → Firestore (is_vip + prix_negocies + statut) : ✅
+  Aperçu PDF : ✅
+  Note info teal : ✅
+
+PARTIE D — COMMISSIONS :
+  MesCommissionsPartner.tsx : ✅
+  KPIs (confirmées / en attente / total estimé) : ✅
+  Calcul 5% automatique : ✅
+  Tableau avec détail dépliable : ✅
+  Prix public vs négocié affiché : ✅
+  Note de commission PDF si existante : ✅
+  Recherche : ✅
+
+PARTIE E — INTÉGRATION :
+  Routes OK (/espace-partenaire) : ✅
+  Header redirige partner → /espace-partenaire : ✅
+  Build : npm run build → ✅ (0 erreurs)
+
+Fichiers créés/modifiés :
+  src/front/pages/EspacePartenaire.tsx (refonte complète)
+  src/front/pages/espace-partenaire/MesClientsPartner.tsx
+  src/front/pages/espace-partenaire/GestionDevisPartner.tsx
+  src/front/pages/espace-partenaire/MesCommissionsPartner.tsx
