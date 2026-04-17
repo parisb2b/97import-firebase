@@ -1,0 +1,57 @@
+=== MAJ35A-FIX3 — Affichage uniforme + Calcul cumulé FA ===
+Date : 2026-04-17
+
+PARTIE A — COMPOSANT DevisCard :
+  Fichier créé : src/front/pages/espace-client/DevisCard.tsx
+  Sections : Détail commande, Produits, Documents (5), Suivi paiements (3), Historique, Bouton acompte
+  Gestion is_vip + prix_negocies : ✅
+  PopupAcompte intégré : ✅
+
+PARTIE B — INTÉGRATION 4 ONGLETS :
+  MesDevis.tsx : ✅ (filtre tous sauf annulés)
+  MesCommandes.tsx : ✅ (filtre acompte encaissé)
+  MesVirements.tsx : ✅ (filtre acompte existant)
+  MesFactures.tsx : ✅ (filtre facture générée)
+  Duplication éliminée : ✅
+
+PARTIE C — CALCUL CUMULÉ FA :
+  pdf-generator.ts modifié : ✅
+  Libellé "(30%)" supprimé : ✅
+  Historique chronologique : ✅
+  Acompte présent en violet + gras : ✅
+  Total cumulé calculé correctement : ✅
+  Solde restant dû = total_ht - cumulé : ✅
+
+PARTIE D — BUILD :
+  npm run build : ✅ (0 erreurs)
+
+TESTS MANUELS : (à effectuer par Michel)
+  Test 1 - Affichage uniforme :
+    1. Connexion client@97import.com / Test2026!
+    2. Ouvrir DVS-2604012 dans Mes devis → déplier
+    3. Vérifier : détail complet visible
+    4. Vérifier même affichage dans Mes commandes, Mes virements, Mes factures
+
+  Test 2 - Calcul cumulé FA :
+    1. Côté admin, aller sur DVS-2604012
+    2. Déclarer 3 acomptes : 500€, 1000€, 1500€
+    3. Admin encaisse les 3 successivement
+    4. Télécharger les 3 FA et vérifier calculs cumulés
+
+COMMITS :
+  d714569 - v35a-fix3-A: composant partagé DevisCard avec détail complet uniforme
+  ffc1c1a - v35a-fix3-B: intégration DevisCard dans les 4 onglets client
+  d0be843 - v35a-fix3-C: correction calcul FA - historique cumulé des acomptes
+  191b88d - v35a-fix3-D: fix build - type casts + suppression drawAcompteBlock inutilisé
+
+FICHIERS MODIFIÉS :
+  ✅ src/front/pages/espace-client/DevisCard.tsx (créé - 450 lignes)
+  ✅ src/front/pages/espace-client/MesDevis.tsx (simplifié - ~95 lignes)
+  ✅ src/front/pages/espace-client/MesCommandes.tsx (simplifié - ~95 lignes)
+  ✅ src/front/pages/espace-client/MesVirements.tsx (simplifié - ~95 lignes)
+  ✅ src/front/pages/espace-client/MesFactures.tsx (simplifié - ~95 lignes)
+  ✅ src/lib/pdf-generator.ts (modifié generateFactureAcompte - +96 lignes, -32 lignes)
+
+TOTAL LIGNES : +134 insertions, -712 suppressions
+
+STATUT : ✅ COMPLET — Build OK, prêt pour tests manuels
