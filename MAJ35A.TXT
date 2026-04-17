@@ -1,0 +1,42 @@
+=== MAJ35A — Socle Firestore + Fix workflow acomptes ===
+Date : 2026-04-17
+
+PARTIE A — SAUVEGARDE :
+  Backup quotes + products : ✅ (11 devis + 110 produits)
+
+PARTIE B — ENRICHISSEMENT PRODUITS :
+  11 nouveaux champs ajoutés (usage_zh/en/fr, reference_usine, unite_export, ce_certification, stock_*) : ✅
+  Produits concernés : 110/110
+
+PARTIE C — COLLECTIONS CRÉÉES :
+  tarifs_logistiques/ : ✅ (3 docs — MQ 3800€, GP 4050€, FR 4300€)
+  ports/ : ✅ (10 docs — 4 chargement CN + 6 destination FR/DOM-TOM)
+
+PARTIE D — FIX BUG ACOMPTES (LE PLUS IMPORTANT) :
+  Fichier modifié : src/admin/pages/DetailDevis.tsx
+  Modal de sélection acompte déclaré : ✅
+  handleEncaisser MODIFIE statut 'declare' → 'encaisse' (au lieu d'ajouter) : ✅
+  Recalcul total_encaisse depuis somme acomptes 'encaisse' : ✅
+  Calcul statut_paiement (non_paye/paye_partiel/paye_complet) : ✅
+  Passage auto statut 'nouveau' → 'en_cours' si encaissé : ✅
+  Upload PDF FA dans Storage (factures_acompte/{FA-XXXX}.pdf) : ✅
+  URL écrite dans facture_acompte_url : ✅
+  Download PDF local pour l'admin : ✅
+
+PARTIE E — UPLOAD PDF DEVIS :
+  Bouton PDF admin uploade dans Storage si devis_url absent : ✅
+  Storage path : devis/{numero}.pdf : ✅
+  URL écrite dans devis_url : ✅
+
+PARTIE F — STATUTS 2 DIMENSIONS :
+  Champ statut_paiement ajouté aux 11 devis : ✅
+  Migration devis existants : ✅ (11/11, tous non_paye car aucun encaissé)
+
+PARTIE H — VÉRIFICATION FINALE :
+  Produits avec nouveaux champs : 110/110 ✅
+  tarifs_logistiques : 3 docs ✅
+  ports : 10 docs ✅
+  Statuts devis : 10 nouveau + 1 vip_envoye
+  Statut paiement : 11 non_paye (normal — aucun encaissé encore)
+
+Build : npm run build → ✅ (0 erreurs)

@@ -1,3 +1,11 @@
+[2026-04-17 12:00] v35a — Socle Firestore + Fix bug P1 acomptes + Upload PDF Storage
+  - FIX BUG CRITIQUE : handleEncaisser MODIFIE l'acompte (statut→encaisse) au lieu d'ajouter
+  - Modal admin : sélection de l'acompte déclaré à encaisser
+  - Upload PDF FA dans Storage + écriture facture_acompte_url
+  - Upload PDF devis dans Storage + écriture devis_url
+  - Statut 2 dimensions : statut (cycle de vie) + statut_paiement (non_paye/partiel/complet)
+  - 11 nouveaux champs produits (catalogue v5), 3 tarifs logistiques, 10 ports
+
 [2026-04-16 16:45] v34 — Harmonisation structure produits + seed 10 produits manquants
   - reference unifié (96 produits), nom_zh unifié (46), legacy nettoyé (97)
   - Doublon MS-20-001 fusionné, variantes structurées (16 MP + 6 maisons + 78 autres)
