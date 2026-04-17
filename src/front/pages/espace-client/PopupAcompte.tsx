@@ -3,6 +3,7 @@ import { doc, updateDoc, collection, query, where, getDocs } from 'firebase/fire
 import { db } from '../../../lib/firebase';
 import { useToast } from '../../components/Toast';
 import { montantAcompteParDefaut } from '../../../lib/devisHelpers';
+import { notifyAcompteDeclare } from '../../../lib/emailService';
 
 interface Props {
   devisId: string;
@@ -63,16 +64,26 @@ export default function PopupAcompte({ devisId, devisNumero, clientNom, onClose,
       const currentData = snap.docs[0]?.data();
       const currentAcomptes = currentData?.acomptes || [];
 
+      const nouvelAcompte = {
+        montant,
+        date: new Date().toISOString(),
+        type_compte: typeCompte,
+        statut: 'declare',
+        iban_utilise: rib.iban,
+      };
+
       await updateDoc(devisRef, {
-        acomptes: [...currentAcomptes, {
-          montant,
-          date: new Date().toISOString(),
-          type_compte: typeCompte,
-          statut: 'declare',
-          iban_utilise: rib.iban,
-        }],
+        acomptes: [...currentAcomptes, nouvelAcompte],
         updatedAt: new Date(),
       });
+
+      // Notification email
+      try {
+        const devisData = { numero: devisNumero, ...currentData };
+        await notifyAcompteDeclare(devisData, nouvelAcompte);
+      } catch (err) {
+        console.error('Erreur notification acompte déclaré:', err);
+      }
 
       showToast(`Acompte de ${montant.toLocaleString('fr-FR')} € déclaré ✅`);
       onAcompteAdded();

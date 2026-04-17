@@ -4,6 +4,7 @@ import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage
 import { db, storage } from '../../lib/firebase';
 import { generateFactureAcompte } from '../../lib/pdf-generator';
 import { getNextNumber } from '../../lib/counters';
+import { notifyAcompteEncaisse } from '../../lib/emailService';
 
 interface Props {
   devis: any;
@@ -109,6 +110,21 @@ export default function PopupEncaisserAcompte({ devis, onClose, onSuccess }: Pro
         facture_acompte_url: pdfUrl,
         updated_at: serverTimestamp(),
       });
+
+      // Notification email
+      try {
+        const devisAJour = {
+          ...devis,
+          acomptes: acomptesActuels,  // avec l'acompte modifié
+        };
+        await notifyAcompteEncaisse(
+          devisAJour,
+          acomptesActuels[selectedIndex],
+          pdfUrl  // l'URL Storage de la FA générée
+        );
+      } catch (err) {
+        console.error('Erreur notification acompte encaissé:', err);
+      }
 
       // Download local pour admin
       pdfDoc.save(`${numeroFA}.pdf`);

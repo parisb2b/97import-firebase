@@ -3,6 +3,7 @@ import { collection, query, where, getDocs, doc, updateDoc, getDoc } from 'fireb
 import { db } from '../../../lib/firebase';
 import { generateDevis, downloadPDF } from '../../../lib/pdf-generator';
 import { useToast } from '../../components/Toast';
+import { notifyDevisVipEnvoye } from '../../../lib/emailService';
 
 interface DevisLine {
   ref: string;
@@ -94,6 +95,24 @@ export default function GestionDevisPartner({ partnerCode }: { partnerCode: stri
         statut: 'vip_envoye',
         updatedAt: new Date(),
       });
+
+      // Notification email
+      try {
+        // Recharger le devis à jour
+        const devisSnap = await getDoc(doc(db, 'quotes', d.id));
+        const devisAJour = { id: d.id, numero: d.numero, ...devisSnap.data() };
+
+        // Récupérer le nom du partenaire
+        const partenaireSnap = await getDoc(doc(db, 'partners', partnerCode));
+        const partenaireName = partenaireSnap.exists()
+          ? `${partenaireSnap.data().prenom || ''} ${partenaireSnap.data().nom || ''}`.trim() || undefined
+          : undefined;
+
+        await notifyDevisVipEnvoye(devisAJour, partenaireName);
+      } catch (err) {
+        console.error('Erreur notification VIP:', err);
+      }
+
       showToast(`Devis VIP envoyé à ${d.client_nom || d.client_email} ✅`);
       await loadDevis();
     } catch (err) {

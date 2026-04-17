@@ -5,6 +5,7 @@ import { doc, setDoc, getDoc, serverTimestamp, collection, query, where, getDocs
 import { getNextNumber } from '../../lib/counters';
 import { useI18n } from '../../i18n';
 import { useToast } from '../components/Toast';
+import { notifyDevisCree } from '../../lib/emailService';
 
 interface CartItem {
   id: string;
@@ -170,16 +171,18 @@ export default function Panier() {
         if (userSnap.exists()) userProfile = userSnap.data();
       } catch {}
 
-      await setDoc(doc(db, 'quotes', devisId), {
+      const devisData = {
         numero,
         client_id: user.uid,
         client_email: userProfile.email || user.email,
         client_nom: user.displayName || `${userProfile.firstName || ''} ${userProfile.lastName || ''}`.trim(),
+        client_prenom: userProfile.firstName || userProfile.prenom || '',
         client_tel: userProfile.phone || userProfile.telephone || '',
         client_adresse: [userProfile.adresse, userProfile.codePostal, userProfile.ville, userProfile.pays].filter(Boolean).join(', '),
         client_siret: userProfile.siret || '',
         statut: 'nouveau',
         destination: userProfile.pays || 'Martinique',
+        pays_livraison: userProfile.pays || 'Martinique',
         is_vip: false,
         lignes,
         total_ht: total,
@@ -192,7 +195,16 @@ export default function Panier() {
         }],
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
-      });
+      };
+
+      await setDoc(doc(db, 'quotes', devisId), devisData);
+
+      // Notification email
+      try {
+        await notifyDevisCree(devisData);
+      } catch (err) {
+        console.error('Erreur notification devis créé:', err);
+      }
 
       localStorage.removeItem('cart');
       window.dispatchEvent(new Event('cart-updated'));
@@ -229,16 +241,18 @@ export default function Panier() {
         if (userSnap.exists()) userProfile = userSnap.data();
       } catch {}
 
-      await setDoc(doc(db, 'quotes', devisId), {
+      const devisData = {
         numero,
         client_id: user.uid,
         client_email: userProfile.email || user.email,
         client_nom: user.displayName || `${userProfile.firstName || ''} ${userProfile.lastName || ''}`.trim(),
+        client_prenom: userProfile.firstName || userProfile.prenom || '',
         client_tel: userProfile.phone || userProfile.telephone || '',
         client_adresse: [userProfile.adresse, userProfile.codePostal, userProfile.ville, userProfile.pays].filter(Boolean).join(', '),
         client_siret: userProfile.siret || '',
         statut: 'brouillon',
         destination: userProfile.pays || 'Martinique',
+        pays_livraison: userProfile.pays || 'Martinique',
         is_vip: false,
         lignes,
         total_ht: total,
@@ -246,7 +260,16 @@ export default function Panier() {
         acomptes: [],
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
-      });
+      };
+
+      await setDoc(doc(db, 'quotes', devisId), devisData);
+
+      // Notification email
+      try {
+        await notifyDevisCree(devisData);
+      } catch (err) {
+        console.error('Erreur notification devis créé:', err);
+      }
 
       localStorage.removeItem('cart');
       window.dispatchEvent(new Event('cart-updated'));
