@@ -15,15 +15,15 @@ export default function MesFactures({ userId, profile }: { userId: string; profi
     try {
       const q = query(collection(db, 'quotes'), where('client_id', '==', userId));
       const snap = await getDocs(q);
-      const all = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      const all = snap.docs.map(d => ({ id: d.id, ...d.data() } as any));
       // Filtre : devis avec au moins 1 facture générée
       const filtered = all
-        .filter(d =>
+        .filter((d: any) =>
           (Array.isArray(d.factures_acompte_urls) && d.factures_acompte_urls.length > 0) ||
           d.facture_finale_url ||
           d.facture_logistique_url
         )
-        .sort((a, b) => (b.createdAt?.toMillis?.() || b.createdAt?.seconds * 1000 || 0) - (a.createdAt?.toMillis?.() || a.createdAt?.seconds * 1000 || 0));
+        .sort((a: any, b: any) => (b.createdAt?.toMillis?.() || b.createdAt?.seconds * 1000 || 0) - (a.createdAt?.toMillis?.() || a.createdAt?.seconds * 1000 || 0));
       setFactures(filtered);
     } catch (err) {
       console.error(err);

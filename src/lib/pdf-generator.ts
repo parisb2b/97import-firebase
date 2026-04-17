@@ -444,30 +444,6 @@ function drawTotalsVIP(doc: jsPDF, totalPublic: number, totalNegocie: number, y:
 }
 
 // ============ DRAW: ACOMPTE BLOCK ============
-function drawAcompteBlock(doc: jsPDF, totalHT: number, acomptePct: number, acompteMontant: number, solde: number, y: number): number {
-  doc.setFillColor(...C.salmonLight);
-  doc.setDrawColor(...C.grayLine);
-  doc.rect(20, y, 170, 28, 'FD');
-
-  doc.setFontSize(10);
-  doc.setTextColor(...C.black);
-  doc.setFont('helvetica', 'normal');
-  doc.text('Total devis HT :', 30, y + 8);
-  doc.text(formatEUR(totalHT), 180, y + 8, { align: 'right' });
-
-  doc.text(`Acompte versé (${acomptePct}%) :`, 30, y + 16);
-  doc.setFont('helvetica', 'bold');
-  doc.setTextColor(...C.salmon);
-  doc.text(formatEUR(acompteMontant), 180, y + 16, { align: 'right' });
-
-  doc.setFont('helvetica', 'bold');
-  doc.setTextColor(...C.black);
-  doc.text('Solde restant dû :', 30, y + 24);
-  doc.text(formatEUR(solde), 180, y + 24, { align: 'right' });
-  doc.setFont('helvetica', 'normal');
-
-  return y + 33;
-}
 
 // ============ DRAW: CONDITIONS + SIGNATURE ============
 function drawConditionsSignature(doc: jsPDF, y: number, color: readonly [number, number, number]) {

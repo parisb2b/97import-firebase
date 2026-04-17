@@ -17,8 +17,8 @@ export default function MesDevis({ userId, profile }: { userId: string; profile?
       const q = query(collection(db, 'quotes'), where('client_id', '==', userId));
       const snap = await getDocs(q);
       const list = snap.docs
-        .map(d => ({ id: d.id, ...d.data() }))
-        .sort((a, b) => (b.createdAt?.toMillis?.() || b.createdAt?.seconds * 1000 || 0) - (a.createdAt?.toMillis?.() || a.createdAt?.seconds * 1000 || 0));
+        .map(d => ({ id: d.id, ...d.data() } as any))
+        .sort((a: any, b: any) => (b.createdAt?.toMillis?.() || b.createdAt?.seconds * 1000 || 0) - (a.createdAt?.toMillis?.() || a.createdAt?.seconds * 1000 || 0));
       setDevis(list);
     } catch (err) {
       console.error('Error loading devis:', err);

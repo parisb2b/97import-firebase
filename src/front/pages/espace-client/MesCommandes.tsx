@@ -15,11 +15,11 @@ export default function MesCommandes({ userId, profile }: { userId: string; prof
     try {
       const q = query(collection(db, 'quotes'), where('client_id', '==', userId));
       const snap = await getDocs(q);
-      const all = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      const all = snap.docs.map(d => ({ id: d.id, ...d.data() } as any));
       // Filtre : devis avec au moins 1 acompte encaissé
       const filtered = all
-        .filter(d => Array.isArray(d.acomptes) && d.acomptes.some((a: any) => a.statut === 'encaisse'))
-        .sort((a, b) => (b.createdAt?.toMillis?.() || b.createdAt?.seconds * 1000 || 0) - (a.createdAt?.toMillis?.() || a.createdAt?.seconds * 1000 || 0));
+        .filter((d: any) => Array.isArray(d.acomptes) && d.acomptes.some((a: any) => a.statut === 'encaisse'))
+        .sort((a: any, b: any) => (b.createdAt?.toMillis?.() || b.createdAt?.seconds * 1000 || 0) - (a.createdAt?.toMillis?.() || a.createdAt?.seconds * 1000 || 0));
       setCommandes(filtered);
     } catch (err) {
       console.error(err);
