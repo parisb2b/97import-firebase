@@ -72,15 +72,25 @@ export default function GestionDevisPartner({ partnerCode }: { partnerCode: stri
 
   const handleSendVIP = async (d: Devis) => {
     const prices = editedPrices[d.id] || [];
-    const prixNegocies = d.lignes.map((l, i) => ({
-      ref: l.ref,
-      prix_negocie: prices[i] !== undefined ? prices[i] : (l.prix_negocie || l.prix_unitaire),
-    }));
+
+    // Construire le map prix_negocies (objet, pas array)
+    const prixNegociesMap: Record<string, number> = {};
+    let totalHtNegocie = 0;
+
+    d.lignes.forEach((ligne, idx) => {
+      const prixSaisi = prices[idx];
+      const prixNeg = prixSaisi !== undefined ? prixSaisi : (ligne.prix_negocie || ligne.prix_unitaire);
+      const ref = ligne.ref || `line_${idx}`;
+      prixNegociesMap[ref] = Number(prixNeg);
+      totalHtNegocie += prixNeg * (ligne.qte || 1);
+    });
 
     try {
       await updateDoc(doc(db, 'quotes', d.id), {
         is_vip: true,
-        prix_negocies: prixNegocies,
+        prix_negocies: prixNegociesMap,  // Map au lieu d'array
+        total_ht_public: d.total_ht,      // Garder le prix public original
+        total_ht: totalHtNegocie,         // Nouveau total négocié
         statut: 'vip_envoye',
         updatedAt: new Date(),
       });

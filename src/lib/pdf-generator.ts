@@ -283,10 +283,11 @@ function drawProductTable(
   doc: jsPDF,
   lignes: any[],
   startY: number,
-  options?: { headerColor?: readonly [number, number, number]; isVip?: boolean }
+  options?: { headerColor?: readonly [number, number, number]; isVip?: boolean; prixNegocies?: Record<string, number> }
 ): number {
   const hColor = options?.headerColor || C.salmon;
   const isVip = options?.isVip || false;
+  const prixNegocies = options?.prixNegocies || {};
   let y = startY;
 
   // Column positions (prix élargi à 32mm pour gros montants)
@@ -339,10 +340,15 @@ function drawProductTable(
       doc.text(descLines[l], colDesc + 2, y + 5 + l * 4);
     }
 
-    if (isVip && ligne.prix_public) {
-      // VIP: struck price + negotiated
+    const ref = ligne.ref || ligne.reference || '';
+    const prixPublic = ligne.prix_unitaire || 0;
+    const prixNegocie = isVip && prixNegocies[ref] !== undefined ? prixNegocies[ref] : prixPublic;
+    const estNegocie = isVip && prixNegocie !== prixPublic;
+
+    if (estNegocie) {
+      // VIP: prix public barré + prix négocié en violet
       doc.setTextColor(...C.grayStrike);
-      const pubText = formatEUR(ligne.prix_public);
+      const pubText = formatEUR(prixPublic);
       doc.text(pubText, colPrix, y + 5, { align: 'right' });
       const pubW = doc.getTextWidth(pubText);
       doc.setDrawColor(...C.grayStrike);
@@ -350,12 +356,12 @@ function drawProductTable(
 
       doc.setTextColor(...C.violet);
       doc.setFont('helvetica', 'bold');
-      doc.text(formatEUR(ligne.prix_unitaire), colPrix, y + 10, { align: 'right' });
+      doc.text(formatEUR(prixNegocie), colPrix, y + 10, { align: 'right' });
       doc.setFont('helvetica', 'normal');
 
       // Total VIP
-      const totalPub = (ligne.prix_public || 0) * (ligne.qte || 1);
-      const totalNeg = (ligne.prix_unitaire || 0) * (ligne.qte || 1);
+      const totalPub = prixPublic * (ligne.qte || 1);
+      const totalNeg = prixNegocie * (ligne.qte || 1);
       doc.setTextColor(...C.grayStrike);
       const totPubText = formatEUR(totalPub);
       doc.text(totPubText, tableRight - 2, y + 5, { align: 'right' });
@@ -523,11 +529,16 @@ export function generateDevis(quote: any, emetteur?: any): jsPDF {
   }, 42, color);
 
   y = drawBankInfo(doc, cfg.bankInfo, y);
-  y = drawProductTable(doc, quote.lignes || [], y + 2, { headerColor: color, isVip });
+  y = drawProductTable(doc, quote.lignes || [], y + 2, {
+    headerColor: color,
+    isVip,
+    prixNegocies: quote.prix_negocies || {}
+  });
 
   if (isVip) {
-    const totalPublic = (quote.lignes || []).reduce((s: number, l: any) => s + ((l.prix_public || l.prix_unitaire || 0) * (l.qte || 1)), 0);
-    y = drawTotalsVIP(doc, totalPublic, quote.total_ht || 0, y);
+    const totalPublic = quote.total_ht_public || (quote.lignes || []).reduce((s: number, l: any) => s + ((l.prix_unitaire || 0) * (l.qte || 1)), 0);
+    const totalNegocie = quote.total_ht || totalPublic;
+    y = drawTotalsVIP(doc, totalPublic, totalNegocie, y);
   } else {
     y = drawTotals(doc, quote.total_ht || 0, y, color);
   }
