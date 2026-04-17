@@ -531,8 +531,9 @@ export function generateDevis(quote: any, emetteur?: any): jsPDF {
 export function generateFactureAcompte(quote: any, acompteCible: any, emetteur?: any): jsPDF {
   const doc = new jsPDF();
   const cfg = getConfig(emetteur);
-  const numero = acompteCible?.numero || 'FA-' + (quote.numero || '').replace('DVS-', '');
-  const date = formatDate(acompteCible?.createdAt || quote.createdAt);
+  // FIX BUG #1: Lire le numéro depuis acompteCible.ref_fa (source fiable)
+  const numero = acompteCible?.ref_fa || quote?.numero_fa || 'FA-' + (quote.numero || '').replace('DVS-', '');
+  const date = formatDate(acompteCible?.date_encaissement || acompteCible?.createdAt || quote.createdAt);
 
   drawLogo(doc, cfg.showLogo);
   drawHeader(doc, "Facture d'Acompte", numero, date, C.salmon);
@@ -563,7 +564,7 @@ export function generateFactureAcompte(quote: any, acompteCible: any, emetteur?:
   y += 10;
 
   // ═══════════════════════════════════════════
-  // NOUVEAU BLOC : Historique cumulé
+  // BLOC HISTORIQUE CUMULÉ
   // ═══════════════════════════════════════════
 
   // Calculer l'historique des acomptes encaissés jusqu'à l'acompte cible (inclus)
@@ -590,77 +591,91 @@ export function generateFactureAcompte(quote: any, acompteCible: any, emetteur?:
   const soldeRestantApres = totalHt - totalEncaisseCumule;
 
   // Cadre total devis
-  doc.setFillColor(251, 240, 237); // #FBF0ED pale rose
+  doc.setFillColor(...C.salmonLight); // rose pâle
   doc.rect(15, y, 180, 10, 'F');
   doc.setTextColor(0, 0, 0);
   doc.setFontSize(10);
+  doc.setFont('helvetica', 'normal');
   doc.text('Total devis HT :', 20, y + 7);
-  doc.text(`${totalHt.toLocaleString('fr-FR', { minimumFractionDigits: 2 })} €`, 190, y + 7, { align: 'right' });
+  // FIX BUG #2: Utiliser formatEUR pour éviter espaces insécables
+  doc.text(formatEUR(totalHt), 190, y + 7, { align: 'right' });
 
   y += 16;
 
   // Titre historique
-  doc.setTextColor(200, 127, 107);
+  doc.setTextColor(...C.salmon);
   doc.setFontSize(11);
+  doc.setFont('helvetica', 'bold');
   doc.text('Historique des acomptes encaissés :', 20, y);
   y += 8;
 
   // Liste des acomptes
-  doc.setTextColor(0, 0, 0);
   doc.setFontSize(9);
+  doc.setFont('helvetica', 'normal');
 
   for (const a of acomptesJusquaCible) {
     const refFa = a.ref_fa || '—';
     const dateA = a.date_encaissement || a.date;
     const dateStr = dateA ? new Date(dateA).toLocaleDateString('fr-FR') : '—';
-    const montant = (a.montant || 0).toLocaleString('fr-FR', { minimumFractionDigits: 2 });
     const estCible = a.ref_fa === refFaCible;
 
-    const libelle = `  ${refFa}  (${dateStr})${estCible ? '  ← présent' : ''}`;
+    // FIX BUG #3: Changer "← présent" en "<< ACTUEL >>"
+    const libelleBase = `${refFa}  (${dateStr})`;
+    const libelleComplet = estCible ? `${libelleBase}  << ACTUEL >>` : libelleBase;
 
     if (estCible) {
-      doc.setTextColor(124, 58, 237); // violet
+      // FIX BUG #4: Utiliser salmon au lieu de violet
+      doc.setTextColor(...C.salmon);
       doc.setFont('helvetica', 'bold');
     } else {
-      doc.setTextColor(0, 0, 0);
+      doc.setTextColor(60, 60, 60);
       doc.setFont('helvetica', 'normal');
     }
 
-    doc.text(libelle, 20, y);
-    doc.text(`${montant} €`, 190, y, { align: 'right' });
-    y += 6;
+    doc.text(`  ${libelleComplet}`, 20, y);
+    // FIX BUG #2: Utiliser formatEUR
+    doc.text(formatEUR(a.montant || 0), 190, y, { align: 'right' });
+    y += 7;
   }
 
+  // Reset style
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(0, 0, 0);
 
   // Ligne séparatrice
-  doc.setDrawColor(200, 127, 107);
+  doc.setDrawColor(...C.salmon);
   doc.setLineWidth(0.5);
-  doc.line(20, y + 2, 190, y + 2);
-  y += 8;
+  doc.line(20, y + 1, 190, y + 1);
+  y += 6;
 
   // Total cumulé encaissé
-  doc.setFillColor(251, 240, 237);
-  doc.rect(15, y, 180, 9, 'F');
+  doc.setFillColor(...C.salmonLight);
+  doc.rect(15, y, 180, 10, 'F');
+  doc.setTextColor(0, 0, 0);
   doc.setFontSize(10);
-  doc.text('Total encaissé cumulé :', 20, y + 6);
-  const totalCumuleStr = totalEncaisseCumule.toLocaleString('fr-FR', { minimumFractionDigits: 2 });
-  doc.setTextColor(5, 150, 105); // vert
+  doc.setFont('helvetica', 'normal');
+  doc.text('Total encaissé cumulé :', 20, y + 7);
+  doc.setTextColor(...C.salmon);
   doc.setFont('helvetica', 'bold');
-  doc.text(`${totalCumuleStr} €`, 190, y + 6, { align: 'right' });
+  // FIX BUG #2: Utiliser formatEUR
+  doc.text(formatEUR(totalEncaisseCumule), 190, y + 7, { align: 'right' });
 
   y += 14;
 
   // Solde restant dû
-  doc.setFillColor(219, 234, 254); // #DBEAFE bleu clair
+  // FIX BUG #4: Utiliser salmon pour le fond au lieu de bleu
+  doc.setFillColor(...C.salmon);
   doc.rect(15, y, 180, 12, 'F');
+  doc.setTextColor(255, 255, 255); // blanc pour contraste
   doc.setFontSize(11);
-  doc.setTextColor(30, 58, 138); // #1E3A8A
   doc.setFont('helvetica', 'bold');
   doc.text('Solde restant dû :', 20, y + 8);
-  const soldeStr = soldeRestantApres.toLocaleString('fr-FR', { minimumFractionDigits: 2 });
-  doc.text(`${soldeStr} €`, 190, y + 8, { align: 'right' });
+  // FIX BUG #2: Utiliser formatEUR
+  doc.text(formatEUR(soldeRestantApres), 190, y + 8, { align: 'right' });
+
+  // Reset
+  doc.setTextColor(0, 0, 0);
+  doc.setFont('helvetica', 'normal');
 
   y += 18;
 

@@ -79,8 +79,11 @@ export default function PopupEncaisserAcompte({ devis, onClose, onSuccess }: Pro
       const emetteur = emetteurSnap.exists() ? emetteurSnap.data() : undefined;
 
       const pdfDoc = generateFactureAcompte(
-        { ...devis, numero_fa: numeroFA },
-        acomptesActuels[selectedIndex],
+        {
+          ...devis,
+          acomptes: acomptesActuels,  // ← IMPORTANT : le nouveau tableau
+        },
+        acomptesActuels[selectedIndex],   // ← acompte cible (modifié)
         emetteur
       );
       const pdfBlob = pdfDoc.output('blob');
