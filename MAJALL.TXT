@@ -1,3 +1,48 @@
+[2026-04-17 13:30] v35a-fix3 — Affichage uniforme + Calcul cumulé FA
+======================================================================================
+PROBLÈME #1 : Affichage incohérent entre les 4 onglets client (Mes devis / Mes commandes / Mes virements / Mes factures)
+PROBLÈME #2 : Facture Acompte (FA) affiche "Acompte versé (30%)" avec calcul erroné, ignore l'historique cumulé
+
+SOLUTION :
+  - Création composant partagé DevisCard.tsx (450 lignes) : 5 sections complètes
+    • Détail commande (destination, partenaire, paiement)
+    • Produits (avec support prix VIP négociés)
+    • Documents (5 slots : Devis, FA, FF, FL, BL)
+    • Suivi paiements (3 boxes colorées : Encaissé, Déclaré, Solde)
+    • Historique acomptes + bouton "Verser un acompte"
+
+  - Intégration dans 4 onglets avec filtres spécifiques :
+    • MesDevis.tsx : tous devis sauf annulés (simplifié 95 lignes)
+    • MesCommandes.tsx : devis avec ≥1 acompte encaissé (simplifié 95 lignes)
+    • MesVirements.tsx : devis avec ≥1 acompte (déclaré ou encaissé), forceOpen=true (simplifié 95 lignes)
+    • MesFactures.tsx : devis avec ≥1 facture générée (FA/FF/FL) (simplifié 95 lignes)
+
+  - Correction calcul FA dans pdf-generator.ts :
+    • Historique chronologique des acomptes encaissés jusqu'à l'acompte présent
+    • Acompte présent en violet + gras + "← présent"
+    • Total encaissé cumulé en vert
+    • Solde restant dû = total_ht - total_cumulé (en bleu)
+    • Suppression libellé erroné "(30%)"
+    • Suppression fonction drawAcompteBlock (obsolète)
+
+MODIFICATIONS :
+  - src/front/pages/espace-client/DevisCard.tsx (NEW - 450 lignes)
+  - src/front/pages/espace-client/MesDevis.tsx (simplifié de 284 → 95 lignes)
+  - src/front/pages/espace-client/MesCommandes.tsx (simplifié de 293 → 95 lignes)
+  - src/front/pages/espace-client/MesVirements.tsx (simplifié de 178 → 95 lignes)
+  - src/front/pages/espace-client/MesFactures.tsx (simplifié de 178 → 95 lignes)
+  - src/lib/pdf-generator.ts (modifié generateFactureAcompte +96 lignes, -32 lignes)
+
+COMMITS :
+  d714569 - v35a-fix3-A: composant partagé DevisCard avec détail complet uniforme
+  ffc1c1a - v35a-fix3-B: intégration DevisCard dans les 4 onglets client
+  d0be843 - v35a-fix3-C: correction calcul FA - historique cumulé des acomptes
+  191b88d - v35a-fix3-D: fix build - type casts + suppression drawAcompteBlock inutilisé
+  7040380 - v35a-fix3: rapport complet
+
+Build : ✅ SUCCÈS (0 erreurs TypeScript)
+Impact : +134 insertions, -712 suppressions (DRY principle appliqué)
+
 [2026-04-17 12:50] v35a-fix2 — Correction 6 bugs workflow (prix VIP + Firebase + modal €)
 ======================================================================================
 BUG #1 — Prix VIP non persisté :
