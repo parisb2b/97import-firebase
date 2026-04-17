@@ -2,6 +2,20 @@ import { useState, useEffect } from 'react';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import { useToast } from '../../components/Toast';
+import PopupAcompte from './PopupAcompte';
+import { peutVerserAcompte } from '../../../lib/devisHelpers';
+
+interface Devis {
+  id: string;
+  numero: string;
+  statut: string;
+  statut_paiement?: string;
+  total_ht: number;
+  total_encaisse?: number;
+  acomptes?: any[];
+  client_nom: string;
+  lignes?: any[];
+}
 
 interface FactureRow {
   numero: string;
@@ -12,49 +26,63 @@ interface FactureRow {
   url: string;
   devisId: string;
   produit: string;
+  devis: Devis;
 }
 
-export default function MesFactures({ userId }: { userId: string }) {
+export default function MesFactures({ userId, profile }: { userId: string; profile?: any }) {
   const { showToast } = useToast();
   const [factures, setFactures] = useState<FactureRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [search, setSearch] = useState('');
+  const [popupDevis, setPopupDevis] = useState<Devis | null>(null);
+
+  const loadFactures = async () => {
+    setLoading(true);
+    try {
+      const q = query(collection(db, 'quotes'), where('client_id', '==', userId));
+      const snap = await getDocs(q);
+      const allFactures: FactureRow[] = [];
+
+      snap.docs.forEach(d => {
+        const data = d.data();
+        const devis: Devis = {
+          id: d.id,
+          numero: data.numero || '',
+          statut: data.statut || 'nouveau',
+          statut_paiement: data.statut_paiement,
+          total_ht: data.total_ht || 0,
+          total_encaisse: data.total_encaisse || 0,
+          acomptes: data.acomptes || [],
+          client_nom: data.client_nom || '',
+          lignes: data.lignes || [],
+        };
+        const n = data.numero?.replace(/^DVS-/, '') || '';
+        const date = data.createdAt?.toDate?.()?.toLocaleDateString('fr-FR') || '—';
+        const produit = data.lignes?.[0]?.nom_fr || 'Produit';
+
+        if (data.facture_acompte_url) {
+          allFactures.push({ numero: `FA-${n}`, type: 'FA', typeLabel: 'Facture acompte', date, montant: (data.acomptes || []).filter((a: any) => a.statut === 'encaisse').reduce((s: number, a: any) => s + a.montant, 0), url: data.facture_acompte_url, devisId: d.id, produit, devis });
+        }
+        if (data.facture_finale_url) {
+          allFactures.push({ numero: `FF-${n}`, type: 'FF', typeLabel: 'Facture finale', date, montant: data.total_ht || 0, url: data.facture_finale_url, devisId: d.id, produit, devis });
+        }
+        if (data.facture_logistique_url) {
+          allFactures.push({ numero: `FL-${n}`, type: 'FL', typeLabel: 'Facture logistique', date, montant: data.frais_logistique || 0, url: data.facture_logistique_url, devisId: d.id, produit, devis });
+        }
+      });
+
+      setFactures(allFactures);
+    } catch (err) {
+      console.error(err);
+      showToast('Erreur de chargement', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const load = async () => {
-      setLoading(true);
-      try {
-        const q = query(collection(db, 'quotes'), where('client_id', '==', userId));
-        const snap = await getDocs(q);
-        const allFactures: FactureRow[] = [];
-
-        snap.docs.forEach(d => {
-          const data = d.data();
-          const n = data.numero?.replace(/^DVS-/, '') || '';
-          const date = data.createdAt?.toDate?.()?.toLocaleDateString('fr-FR') || '—';
-          const produit = data.lignes?.[0]?.nom_fr || 'Produit';
-
-          if (data.facture_acompte_url) {
-            allFactures.push({ numero: `FA-${n}`, type: 'FA', typeLabel: 'Facture acompte', date, montant: (data.acomptes || []).filter((a: any) => a.statut === 'encaisse').reduce((s: number, a: any) => s + a.montant, 0), url: data.facture_acompte_url, devisId: d.id, produit });
-          }
-          if (data.facture_finale_url) {
-            allFactures.push({ numero: `FF-${n}`, type: 'FF', typeLabel: 'Facture finale', date, montant: data.total_ht || 0, url: data.facture_finale_url, devisId: d.id, produit });
-          }
-          if (data.facture_logistique_url) {
-            allFactures.push({ numero: `FL-${n}`, type: 'FL', typeLabel: 'Facture logistique', date, montant: data.frais_logistique || 0, url: data.facture_logistique_url, devisId: d.id, produit });
-          }
-        });
-
-        setFactures(allFactures);
-      } catch (err) {
-        console.error(err);
-        showToast('Erreur de chargement', 'error');
-      } finally {
-        setLoading(false);
-      }
-    };
-    load();
+    loadFactures();
   }, [userId]);
 
   const filtered = factures.filter(f => {
@@ -116,16 +144,34 @@ export default function MesFactures({ userId }: { userId: string }) {
                     <p style={{ marginBottom: 6 }}><strong>Émetteur :</strong> LUXENT LIMITED</p>
                     <p style={{ marginBottom: 6 }}><strong>Produits :</strong> {f.produit}</p>
                     <p style={{ marginBottom: 10 }}><strong>Montant :</strong> {f.montant?.toLocaleString('fr-FR')} €</p>
-                    <button onClick={() => { const a = document.createElement('a'); a.href = f.url; a.download = f.numero + '.pdf'; a.click(); }}
-                      style={{ padding: '8px 16px', background: '#1565C0', color: '#fff', border: 'none', borderRadius: 10, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
-                      📥 Télécharger PDF
-                    </button>
+                    <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                      <button onClick={() => { const a = document.createElement('a'); a.href = f.url; a.download = f.numero + '.pdf'; a.click(); }}
+                        style={{ padding: '8px 16px', background: '#1565C0', color: '#fff', border: 'none', borderRadius: 10, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
+                        📥 Télécharger PDF
+                      </button>
+                      {peutVerserAcompte(f.devis) && (
+                        <button onClick={() => setPopupDevis(f.devis)}
+                          style={{ padding: '8px 16px', background: '#0D9488', color: '#fff', border: 'none', borderRadius: 10, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
+                          💶 Verser un acompte
+                        </button>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>
             );
           })}
         </div>
+      )}
+
+      {popupDevis && (
+        <PopupAcompte
+          devisId={popupDevis.id}
+          devisNumero={popupDevis.numero}
+          clientNom={popupDevis.client_nom || `${profile?.firstName || ''} ${profile?.lastName || ''}`}
+          onClose={() => setPopupDevis(null)}
+          onAcompteAdded={loadFactures}
+        />
       )}
     </div>
   );
