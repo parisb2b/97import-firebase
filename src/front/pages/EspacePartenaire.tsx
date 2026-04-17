@@ -78,7 +78,7 @@ export default function EspacePartenaire() {
       case 'devis': return <MesDevis userId={user.uid} profile={profile} />;
       case 'commandes': return <MesCommandes userId={user.uid} profile={profile} />;
       case 'virements': return <MesVirements userId={user.uid} profile={profile} />;
-      case 'factures': return <MesFactures userId={user.uid} />;
+      case 'factures': return <MesFactures userId={user.uid} profile={profile} />;
       case 'suivi': return <SuiviAchats userId={user.uid} />;
       case 'achats': return <ContinuerAchats />;
       case 'infos': return <MesInfos userId={user.uid} profile={profile} />;
