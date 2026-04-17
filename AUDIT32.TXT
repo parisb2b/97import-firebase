@@ -1,0 +1,405 @@
+╔═══════════════════════════════════════════════════════╗
+║  AUDIT32 — LIAISONS FRONT ↔ BACK-OFFICE               ║
+║  Date : 2026-04-16                                    ║
+║  Branche : v2                                         ║
+╚═══════════════════════════════════════════════════════╝
+
+═══ RÉSUMÉ EXÉCUTIF ═══
+
+Total domaines audités : 12
+✅ OK : 4
+⚠️ PARTIELS : 5
+❌ CASSÉS : 3
+
+BUGS CRITIQUES DÉTECTÉS :
+1. ❌ ACOMPTES : L'admin ajoute {date, montant, ref_fa} SANS champ statut → le front cherche statut='encaisse' → "Mes commandes" toujours vide
+2. ❌ SAV : Le front écrit photos_urls[], l'admin lit photos[] → photos invisibles côté admin
+3. ❌ COMMISSIONS : L'admin utilise collection séparée 'commissions', le partenaire calcule depuis quotes → données jamais synchronisées
+4. ⚠️ PROFILS : Double collection users/ + profiles/ avec champs incohérents
+5. ⚠️ CONTENEURS : Admin utilise collection 'containers', front lit 'conteneur_id' dans quotes → aucune liaison
+
+DONNÉES RÉELLES FIRESTORE :
+  quotes : 8 documents (AUCUN encaissé — 0 sur 8)
+  users : 6 documents
+  profiles : 12 documents (double !)
+  partners : 4 documents
+  products : 101 documents
+  admin_params : 3 documents
+  sav : 0 documents
+  conteneurs/containers : 0 documents
+  commissions : 0 documents
+
+
+═══ DÉTAIL PAR DOMAINE ═══
+
+─── DOMAINE 1 — DEVIS (collection quotes) ───
+Statut : ⚠️ PARTIEL
+
+Fichiers front impliqués :
+  - src/front/pages/Panier.tsx (création)
+  - src/front/pages/espace-client/MesDevis.tsx (lecture)
+
+Fichiers admin impliqués :
+  - src/admin/pages/ListeDevis.tsx (lecture — scan complet)
+  - src/admin/pages/DetailDevis.tsx (lecture + modification)
+
+Champs écrits par le front (Panier.tsx) :
+  ✅ numero (format DVS-YYMMNNN via getNextNumber)
+  ✅ client_id (user.uid)
+  ✅ client_email (depuis profil users/)
+  ✅ client_nom (depuis profil users/)
+  ✅ client_tel (depuis profil users/) — ajouté en v31
+  ✅ client_adresse (depuis profil users/) — ajouté en v31
+  ✅ client_siret (depuis profil users/) — ajouté en v31
+  ✅ statut ('nouveau' ou 'brouillon')
+  ✅ destination (depuis profil)
+  ✅ is_vip (false)
+  ✅ lignes[] (ref, nom_fr, qte, prix_unitaire, total)
+  ✅ total_ht
+  ✅ partenaire_code
+  ✅ acomptes[] ({montant, date, type_compte, statut:'declare'})
+  ✅ createdAt, updatedAt
+
+Champs lus par l'admin (DetailDevis.tsx) :
+  ✅ numero, client_id, client_nom, client_email
+  ✅ client_tel, client_adresse, client_siret — ajouté en v31 avec fallback users/
+  ✅ statut, lignes[], total_ht
+  ⚠️ acompte_pct (30 — pas écrit par le front, valeur par défaut)
+  ⚠️ acomptes[] — l'admin LIT ce champ mais ÉCRIT un format DIFFÉRENT (voir Domaine 2)
+  ⚠️ total_encaisse, solde_restant — calculés par l'admin mais pas par le front
+
+Désynchronisations :
+  - acompte_pct : écrit par admin (30), jamais par le front
+  - total_encaisse : calculé par l'admin, le front calcule à la volée depuis acomptes[]
+  - solde_restant : idem
+  - Le front écrit 'lignes', l'admin lit 'lignes' — OK, mais l'interface admin utilise aussi 'produits' dans certains endroits
+
+Recommandations v33 :
+  - Harmoniser total_encaisse/solde_restant : soit les calculer toujours à la volée, soit les maintenir côté admin ET front
+  - Supprimer acompte_pct si inutilisé
+
+
+─── DOMAINE 2 — ACOMPTES (BUG PRINCIPAL) ───
+Statut : ❌ CASSÉ
+
+CAUSE RACINE DU BUG DE MICHEL :
+
+Format écrit par le FRONT (PopupAcompte.tsx) :
+  acomptes[]: { montant, date, type_compte, statut:'declare', iban_utilise }
+
+Format écrit par l'ADMIN (DetailDevis.tsx handleEncaisser) :
+  acomptes[]: { date, montant, ref_fa }
+  → PAS DE CHAMP statut !
+
+Filtre "Mes commandes" (MesCommandes.tsx) :
+  d.acomptes?.some(a => a.statut === 'encaisse')
+  → AUCUN acompte n'a jamais statut='encaisse' → "Mes commandes" est TOUJOURS VIDE
+
+PREUVE dans les données réelles :
+  DVS-2604008 acomptes = [{"date":"2026-04-15T09:49:30.688Z","type_compte":"professionnel","statut":"declare","montant":5000}]
+  → Le client a déclaré un virement de 5000€, mais l'admin n'a jamais changé le statut
+  → Même si l'admin "encaisse", il AJOUTE un NOUVEL objet {date, montant, ref_fa} via arrayUnion
+  → L'ancien objet garde statut:'declare' pour toujours
+
+FLUX ATTENDU (qui ne fonctionne PAS) :
+  1. Client déclare un virement → acompte ajouté avec statut='declare' ✅
+  2. Admin valide l'encaissement → devrait MODIFIER le statut de CET acompte à 'encaisse' ❌
+  3. Front filtre sur statut='encaisse' pour afficher dans "Mes commandes" ❌ (jamais encaissé)
+
+FLUX ACTUEL (cassé) :
+  1. Client déclare → {montant:5000, statut:'declare', type_compte:'pro', ...}
+  2. Admin "encaisse" → AJOUTE un NOUVEL objet {montant:X, date:Y, ref_fa:Z} (sans statut)
+  3. On a maintenant 2 entrées dans acomptes[] : l'original 'declare' et le nouveau sans statut
+  4. Le front cherche statut='encaisse' → jamais trouvé → "Mes commandes" vide
+
+Recommandations v33 CRITIQUES :
+  1. L'admin doit MODIFIER l'acompte existant, pas en ajouter un nouveau
+     OU : l'admin doit mettre statut='encaisse' sur l'acompte qu'il valide
+  2. Le bouton "Encaisser" dans DetailDevis doit :
+     - Lister les acomptes 'declare' du client
+     - Permettre de sélectionner lequel encaisser
+     - Mettre le statut de CET acompte à 'encaisse'
+     - Ajouter le ref_fa à cet acompte
+  3. Recalculer total_encaisse depuis la somme des acomptes 'encaisse'
+
+
+─── DOMAINE 3 — CLIENTS (users) ───
+Statut : ⚠️ PARTIEL
+
+Collections utilisées :
+  - users/ : source fiable pour le rôle et profil
+  - profiles/ : legacy, 12 documents (le double de users qui en a 6)
+
+Fichiers front :
+  - Inscription.tsx : écrit dans USERS et PROFILES (doublon)
+  - Profil.tsx : écrit dans PROFILES et USERS
+  - MesInfos.tsx : écrit dans USERS (phone, telephone, langue)
+  - MesAdresses.tsx : écrit dans USERS (adresses[])
+  - Header.tsx : lit le rôle depuis USERS
+
+Fichiers admin :
+  - DetailClient.tsx : lit d'abord PROFILES, puis fallback USERS
+  - DetailDevis.tsx : lit USERS/{client_id} pour les infos client
+
+Champs dans users/ :
+  uid, email, firstName, lastName, nom, role, phone, telephone, adresse, codePostal, ville, pays, siret, langue, adresses[], createdAt, updatedAt
+
+Champs dans profiles/ :
+  uid, email, nom, displayName, tel, phone, adresse, pays, role, createdAt
+
+Désynchronisations :
+  - profiles/ a des champs DIFFÉRENTS (tel vs telephone, displayName vs firstName+lastName)
+  - L'admin lit d'abord profiles/ (12 docs) qui peut avoir des données OBSOLÈTES
+  - Le front MesInfos écrit dans users/ mais PAS dans profiles/
+  - Résultat : l'admin peut voir des données différentes de ce que le client a mis à jour
+
+Recommandations v33 :
+  - Supprimer la collection profiles/ (ou la marquer deprecated)
+  - L'admin ne doit lire QUE users/
+  - Harmoniser les noms de champs : telephone → phone, prenom → firstName, etc.
+
+
+─── DOMAINE 4 — PARTENAIRES (partners) ───
+Statut : ✅ OK
+
+Collection : partners/
+  4 documents : PB (Pierre Bernard), JM, MC, TD
+  Champs : code, nom, actif, userId, email, tel, taux_commission
+
+Front : lit partners/ avec where('actif', '==', true) pour le popup panier ✅
+Front : EspacePartenaire lit partners/ avec where('userId', '==', uid) ✅
+Front : GestionDevisPartner lit quotes/ avec where('partenaire_code', '==', code) ✅
+Admin : DetailPartenaire lit partners/ par ID ✅
+
+Désynchronisation mineure :
+  - MC (Michel Chen) et TD/JM n'ont pas de userId → ne peuvent pas se connecter à l'espace partenaire
+  - Seul PB a un userId lié
+
+Recommandation v33 :
+  - Relier les userId manquants pour MC, JM, TD
+
+
+─── DOMAINE 5 — PRODUITS (products) ───
+Statut : ✅ OK
+
+Collection : products/ (101 documents)
+
+Front lit : reference, nom_fr, nom_en, nom_zh, prix_public_eur, categorie, gamme, type, images_urls[], actif, description_fr, fiche_pdf_url, video_url
+Admin écrit : numero_interne, nom_fr, nom_chinois/nom_cn, categorie, prix_achat_cny, prix_public_eur, actif
+
+Désynchronisation mineure :
+  - Admin utilise 'nom_chinois' ou 'nom_cn', front utilise 'nom_zh' — à vérifier si c'est le même champ
+  - Admin utilise 'numero_interne', front utilise 'reference' — probablement le même
+
+Recommandation v33 :
+  - Vérifier et harmoniser nom_chinois/nom_cn/nom_zh
+
+
+─── DOMAINE 6 — SAV (collection sav) ───
+Statut : ❌ CASSÉ
+
+Front PopupSAV écrit :
+  numero, userId, email, nom, prenom, telephone, commande_ref, devis_id,
+  type_probleme, description, photos_urls[], statut:'nouveau', messages[], createdAt, updatedAt
+
+Admin SAVDetail lit :
+  numero, client_id, quote_id, produit_ref, description, photos[], statut,
+  piece_affectee, createdAt, updatedAt
+
+Désynchronisations :
+  ❌ photos_urls[] (front) vs photos[] (admin) → l'admin ne voit PAS les photos
+  ❌ userId (front) vs client_id (admin) → l'admin ne peut pas retrouver le client
+  ❌ commande_ref (front) vs quote_id (admin) → liaison cassée
+  ❌ type_probleme (front) vs piece_affectee (admin) → champs différents
+  ⚠️ 0 documents SAV en base → pas encore testé en production
+
+Recommandations v33 :
+  - Harmoniser les noms de champs SAV (front doit écrire ce que l'admin lit)
+  - Ou : l'admin doit s'adapter aux champs écrits par le front
+
+
+─── DOMAINE 7 — COMMISSIONS ───
+Statut : ❌ CASSÉ
+
+Admin :
+  - Utilise collection séparée 'commissions/' (0 documents actuellement)
+  - Champs : numero, partenaire_id, partenaire_code, partenaire_nom, quote_id, client_nom, total_commission, statut, lignes[], createdAt
+  - Dashboard lit commissions/ et notes_commission/ avec statut='due'
+
+Front (MesCommissionsPartner.tsx) :
+  - NE LIT PAS la collection 'commissions/'
+  - Calcule les commissions à la volée depuis quotes/ (5% × total_ht)
+  - Lit le champ note_commission_url dans quotes/ pour le PDF
+  - Lit commission_payee (type assertion) dans quotes/
+
+Désynchronisations :
+  ❌ L'admin crée des commissions dans commissions/, le partenaire ne les voit jamais
+  ❌ Le partenaire calcule 5% à la volée, l'admin peut avoir un taux différent (taux_commission dans partners/)
+  ❌ Aucun lien entre les deux systèmes
+
+Recommandations v33 :
+  - Le front partenaire doit lire depuis commissions/ (comme l'admin)
+  - OU l'admin doit écrire note_commission_url et commission_payee dans quotes/
+  - Harmoniser le taux (5% fixe ou dynamique depuis partners/)
+
+
+─── DOMAINE 8 — CONTENEURS / EXPÉDITION ───
+Statut : ⚠️ PARTIEL
+
+Admin :
+  - Utilise collection 'containers/' (avec un 's')
+  - NouveauConteneur écrit : numero, type, destination, statut, date_depart, lignes[], etc.
+  - 0 conteneurs en base actuellement
+
+Front (SuiviAchats.tsx) :
+  - Lit le champ 'conteneur_id' dans quotes/
+  - Filtre les devis qui ont un conteneur_id
+  - Lit 'statut_commande' dans quotes/
+
+Désynchronisation :
+  ⚠️ L'admin crée des conteneurs dans containers/ mais ne lie PAS les devis
+  ⚠️ Le front lit conteneur_id dans quotes/ — ce champ n'est jamais écrit par l'admin
+  ⚠️ Le front lit statut_commande dans quotes/ — ce champ n'est jamais écrit par l'admin
+  → SuiviAchats sera toujours vide même avec des conteneurs créés
+
+Recommandations v33 :
+  - L'admin doit écrire conteneur_id et statut_commande dans les quotes/ concernées quand il ajoute un devis à un conteneur
+  - Ou : le front doit lire directement depuis containers/ en faisant la jointure
+
+
+─── DOMAINE 9 — FACTURES ET DOCUMENTS PDF ───
+Statut : ⚠️ PARTIEL
+
+Génération PDF :
+  - src/lib/pdf-generator.ts : génère devis et facture acompte via jsPDF
+  - Le PDF est généré côté client (dans le navigateur), pas uploadé sur Storage
+  - Pas de facture finale, facture logistique, ou bon de livraison générés
+
+Front lit dans quotes/ :
+  - devis_url → jamais écrit (PDF généré à la volée)
+  - facture_acompte_url → jamais écrit
+  - facture_finale_url → jamais écrit
+  - facture_logistique_url → jamais écrit
+  - bon_livraison_url → jamais écrit
+
+Désynchronisations :
+  ⚠️ Le front MesCommandes affiche 5 documents mais AUCUN n'a d'URL stockée
+  ⚠️ Les documents sont toujours "grisés" / "En attente" car aucune URL n'existe
+  ⚠️ Le PDF est généré à la volée sans être persisté dans Storage
+
+Recommandations v33 :
+  - Générer les PDF et les uploader dans Firebase Storage
+  - Écrire les URLs dans quotes/ (devis_url, facture_acompte_url, etc.)
+  - Ou : accepter la génération à la volée (mais les documents grisés resteront)
+
+
+─── DOMAINE 10 — ADRESSES ET PROFIL CLIENT ───
+Statut : ✅ OK
+
+Front MesAdresses.tsx :
+  - Lit/écrit users/{uid}.adresses[] ✅
+  - Format : [{label, prenom, nom, adresse, code_postal, ville, pays, telephone, par_defaut}]
+
+Front MesInfos.tsx :
+  - Lit/écrit users/{uid} : phone, telephone, langue ✅
+
+Admin DetailClient.tsx :
+  - Lit users/ (avec fallback profiles/) ⚠️ voir Domaine 3
+
+
+─── DOMAINE 11 — PARAMÈTRES ADMIN (admin_params) ───
+Statut : ✅ OK
+
+Documents : 3 (emetteur + probablement pricing + autre)
+
+Front lit admin_params/emetteur : pour générer les PDF ✅
+Admin lit admin_params/emetteur : pour les PDF ✅
+
+PopupAcompte : les RIB sont EN DUR dans le code (N26 et Banking Circle)
+  → TODO : idéalement lire depuis admin_params/rib
+
+Recommandation v33 :
+  - Stocker les RIB dans admin_params/rib et les lire dynamiquement
+
+
+─── DOMAINE 12 — RÔLES ET PERMISSIONS ───
+Statut : ⚠️ PARTIEL
+
+Source du rôle : users/{uid}.role
+Valeurs : 'user', 'partner', 'vip', 'admin', undefined
+
+Fichiers qui lisent le rôle :
+  ✅ Header.tsx : users/ → redirige client/partner
+  ✅ EspaceClient.tsx : users/ → redirige partner vers /espace-partenaire
+  ✅ EspacePartenaire.tsx : users/ → charge code partenaire
+  ⚠️ AdminLogin : vérifie role='admin' — OK
+  ⚠️ parisb2b@gmail.com a role=undefined → peut poser problème
+
+Désynchronisation :
+  ⚠️ profiles/ peut avoir un rôle différent de users/ (voir Domaine 3)
+  ⚠️ Un utilisateur avec role=undefined est traité comme 'user' partout
+
+Recommandation v33 :
+  - S'assurer que parisb2b@gmail.com a un rôle défini
+  - Ne lire le rôle QUE depuis users/
+
+
+═══ RECOMMANDATIONS POUR LE PROCHAIN PROMPT (v33) ═══
+
+PRIORITÉ 1 — CRITIQUE (bloque le workflow) :
+
+  1. FIX ACOMPTES : L'admin doit modifier le statut de l'acompte existant à 'encaisse'
+     au lieu d'ajouter un nouvel objet. Modifier DetailDevis.tsx handleEncaisser :
+     - Lister les acomptes 'declare' du client
+     - Permettre de sélectionner lequel encaisser
+     - Changer son statut à 'encaisse' + ajouter ref_fa
+     - Recalculer total_encaisse = somme des acomptes 'encaisse'
+
+  2. FIX SAV CHAMPS : Harmoniser les noms de champs entre front et admin :
+     - photos_urls → photos_urls (adapter l'admin)
+     - userId → userId (adapter l'admin)
+     - commande_ref → commande_ref (adapter l'admin)
+     - type_probleme → type_probleme (adapter l'admin)
+
+  3. FIX COMMISSIONS : Le front partenaire doit lire depuis commissions/
+     au lieu de calculer à la volée depuis quotes/
+
+PRIORITÉ 2 — IMPORTANT (améliore la cohérence) :
+
+  4. SUPPRIMER profiles/ : Migrer tout vers users/, supprimer les lectures de profiles/
+     dans DetailClient.tsx, Profil.tsx, Inscription.tsx
+
+  5. CONTENEURS → QUOTES : Quand l'admin ajoute un devis à un conteneur,
+     écrire conteneur_id et statut_commande dans quotes/{devisId}
+
+  6. FACTURES PDF : Soit persister les PDF dans Storage et écrire les URLs,
+     soit accepter la génération à la volée et adapter le front
+
+  7. HARMONISER noms de champs produits : nom_chinois/nom_cn → nom_zh
+
+PRIORITÉ 3 — OPTIMISATION :
+
+  8. RIB DYNAMIQUES : Lire les RIB depuis admin_params/ au lieu de valeurs en dur
+  9. RÔLE parisb2b : Définir le rôle (admin ?)
+  10. PARTENAIRES sans userId : Relier MC, JM, TD à leurs comptes utilisateurs
+
+
+═══ MATRICE DES LIAISONS ═══
+
+Domaine       | Front écrit | Admin lit | Admin écrit | Front lit | Statut
+──────────────|─────────────|───────────|─────────────|───────────|────────
+Devis         | quotes/     | quotes/   | quotes/     | quotes/   | ⚠️ PARTIEL
+Acomptes      | quotes/.acomptes[]{statut:'declare'} | quotes/.acomptes[] | quotes/.acomptes[]{SANS statut} | filtre statut='encaisse' | ❌ CASSÉ
+Clients       | users/+profiles/ | profiles/→users/ | — | users/ | ⚠️ PARTIEL
+Partenaires   | partners/   | partners/ | partners/   | partners/ | ✅ OK
+Produits      | —           | products/ | products/   | products/ | ✅ OK
+SAV           | sav/{photos_urls,userId} | sav/{photos,client_id} | sav/ | sav/ | ❌ CASSÉ
+Commissions   | calcul depuis quotes/ | commissions/ | commissions/ | — | ❌ CASSÉ
+Conteneurs    | lit conteneur_id dans quotes/ | containers/ | containers/ | quotes/.conteneur_id (jamais écrit) | ⚠️ PARTIEL
+Factures PDF  | lit *_url dans quotes/ | génère à la volée | — | quotes/*_url (jamais écrit) | ⚠️ PARTIEL
+Adresses      | users/.adresses[] | users/ | — | users/.adresses[] | ✅ OK
+Paramètres    | admin_params/ | admin_params/ | admin_params/ | admin_params/ | ✅ OK
+Rôles         | users/.role | users/.role | — | users/.role | ⚠️ PARTIEL
+
+
+═══ FIN DE L'AUDIT ═══

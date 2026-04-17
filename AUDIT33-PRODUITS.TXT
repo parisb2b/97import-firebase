@@ -1,0 +1,225 @@
+╔═══════════════════════════════════════════════════════╗
+║  AUDIT33 — ÉTAT DES PRODUITS FIRESTORE                ║
+║  Date : 2026-04-16                                    ║
+║  Branche : v2 (lecture seule)                         ║
+╚═══════════════════════════════════════════════════════╝
+
+═══ RÉSUMÉ EXÉCUTIF ═══
+
+Total produits Firestore : 101
+Répartition par catégorie :
+  - Mini-Pelle : 44 (machines + accessoires)
+  - Maisons : 25 (standard + premium + options chambres)
+  - Solaire : 18 (kits + composants + options)
+  - Agricole : 1 (motoculteur uniquement)
+  - Divers : 4 (camping-car, groupe électrogène, clim, meuble)
+  - Logistique : 9 (fret, dédouanement, services)
+
+Produits attendus par les maquettes : ~31 refs principales
+  ✅ Présents (sous numero_interne) : ~25
+  ⚠️ Présents mais incomplets (prix, images) : ~20
+  ❌ Réellement manquants (à créer) : ~6 (Agricole + Divers)
+
+⚠️ PROBLÈME CRITIQUE : Le champ 'reference' n'existe que sur 5 produits (5%).
+   97 produits utilisent 'numero_interne'. Le front Catalogue doit chercher
+   via 'numero_interne' et non 'reference'.
+
+Médias :
+  - image_principale_url : 0/101 (0%) — champ jamais utilisé
+  - images_urls[] : 37/101 (37%)
+  - Produits sans aucune image : 64 (63%)
+  - Vidéos référencées : 1/101
+  - Fiches PDF : 0/101
+
+Structure variantes/options :
+  - Champ 'gamme' : 98/101 (97%) ✅
+  - Champ 'variante_attributs' : 0/101
+  - Champ 'options_disponibles' : 0/101
+  - Gammes détectées : R18 PRO, R22 PRO, R32 PRO, R57 PRO, Standard, Premium,
+    Camping Car, Kit 10kW, Kit 12kW, Kit 20kW, Composants, etc.
+
+Produits inactifs : 5
+Doublons de référence : 0 (mais MS-20-001 apparaît 2x avec des données différentes)
+
+
+═══ DÉTAIL PAR CATÉGORIE ═══
+
+─── MINI-PELLE (44 produits) ───
+
+Machines principales (16 produits, 4 gammes × 4 variantes) :
+  ✅ MP-R18-001 | Mini-pelle R18 PRO (caoutchouc) | Sur devis | 5 img
+  ✅ MP-R18-002 | Mini-pelle R18 PRO (métal)       | Sur devis | 0 img
+  ✅ MP-R18-003 | Mini-pelle R18 PRO (double)       | Sur devis | 0 img
+  ❌ MP-R18-004 | Mini-pelle R18 PRO — Avec cabine  | Sur devis | 0 img (inactif)
+  ✅ MP-R22-001 | Mini-pelle R22 PRO (caoutchouc) | Sur devis | 6 img
+  ✅ MP-R22-002 | Mini-pelle R22 PRO (métal)       | Sur devis | 0 img
+  ✅ MP-R22-003 | Mini-pelle R22 PRO (double)       | Sur devis | 0 img
+  ❌ MP-R22-004 | Mini-pelle R22 PRO — Avec cabine  | Sur devis | 0 img (inactif)
+  ✅ MP-R32-001 | Mini-pelle R32 PRO (caoutchouc) | Sur devis | 5 img
+  ✅ MP-R32-002 | Mini-pelle R32 PRO (métal)       | Sur devis | 0 img
+  ✅ MP-R32-003 | Mini-pelle R32 PRO (double)       | Sur devis | 0 img
+  ❌ MP-R32-004 | Mini-pelle R32 PRO — Avec cabine  | Sur devis | 0 img (inactif)
+  ✅ MP-R57-001 | Mini-pelle R57 PRO (caoutchouc) | Sur devis | 1 img
+  ✅ MP-R57-002 | Mini-pelle R57 PRO (métal)       | Sur devis | 0 img
+  ✅ MP-R57-003 | Mini-pelle R57 PRO (double)       | Sur devis | 0 img
+  ❌ MP-R57-004 | Mini-pelle R57 PRO — Avec cabine  | Sur devis | 0 img (inactif)
+
+Note : Les 4 variantes "Avec cabine" sont inactives (actif=false).
+
+Accessoires (26 produits) :
+  Godets curage R22 : ACC-GC-001 (30cm), ACC-GC-002 (60cm), ACC-GC-003 (80cm)
+  Godets curage R32 : ACC-GC-004 (60cm), ACC-GC-005 (80cm)
+  Godets à dents R22 : ACC-GD-001→005 (20cm à 80cm)
+  Godets à dents R32 : ACC-GD-006→008 (30cm à 80cm)
+  Godets à dents R57 : ACC-GD-009→011 (60cm à 100cm)
+  Godets inclinables R22 : ACC-GI-001 (60cm), ACC-GI-002 (80cm)
+  Grappins : ACC-GP-001 (R22), ACC-GP-002 (R32), ACC-GP-003 (R57)
+  Marteaux hydrauliques : ACC-MH-001 (R22), ACC-MH-002 (R32), ACC-MH-003 (R57)
+  Tarières : ACC-TA-001 (R22), ACC-TA-002 (R32)
+  + 1 produit test (ACC-GD-R22-20 avec prix 588€ et 3 img)
+
+⚠️ Prix : AUCUNE machine n'a de prix_public_eur. Tous "Sur devis".
+⚠️ Images : 12 accessoires et 9 machines sans image.
+⚠️ Manque : Tarière R57, Godets inclinables R32/R57.
+
+─── MAISONS (25 produits) ───
+
+Gamme Standard (4 tailles × (1 base + 3 options chambres)) :
+  ✅ MS-20-001 | Maison Standard 20 Pieds | Sur devis | 2 img
+  ✅ MS-20-001 | Maison Modulaire Standard 20 pieds | 14840 € | 7 img (DOUBLON avec prix !)
+  ✅ MS-30-001 | Maison Standard 30 Pieds | Sur devis | 2 img
+  ✅ MS-40-001 | Maison Standard 40 Pieds | Sur devis | 3 img
+  + 9 options chambres (MS-20-OPT-1CH/2CH/3CH, MS-30-OPT-*, MS-40-OPT-*)
+
+Gamme Premium (3 tailles × (1 base + 3 options chambres)) :
+  ✅ MP-20-001 | Maison Premium 20 Pieds | Sur devis | 2 img
+  ✅ MP-30-001 | Maison Premium 30 Pieds | Sur devis | 1 img
+  ✅ MP-40-001 | Maison Premium 40 Pieds | Sur devis | 1 img
+  + 9 options chambres
+
+⚠️ Attention : Les refs MP-20-001, MP-30-001, MP-40-001 existent MAIS sont dans la catégorie
+   Maisons, pas Mini-Pelle. La maquette les attendait comme maisons premium → OK.
+⚠️ Prix : Seul MS-20-001 (doublon) a un prix (14840€). Tous les autres "Sur devis".
+⚠️ Camping-car : CC-20-001, CC-30-001, CC-40-001 MANQUANTS (seul CC-BYD-001 existe dans Divers).
+
+─── SOLAIRE (18 produits) ───
+
+Kits complets :
+  ✅ KS-10K-001 | Kit Solaire 10 kW | Sur devis | 3 img
+  ✅ KS-12K-001 | Kit Solaire 12 kW | Sur devis | 2 img
+  ✅ KS-20K-001 | Kit Solaire 20 kW | Sur devis | 1 img
+  ✅ SOL-5KW-001 | Kit Solaire 5kW | 6140 € | 0 img
+  ✅ SOL-10K-001 | Kit Solaire Complet 10kW | 10740 € | 8 img
+
+Composants (onduleurs, batteries, panneaux, câblage) : 9 produits
+Options (pose sol, panneaux grand format) : 3 produits
+
+⚠️ Doublon conceptuel : KS-10K-001 ET SOL-10K-001 sont tous deux des kits 10kW.
+⚠️ Les refs maquette (SOL-K10-001, etc.) ne matchent PAS les refs Firestore (KS-10K-001).
+   Mapping nécessaire : SOL-K10-001 → KS-10K-001, SOL-K5-001 → SOL-5KW-001
+
+─── AGRICOLE (1 seul produit !) ───
+
+  ✅ MA-MOT-001 | Motoculteur 12CV | 2174 € | 0 img
+
+❌ TRÈS INCOMPLET. Maquette attend 8 produits :
+  AGR-MC-7CV, AGR-MC-12CV, AGR-TR-25CV, AGR-TR-45CV, AGR-TR-65CV,
+  AGR-REM-1T, AGR-CHR-2S, AGR-ROG-001
+  → 7 produits à créer
+
+─── DIVERS (4 produits) ───
+
+  ✅ CC-BYD-001 | Camping Car Deluxe Hybride BYD | Sur devis | 7 img
+  ✅ DIV-GEN-001 | Groupe électrogène 5kVA | 3068 € | 0 img
+  ✅ DVS-CLIM-001 | Climatisation — Maison modulaire | Sur devis | 0 img
+  ✅ DVS-MEUB-001 | Pack Meuble sur mesure | Sur devis | 0 img
+
+⚠️ Refs maquette ne matchent pas :
+  DIV-GE-5KVA → DIV-GEN-001 (existe)
+  DIV-GE-10KVA → MANQUANT
+  DIV-CLIM-9K, DIV-CLIM-12K → DVS-CLIM-001 existe (pas de variante BTU)
+  DIV-CC-20 → CC-BYD-001 existe (pas la même ref)
+
+─── LOGISTIQUE (9 produits — pas dans les maquettes front) ───
+
+  Fret maritime : 3 destinations (MQ, GP, FR)
+  Dédouanement : 3 destinations
+  Services : 1
+  → Utilisés en interne pour les devis, pas affichés au front.
+
+
+═══ PROBLÈMES DE STRUCTURE ═══
+
+Champs non harmonisés détectés :
+  - numero_interne (97%) vs reference (5%) → UNIFIER vers reference
+  - nom_chinois (46%) vs nom_zh (8%) → UNIFIER vers nom_zh
+  - prix_public (8%) vs prix_public_eur (8%) → UNIFIER vers prix_public_eur
+  - prix_achat (8%) vs prix_achat_eur (8%) vs prix_achat_cny (9%) → garder les deux
+  - image_principale_url (0%) — jamais utilisé, le front lit images_urls[0]
+  - nom (92%) vs nom_fr (100%) → nom est un doublon, garder nom_fr
+
+Champs requis rarement remplis :
+  - prix_public_eur : 8/101 (8%) → la majorité "Sur devis"
+  - description_fr : 13/101 (13%)
+  - nom_en : 17/101 (17%)
+  - nom_zh (ou nom_chinois) : ~50/101 (50% combiné)
+
+Produits sans catégorie : 0 ✅
+Produits inactifs : 5 (les 4 "Avec cabine" + 1 logistique)
+Doublons : MS-20-001 existe 2 fois avec des données différentes
+
+
+═══ PLAN POUR PROMPT v34 (SEED) ═══
+
+PRIORITÉ 1 — Créer les produits manquants :
+  Agricole : AGR-MC-7CV, AGR-TR-25CV, AGR-TR-45CV, AGR-TR-65CV,
+             AGR-REM-1T, AGR-CHR-2S, AGR-ROG-001 (7 produits)
+  Divers : DIV-GE-10KVA (groupe 10kVA), DIV-CLIM-9K, DIV-CLIM-12K (3 produits)
+  Maisons : CC-20-001, CC-30-001, CC-40-001 (camping-car, 3 produits)
+  Total à créer : ~13 produits
+
+PRIORITÉ 2 — Renommer/harmoniser les champs (batch update) :
+  - numero_interne → copier vers 'reference' pour les 97 produits sans
+  - nom_chinois → copier vers 'nom_zh'
+  - Fusionner le doublon MS-20-001
+
+PRIORITÉ 3 — Compléter les prix (batch update) :
+  - 93 produits sans prix_public_eur
+  - Au minimum remplir pour les machines principales (R18/R22/R32/R57)
+  - Et les maisons (Standard/Premium)
+  - Question pour Michel : prix réels ou placeholders ?
+
+PRIORITÉ 4 — Médias :
+  - 64 produits sans image (63%)
+  - Les variantes 002/003 des mini-pelles n'ont pas d'image → réutiliser celles du 001
+  - Les accessoires R32/R57 n'ont pas d'image → réutiliser celles du R22
+  - Les options chambres maisons n'ont pas d'image → normal (options)
+
+PRIORITÉ 5 — Structure variantes/options :
+  - Ajouter variante_attributs sur les machines (ex: {Chenilles: "Caoutchouc"})
+  - Ajouter est_variante_principale=true sur les 001
+  - Ajouter options_disponibles pour les machines (cabine, chenilles, etc.)
+
+
+═══ QUESTIONS POUR MICHEL ═══
+
+1. PRIX : Faut-il créer les produits manquants avec prix placeholder (0 € "Sur devis")
+   ou attendre les prix réels ? Notamment pour les tracteurs agricoles.
+
+2. ACCESSOIRES : La maquette montre des accessoires R22. Les équivalents R32/R57
+   existent déjà. Faut-il aussi créer des accessoires R18 manquants (tarière, etc.) ?
+
+3. OPTIONS CABINE : Les 4 variantes "Avec cabine" sont inactives.
+   Les activer ou les garder cachées ?
+
+4. CAMPING-CAR : CC-BYD-001 existe dans Divers. Faut-il le déplacer dans Maisons
+   et créer CC-20/30/40 comme variantes de taille ?
+
+5. DOUBLON MS-20-001 : Deux fiches existent. Laquelle garder ?
+   Celle avec prix (14840€) ou celle sans prix mais avec plus de champs ?
+
+6. REFS MAQUETTE vs FIRESTORE : Les refs maquette (SOL-K10-001) ne correspondent pas
+   aux refs Firestore (KS-10K-001). Doit-on renommer les produits ou adapter les maquettes ?
+
+
+═══ FIN DE L'AUDIT ═══

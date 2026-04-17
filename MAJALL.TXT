@@ -1,3 +1,51 @@
+[2026-04-17 12:16] v35a-fix — Bouton "Verser un acompte" omniprésent (tous onglets client)
+======================================================================================
+PROBLÈME : Client ne peut pas déclarer un acompte depuis l'onglet "Mes devis"
+SOLUTION : Ajout bouton + logique métier unifiée dans les 4 onglets client
+
+MODIFICATIONS :
+  - src/lib/devisHelpers.ts (NEW) : 3 fonctions partagées
+    • peutVerserAcompte(devis) : règles métier (non annulé, non soldé, solde > 0, < 3 acomptes)
+    • montantAcompteParDefaut(devis) : min(500€, solde restant)
+    • referenceAcompte(devis) : format DVS-YYMMNNN / Prénom Nom
+
+  - src/front/pages/espace-client/MesDevis.tsx : bouton ajouté
+    • Import PopupAcompte + peutVerserAcompte
+    • State popupDevis
+    • Bouton "💶 Verser un acompte" dans section dépliée (si peutVerserAcompte)
+    • Fonction loadDevis pour reload après ajout
+
+  - src/front/pages/espace-client/MesCommandes.tsx : bouton harmonisé
+    • Import peutVerserAcompte
+    • Bouton existant wrappé dans condition peutVerserAcompte
+
+  - src/front/pages/espace-client/MesVirements.tsx : bouton harmonisé
+    • Import peutVerserAcompte
+    • Bouton "+ Verser un autre acompte" wrappé dans condition peutVerserAcompte
+
+  - src/front/pages/espace-client/MesFactures.tsx : bouton ajouté
+    • Import PopupAcompte + peutVerserAcompte
+    • Interface Devis ajoutée
+    • FactureRow enrichi avec objet devis complet
+    • State popupDevis
+    • Bouton "💶 Verser un acompte" dans section dépliée
+    • Fonction loadFactures pour reload
+    • Prop profile ajoutée
+
+  - src/front/pages/espace-client/PopupAcompte.tsx : montant dynamique
+    • Import montantAcompteParDefaut + useEffect
+    • Fetch devis on mount pour calculer montant adapté (500€ ou solde restant si < 500€)
+
+COMMITS :
+  da225b9 - v35a-fix-A: helper peutVerserAcompte partagé
+  497ed8c - v35a-fix-C: bouton 'Verser un acompte' dans Mes devis
+  a6da2ef - v35a-fix-D: harmonisation bouton acompte dans Mes commandes
+  8a3b07a - v35a-fix-E: bouton acompte dans Mes virements
+  524fa2a - v35a-fix-F: bouton acompte dans Mes factures
+  3dbf757 - v35a-fix-G: PopupAcompte utilise montant par défaut calculé
+
+Build : ✅ SUCCÈS (0 erreurs TypeScript)
+
 [2026-04-17 12:00] v35a — Socle Firestore + Fix bug P1 acomptes + Upload PDF Storage
   - FIX BUG CRITIQUE : handleEncaisser MODIFIE l'acompte (statut→encaisse) au lieu d'ajouter
   - Modal admin : sélection de l'acompte déclaré à encaisser

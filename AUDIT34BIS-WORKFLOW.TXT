@@ -1,0 +1,275 @@
+╔═══════════════════════════════════════════════════════╗
+║  AUDIT34BIS — WORKFLOW DEVIS → COMMANDE               ║
+║  Date : 2026-04-17                                    ║
+║  Objectif : préparer le prompt v35                    ║
+╚═══════════════════════════════════════════════════════╝
+
+═══ RÉSUMÉ EXÉCUTIF ═══
+
+ÉTAT GÉNÉRAL :
+  ✅ Fonctionnel : 3 domaines (numérotation, VIP partenaire, PDF generator)
+  ⚠️  Partiel : 3 domaines (PDF upload, commissions, listes d'achat)
+  ❌ Absent : 2 domaines (système mail, workflow acomptes admin→front)
+
+DOMAINES AUDITÉS :
+  1. ❌ Système mail — ABSENT (aucun service mail installé)
+  2. ⚠️  Génération PDF — 6 fonctions existent, AUCUN upload Storage
+  3. ✅ Numérotation unique — fonctionne (1 compteur actif DVS_2604)
+  4. ❌ Workflow acomptes — BUG CONFIRMÉ (admin ne met jamais statut='encaisse')
+  5. ⚠️  Liste d'achat — pages admin existent, 2 collections différentes
+  6. ✅ Parcours VIP partenaire — fonctionne
+  7. ⚠️  Commissions — 0 documents, front et admin désynchronisés
+  8. ❌ Destinataires email — aucun système mail en place
+
+
+═══ DÉTAIL PAR DOMAINE ═══
+
+─── A. SYSTÈME MAIL ───
+Statut : ❌ ABSENT
+
+Service détecté : AUCUN
+  - Pas de resend, nodemailer, sendgrid dans le code ni dans package.json
+  - Pas de dossier functions/ ou api/
+  - Pas de Firebase Cloud Functions
+  - Pas de route API Vercel (vercel.json = simple rewrite SPA)
+  - Pas de clé API email dans .env, .env.local ou .env.production
+
+Fichiers concernés : AUCUN
+Endpoint API : ABSENT
+Templates existants : AUCUN
+
+Email admin trouvé : parisb2b@gmail.com (dans GestionSite.tsx et Footer.tsx — en dur)
+Email from : notifications@97import.com (mentionné par Michel mais non configuré)
+
+CE QU'IL FAUT CRÉER EN v35 :
+  1. Installer Resend (npm install resend)
+  2. Créer une route API Vercel (/api/send-email.ts)
+  3. Configurer RESEND_API_KEY dans .env.production et Vercel
+  4. Créer les templates email (HTML inline ou React Email)
+  5. Appeler l'API depuis le front à chaque événement
+
+
+─── B. GÉNÉRATION PDF ───
+Statut : ⚠️  PARTIEL (génération OK, upload/persistance ABSENT)
+
+Fichier principal : src/lib/pdf-generator.ts (927 lignes)
+
+Fonctions exportées :
+  ✅ generateDevis(quote, emetteur?) → jsPDF             (ligne 506)
+  ✅ generateFactureAcompte(quote, acompte, emetteur?)    (ligne 544)
+  ✅ generateFactureFinale(quote, numero, emetteur?)       (ligne 592)
+  ✅ generateNoteCommission(note, emetteur?)               (ligne 620)
+  ✅ generateFactureLogistique(container, frais, emetteur?) (ligne 803)
+  ✅ downloadPDF(doc, filename)                            (ligne 917)
+
+Types de documents gérés :
+  DVS (devis)              : ✅ generateDevis — utilisé dans DetailDevis + MesDevis + MesCommandes
+  FA (facture acompte)     : ✅ generateFactureAcompte — utilisé dans l'ancien EspaceClient
+  FF (facture finale)      : ✅ generateFactureFinale — existe mais jamais appelé
+  FL (facture logistique)  : ✅ generateFactureLogistique — existe mais jamais appelé
+  BL (bon de livraison)    : ❌ pas de fonction generateBL
+  NC (note commission)     : ✅ generateNoteCommission — utilisé dans NotesCommission.tsx admin
+  LA (liste d'achat)       : ❌ pas de fonction generateListeAchat
+
+Upload Storage : ❌ ABSENT pour les PDF
+  - Seul PopupSAV.tsx upload dans Storage (photos SAV)
+  - Aucun PDF n'est jamais uploadé dans Storage
+  - Les PDF sont générés à la volée côté navigateur avec downloadPDF()
+
+URLs écrites dans quotes/ : ❌ JAMAIS
+  - Le front LIT devis_url, facture_acompte_url, etc. mais ces champs sont toujours vides
+  - Résultat : les 5 documents dans MesCommandes sont toujours grisés "En attente"
+
+
+─── C. NUMÉROTATION ───
+Statut : ✅ FONCTIONNEL
+
+Fonction : getNextNumber(prefix) dans src/lib/counters.ts
+Mécanisme : Transaction atomique sur collection counters/
+Format : {PREFIX}-{AAMM}{NNN} (ex: DVS-2604008)
+Reset mensuel : ✅ Automatique (le compteur ID inclut AAMM)
+
+Collection counters Firestore : 1 document actif
+  DVS_2604 : { valeur: 11 }
+
+Préfixes supportés (commentaire) : DVS | FA | F | NC | CONT | SAV | LA | STK
+Préfixes réellement utilisés dans le code :
+  - DVS : DetailDevis (admin) + Panier (front)
+  - FA : DetailDevis handleEncaisser (admin)
+  - CONT : NouveauConteneur (admin)
+  - SAV : PopupSAV (front)
+
+
+─── D. WORKFLOW ACOMPTES ───
+Statut : ❌ CASSÉ — BUG CONFIRMÉ
+
+Fichier PopupAcompte : src/front/pages/espace-client/PopupAcompte.tsx
+2 RIB (perso/pro) : ✅
+  - Perso : N26 Bank GmbH — DE93 1001 1001 2625 2584 23 / NTSBDEB1XXX
+  - Pro : Banking Circle S.A. — DE76 2022 0800 0059 5688 30 / SXPYDEHH
+
+CE QUE LE FRONT ÉCRIT (PopupAcompte) :
+  acomptes[]: arrayAppend({
+    montant: number,
+    date: ISO string,
+    type_compte: 'perso' | 'pro',
+    statut: 'declare',        ← LE FRONT MET 'declare'
+    iban_utilise: string,
+  })
+
+Fichier admin : src/admin/pages/DetailDevis.tsx
+Fonction handleEncaisser : ✅ existe (ligne 241)
+
+CE QUE LA FONCTION FAIT ACTUELLEMENT (BUG) :
+  1. Génère un numéro FA via getNextNumber('FA')
+  2. Crée un NOUVEL objet : { date, montant, ref_fa }  ← PAS DE CHAMP statut !
+  3. L'ajoute via arrayUnion dans acomptes[]
+  4. Incrémente total_encaisse et décrémente solde_restant
+
+  → L'admin AJOUTE un nouvel acompte SANS statut au lieu de MODIFIER
+    le statut de l'acompte 'declare' existant vers 'encaisse'
+
+FILTRE Mes commandes côté client :
+  Fichier : src/front/pages/espace-client/MesCommandes.tsx (ligne ~63)
+  Code exact : d.acomptes?.some(a => a.statut === 'encaisse')
+  → Puisque AUCUN acompte n'a jamais statut='encaisse', "Mes commandes" est TOUJOURS VIDE
+
+PREUVE dans les données réelles (11 devis) :
+  - 11 devis avec 15 acomptes au total
+  - 0 acompte avec statut='encaisse'
+  - 15 acomptes avec statut='declare'
+  - 0 acompte sans statut (le bug admin ne s'est jamais produit car le bouton
+    "Encaisser" n'a jamais été cliqué — les devis sont tous en statut='nouveau')
+
+
+─── E. LISTE D'ACHAT ───
+Statut : ⚠️  PARTIEL
+
+Pages admin :
+  ✅ src/admin/pages/ListesAchat.tsx — lit collection 'listes_achat'
+  ✅ src/admin/pages/DetailAchat.tsx — lit collection 'purchase_lists'
+  → INCOHÉRENCE : 2 collections différentes selon la page !
+
+Collections Firestore : probablement 0 documents dans les deux
+Génération : manuelle (pas de génération automatique depuis les devis)
+
+
+─── F. PARCOURS VIP PARTENAIRE ───
+Statut : ✅ FONCTIONNEL
+
+Fichier : src/front/pages/espace-partenaire/GestionDevisPartner.tsx
+Bouton "Envoyer devis VIP" : ✅
+
+Ce que la fonction écrit dans Firestore :
+  - is_vip: true
+  - prix_negocies: [{ref, prix_negocie}]
+  - statut: 'vip_envoye'
+  - updatedAt: new Date()
+
+L'admin voit les devis VIP :
+  - Dashboard.tsx filtre is_vip ou statut='vip_envoye' ✅
+  - ListeDevis.tsx affiche un badge violet "VIP" ✅
+
+Preuve : DVS-2604011 a statut='vip_envoye' ✅
+
+
+─── G. COMMISSIONS ───
+Statut : ⚠️  PARTIEL (désynchronisé)
+
+Calcul côté front partenaire :
+  ✅ MesCommissionsPartner.tsx
+  Formule : 5% fixe (COMMISSION_RATE = 0.05)
+  Source : calcule depuis quotes/ (total_ht × 0.05)
+
+Écriture côté admin :
+  ⚠️ Collection 'commissions/' existe dans le code (Dashboard, DetailPartenaire, Factures, NotesCommission)
+  ❌ 0 documents dans Firestore → jamais utilisé en pratique
+
+Admin page NotesCommission.tsx :
+  ✅ Crée des notes de commission avec generateNoteCommission() PDF
+  Mais : lit depuis commissions/ qui est vide
+
+Synchro front/admin : ❌ ABSENT
+  Le front calcule depuis quotes/, l'admin attend des docs dans commissions/
+
+
+─── H. EMAILS CONFIGURÉS ───
+Statut : ❌ ABSENT
+
+Email admin destinataire : parisb2b@gmail.com (en dur dans GestionSite.tsx)
+Email from : NON CONFIGURÉ (aucun service mail)
+DNS : notifications@97import.com mentionné par Michel → à configurer avec Resend + IONOS
+
+
+═══ PLAN D'ACTION POUR v35 ═══
+
+PRIORITÉ 1 — Ce qui BLOQUE le workflow (à fixer absolument) :
+
+  1. FIX handleEncaisser dans DetailDevis.tsx :
+     - Au lieu d'ajouter un nouvel objet, MODIFIER le statut de l'acompte 'declare' existant
+     - Flow : admin sélectionne un acompte 'declare' → change son statut à 'encaisse' + ajoute ref_fa
+     - Recalculer total_encaisse = somme des montants avec statut='encaisse'
+     → Fichier : src/admin/pages/DetailDevis.tsx (handleEncaisser, ligne 241)
+
+  2. FIX statut devis : Quand le premier acompte est encaissé,
+     changer le statut du devis de 'nouveau' à 'accepte' (ou au moins != 'nouveau')
+     → Même fichier
+
+PRIORITÉ 2 — Ce qui est absent mais nécessaire au workflow :
+
+  3. UPLOAD PDF dans Storage + écriture URLs dans quotes/ :
+     - Quand l'admin génère un PDF (devis, FA), l'uploader dans Storage
+     - Écrire l'URL dans le champ correspondant du devis (devis_url, facture_acompte_url)
+     → Fichier : src/admin/pages/DetailDevis.tsx
+
+  4. FIX listes d'achat : unifier ListesAchat (listes_achat) et DetailAchat (purchase_lists)
+     → Fichiers : src/admin/pages/ListesAchat.tsx, DetailAchat.tsx
+
+PRIORITÉ 3 — Système mail (optionnel pour v35, peut être v36) :
+
+  5. Installer Resend : npm install resend
+  6. Créer api/send-email.ts (route Vercel serverless)
+  7. Configurer .env avec RESEND_API_KEY
+  8. Créer les templates :
+     - Nouveau devis (→ admin)
+     - Acompte déclaré (→ admin)
+     - Acompte encaissé (→ client)
+     - Devis VIP envoyé (→ client)
+  9. Appeler l'API depuis les actions correspondantes
+
+FICHIERS À MODIFIER :
+  src/admin/pages/DetailDevis.tsx — handleEncaisser (FIX acomptes + upload PDF)
+
+FICHIERS À CRÉER (si mail en v35) :
+  api/send-email.ts — route Vercel serverless
+  src/lib/email-templates.ts — templates HTML email
+
+NE PAS TOUCHER :
+  src/front/pages/espace-client/PopupAcompte.tsx — fonctionne correctement
+  src/front/pages/espace-client/MesCommandes.tsx — le filtre est correct
+  src/front/pages/espace-partenaire/GestionDevisPartner.tsx — fonctionne
+  src/lib/counters.ts — fonctionne
+  src/lib/pdf-generator.ts — les 6 fonctions sont bonnes, ne pas les modifier
+
+
+═══ QUESTIONS POUR MICHEL ═══
+
+1. MAIL : Resend est le choix confirmé ? Si oui, Michel doit fournir la clé API
+   ou la créer sur resend.com avec le domaine 97import.com.
+
+2. PDF : Faut-il persister les PDF dans Firebase Storage ET écrire les URLs
+   dans les devis ? Ou garder la génération à la volée ?
+
+3. MULTI-DESTINATAIRES : Quand un acompte est encaissé, faut-il notifier :
+   - Le client seul ?
+   - Le client + le partenaire (si partenaire_code) ?
+   - Le client + le partenaire + l'admin ?
+
+4. LISTE D'ACHAT : La collection est 'listes_achat' ou 'purchase_lists' ?
+   2 pages admin utilisent des noms différents.
+
+5. STATUT DEVIS : Quand le premier acompte est encaissé, quel statut pour le devis ?
+   'accepte' ? 'en_cours' ? 'paye_partiel' ?
+
+
+═══ FIN DE L'AUDIT ═══

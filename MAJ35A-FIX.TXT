@@ -1,0 +1,93 @@
+=== MAJ35A-FIX — Bouton Verser un acompte omniprésent ===
+Date : 2026-04-17
+
+PARTIE A — DIAGNOSTIC :
+  Fichiers onglets client détectés :
+    - MesDevis.tsx
+    - MesCommandes.tsx
+    - MesVirements.tsx
+    - MesFactures.tsx
+  PopupAcompte.tsx : ✅ existe
+
+  État initial du bouton par onglet :
+    MesDevis.tsx       : ❌ absent (1 occurrence non significative)
+    MesCommandes.tsx   : ✅ présent (16 occurrences, mais sans condition)
+    MesVirements.tsx   : ✅ présent (18 occurrences, mais sans condition)
+    MesFactures.tsx    : ❌ absent (3 occurrences non significatives)
+
+PARTIE B — HELPER PARTAGÉ :
+  src/lib/devisHelpers.ts créé : ✅
+  Fonctions : peutVerserAcompte, montantAcompteParDefaut, referenceAcompte
+  Commit : da225b9
+
+PARTIE C — MES DEVIS :
+  Bouton ajouté : ✅
+  Condition peutVerserAcompte appliquée : ✅
+  PopupAcompte intégré : ✅
+  État géré avec popupDevis
+  Fonction loadDevis créée pour rechargement après ajout
+  Commit : 497ed8c
+
+PARTIE D — MES COMMANDES :
+  État : modifié (bouton existait déjà)
+  Import peutVerserAcompte ajouté : ✅
+  Condition harmonisée : ✅ (bouton maintenant conditionnel)
+  Commit : a6da2ef
+
+PARTIE E — MES VIREMENTS :
+  Bouton "+ Verser un autre acompte" existait déjà
+  Import peutVerserAcompte ajouté : ✅
+  Condition appliquée sur r.devis : ✅
+  Commit : 8a3b07a
+
+PARTIE F — MES FACTURES :
+  Interface Devis ajoutée pour typage complet
+  FactureRow enrichi avec objet devis complet
+  Bouton "Verser un acompte" ajouté dans section dépliée : ✅
+  Condition peutVerserAcompte appliquée : ✅
+  PopupAcompte intégré : ✅
+  État géré avec popupDevis
+  Fonction loadFactures créée pour rechargement
+  Prop profile ajoutée au composant
+  Commit : 524fa2a
+
+PARTIE G — POPUP ACOMPTE :
+  Montant par défaut dynamique : ✅
+  Import montantAcompteParDefaut ajouté : ✅
+  useEffect ajouté pour fetch devis et calcul montant adapté
+  Le montant s'adapte au solde restant (min entre 500€ et solde)
+  Commit : 3dbf757
+
+PARTIE H — BUILD :
+  npm run build : ✅ (0 erreurs TypeScript)
+  Warnings chunks > 500kB (normal, pas bloquant)
+  Build time : 2.37s
+
+PARTIE I — TESTS MANUELS :
+  À effectuer par Michel après déploiement Vercel :
+  1. Se connecter client@97import.com / Test2026!
+  2. Tester Mes devis → bouton visible et fonctionnel
+  3. Tester popup → déclaration acompte
+  4. Tester Mes virements → bouton "+ Verser un autre acompte"
+  5. Vérifier condition : bouton caché si devis soldé/annulé/3 acomptes
+  6. Tester admin encaissement
+  7. Vérifier Mes factures → bouton présent
+
+RÉSUMÉ COMMITS :
+  da225b9 - v35a-fix-A: helper peutVerserAcompte partagé
+  497ed8c - v35a-fix-C: bouton 'Verser un acompte' dans Mes devis
+  a6da2ef - v35a-fix-D: harmonisation bouton acompte dans Mes commandes
+  8a3b07a - v35a-fix-E: bouton acompte dans Mes virements
+  524fa2a - v35a-fix-F: bouton acompte dans Mes factures
+  3dbf757 - v35a-fix-G: PopupAcompte utilise montant par défaut calculé
+
+FICHIERS MODIFIÉS :
+  ✅ src/lib/devisHelpers.ts (créé)
+  ✅ src/front/pages/espace-client/MesDevis.tsx
+  ✅ src/front/pages/espace-client/MesCommandes.tsx
+  ✅ src/front/pages/espace-client/MesVirements.tsx
+  ✅ src/front/pages/espace-client/MesFactures.tsx
+  ✅ src/front/pages/espace-client/PopupAcompte.tsx
+
+BRANCHE : v2
+PREVIEW VERCEL : (à générer lors du prochain push)
