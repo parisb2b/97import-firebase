@@ -6,13 +6,13 @@ import {
   setDoc,
   updateDoc,
   serverTimestamp,
-  arrayUnion,
 } from 'firebase/firestore';
+import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db } from '../../lib/firebase';
 import { useI18n } from '../../i18n';
 import { getNextNumber } from '../../lib/counters';
 import { OrangeIndicator } from '../../components/OrangeIndicator';
-import { generateDevis, downloadPDF } from '../../lib/pdf-generator';
+import { generateDevis, generateFactureAcompte, downloadPDF } from '../../lib/pdf-generator';
 import { Card, Button } from '../components/Icons';
 
 interface LigneDevis {
@@ -72,9 +72,9 @@ export default function DetailDevis() {
   const [saving, setSaving] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
-  const [showAcompteModal, setShowAcompteModal] = useState(false);
-  const [acompteMontant, setAcompteMontant] = useState(0);
   const [emetteurData, setEmetteurData] = useState<any>(null);
+  const [showEncaisserModal, setShowEncaisserModal] = useState(false);
+  const [selectedAcompteIndex, setSelectedAcompteIndex] = useState<number | null>(null);
 
   const isNew = params?.id === 'nouveau';
 
@@ -239,36 +239,99 @@ export default function DetailDevis() {
   };
 
   const handleEncaisser = async () => {
-    if (!devis.id || acompteMontant <= 0) return;
+    const acomptesDeclares = (devis.acomptes || []).filter((a: any) => a.statut === 'declare');
+    if (acomptesDeclares.length === 0) {
+      setErrorMsg('Aucun acompte déclaré en attente'); setTimeout(() => setErrorMsg(''), 5000);
+      return;
+    }
+    setShowEncaisserModal(true);
+  };
 
+  const confirmerEncaissement = async () => {
+    if (selectedAcompteIndex === null || !devis.id) return;
+    setSaving(true);
     try {
-      const faNumero = await getNextNumber('FA');
-      const newAcompte = {
-        date: new Date().toISOString(),
-        montant: acompteMontant,
-        ref_fa: faNumero,
+      const numeroFA = await getNextNumber('FA');
+
+      // MODIFIER l'acompte existant (pas ajouter)
+      const acomptesActuels = [...(devis.acomptes || [])];
+      const cible = acomptesActuels[selectedAcompteIndex];
+      if (!cible || cible.statut !== 'declare') { setSaving(false); return; }
+
+      acomptesActuels[selectedAcompteIndex] = {
+        ...cible,
+        statut: 'encaisse',
+        ref_fa: numeroFA,
+        date_encaissement: new Date().toISOString(),
       };
 
-      const newTotalEncaisse = devis.total_encaisse + acompteMontant;
+      // Recalculer totaux
+      const totalEncaisse = acomptesActuels
+        .filter((a: any) => a.statut === 'encaisse')
+        .reduce((sum: number, a: any) => sum + (a.montant || 0), 0);
+      const soldeRestant = (devis.total_ht || 0) - totalEncaisse;
 
+      let nouveauStatut = devis.statut;
+      if (nouveauStatut === 'nouveau' || nouveauStatut === 'brouillon') nouveauStatut = 'en_cours';
+
+      let statutPaiement = 'non_paye';
+      if (totalEncaisse >= (devis.total_ht || 0) && devis.total_ht > 0) statutPaiement = 'paye_complet';
+      else if (totalEncaisse > 0) statutPaiement = 'paye_partiel';
+
+      // Générer PDF FA
+      const pdfDoc = generateFactureAcompte(
+        { ...devis, numero_fa: numeroFA },
+        acomptesActuels[selectedAcompteIndex],
+        emetteurData
+      );
+
+      // Upload PDF FA dans Storage
+      const pdfBlob = pdfDoc.output('blob');
+      const storage = getStorage();
+      const fileRef = storageRef(storage, `factures_acompte/${numeroFA}.pdf`);
+      await uploadBytes(fileRef, pdfBlob, { contentType: 'application/pdf' });
+      const pdfUrl = await getDownloadURL(fileRef);
+
+      // Update Firestore — un seul update atomique
       await updateDoc(doc(db, 'quotes', devis.id), {
-        acomptes: arrayUnion(newAcompte),
-        total_encaisse: newTotalEncaisse,
-        solde_restant: devis.total_ht - newTotalEncaisse,
+        acomptes: acomptesActuels,
+        total_encaisse: totalEncaisse,
+        solde_restant: soldeRestant,
+        statut: nouveauStatut,
+        statut_paiement: statutPaiement,
+        facture_acompte_url: pdfUrl,
         updatedAt: serverTimestamp(),
       });
 
-      setDevis({
-        ...devis,
-        acomptes: [...devis.acomptes, newAcompte],
-        total_encaisse: newTotalEncaisse,
-        solde_restant: devis.total_ht - newTotalEncaisse,
-      });
+      setShowEncaisserModal(false);
+      setSelectedAcompteIndex(null);
+      setSuccessMsg(`Acompte ${cible.montant}€ encaissé · FA ${numeroFA} générée`);
+      setTimeout(() => setSuccessMsg(''), 5000);
 
-      setShowAcompteModal(false);
-      setAcompteMontant(0);
+      // Download PDF localement
+      downloadPDF(pdfDoc, `${numeroFA}.pdf`);
+
+      // Recharger le devis
+      const snap = await getDoc(doc(db, 'quotes', devis.id));
+      if (snap.exists()) {
+        const data = snap.data();
+        setDevis({
+          id: snap.id, numero: data.numero || snap.id,
+          client_id: data.client_id || '', client_nom: data.client_nom || '',
+          client_email: data.client_email || '', client_tel: data.client_tel || '',
+          client_adresse: data.client_adresse || '', client_siret: data.client_siret || '',
+          partenaire_id: data.partenaire_id || null, statut: data.statut || 'brouillon',
+          lignes: data.lignes || [], total_ht: data.total_ht || 0,
+          acompte_pct: data.acompte_pct || 30, acomptes: data.acomptes || [],
+          total_encaisse: data.total_encaisse || 0, solde_restant: data.solde_restant || 0,
+          destination: data.destination || 'MQ',
+        });
+      }
     } catch (err) {
-      console.error('Error adding acompte:', err);
+      console.error('Erreur encaissement:', err);
+      setErrorMsg('Erreur : ' + (err as Error).message); setTimeout(() => setErrorMsg(''), 5000);
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -300,8 +363,8 @@ export default function DetailDevis() {
           {isNew ? 'Nouveau devis' : devis.numero}
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
-          {!isNew && devis.statut === 'accepte' && (
-            <Button variant="s" onClick={() => setShowAcompteModal(true)}>
+          {!isNew && (devis.acomptes || []).some((a: any) => a.statut === 'declare') && (
+            <Button variant="s" onClick={handleEncaisser}>
               {t('btn.encaisser')}
             </Button>
           )}
@@ -309,9 +372,20 @@ export default function DetailDevis() {
             {saving ? t('loading') : t('btn.enregistrer')}
           </Button>
           {!isNew && (
-            <Button variant="t" onClick={() => {
-              const pdfDoc = generateDevis(devis, emetteurData);
-              downloadPDF(pdfDoc, `${devis.numero}.pdf`);
+            <Button variant="t" onClick={async () => {
+              try {
+                const pdfDoc = generateDevis(devis, emetteurData);
+                // Upload dans Storage si pas encore fait
+                if (!(devis as any).devis_url) {
+                  const pdfBlob = pdfDoc.output('blob');
+                  const storage = getStorage();
+                  const fileRef = storageRef(storage, `devis/${devis.numero}.pdf`);
+                  await uploadBytes(fileRef, pdfBlob, { contentType: 'application/pdf' });
+                  const pdfUrl = await getDownloadURL(fileRef);
+                  await updateDoc(doc(db, 'quotes', devis.id!), { devis_url: pdfUrl, updatedAt: serverTimestamp() });
+                }
+                downloadPDF(pdfDoc, `${devis.numero}.pdf`);
+              } catch (err) { console.error('PDF error:', err); }
             }}>
               PDF
             </Button>
@@ -474,26 +548,68 @@ export default function DetailDevis() {
         </Card>
       )}
 
-      {/* Modal Acompte */}
-      {showAcompteModal && (
-        <div className="modal-overlay" style={{
-          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 999
+      {/* Modal Encaisser — sélection d'un acompte déclaré */}
+      {showEncaisserModal && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+          background: 'rgba(0,0,0,0.5)', display: 'flex',
+          alignItems: 'center', justifyContent: 'center', zIndex: 1000,
         }}>
-          <div className="card" style={{ width: 380, padding: 24 }}>
-            <div className="ct" style={{ marginBottom: 16 }}>Enregistrer un acompte</div>
-            <div className="fg">
-              <div className="fl">Montant (€)</div>
-              <input className="fi" type="number" value={acompteMontant} min={0}
-                onChange={(e) => setAcompteMontant(Number(e.target.value))} />
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 16 }}>
-              <Button variant="o" onClick={() => setShowAcompteModal(false)}>
-                {t('btn.annuler')}
-              </Button>
-              <Button variant="s" onClick={handleEncaisser}>
-                {t('btn.encaisser')}
-              </Button>
+          <div style={{
+            background: '#fff', borderRadius: 24, padding: 32,
+            maxWidth: 540, width: '90%', maxHeight: '80vh', overflow: 'auto',
+          }}>
+            <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 8, color: '#1E3A5F' }}>
+              Encaisser un acompte
+            </h2>
+            <p style={{ fontSize: 13, color: '#6B7280', marginBottom: 20 }}>
+              Sélectionnez l'acompte reçu en banque :
+            </p>
+
+            {(devis.acomptes || [])
+              .map((a: any, idx: number) => ({ a, idx }))
+              .filter(({ a }: any) => a.statut === 'declare')
+              .map(({ a, idx }: any) => (
+                <label key={idx} style={{
+                  display: 'block', padding: 16, marginBottom: 12,
+                  border: selectedAcompteIndex === idx ? '2px solid #1565C0' : '1.5px solid #E5E7EB',
+                  borderRadius: 12, cursor: 'pointer',
+                  background: selectedAcompteIndex === idx ? '#E3F2FD' : '#fff',
+                }}>
+                  <input type="radio" name="acompte" checked={selectedAcompteIndex === idx}
+                    onChange={() => setSelectedAcompteIndex(idx)} style={{ marginRight: 12 }} />
+                  <strong style={{ color: '#1565C0' }}>{a.montant?.toLocaleString('fr-FR')} €</strong>
+                  {' · '}
+                  <span style={{ fontSize: 13, color: '#374151' }}>
+                    Déclaré le {new Date(a.date).toLocaleDateString('fr-FR')}
+                  </span>
+                  {' · '}
+                  <span style={{ fontSize: 12, color: '#6B7280' }}>
+                    Compte {a.type_compte === 'perso' || a.type_compte === 'personnel' ? 'personnel' : 'professionnel'}
+                  </span>
+                </label>
+              ))}
+
+            <div style={{ display: 'flex', gap: 12, marginTop: 24 }}>
+              <button onClick={confirmerEncaissement} disabled={selectedAcompteIndex === null || saving}
+                style={{
+                  flex: 1, padding: 14,
+                  background: selectedAcompteIndex === null ? '#D3D1C7' : '#1565C0',
+                  color: '#fff', border: 'none', borderRadius: 12,
+                  fontSize: 14, fontWeight: 600,
+                  cursor: selectedAcompteIndex === null ? 'not-allowed' : 'pointer',
+                  opacity: saving ? 0.6 : 1,
+                }}>
+                {saving ? 'Encaissement...' : 'Encaisser cet acompte'}
+              </button>
+              <button onClick={() => { setShowEncaisserModal(false); setSelectedAcompteIndex(null); }}
+                style={{
+                  padding: 14, background: 'transparent', color: '#6B7280',
+                  border: '1.5px solid #E5E7EB', borderRadius: 12,
+                  fontSize: 14, cursor: 'pointer',
+                }}>
+                Annuler
+              </button>
             </div>
           </div>
         </div>
