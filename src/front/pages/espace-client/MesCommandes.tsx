@@ -4,6 +4,7 @@ import { db } from '../../../lib/firebase';
 import { generateDevis, downloadPDF } from '../../../lib/pdf-generator';
 import { useToast } from '../../components/Toast';
 import PopupAcompte from './PopupAcompte';
+import { peutVerserAcompte } from '../../../lib/devisHelpers';
 
 interface DevisLine {
   ref: string;
@@ -262,12 +263,14 @@ export default function MesCommandes({ userId, profile }: { userId: string; prof
                       </div>
                     )}
 
-                    <button onClick={() => setPopupDevis(d)} style={{
-                      width: '100%', padding: '12px 0', background: '#0D9488', color: '#fff',
-                      border: 'none', borderRadius: 12, fontSize: 14, fontWeight: 700, cursor: 'pointer',
-                    }}>
-                      Verser un acompte
-                    </button>
+                    {peutVerserAcompte(d) && (
+                      <button onClick={() => setPopupDevis(d)} style={{
+                        width: '100%', padding: '12px 0', background: '#0D9488', color: '#fff',
+                        border: 'none', borderRadius: 12, fontSize: 14, fontWeight: 700, cursor: 'pointer',
+                      }}>
+                        Verser un acompte
+                      </button>
+                    )}
                   </div>
                 )}
               </div>
