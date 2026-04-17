@@ -12,7 +12,7 @@ import { db, storage } from '../../lib/firebase';
 import { useI18n } from '../../i18n';
 import { getNextNumber } from '../../lib/counters';
 import { OrangeIndicator } from '../../components/OrangeIndicator';
-import { generateDevis, generateFactureAcompte, downloadPDF } from '../../lib/pdf-generator';
+import { generateDevis, downloadPDF } from '../../lib/pdf-generator';
 import { Card, Button } from '../components/Icons';
 import PopupEncaisserAcompte from '../components/PopupEncaisserAcompte';
 

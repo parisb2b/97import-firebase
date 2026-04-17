@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { collection, query, orderBy, getDocs, doc, getDoc } from 'firebase/firestore';
-import { Link, useLocation } from 'wouter';
+import { Link } from 'wouter';
 import { db } from '../../lib/firebase';
 import { generateDevis, downloadPDF } from '../../lib/pdf-generator';
 import PopupEncaisserAcompte from '../components/PopupEncaisserAcompte';
@@ -37,7 +37,6 @@ export default function ListeDevis() {
   const [filterStatut, setFilterStatut] = useState('');
   const [filterDest, setFilterDest] = useState('');
   const [filterPartner, setFilterPartner] = useState('');
-  const [, setLocation] = useLocation();
   const [devisPourEncaisser, setDevisPourEncaisser] = useState<any>(null);
 
   const handleDownloadDevisPDF = async (devisId: string, isVip = false) => {
