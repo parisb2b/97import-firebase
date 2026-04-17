@@ -14,7 +14,9 @@ import DetailDevis from './pages/DetailDevis';
 import Factures from './pages/Factures';
 import NotesCommission from './pages/NotesCommission';
 import FraisLogistique from './pages/FraisLogistique';
-import ListesAchat from './pages/ListesAchat';
+import ListeListesAchat from './pages/ListeListesAchat';
+import NouvelleListeAchat from './pages/NouvelleListeAchat';
+import DetailListeAchat from './pages/DetailListeAchat';
 import ListeConteneurs from './pages/ListeConteneurs';
 import NouveauConteneur from './pages/NouveauConteneur';
 import DetailConteneur from './pages/DetailConteneur';
@@ -33,7 +35,6 @@ import Parametres from './pages/Parametres';
 import DetailFacture from './pages/DetailFacture';
 import DetailCommission from './pages/DetailCommission';
 import DetailFraisLogistique from './pages/DetailFraisLogistique';
-import DetailAchat from './pages/DetailAchat';
 import DetailClient from './pages/DetailClient';
 import DetailPartenaire from './pages/DetailPartenaire';
 
@@ -67,7 +68,7 @@ const SIDEBAR_SECTIONS: SidebarSection[] = [
   {
     separator: true,
     items: [
-      { path: '/admin/achats', label: "Listes d'achat", icon: '🛒' },
+      { path: '/admin/listes-achat', label: "Listes d'achat", icon: '🛒' },
       { path: '/admin/conteneurs', label: 'Conteneurs', icon: '📦' },
       { path: '/admin/stock', label: 'Stock', icon: '📦' },
       { path: '/admin/sav', label: 'SAV', icon: '🔧', badge: 2 },
@@ -105,7 +106,7 @@ const PAGE_TITLES: Record<string, string> = {
   '/admin/factures': 'Factures',
   '/admin/commissions': 'Notes de commission',
   '/admin/frais': 'Factures logistiques',
-  '/admin/achats': "Listes d'achat",
+  '/admin/listes-achat': "Listes d'achat",
   '/admin/conteneurs': 'Conteneurs',
   '/admin/stock': 'Stock',
   '/admin/sav': 'SAV',
@@ -302,8 +303,9 @@ export default function AdminApp() {
               <Route path="/admin/commissions" component={NotesCommission} />
               <Route path="/admin/frais/:id" component={DetailFraisLogistique} />
               <Route path="/admin/frais" component={FraisLogistique} />
-              <Route path="/admin/achats/:id" component={DetailAchat} />
-              <Route path="/admin/achats" component={ListesAchat} />
+              <Route path="/admin/listes-achat/nouvelle" component={NouvelleListeAchat} />
+              <Route path="/admin/listes-achat/:id" component={DetailListeAchat} />
+              <Route path="/admin/listes-achat" component={ListeListesAchat} />
               <Route path="/admin/conteneurs" component={ListeConteneurs} />
               <Route path="/admin/conteneurs/nouveau" component={NouveauConteneur} />
               <Route path="/admin/conteneurs/:id" component={DetailConteneur} />
