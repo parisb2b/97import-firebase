@@ -47,6 +47,22 @@ const STATUT_COLORS: Record<string, { bg: string; color: string; label: string }
   livre: { bg: '#DCFCE7', color: '#166534', label: 'Livré' },
 };
 
+const getBadgeInfo = (devis: any) => {
+  if (devis.is_vip) {
+    return { label: 'VIP', bg: '#EDE9FE', color: '#7C3AED' };  // violet
+  }
+  switch (devis.statut) {
+    case 'nouveau':
+      return { label: 'Nouveau', bg: '#DBEAFE', color: '#1565C0' };
+    case 'en_cours':
+      return { label: 'Commande', bg: '#D1FAE5', color: '#059669' };
+    case 'annule':
+      return { label: 'Annulé', bg: '#FEE2E2', color: '#DC2626' };
+    default:
+      return STATUT_COLORS[devis.statut] || { label: devis.statut || 'Nouveau', bg: '#F3F4F6', color: '#6B7280' };
+  }
+};
+
 export default function MesDevis({ userId, profile }: { userId: string; profile?: any }) {
   const { showToast } = useToast();
   const [devis, setDevis] = useState<Devis[]>([]);
@@ -107,10 +123,6 @@ export default function MesDevis({ userId, profile }: { userId: string; profile?
     );
   });
 
-  const statutStyle = (statut: string) => {
-    const s = STATUT_COLORS[statut] || STATUT_COLORS.brouillon;
-    return { background: s.bg, color: s.color, padding: '4px 12px', borderRadius: 20, fontSize: 11, fontWeight: 600 as const };
-  };
 
   return (
     <div>
@@ -142,6 +154,7 @@ export default function MesDevis({ userId, profile }: { userId: string; profile?
           {filtered.map(d => {
             const isOpen = expandedId === d.id;
             const mainProduct = d.lignes?.[0]?.nom_fr || 'Devis';
+            const badge = getBadgeInfo(d);
 
             return (
               <div key={d.id} style={{ background: '#fff', borderRadius: 16, boxShadow: '0 2px 8px rgba(0,0,0,0.04)', overflow: 'hidden' }}>
@@ -153,7 +166,15 @@ export default function MesDevis({ userId, profile }: { userId: string; profile?
                   <div style={{ flex: 1 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
                       <span style={{ fontWeight: 700, color: '#1565C0', fontSize: 14 }}>{d.numero}</span>
-                      <span style={statutStyle(d.statut)}>{STATUT_COLORS[d.statut]?.label || d.statut}</span>
+                      <span style={{
+                        background: badge.bg,
+                        color: badge.color,
+                        padding: '4px 12px',
+                        borderRadius: 20,
+                        fontSize: 11,
+                        fontWeight: 600,
+                        textTransform: 'uppercase',
+                      }}>{badge.label}</span>
                     </div>
                     <p style={{ fontSize: 12, color: '#9CA3AF' }}>
                       {d.createdAt?.toDate?.()?.toLocaleDateString('fr-FR') || '—'} · {mainProduct}
