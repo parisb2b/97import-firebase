@@ -3,6 +3,7 @@ import { collection, query, orderBy, getDocs, doc, getDoc } from 'firebase/fires
 import { Link, useLocation } from 'wouter';
 import { db } from '../../lib/firebase';
 import { generateDevis, downloadPDF } from '../../lib/pdf-generator';
+import PopupEncaisserAcompte from '../components/PopupEncaisserAcompte';
 import {
   Card,
   Button,
@@ -37,6 +38,7 @@ export default function ListeDevis() {
   const [filterDest, setFilterDest] = useState('');
   const [filterPartner, setFilterPartner] = useState('');
   const [, setLocation] = useLocation();
+  const [devisPourEncaisser, setDevisPourEncaisser] = useState<any>(null);
 
   const handleDownloadDevisPDF = async (devisId: string, isVip = false) => {
     try {
@@ -56,37 +58,42 @@ export default function ListeDevis() {
     }
   };
 
+  const loadDevis = async () => {
+    setLoading(true);
+    try {
+      const q = query(collection(db, 'quotes'), orderBy('createdAt', 'desc'));
+      const snap = await getDocs(q);
+      const data = snap.docs.map((d) => {
+        const raw = d.data();
+        return {
+          id: d.id,
+          numero: raw.numero || d.id,
+          date: raw.createdAt?.toDate?.()?.toLocaleDateString('fr-FR', {
+            day: '2-digit',
+            month: '2-digit',
+          }) || '',
+          client_nom: raw.client_nom || '',
+          partenaire_code: raw.partenaire_code,
+          destination: raw.destination || 'MQ',
+          produits: raw.lignes?.map((l: any) => l.reference).join(', ') || '',
+          total_ht: raw.total_ht || 0,
+          statut: raw.statut || 'brouillon',
+          is_vip: raw.is_vip || false,
+          conteneur_ref: raw.conteneur_ref,
+          acomptes: raw.acomptes || [],
+          lignes: raw.lignes || [],
+          client_id: raw.client_id,
+        } as any;
+      });
+      setDevis(data);
+    } catch (err) {
+      console.error('Error loading devis:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const loadDevis = async () => {
-      try {
-        const q = query(collection(db, 'quotes'), orderBy('createdAt', 'desc'));
-        const snap = await getDocs(q);
-        const data = snap.docs.map((d) => {
-          const raw = d.data();
-          return {
-            id: d.id,
-            numero: raw.numero || d.id,
-            date: raw.createdAt?.toDate?.()?.toLocaleDateString('fr-FR', {
-              day: '2-digit',
-              month: '2-digit',
-            }) || '',
-            client_nom: raw.client_nom || '',
-            partenaire_code: raw.partenaire_code,
-            destination: raw.destination || 'MQ',
-            produits: raw.lignes?.map((l: any) => l.reference).join(', ') || '',
-            total_ht: raw.total_ht || 0,
-            statut: raw.statut || 'brouillon',
-            is_vip: raw.is_vip || false,
-            conteneur_ref: raw.conteneur_ref,
-          } as Devis;
-        });
-        setDevis(data);
-      } catch (err) {
-        console.error('Error loading devis:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
     loadDevis();
   }, []);
 
@@ -279,7 +286,7 @@ export default function ListeDevis() {
                     icon={<EuroIcon />}
                     tooltip="Encaisser acompte"
                     variant="eur"
-                    onClick={(e: any) => { e?.stopPropagation(); setLocation(`/admin/devis/${d.id}`); }}
+                    onClick={(e: any) => { e?.stopPropagation(); setDevisPourEncaisser(d); }}
                   />
                 </td>
               </tr>
@@ -287,6 +294,17 @@ export default function ListeDevis() {
           </tbody>
         </table>
       </Card>
+
+      {devisPourEncaisser && (
+        <PopupEncaisserAcompte
+          devis={devisPourEncaisser}
+          onClose={() => setDevisPourEncaisser(null)}
+          onSuccess={() => {
+            setDevisPourEncaisser(null);
+            loadDevis();
+          }}
+        />
+      )}
     </>
   );
 }
