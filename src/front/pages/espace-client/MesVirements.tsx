@@ -3,6 +3,7 @@ import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import { useToast } from '../../components/Toast';
 import PopupAcompte from './PopupAcompte';
+import { peutVerserAcompte } from '../../../lib/devisHelpers';
 
 interface Acompte {
   montant: number;
@@ -147,12 +148,14 @@ export default function MesVirements({ userId, profile }: { userId: string; prof
                         </div>
                       ))}
                     </div>
-                    <button onClick={() => setPopupDevis(r.devis)} style={{
-                      padding: '8px 16px', background: '#0D9488', color: '#fff', border: 'none', borderRadius: 10,
-                      fontSize: 12, fontWeight: 600, cursor: 'pointer',
-                    }}>
-                      + Verser un autre acompte
-                    </button>
+                    {peutVerserAcompte(r.devis) && (
+                      <button onClick={() => setPopupDevis(r.devis)} style={{
+                        padding: '8px 16px', background: '#0D9488', color: '#fff', border: 'none', borderRadius: 10,
+                        fontSize: 12, fontWeight: 600, cursor: 'pointer',
+                      }}>
+                        + Verser un autre acompte
+                      </button>
+                    )}
                   </div>
                 )}
               </div>
