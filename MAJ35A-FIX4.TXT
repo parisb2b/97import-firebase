@@ -1,0 +1,71 @@
+=== MAJ35A-FIX4 — Virements/Factures liste + Fix PDF FA ===
+Date : 17/04/2026
+
+PARTIE A — MES VIREMENTS EN LISTE :
+  Refonte complète : ✅
+  Tri cliquable sur colonnes (5 colonnes) : ✅
+  Recherche : ✅
+  Modal 👁 Visualiser : ✅
+  Bouton 💶 Verser un autre acompte : ✅
+
+PARTIE B — MES FACTURES EN LISTE :
+  Refonte complète : ✅
+  Filtre type (Tous/FA/FF/FL) : ✅
+  Tri cliquable sur colonnes : ✅
+  Bouton 👁 Visualiser : ✅
+  Bouton ⬇️ Télécharger : ✅
+  Bouton 💶 Verser un autre acompte : ✅
+
+PARTIE C — FIX PDF FA :
+  Bug numéro FA (FA-2604013 erroné) : ✅
+  Bug espaces chiffres (helper formatEur) : ✅
+  Bug cumul historique : ✅
+  Charte couleurs salmon/rose (pas de violet) : ✅
+  PopupEncaisserAcompte passe acomptes à jour : ✅
+
+PARTIE D — BUILD :
+  npm run build : ✅
+
+COMMITS :
+  e9c342c v35a-fix4-A: Mes virements en liste simple avec tri colonnes + modal visualiser
+  29a0d88 v35a-fix4-B: Mes factures en liste simple avec filtres + tri + modal
+  0cb4fa7 v35a-fix4-C: fix PDF FA (numéro + espaces + cumul + charte salmon)
+  666b522 v35a-fix4-D: pass profile prop to MesFactures in both espaces
+
+FICHIERS MODIFIÉS :
+  ✅ src/front/pages/espace-client/MesVirements.tsx (refonte complète)
+  ✅ src/front/pages/espace-client/MesFactures.tsx (refonte complète)
+  ✅ src/lib/pdf-generator.ts (generateFactureAcompte corrigée)
+  ✅ src/admin/components/PopupEncaisserAcompte.tsx (passe acomptes à jour)
+  ✅ src/front/pages/EspaceClient.tsx (ajout profile prop)
+  ✅ src/front/pages/EspacePartenaire.tsx (ajout profile prop)
+
+NOTE : MesDevis.tsx et MesCommandes.tsx restent avec DevisCard (v35a-fix3, inchangé).
+
+BUILD TEST : ✅ 0 erreur TypeScript
+
+DÉTAILS DES CORRECTIONS :
+
+1. MES VIREMENTS - Refonte complète en liste simple
+   - Aplatir devis.acomptes[] en lignes individuelles
+   - Colonnes triables : Devis, Date, Montant, Compte, Statut
+   - Recherche par devis_id, ref_fa, statut
+   - Modal ModalVirement pour visualisation détaillée
+   - Bouton 💶 si peutVerserAcompte (via PopupAcompte)
+
+2. MES FACTURES - Refonte complète en liste simple
+   - Aplatir factures_acompte_urls[] + facture_finale_url + facture_logistique_url
+   - Colonnes triables : N° Facture, Type, Devis, Date, Montant
+   - Filtre type : ALL, FA, FF, FL (segmented control)
+   - Modal ModalFacture pour visualisation
+   - Boutons : 👁 Visualiser, ⬇️ Télécharger, 💶 Verser acompte
+
+3. PDF FA - 4 bugs corrigés
+   - Numéro FA : lit acompteCible.ref_fa au lieu de quote.numero_fa
+   - Espaces chiffres : remplacé toLocaleString par formatEUR() helper
+   - Cumul historique : déjà fonctionnel v35a-fix3, juste ajusté le texte "<< ACTUEL >>"
+   - Couleur : salmon #C87F6B au lieu de violet (124, 58, 237)
+
+4. PopupEncaisserAcompte : passe acomptesActuels à generateFactureAcompte
+
+5. Build TypeScript : fix props manquantes (profile) dans EspaceClient/EspacePartenaire

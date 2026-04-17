@@ -485,3 +485,54 @@ Build : ✅ SUCCÈS (0 erreurs TS)
 - Panier : post-devis → /espace-client
 - Noms produits : double tiret -- → tiret cadratin —
 - Build : ✅ SUCCÈS
+
+[2026-04-17 14:30] v35a-fix4 — Virements/Factures liste + Fix PDF FA
+======================================================================================
+PROBLÈME #1 : v35a-fix3 met DevisCard partout, mais Michel voulait ça UNIQUEMENT pour Mes devis + Mes commandes
+PROBLÈME #2 : Bouton Visualiser ouvre modal simple, pas l'accordéon complet
+PROBLÈME #3 : PDF Facture Acompte (FA) a 4 bugs : numéro erroné (FA-2604013), espaces chiffres, cumul non fonctionnel, couleur violette
+
+SOLUTION :
+
+PARTIE A — MES VIREMENTS EN LISTE SIMPLE :
+  - Refonte complète MesVirements.tsx (ligne = 1 acompte, plus de DevisCard)
+  - 5 colonnes triables : Devis, Date, Montant, Compte, Statut
+  - Recherche par devis_id, ref_fa, statut
+  - Modal ModalVirement pour visualisation détaillée
+  - Bouton 💶 si peutVerserAcompte (via PopupAcompte)
+
+PARTIE B — MES FACTURES EN LISTE SIMPLE :
+  - Refonte complète MesFactures.tsx (ligne = 1 facture FA/FF/FL)
+  - 5 colonnes triables : N° Facture, Type, Devis, Date, Montant
+  - Filtre type : ALL, FA, FF, FL (segmented control UI)
+  - Modal ModalFacture pour visualisation
+  - Boutons : 👁 Visualiser, ⬇️ Télécharger, 💶 Verser acompte
+
+PARTIE C — FIX PDF FA (4 bugs) :
+  - BUG #1 (Numéro FA) : lit acompteCible.ref_fa au lieu de quote.numero_fa
+  - BUG #2 (Espaces chiffres) : remplacé toLocaleString par formatEUR() helper (évite U+00A0)
+  - BUG #3 (Cumul) : texte "<< ACTUEL >>" au lieu de "← présent"
+  - BUG #4 (Charte couleurs) : salmon #C87F6B au lieu de violet (124, 58, 237)
+  - PopupEncaisserAcompte.tsx : passe acomptesActuels à generateFactureAcompte
+
+PARTIE D — FIX BUILD :
+  - EspaceClient.tsx : ajout profile prop à MesFactures
+  - EspacePartenaire.tsx : ajout profile prop à MesFactures
+
+Commits :
+  e9c342c - v35a-fix4-A: Mes virements en liste simple avec tri colonnes + modal visualiser
+  29a0d88 - v35a-fix4-B: Mes factures en liste simple avec filtres + tri + modal
+  0cb4fa7 - v35a-fix4-C: fix PDF FA (numéro + espaces + cumul + charte salmon)
+  666b522 - v35a-fix4-D: pass profile prop to MesFactures in both espaces
+
+Fichiers modifiés :
+  ✅ src/front/pages/espace-client/MesVirements.tsx (refonte complète)
+  ✅ src/front/pages/espace-client/MesFactures.tsx (refonte complète)
+  ✅ src/lib/pdf-generator.ts (generateFactureAcompte corrigée)
+  ✅ src/admin/components/PopupEncaisserAcompte.tsx (passe acomptes à jour)
+  ✅ src/front/pages/EspaceClient.tsx (ajout profile prop)
+  ✅ src/front/pages/EspacePartenaire.tsx (ajout profile prop)
+
+Build : ✅ SUCCÈS (0 erreurs TypeScript)
+
+NOTE : MesDevis.tsx et MesCommandes.tsx gardent DevisCard (v35a-fix3, inchangé)
