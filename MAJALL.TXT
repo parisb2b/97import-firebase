@@ -582,3 +582,59 @@ Fichiers modifiés :
 Build : ✅ SUCCÈS (0 erreurs TypeScript)
 
 Tests manuels à faire : créer devis, VIP, déclarer acompte, encaisser → vérifier emails reçus + collection mail/ delivery.state=SUCCESS
+
+[2026-04-17 15:45] v35c — Back-office Conteneurs
+======================================================================================
+OBJECTIF : Interface admin complète pour gérer les conteneurs d'expédition (création, édition, suivi statut)
+
+CONTEXTE :
+  - Collections Firestore créées v35a : conteneurs/, ports/, tarifs_logistiques/
+  - Routes admin déjà configurées dans AdminApp.tsx
+  - 3 pages admin à réécrire selon nouvelle spec v35c
+
+PARTIE B — LISTE CONTENEURS :
+  - ListeConteneurs.tsx réécrit (collection 'conteneurs' remplace 'containers')
+  - Filtres statut : Tous, Préparation, Chargement, En mer, Arrivé, Livré
+  - Recherche multi-critères + tri 5 colonnes cliquables
+  - Badges couleur + compteur devis liés
+
+PARTIE C — DROPDOWN PORTS DYNAMIQUE :
+  - DropdownPorts.tsx créé (composant réutilisable)
+  - Filtrage par type : chargement | destination
+  - Modal "+ Nouveau" pour ajout port à la volée
+  - Insertion directe Firestore ports/ + auto-sélection
+
+PARTIE D — CRÉATION CONTENEUR :
+  - NouveauConteneur.tsx réécrit
+  - Génération auto CTN-YYMMNNN via getNextNumber()
+  - Formulaire : type, destination, dates, ports, tarif logistique, notes
+  - Pré-sélection intelligente ports selon destination
+  - Chargement dynamique tarifs actifs + affichage détail
+
+PARTIE E — DÉTAIL/ÉDITION CONTENEUR :
+  - DetailConteneur.tsx réécrit (6 sections)
+  - Édition inline tous champs
+  - Infos transporteur : APHU, voyage, BL, seal (à remplir au départ réel)
+  - Liste devis liés (placeholder v35d)
+  - Suppression bloquée si devis rattachés
+
+Commits :
+  bb2de4d - v35c-B: page liste conteneurs admin avec filtres + tri
+  e73d5ad - v35c-C: composant DropdownPorts dynamique avec modal ajout
+  8e789e3 - v35c-D: page création conteneur avec dropdowns ports + tarifs
+  929203a - v35c-E: page détail/édition conteneur avec toutes sections
+
+Fichiers modifiés :
+  ✅ src/admin/pages/ListeConteneurs.tsx (réécrit 222 lignes)
+  ✅ src/admin/components/DropdownPorts.tsx (créé 219 lignes)
+  ✅ src/admin/pages/NouveauConteneur.tsx (réécrit 273 lignes)
+  ✅ src/admin/pages/DetailConteneur.tsx (réécrit 300 lignes)
+
+Structure conteneur Firestore :
+  numero, type, destination, dates (départ/arrivée), ports (chargement/destination),
+  tarif_logistique_ref, infos transporteur (num_physique, voyage_number, bl_number, seal_number),
+  statut, notes, devis_lies[], produits_lignes[], created_at, updated_at
+
+Build : ✅ SUCCÈS (0 erreurs TypeScript)
+
+Workflow complet : Liste → Créer → Éditer → Changer statut → (v35d: lier devis via listes d'achat)

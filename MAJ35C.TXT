@@ -1,0 +1,142 @@
+=== MAJ35C — Back-office Conteneurs ===
+Date : 17/04/2026
+
+PARTIE A — ROUTES ET SIDEBAR :
+  Routes admin déjà configurées dans AdminApp.tsx : ✅
+  Ordre correct (nouveau avant :id) : ✅
+  Sidebar "Conteneurs" présente : ✅
+
+PARTIE B — PAGE LISTE CONTENEURS :
+  ListeConteneurs.tsx réécrit complet : ✅
+  Collection 'conteneurs' (remplace 'containers') : ✅
+  Filtres statut (Tous, Préparation, Chargement, En mer, Arrivé, Livré) : ✅
+  Recherche par numéro, destination, type, N° physique : ✅
+  Tri cliquable 5 colonnes : ✅
+  Affichage badges couleur statut : ✅
+  Compteur devis liés par conteneur : ✅
+
+PARTIE C — COMPOSANT DROPDOWN PORTS :
+  DropdownPorts.tsx créé : ✅
+  Filtrage par type (chargement/destination) : ✅
+  Modal ajout nouveau port à la volée : ✅
+  Insertion directe dans collection 'ports/' : ✅
+  Rafraîchissement automatique liste : ✅
+
+PARTIE D — PAGE CRÉATION CONTENEUR :
+  NouveauConteneur.tsx réécrit complet : ✅
+  Génération auto numéro CTN-YYMMNNN : ✅
+  Formulaire 8 champs (type, destination, dates, ports, tarif, notes) : ✅
+  Intégration DropdownPorts : ✅
+  Chargement tarifs logistiques actifs : ✅
+  Pré-sélection ports selon destination : ✅
+  Validation champs obligatoires : ✅
+  Redirect après création vers /admin/conteneurs/:id : ✅
+
+PARTIE E — PAGE DÉTAIL CONTENEUR :
+  DetailConteneur.tsx réécrit complet : ✅
+  6 sections : header, infos principales, ports, transporteur, statut/notes, devis liés : ✅
+  Édition inline tous champs : ✅
+  DropdownPorts intégré : ✅
+  Infos transporteur (APHU, voyage, BL, seal) : ✅
+  Bouton enregistrer : ✅
+  Bouton supprimer avec protection (si devis liés) : ✅
+  Conversion Timestamp ↔ input date : ✅
+
+PARTIE F — ROUTING ET INTÉGRATION :
+  Routes vérifiées dans AdminApp.tsx : ✅
+  Ordre correct (nouveau avant :id) : ✅
+  Imports corrects : ✅
+
+PARTIE G — BUILD :
+  npm run build : ✅ 0 erreur TypeScript
+
+COMMITS :
+  bb2de4d v35c-B: page liste conteneurs admin avec filtres + tri
+  e73d5ad v35c-C: composant DropdownPorts dynamique avec modal ajout
+  8e789e3 v35c-D: page création conteneur avec dropdowns ports + tarifs
+  929203a v35c-E: page détail/édition conteneur avec toutes sections
+
+FICHIERS MODIFIÉS/CRÉÉS :
+  ✅ src/admin/pages/ListeConteneurs.tsx (réécrit — 222 lignes)
+  ✅ src/admin/components/DropdownPorts.tsx (créé — 219 lignes)
+  ✅ src/admin/pages/NouveauConteneur.tsx (réécrit — 273 lignes)
+  ✅ src/admin/pages/DetailConteneur.tsx (réécrit — 300 lignes)
+
+ROUTES ADMIN (déjà configurées dans AdminApp.tsx) :
+  ✅ /admin/conteneurs → ListeConteneurs
+  ✅ /admin/conteneurs/nouveau → NouveauConteneur
+  ✅ /admin/conteneurs/:id → DetailConteneur
+
+COLLECTION FIRESTORE UTILISÉE :
+  ✅ conteneurs/ (avec structure v35a)
+  ✅ ports/ (lecture + écriture via DropdownPorts)
+  ✅ tarifs_logistiques/ (lecture seule pour affichage)
+
+STRUCTURE CONTENEUR FIRESTORE :
+  - numero: string (CTN-YYMMNNN)
+  - type: string (20GP | 40GP | 40HC)
+  - destination: string (MQ | GP | GF | RE | FR)
+  - date_depart_est: Timestamp
+  - date_arrivee_est: Timestamp
+  - port_chargement: string (code port)
+  - port_destination: string (code port)
+  - tarif_logistique_ref: string
+  - num_physique: string (ex: APHU7221859)
+  - voyage_number: string
+  - bl_number: string
+  - seal_number: string
+  - statut: string (preparation | en_chargement | en_mer | arrive | livre)
+  - notes: string
+  - devis_lies: string[] (DVS-xxx)
+  - produits_lignes: any[] (placeholder v35d)
+  - created_at: Timestamp
+  - updated_at: Timestamp
+
+FONCTIONNALITÉS CLÉS :
+1. LISTE CONTENEURS
+   - Affichage tous conteneurs avec filtres statut
+   - Recherche multi-critères (numéro, destination, type, N° physique)
+   - Tri cliquable sur 5 colonnes
+   - Compteur devis liés affiché par ligne
+   - Clic ligne → navigation détail
+
+2. DROPDOWN PORTS DYNAMIQUE
+   - Sélection port existant
+   - Bouton "+ Nouveau" ouvre modal
+   - Ajout direct dans Firestore ports/
+   - Auto-sélection du nouveau port créé
+   - Filtrage par type (chargement vs destination)
+
+3. CRÉATION CONTENEUR
+   - Génération auto numéro CTN via getNextNumber()
+   - Pré-sélection intelligente ports selon destination
+   - Chargement dynamique tarifs logistiques actifs
+   - Affichage détail tarif sélectionné (fret, dédouanement, services)
+   - Validation dates obligatoires
+
+4. DÉTAIL/ÉDITION CONTENEUR
+   - Vue complète toutes sections
+   - Édition inline tous champs
+   - Infos transporteur à remplir au départ réel
+   - Liste devis liés (placeholder v35d)
+   - Suppression bloquée si devis liés
+   - Mise à jour updated_at automatique
+
+BUILD : ✅ 0 erreur TypeScript
+
+TESTS MANUELS À FAIRE :
+1. Créer nouveau conteneur → vérifier numéro CTN auto
+2. Ajouter nouveau port via modal → vérifier apparition immédiate
+3. Éditer conteneur existant → vérifier sauvegarde
+4. Filtrer par statut → vérifier liste filtrée
+5. Trier colonnes → vérifier ordre asc/desc
+6. Supprimer conteneur vide → vérifier suppression
+7. Tenter supprimer conteneur avec devis liés → vérifier blocage
+
+NOTES :
+- Routes déjà configurées dans AdminApp.tsx (v35a)
+- Collection 'conteneurs' seedée v35a (3 docs test)
+- Collection 'ports' seedée v35a (10 docs)
+- Collection 'tarifs_logistiques' seedée v35a (3 docs)
+- Format numéro CTN-YYMMNNN maintenu (cohérence DVS/FA/LA)
+- Liaison devis ↔ conteneurs sera implémentée v35d (listes d'achat)
