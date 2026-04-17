@@ -3,6 +3,8 @@ import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firesto
 import { db } from '../../../lib/firebase';
 import { generateDevis, downloadPDF } from '../../../lib/pdf-generator';
 import { useToast } from '../../components/Toast';
+import PopupAcompte from './PopupAcompte';
+import { peutVerserAcompte } from '../../../lib/devisHelpers';
 
 interface DevisLine {
   ref: string;
@@ -45,31 +47,33 @@ const STATUT_COLORS: Record<string, { bg: string; color: string; label: string }
   livre: { bg: '#DCFCE7', color: '#166534', label: 'Livré' },
 };
 
-export default function MesDevis({ userId }: { userId: string; profile?: any }) {
+export default function MesDevis({ userId, profile }: { userId: string; profile?: any }) {
   const { showToast } = useToast();
   const [devis, setDevis] = useState<Devis[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [search, setSearch] = useState('');
+  const [popupDevis, setPopupDevis] = useState<Devis | null>(null);
+
+  const loadDevis = async () => {
+    setLoading(true);
+    try {
+      const q = query(collection(db, 'quotes'), where('client_id', '==', userId));
+      const snap = await getDocs(q);
+      const list = snap.docs
+        .map(d => ({ id: d.id, ...d.data() } as Devis))
+        .sort((a, b) => (b.createdAt?.toMillis?.() || b.createdAt?.seconds * 1000 || 0) - (a.createdAt?.toMillis?.() || a.createdAt?.seconds * 1000 || 0));
+      setDevis(list);
+    } catch (err) {
+      console.error('Error loading devis:', err);
+      showToast('Erreur de chargement des devis', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const load = async () => {
-      setLoading(true);
-      try {
-        const q = query(collection(db, 'quotes'), where('client_id', '==', userId));
-        const snap = await getDocs(q);
-        const list = snap.docs
-          .map(d => ({ id: d.id, ...d.data() } as Devis))
-          .sort((a, b) => (b.createdAt?.toMillis?.() || b.createdAt?.seconds * 1000 || 0) - (a.createdAt?.toMillis?.() || a.createdAt?.seconds * 1000 || 0));
-        setDevis(list);
-      } catch (err) {
-        console.error('Error loading devis:', err);
-        showToast('Erreur de chargement des devis', 'error');
-      } finally {
-        setLoading(false);
-      }
-    };
-    load();
+    loadDevis();
   }, [userId]);
 
   const handleDownloadPDF = async (d: Devis) => {
@@ -205,12 +209,54 @@ export default function MesDevis({ userId }: { userId: string; profile?: any }) 
                         </tr>
                       </tfoot>
                     </table>
+
+                    {peutVerserAcompte(d) && (
+                      <div style={{
+                        marginTop: 20,
+                        paddingTop: 20,
+                        borderTop: '1px solid #E5E7EB',
+                        display: 'flex',
+                        justifyContent: 'flex-end',
+                      }}>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setPopupDevis(d);
+                          }}
+                          style={{
+                            padding: '10px 20px',
+                            background: '#1565C0',
+                            color: '#fff',
+                            border: 'none',
+                            borderRadius: 12,
+                            fontSize: 14,
+                            fontWeight: 600,
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 8,
+                          }}
+                        >
+                          💶 Verser un acompte
+                        </button>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
             );
           })}
         </div>
+      )}
+
+      {popupDevis && (
+        <PopupAcompte
+          devisId={popupDevis.id}
+          devisNumero={popupDevis.numero}
+          clientNom={popupDevis.client_nom || `${profile?.firstName || ''} ${profile?.lastName || ''}`}
+          onClose={() => setPopupDevis(null)}
+          onAcompteAdded={loadDevis}
+        />
       )}
     </div>
   );
