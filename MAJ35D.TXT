@@ -1,0 +1,191 @@
+=== MAJ35D — Back-office Listes d'Achat ===
+Date : 17/04/2026
+
+CONTEXTE :
+  Implémentation complète du système de Listes d'Achat (Purchase Lists)
+  pour préparer les bons de commande fournisseurs chinois à partir
+  des devis avec acompte encaissé.
+
+WORKFLOW MÉTIER :
+  1. Admin crée LA vide (brouillon) → numéro LA-YYMMNNN auto
+  2. Ajout produits via modal (pioche dans devis avec acompte_encaisse)
+  3. Éclatement automatique des kits en composants
+  4. Attribution produits à conteneurs via dropdown
+  5. Enregistrer (reste brouillon) ou Envoyer (figer en envoyee)
+  6. LA envoyée → read-only, update devis_lies dans conteneurs
+
+COMMITS :
+  aced311 v35d-A: routes admin listes d'achat + sidebar
+  fca18d8 v35d-B+C+D+E+F: pages listes achat complètes
+
+FICHIERS CRÉÉS :
+  ✅ src/admin/pages/ListeListesAchat.tsx (292 lignes)
+  ✅ src/admin/pages/NouvelleListeAchat.tsx (174 lignes)
+  ✅ src/admin/pages/DetailListeAchat.tsx (660 lignes)
+
+FICHIERS MODIFIÉS :
+  ✅ src/admin/AdminApp.tsx (routes + sidebar + imports)
+
+ROUTES ADMIN :
+  ✅ /admin/listes-achat → ListeListesAchat
+  ✅ /admin/listes-achat/nouvelle → NouvelleListeAchat
+  ✅ /admin/listes-achat/:id → DetailListeAchat
+
+COLLECTION FIRESTORE :
+  ✅ listes_achat/ (structure détaillée ci-dessous)
+
+STRUCTURE LISTE ACHAT FIRESTORE :
+  {
+    numero: string,                // LA-YYMMNNN
+    date_creation: Timestamp,
+    date_envoi?: Timestamp,        // null si brouillon
+    statut: 'brouillon' | 'envoyee',
+    notes: string,
+    total_cny: number,             // calculé
+    lignes: [
+      {
+        id: string,                // uid interne
+        ref: string,               // réf produit
+        nom_fr: string,
+        qte: number,               // éditable
+        fournisseur: string,
+        prix_achat_unitaire: number,
+        conteneur_id: string | null, // CTN-xxx ou null
+        devis_id: string,          // DVS-xxx origine
+        client_nom: string,
+        kit_parent?: string,       // si composant de kit
+        kit_parent_nom?: string,
+        est_composant_kit: boolean,
+        date_ajout: string,
+      }
+    ],
+    created_at: Timestamp,
+    updated_at: Timestamp,
+  }
+
+FONCTIONNALITÉS CLÉS :
+
+1. LISTE LISTES D'ACHAT (ListeListesAchat.tsx)
+   - Filtres statut : TOUS | brouillon | envoyee (boutons style v35)
+   - Recherche : numéro, notes, refs produits
+   - Tri cliquable 5 colonnes : numero, date_creation, nb_lignes, total_cny, statut
+   - useMemo pour filtrage + tri (fix v35c-fix1)
+   - Affichage : numero, date, nb produits (badge), total CNY, statut (pill)
+   - Clic ligne → navigation vers détail
+   - Bouton "+ Nouvelle liste" → page création
+
+2. CRÉATION LISTE (NouvelleListeAchat.tsx)
+   - Génération auto numéro LA-YYMMNNN via getNextNumber('LA')
+   - Affichage read-only du numéro + statut brouillon
+   - Création document vide : lignes=[], total_cny=0, statut=brouillon
+   - Redirect automatique vers /admin/listes-achat/{numero}
+
+3. DÉTAIL/ÉDITION LISTE (DetailListeAchat.tsx)
+   a) Header :
+      - Numéro + badge statut (brouillon orange / envoyee vert)
+      - Compteurs : nb produits, total CNY
+      - Bouton "Ajouter produits" (si brouillon)
+   
+   b) Section Informations :
+      - Numéro, date création, date envoi (si envoyee)
+   
+   c) Section Produits (table) :
+      - Colonnes : Réf, Nom FR, Qté, Prix unit ¥, Total ¥, Conteneur, Client, Actions
+      - Qté éditable (input number) si brouillon
+      - Dropdown conteneur (charge conteneurs actifs, exclut livrés)
+      - Badge composant kit (🔧 de {kit_parent}) si est_composant_kit
+      - Bouton suppression ligne (croix rouge) si brouillon
+      - Total CNY calculé via useMemo
+   
+   d) Section Notes :
+      - Textarea éditable si brouillon, read-only sinon
+   
+   e) Boutons actions :
+      - Si brouillon : "Enregistrer (brouillon)" + "Envoyer (figer)"
+      - Si envoyee : bandeau "Liste validée — non modifiable"
+
+4. MODAL AJOUT PRODUITS (ModalAjoutProduits)
+   a) Chargement devis :
+      - Filtre : seulement devis avec acomptes.statut === 'encaisse'
+      - Affichage : numero devis, client, nb produits
+   
+   b) Sélection produits :
+      - Checkboxes par ligne de devis
+      - Indication "⚠️ Déjà dans cette LA" si ref déjà présente
+      - Barre recherche : devis, client, produit
+   
+   c) Éclatement kits (logique critique) :
+      - Lecture produit dans products/{ref}
+      - Si est_kit=true ET composition_kit existe :
+        → Split composition_kit par ';'
+        → Pour chaque composant : lecture products/{compRef}
+        → Création ligne par composant avec :
+           * ref = compRef
+           * nom_fr, fournisseur, prix_achat depuis products
+           * qte = qte_devis (pas de multiplication, 1 par kit)
+           * kit_parent = ref du kit
+           * est_composant_kit = true
+      - Sinon : ajout ligne simple
+   
+   d) Ajout :
+      - Traitement async avec loading
+      - Compteur sélection dynamique
+      - Bouton "Ajouter (X)" désactivé si aucune sélection
+
+5. ENVOI ET MISE À JOUR CONTENEURS
+   - Bouton "Envoyer" :
+     → Confirmation modale avec avertissement
+     → Change statut=envoyee, date_envoi=serverTimestamp()
+     → Appelle updateConteneursDevisLies(lignes)
+   
+   - updateConteneursDevisLies() :
+     → Groupe devis_id par conteneur_id
+     → Pour chaque conteneur : merge avec devis_lies existants
+     → Update conteneurs/{id}.devis_lies = [...existants, ...nouveaux]
+
+6. READ-ONLY MODE
+   - Activé si statut === 'envoyee'
+   - Désactive :
+     * Input qté (affiche valeur)
+     * Dropdown conteneur (affiche valeur)
+     * Bouton suppression ligne
+     * Bouton ajouter produits
+     * Textarea notes
+     * Boutons enregistrer/envoyer
+   - Affiche bandeau gris "Liste validée — non modifiable"
+
+BUILD : ✅ 0 erreur TypeScript
+
+TESTS MANUELS À FAIRE :
+1. Naviguer vers /admin/listes-achat → liste vide
+2. Créer nouvelle LA → vérifier numéro LA-2604xxx généré
+3. Page détail : liste vide, bouton "Ajouter produits"
+4. Modal : vérifier filtrage devis avec acompte encaissé uniquement
+5. Sélectionner produit simple → ajouter → vérifier ligne créée
+6. Sélectionner produit kit → vérifier éclatement en composants
+7. Éditer quantité → vérifier total recalculé
+8. Attribuer conteneur via dropdown → vérifier sauvegarde
+9. Enregistrer brouillon → vérifier reload données
+10. Envoyer → vérifier passage envoyee + read-only
+11. Vérifier devis_lies mis à jour dans conteneurs concernés
+12. Filtres liste : brouillon/envoyee → vérifier affichage
+13. Tri colonnes → vérifier ordre asc/desc
+14. Recherche → vérifier filtrage
+
+NOTES TECHNIQUES :
+- Counter LA déjà supporté dans counters.ts (ligne 22)
+- useMemo utilisé partout (conformité v35c-fix1)
+- Style inline v35 (pas de className legacy)
+- Modal intégré dans DetailListeAchat.tsx (pas de fichier séparé)
+- Composition_kit format : "REF1;REF2;REF3" (split ';')
+- Collection products doit avoir est_kit + composition_kit optionnels
+- Collection quotes doit avoir acomptes[].statut
+- Pas de notification email pour v35d (sera v35e si besoin)
+
+DÉPENDANCES EXTERNES :
+- Firestore collections : listes_achat/, quotes/, products/, conteneurs/
+- Counter system : getNextNumber('LA')
+- Products fields : est_kit (bool), composition_kit (string), prix_achat (number), fournisseur (string)
+- Quotes fields : acomptes[{statut, ...}], lignes[{ref, nom_fr, qte, ...}]
+- Conteneurs fields : devis_lies (string[]), statut (string)
+

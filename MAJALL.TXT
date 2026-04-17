@@ -655,3 +655,34 @@ FICHIERS MODIFIÉS :
 
 BUILD : ✅ 0 erreur TypeScript
 COMMIT : 7135681
+
+=== v35d — Listes d'Achat (Back-office) ===
+Date : 17/04/2026
+
+OBJECTIF :
+  Système complet de Listes d'Achat pour préparer bons de commande fournisseurs
+  depuis devis avec acompte encaissé + éclatement automatique kits
+
+COMMITS :
+  aced311 v35d-A: routes + sidebar
+  fca18d8 v35d-B+C+D+E+F: 3 pages complètes (liste, création, détail+modal)
+
+FICHIERS CRÉÉS :
+  ✅ src/admin/pages/ListeListesAchat.tsx (292 lignes - list view)
+  ✅ src/admin/pages/NouvelleListeAchat.tsx (174 lignes - create)
+  ✅ src/admin/pages/DetailListeAchat.tsx (660 lignes - detail+modal)
+
+FONCTIONNALITÉS :
+  - Liste : filtres statut, recherche, tri 5 colonnes (useMemo)
+  - Création : numéro LA-YYMMNNN auto via getNextNumber
+  - Détail : table lignes (qté éditable, dropdown conteneur, delete)
+  - Modal ajout produits : filtrage devis acompte_encaisse only
+  - Éclatement kits : composition_kit split ';' → 1 ligne par composant
+  - Enregistrer (brouillon) / Envoyer (figer → envoyee)
+  - Read-only mode quand envoyee
+  - Update devis_lies dans conteneurs au moment envoi
+
+COLLECTION :
+  listes_achat/ : {numero, statut, lignes[], total_cny, notes, dates}
+
+BUILD : ✅ 0 erreur TypeScript
