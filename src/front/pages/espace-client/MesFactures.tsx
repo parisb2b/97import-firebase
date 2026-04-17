@@ -206,7 +206,7 @@ export default function MesFactures({ userId, profile }: MesFacturesProps) {
                     <td style={{ ...tdStyle, textAlign: 'right' }}>
                       <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end' }}>
                         <button onClick={() => setModalFacture(f)} title="Visualiser" style={btnIconStyle}>👁</button>
-                        <a href={f.url} download title="Télécharger" style={{ ...btnIconStyle, textDecoration: 'none', color: '#374151' }}>⬇️</a>
+                        <a href={f.url} target="_blank" rel="noopener noreferrer" title="Ouvrir dans un nouvel onglet" style={{ ...btnIconStyle, textDecoration: 'none', color: '#374151' }}>⬇️</a>
                         {canVerser && (
                           <button onClick={() => setPopupDevis(f.devis_ref)} title="Verser un autre acompte"
                             style={{ ...btnIconStyle, background: '#059669', color: '#fff' }}>💶</button>
