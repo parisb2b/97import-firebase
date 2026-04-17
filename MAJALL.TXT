@@ -638,3 +638,20 @@ Structure conteneur Firestore :
 Build : ✅ SUCCÈS (0 erreurs TypeScript)
 
 Workflow complet : Liste → Créer → Éditer → Changer statut → (v35d: lier devis via listes d'achat)
+
+=== v35c-fix1 — Fix tri colonnes ===
+Date : 17/04/2026
+
+PROBLÈME :
+  Tri cliquable ne fonctionnait pas (React ne détectait pas les changements)
+
+SOLUTION :
+  useMemo avec dépendances [filtered, sortCol, sortDir] + robustification comparaisons
+
+FICHIERS MODIFIÉS :
+  ✅ src/admin/pages/ListeConteneurs.tsx (tri conteneurs)
+  ✅ src/front/pages/espace-client/MesFactures.tsx (tri factures)
+  ✅ src/front/pages/espace-client/MesVirements.tsx (tri virements)
+
+BUILD : ✅ 0 erreur TypeScript
+COMMIT : 7135681

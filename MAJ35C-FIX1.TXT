@@ -1,0 +1,56 @@
+=== MAJ35C-FIX1 — Fix tri colonnes ===
+Date : 17/04/2026
+
+PROBLÈME :
+  Tri cliquable sur en-têtes colonnes ne fonctionnait pas
+  (icônes affichées, onClick déclenché, mais ordre des lignes inchangé)
+
+CAUSE :
+  Tri calculé via [...filtered].sort() directement dans le render
+  React ne détectait pas le changement → pas de re-render
+
+SOLUTION :
+  Utilisation de useMemo avec dépendances [filtered, sortCol, sortDir]
+  Robustification de la comparaison (undefined, null, Timestamp, string)
+
+FICHIERS MODIFIÉS :
+  ✅ src/admin/pages/ListeConteneurs.tsx
+  ✅ src/front/pages/espace-client/MesFactures.tsx
+  ✅ src/front/pages/espace-client/MesVirements.tsx
+
+CHANGEMENTS PAR FICHIER :
+
+1. ListeConteneurs.tsx :
+   - Import useMemo ajouté
+   - Filtrage enveloppé dans useMemo([conteneurs, statutFilter, searchTerm])
+   - Tri enveloppé dans useMemo([filtered, sortCol, sortDir])
+   - Robustification : gestion Timestamp Firestore + undefined/null
+   - else if pour éviter double conversion string
+
+2. MesFactures.tsx :
+   - Import useMemo ajouté
+   - Filtrage enveloppé dans useMemo([factures, filterType, searchTerm])
+   - Tri enveloppé dans useMemo([filtered, sortCol, sortDir])
+   - Robustification : gestion undefined/null + else if
+
+3. MesVirements.tsx :
+   - Import useMemo ajouté
+   - Filtrage enveloppé dans useMemo([virements, searchTerm])
+   - Tri enveloppé dans useMemo([filtered, sortCol, sortDir])
+   - Robustification : gestion undefined/null + else if
+
+BUILD : ✅ 0 erreur TypeScript
+
+COMMIT : 7135681 v35c-fix1: tri colonnes fonctionnel via useMemo + robustesse tri
+
+TESTS À FAIRE :
+1. ListeConteneurs : cliquer sur en-têtes → ordre doit changer
+2. MesFactures : cliquer sur en-têtes → ordre doit changer
+3. MesVirements : cliquer sur en-têtes → ordre doit changer
+4. Vérifier asc/desc (icônes ▲▼)
+5. Tester avec valeurs undefined/null (doivent aller en fin)
+
+NOTES :
+- Fix appliqué aux 3 fichiers ayant le même pattern de tri
+- useMemo garantit que React détecte les changements de dépendances
+- Robustesse améliorée : else if évite double conversion, gestion null/undefined explicite
