@@ -552,11 +552,11 @@ export function generateDevis(quote: any, emetteur?: any): jsPDF {
 // ============================================================
 // EXPORT: GÉNÉRER FACTURE ACOMPTE PDF
 // ============================================================
-export function generateFactureAcompte(quote: any, acompte: any, emetteur?: any): jsPDF {
+export function generateFactureAcompte(quote: any, acompteCible: any, emetteur?: any): jsPDF {
   const doc = new jsPDF();
   const cfg = getConfig(emetteur);
-  const numero = acompte?.numero || 'FA-' + (quote.numero || '').replace('DVS-', '');
-  const date = formatDate(acompte?.createdAt || quote.createdAt);
+  const numero = acompteCible?.numero || 'FA-' + (quote.numero || '').replace('DVS-', '');
+  const date = formatDate(acompteCible?.createdAt || quote.createdAt);
 
   drawLogo(doc, cfg.showLogo);
   drawHeader(doc, "Facture d'Acompte", numero, date, C.salmon);
@@ -586,11 +586,107 @@ export function generateFactureAcompte(quote: any, acompte: any, emetteur?: any)
   doc.text('TVA non applicable, art. 293 B du CGI', 190, y + 5, { align: 'right' });
   y += 10;
 
-  // Acompte block
-  const pct = quote.acompte_pct || 30;
-  const montant = acompte?.montant || quote.total_encaisse || 0;
-  const solde = quote.solde_restant ?? ((quote.total_ht || 0) - montant);
-  y = drawAcompteBlock(doc, quote.total_ht || 0, pct, montant, solde, y);
+  // ═══════════════════════════════════════════
+  // NOUVEAU BLOC : Historique cumulé
+  // ═══════════════════════════════════════════
+
+  // Calculer l'historique des acomptes encaissés jusqu'à l'acompte cible (inclus)
+  const acomptes = Array.isArray(quote.acomptes) ? quote.acomptes : [];
+  const acomptesEncaisses = acomptes
+    .filter((a: any) => a.statut === 'encaisse')
+    .sort((a: any, b: any) => {
+      const dA = new Date(a.date_encaissement || a.date).getTime();
+      const dB = new Date(b.date_encaissement || b.date).getTime();
+      return dA - dB;
+    });
+
+  // Trouver l'index de l'acompte cible dans la liste chronologique
+  const refFaCible = acompteCible.ref_fa;
+  const indexCible = acomptesEncaisses.findIndex((a: any) => a.ref_fa === refFaCible);
+  const acomptesJusquaCible = indexCible >= 0
+    ? acomptesEncaisses.slice(0, indexCible + 1)
+    : [acompteCible]; // fallback si non trouvé
+
+  const totalEncaisseCumule = acomptesJusquaCible.reduce(
+    (s: number, a: any) => s + (a.montant || 0), 0
+  );
+  const totalHt = quote.total_ht || 0;
+  const soldeRestantApres = totalHt - totalEncaisseCumule;
+
+  // Cadre total devis
+  doc.setFillColor(251, 240, 237); // #FBF0ED pale rose
+  doc.rect(15, y, 180, 10, 'F');
+  doc.setTextColor(0, 0, 0);
+  doc.setFontSize(10);
+  doc.text('Total devis HT :', 20, y + 7);
+  doc.text(`${totalHt.toLocaleString('fr-FR', { minimumFractionDigits: 2 })} €`, 190, y + 7, { align: 'right' });
+
+  y += 16;
+
+  // Titre historique
+  doc.setTextColor(200, 127, 107);
+  doc.setFontSize(11);
+  doc.text('Historique des acomptes encaissés :', 20, y);
+  y += 8;
+
+  // Liste des acomptes
+  doc.setTextColor(0, 0, 0);
+  doc.setFontSize(9);
+
+  for (const a of acomptesJusquaCible) {
+    const refFa = a.ref_fa || '—';
+    const dateA = a.date_encaissement || a.date;
+    const dateStr = dateA ? new Date(dateA).toLocaleDateString('fr-FR') : '—';
+    const montant = (a.montant || 0).toLocaleString('fr-FR', { minimumFractionDigits: 2 });
+    const estCible = a.ref_fa === refFaCible;
+
+    const libelle = `  ${refFa}  (${dateStr})${estCible ? '  ← présent' : ''}`;
+
+    if (estCible) {
+      doc.setTextColor(124, 58, 237); // violet
+      doc.setFont('helvetica', 'bold');
+    } else {
+      doc.setTextColor(0, 0, 0);
+      doc.setFont('helvetica', 'normal');
+    }
+
+    doc.text(libelle, 20, y);
+    doc.text(`${montant} €`, 190, y, { align: 'right' });
+    y += 6;
+  }
+
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(0, 0, 0);
+
+  // Ligne séparatrice
+  doc.setDrawColor(200, 127, 107);
+  doc.setLineWidth(0.5);
+  doc.line(20, y + 2, 190, y + 2);
+  y += 8;
+
+  // Total cumulé encaissé
+  doc.setFillColor(251, 240, 237);
+  doc.rect(15, y, 180, 9, 'F');
+  doc.setFontSize(10);
+  doc.text('Total encaissé cumulé :', 20, y + 6);
+  const totalCumuleStr = totalEncaisseCumule.toLocaleString('fr-FR', { minimumFractionDigits: 2 });
+  doc.setTextColor(5, 150, 105); // vert
+  doc.setFont('helvetica', 'bold');
+  doc.text(`${totalCumuleStr} €`, 190, y + 6, { align: 'right' });
+
+  y += 14;
+
+  // Solde restant dû
+  doc.setFillColor(219, 234, 254); // #DBEAFE bleu clair
+  doc.rect(15, y, 180, 12, 'F');
+  doc.setFontSize(11);
+  doc.setTextColor(30, 58, 138); // #1E3A8A
+  doc.setFont('helvetica', 'bold');
+  doc.text('Solde restant dû :', 20, y + 8);
+  const soldeStr = soldeRestantApres.toLocaleString('fr-FR', { minimumFractionDigits: 2 });
+  doc.text(`${soldeStr} €`, 190, y + 8, { align: 'right' });
+
+  y += 18;
 
   drawFooter(doc, 'Facture', numero, C.salmon);
 
