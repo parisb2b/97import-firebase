@@ -7,8 +7,8 @@ import {
   updateDoc,
   serverTimestamp,
 } from 'firebase/firestore';
-import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { db } from '../../lib/firebase';
+import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { db, storage } from '../../lib/firebase';
 import { useI18n } from '../../i18n';
 import { getNextNumber } from '../../lib/counters';
 import { OrangeIndicator } from '../../components/OrangeIndicator';
@@ -287,7 +287,6 @@ export default function DetailDevis() {
 
       // Upload PDF FA dans Storage
       const pdfBlob = pdfDoc.output('blob');
-      const storage = getStorage();
       const fileRef = storageRef(storage, `factures_acompte/${numeroFA}.pdf`);
       await uploadBytes(fileRef, pdfBlob, { contentType: 'application/pdf' });
       const pdfUrl = await getDownloadURL(fileRef);
@@ -378,7 +377,6 @@ export default function DetailDevis() {
                 // Upload dans Storage si pas encore fait
                 if (!(devis as any).devis_url) {
                   const pdfBlob = pdfDoc.output('blob');
-                  const storage = getStorage();
                   const fileRef = storageRef(storage, `devis/${devis.numero}.pdf`);
                   await uploadBytes(fileRef, pdfBlob, { contentType: 'application/pdf' });
                   const pdfUrl = await getDownloadURL(fileRef);
