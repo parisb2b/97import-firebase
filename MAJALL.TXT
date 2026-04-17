@@ -536,3 +536,49 @@ Fichiers modifiés :
 Build : ✅ SUCCÈS (0 erreurs TypeScript)
 
 NOTE : MesDevis.tsx et MesCommandes.tsx gardent DevisCard (v35a-fix3, inchangé)
+
+[2026-04-17 14:55] v35b — Notifications email (Firestore Extension + Resend)
+======================================================================================
+OBJECTIF : Envoyer des emails automatiques lors de 4 événements clés du workflow de commande
+
+PRÉREQUIS :
+  - Firebase Extension "Trigger Email from Firestore" installée et configurée
+  - SMTP URI : smtps://resend:API_KEY@smtp.resend.com:465
+  - Collection mail/ créée automatiquement
+  - Default FROM : notifications@97import.com
+  - Default REPLY-TO : parisb2b@gmail.com
+
+PARTIE A — SERVICE EMAIL :
+  - src/lib/emailService.ts créé (547 lignes)
+  - Template HTML responsive charte 97import (bleu #1565C0 + salmon #C87F6B)
+  - 4 fonctions exportées :
+    • notifyDevisCree : client + admin + partenaire (si attribué)
+    • notifyDevisVipEnvoye : client (offre VIP) + admin
+    • notifyAcompteDeclare : client (accusé) + admin (URGENT) + partenaire
+    • notifyAcompteEncaisse : client (avec FA.pdf en PJ) + partenaire (commission)
+
+PARTIE B — HOOKS DANS LE CODE :
+  - Panier.tsx : hook devis créé (handleAvecAcompte + handleSansAcompte)
+  - GestionDevisPartner.tsx : hook VIP envoyé (handleSendVIP)
+  - PopupAcompte.tsx : hook acompte déclaré (handleConfirm)
+  - PopupEncaisserAcompte.tsx : hook acompte encaissé (confirmer)
+
+PARTIE C — FIX PDF NOUVEL ONGLET :
+  - MesFactures.tsx : bouton ⬇️ download → target="_blank" + rel="noopener noreferrer"
+
+Commits :
+  f156c16 - v35b-A: service email avec 4 événements (devis/vip/acompte déclaré/encaissé)
+  bf7d901 - v35b-B: hooks email dans panier + VIP + acompte déclaré + encaissé
+  4dde8dd - v35b-C: PDF facture ouvre dans nouvel onglet
+
+Fichiers modifiés :
+  ✅ src/lib/emailService.ts (créé)
+  ✅ src/front/pages/Panier.tsx (hook devis créé)
+  ✅ src/front/pages/espace-partenaire/GestionDevisPartner.tsx (hook VIP)
+  ✅ src/front/pages/espace-client/PopupAcompte.tsx (hook acompte déclaré)
+  ✅ src/admin/components/PopupEncaisserAcompte.tsx (hook acompte encaissé)
+  ✅ src/front/pages/espace-client/MesFactures.tsx (fix nouvel onglet)
+
+Build : ✅ SUCCÈS (0 erreurs TypeScript)
+
+Tests manuels à faire : créer devis, VIP, déclarer acompte, encaisser → vérifier emails reçus + collection mail/ delivery.state=SUCCESS

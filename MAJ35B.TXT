@@ -1,0 +1,93 @@
+=== MAJ35B — Notifications email (Firestore Extension + Resend) ===
+Date : 17/04/2026
+
+PARTIE A — SERVICE EMAIL :
+  src/lib/emailService.ts créé : ✅
+  Template HTML base partagé : ✅
+  4 fonctions exportées :
+    - notifyDevisCree (client + admin + partenaire) : ✅
+    - notifyDevisVipEnvoye (client + admin) : ✅
+    - notifyAcompteDeclare (client + admin + partenaire) : ✅
+    - notifyAcompteEncaisse (client avec FA PJ + partenaire) : ✅
+
+PARTIE B — HOOKS DANS LE CODE :
+  Hook création devis panier : ✅
+  Hook envoi VIP partenaire : ✅
+  Hook déclaration acompte client : ✅
+  Hook encaissement acompte admin : ✅
+
+PARTIE C — FIX PDF NOUVEL ONGLET :
+  MesFactures.tsx bouton ⬇️ : target="_blank" : ✅
+
+PARTIE D — BUILD :
+  npm run build : ✅
+
+COMMITS :
+  f156c16 v35b-A: service email avec 4 événements (devis/vip/acompte déclaré/encaissé)
+  bf7d901 v35b-B: hooks email dans panier + VIP + acompte déclaré + encaissé
+  4dde8dd v35b-C: PDF facture ouvre dans nouvel onglet
+
+FICHIERS MODIFIÉS :
+  ✅ src/lib/emailService.ts (créé — 547 lignes)
+  ✅ src/front/pages/Panier.tsx (hook devis créé — 2 appels)
+  ✅ src/front/pages/espace-partenaire/GestionDevisPartner.tsx (hook VIP)
+  ✅ src/front/pages/espace-client/PopupAcompte.tsx (hook acompte déclaré)
+  ✅ src/admin/components/PopupEncaisserAcompte.tsx (hook acompte encaissé)
+  ✅ src/front/pages/espace-client/MesFactures.tsx (fix nouvel onglet)
+
+PRÉREQUIS MANUELS (vérifier avec Michel) :
+  - Firestore Extension "Trigger Email" installée : ✅
+  - SMTP Resend configuré avec API key : ✅
+  - Collection mail/ créée : (créée automatiquement par l'extension)
+  - Domaine 97import.com vérifié dans Resend : ✅
+
+TESTS MANUELS (à remplir par Michel) :
+  Test 1 — Devis créé : ⏳
+  Test 2 — Devis VIP : ⏳
+  Test 3 — Acompte déclaré : ⏳
+  Test 4 — Acompte encaissé avec FA PJ : ⏳
+
+DÉTAILS TECHNIQUES :
+
+1. SERVICE EMAIL (emailService.ts)
+   - Fonction sendEmail() : écrit un document dans collection mail/
+   - Template HTML responsive : charte 97import (bleu #1565C0 + salmon #C87F6B)
+   - Conversion htmlToText() pour clients mail texte seul
+   - Helper formatEur() pour affichage montants
+   - Gestion pièces jointes (FA PDF depuis Storage URL)
+
+2. ÉVÉNEMENT 1 — Devis créé (Panier.tsx)
+   - Hook dans handleAvecAcompte (après setDoc)
+   - Hook dans handleSansAcompte (après setDoc)
+   - 3 emails envoyés : client + admin + partenaire (si attribué)
+   - Données enrichies : client_prenom, pays_livraison ajoutés
+
+3. ÉVÉNEMENT 2 — Devis VIP envoyé (GestionDevisPartner.tsx)
+   - Hook dans handleSendVIP (après updateDoc statut vip_envoye)
+   - Fetch partenaire pour récupérer nom/prénom
+   - 2 emails envoyés : client (offre VIP) + admin (notification)
+   - Affiche économie si totalHtPublic > totalHtNegocie
+
+4. ÉVÉNEMENT 3 — Acompte déclaré (PopupAcompte.tsx)
+   - Hook dans handleConfirm (après updateDoc acomptes)
+   - 3 emails envoyés : client (accusé) + admin (URGENT vérifier) + partenaire (si attribué)
+   - Email admin : fond jaune + bordure orange pour urgence
+
+5. ÉVÉNEMENT 4 — Acompte encaissé (PopupEncaisserAcompte.tsx)
+   - Hook dans confirmer (après updateDoc + génération PDF FA)
+   - 2 emails envoyés : client (avec FA.pdf en PJ) + partenaire (commission confirmée)
+   - Calcul automatique solde restant dans email
+   - Message conditionnel : "verser nouvel acompte" si solde > 0, sinon "commande payée"
+
+6. FIX PDF NOUVEL ONGLET
+   - Bouton ⬇️ dans MesFactures.tsx : download → target="_blank" + rel="noopener noreferrer"
+   - Ouvre le PDF dans nouvel onglet au lieu de télécharger
+
+BUILD : ✅ 0 erreur TypeScript (warnings chunk size ignorés)
+
+NEXT STEPS (tests manuels par Michel) :
+1. Créer un devis test → vérifier 3 emails reçus
+2. Envoyer VIP depuis espace partenaire → vérifier 2 emails
+3. Déclarer acompte → vérifier 3 emails (dont admin URGENT)
+4. Encaisser acompte admin → vérifier email client avec FA.pdf en pièce jointe
+5. Consulter collection mail/ dans Firestore : delivery.state = SUCCESS
