@@ -1,219 +1,342 @@
 import { useState, useEffect } from 'react';
-import { useRoute } from 'wouter';
-import { doc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { useLocation, useRoute, Link } from 'wouter';
+import { doc, getDoc, updateDoc, deleteDoc, serverTimestamp, Timestamp } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
-import { useI18n } from '../../i18n';
-import { Card, Button, InfoBlock } from '../components/Icons';
-import { generateBCChine, generateBEExport, generateBDPackingList, generateBDInvoiceExcel, downloadExcel } from '../../lib/excel-generator';
+import DropdownPorts from '../components/DropdownPorts';
 
-interface LigneConteneur {
-  ref: string;
-  nom_fr: string;
-  nom_zh: string;
-  qte_colis: number;
-  qte_pieces: number;
-  l: number;
-  L: number;
-  h: number;
-  volume_m3: number;
-  poids_net: number;
-}
+const STATUTS = [
+  { value: 'preparation', label: 'En préparation', color: '#1565C0' },
+  { value: 'en_chargement', label: 'En chargement', color: '#D97706' },
+  { value: 'en_mer', label: 'En mer', color: '#2563EB' },
+  { value: 'arrive', label: 'Arrivé au port', color: '#059669' },
+  { value: 'livre', label: 'Livré', color: '#065F46' },
+];
 
-interface Container {
-  id: string;
-  numero: string;
-  type: string;
-  destination: string;
-  statut: string;
-  date_depart?: any;
-  date_arrivee_prevue?: any;
-  voyage_number?: string;
-  bl_waybill?: string;
-  seal?: string;
-  port_chargement: string;
-  port_destination: string;
-  lignes: LigneConteneur[];
-  volume_total: number;
-  poids_total: number;
-}
+const DESTINATIONS = [
+  { code: 'MQ', label: '🇲🇶 Martinique' },
+  { code: 'GP', label: '🇬🇵 Guadeloupe' },
+  { code: 'GF', label: '🇬🇫 Guyane' },
+  { code: 'RE', label: '🇷🇪 Réunion' },
+  { code: 'FR', label: '🇫🇷 France Métro.' },
+];
 
 export default function DetailConteneur() {
-  const { t } = useI18n();
   const [, params] = useRoute('/admin/conteneurs/:id');
-  const [container, setContainer] = useState<Container | null>(null);
+  const [, setLocation] = useLocation();
+  const [conteneur, setConteneur] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [form, setForm] = useState<any>({});
 
   useEffect(() => {
-    const load = async () => {
-      if (!params?.id) return;
-      const snap = await getDoc(doc(db, 'containers', params.id));
-      if (snap.exists()) setContainer({ id: snap.id, ...snap.data() } as Container);
-      setLoading(false);
-    };
-    load();
+    if (params?.id) loadConteneur(params.id);
   }, [params?.id]);
 
-  const calculateTotals = (lignes: LigneConteneur[]) => ({
-    volume_total: lignes.reduce((sum, l) => sum + l.volume_m3, 0),
-    poids_total: lignes.reduce((sum, l) => sum + l.poids_net * l.qte_pieces, 0),
-  });
+  const loadConteneur = async (id: string) => {
+    setLoading(true);
+    try {
+      const snap = await getDoc(doc(db, 'conteneurs', id));
+      if (snap.exists()) {
+        const data = snap.data();
+        setConteneur({ id: snap.id, ...data });
+        setForm({
+          type: data.type || '',
+          destination: data.destination || '',
+          date_depart_est: timestampToDateInput(data.date_depart_est),
+          date_arrivee_est: timestampToDateInput(data.date_arrivee_est),
+          port_chargement: data.port_chargement || '',
+          port_destination: data.port_destination || '',
+          num_physique: data.num_physique || '',
+          voyage_number: data.voyage_number || '',
+          bl_number: data.bl_number || '',
+          seal_number: data.seal_number || '',
+          statut: data.statut || 'preparation',
+          notes: data.notes || '',
+        });
+      } else {
+        alert('Conteneur introuvable');
+        setLocation('/admin/conteneurs');
+      }
+    } catch (err) {
+      console.error('Erreur chargement:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSave = async () => {
-    if (!container) return;
+    if (!conteneur) return;
     setSaving(true);
     try {
-      const totals = calculateTotals(container.lignes);
-      await updateDoc(doc(db, 'containers', container.id), { ...container, ...totals, updatedAt: serverTimestamp() });
-      setContainer({ ...container, ...totals });
-    } catch (err) {
-      console.error('Error saving:', err);
+      await updateDoc(doc(db, 'conteneurs', conteneur.id), {
+        type: form.type,
+        destination: form.destination,
+        date_depart_est: form.date_depart_est ? Timestamp.fromDate(new Date(form.date_depart_est)) : null,
+        date_arrivee_est: form.date_arrivee_est ? Timestamp.fromDate(new Date(form.date_arrivee_est)) : null,
+        port_chargement: form.port_chargement,
+        port_destination: form.port_destination,
+        num_physique: form.num_physique,
+        voyage_number: form.voyage_number,
+        bl_number: form.bl_number,
+        seal_number: form.seal_number,
+        statut: form.statut,
+        notes: form.notes,
+        updated_at: serverTimestamp(),
+      });
+
+      alert('Conteneur mis à jour');
+      await loadConteneur(conteneur.id);
+    } catch (err: any) {
+      alert('Erreur: ' + err.message);
     } finally {
       setSaving(false);
     }
   };
 
-  const handleAddLigne = () => {
-    if (!container) return;
-    setContainer({ ...container, lignes: [...container.lignes, { ref: '', nom_fr: '', nom_zh: '', qte_colis: 1, qte_pieces: 1, l: 0, L: 0, h: 0, volume_m3: 0, poids_net: 0 }] });
-  };
-
-  const handleLigneChange = (index: number, field: keyof LigneConteneur, value: string | number) => {
-    if (!container) return;
-    const newLignes = [...container.lignes];
-    newLignes[index] = { ...newLignes[index], [field]: value };
-    if (['l', 'L', 'h'].includes(field)) {
-      const { l, L, h } = newLignes[index];
-      newLignes[index].volume_m3 = (l * L * h) / 1000000;
+  const handleDelete = async () => {
+    if (!conteneur) return;
+    if (Array.isArray(conteneur.devis_lies) && conteneur.devis_lies.length > 0) {
+      alert(`Impossible de supprimer : ${conteneur.devis_lies.length} devis sont liés à ce conteneur.`);
+      return;
     }
-    setContainer({ ...container, lignes: newLignes });
-  };
+    if (!confirm(`Supprimer définitivement le conteneur ${conteneur.numero} ?`)) return;
 
-  const handleRemoveLigne = (index: number) => {
-    if (!container) return;
-    setContainer({ ...container, lignes: container.lignes.filter((_, i) => i !== index) });
-  };
-
-  const handleStatutChange = async (newStatut: string) => {
-    if (!container) return;
     try {
-      await updateDoc(doc(db, 'containers', container.id), { statut: newStatut, updatedAt: serverTimestamp() });
-      setContainer({ ...container, statut: newStatut });
-    } catch (err) {
-      console.error('Error updating statut:', err);
+      await deleteDoc(doc(db, 'conteneurs', conteneur.id));
+      alert('Conteneur supprimé');
+      setLocation('/admin/conteneurs');
+    } catch (err: any) {
+      alert('Erreur: ' + err.message);
     }
   };
 
-  const handleExportExcel = (type: string) => {
-    if (!container) return;
-    const data = { ...container } as any;
-    switch (type) {
-      case 'bc': downloadExcel(generateBCChine(data), `BC-${container.numero}.xlsx`); break;
-      case 'be': downloadExcel(generateBEExport(data), `BE-${container.numero}.xlsx`); break;
-      case 'packing': downloadExcel(generateBDPackingList(data), `PL-${container.numero}.xlsx`); break;
-      case 'invoice': downloadExcel(generateBDInvoiceExcel(data), `INV-${container.numero}.xlsx`); break;
-    }
-  };
+  if (loading || !conteneur) {
+    return <div style={{ padding: 40, textAlign: 'center', color: '#9CA3AF' }}>Chargement...</div>;
+  }
 
-  if (loading) return <div style={{ textAlign: 'center', padding: 32 }}>Chargement...</div>;
-  if (!container) return <div className="alert rd">Conteneur non trouvé</div>;
-
-  const totals = calculateTotals(container.lignes);
+  const statutInfo = STATUTS.find(s => s.value === form.statut) || STATUTS[0];
+  const destLabel = DESTINATIONS.find(d => d.code === form.destination)?.label || form.destination;
+  const nbDevis = Array.isArray(conteneur.devis_lies) ? conteneur.devis_lies.length : 0;
 
   return (
-    <>
+    <div style={{ padding: 32, maxWidth: 900, margin: '0 auto' }}>
       {/* Header */}
-      <div className="filters" style={{ justifyContent: 'space-between' }}>
-        <div className="ct" style={{ fontSize: 18 }}>{container.numero}</div>
-        <div style={{ display: 'flex', gap: 8 }}>
-          <Button variant="p" onClick={handleSave} disabled={saving}>
-            {saving ? t('loading') : t('btn.enregistrer')}
-          </Button>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
+        <Link href="/admin/conteneurs">
+          <button style={{ background: 'transparent', border: 'none', color: '#6B7280', fontSize: 14, cursor: 'pointer', padding: 0 }}>
+            ← Retour liste
+          </button>
+        </Link>
+      </div>
+
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: 24 }}>
+        <div>
+          <h1 style={{ fontSize: 28, fontWeight: 700, color: '#1E3A5F', margin: 0 }}>
+            {conteneur.numero}
+          </h1>
+          <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginTop: 8 }}>
+            <span style={{
+              background: `${statutInfo.color}15`, color: statutInfo.color,
+              padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 600,
+            }}>
+              {statutInfo.label}
+            </span>
+            <span style={{ color: '#6B7280', fontSize: 14 }}>
+              {form.type} · {destLabel} · {nbDevis} devis liés
+            </span>
+          </div>
         </div>
       </div>
 
-      {/* Infos conteneur */}
-      <Card title="Informations conteneur">
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, padding: 16 }}>
-          <InfoBlock title="Type"><span style={{ fontWeight: 600 }}>{container.type}</span></InfoBlock>
-          <InfoBlock title="Destination"><span style={{ fontWeight: 600 }}>{container.destination}</span></InfoBlock>
-          <InfoBlock title="Port chargement"><span>{container.port_chargement}</span></InfoBlock>
-          <InfoBlock title="Port destination"><span>{container.port_destination}</span></InfoBlock>
-          <div className="fg">
-            <div className="fl">Statut</div>
-            <select className="fsel" value={container.statut} onChange={(e) => handleStatutChange(e.target.value)}>
-              <option value="préparation">En préparation</option>
-              <option value="chargé">Chargé</option>
-              <option value="parti">Parti du port</option>
-              <option value="arrivé">Arrivé</option>
-              <option value="livré">Livré</option>
+      {/* Section Informations principales */}
+      <div style={cardStyle}>
+        <h2 style={sectionTitleStyle}>Informations principales</h2>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+          <div>
+            <label style={labelStyle}>Type</label>
+            <select value={form.type} onChange={e => setForm({ ...form, type: e.target.value })} style={inputStyle}>
+              <option value="20GP">20GP</option>
+              <option value="40GP">40GP</option>
+              <option value="40HC">40HC</option>
             </select>
           </div>
-          <InfoBlock title="Volume total"><span style={{ fontWeight: 600 }}>{totals.volume_total.toFixed(2)} m³</span></InfoBlock>
-          <InfoBlock title="Poids total"><span style={{ fontWeight: 600 }}>{totals.poids_total.toLocaleString('fr-FR')} kg</span></InfoBlock>
-        </div>
-      </Card>
-
-      {/* Documents export */}
-      <Card title="Documents export">
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, padding: 16 }}>
-          <Button variant="t" onClick={() => handleExportExcel('bc')}>BC CHINE</Button>
-          <Button variant="t" onClick={() => handleExportExcel('be')}>BE EXPORT</Button>
-          <Button variant="s" onClick={() => handleExportExcel('invoice')}>BD INVOICE</Button>
-          <Button variant="s" onClick={() => handleExportExcel('packing')}>BD PACKING LIST</Button>
-          <Button variant="o" onClick={() => alert('Fonction email client en cours de développement')}>Email client</Button>
-          <Button variant="o" onClick={() => alert('Fonction email transitaire en cours de développement')}>Email transitaire</Button>
-          <Button variant="o" onClick={() => alert('Fonction tracking en cours de développement')}>Tracking</Button>
-        </div>
-      </Card>
-
-      {/* Lignes conteneur */}
-      <Card title="Contenu du conteneur" actions={
-        <Button variant="o" onClick={handleAddLigne} style={{ fontSize: 12 }}>+ Ajouter une ligne</Button>
-      }>
-        {container.lignes.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: 24, color: 'var(--tx3)' }}>Aucun produit</div>
-        ) : (
-          <div style={{ overflowX: 'auto' }}>
-            <table className="admin-table">
-              <thead>
-                <tr>
-                  <th>Réf</th>
-                  <th>Nom FR</th>
-                  <th>Nom ZH</th>
-                  <th style={{ textAlign: 'right', width: 60 }}>Colis</th>
-                  <th style={{ textAlign: 'right', width: 60 }}>Pièces</th>
-                  <th style={{ textAlign: 'right', width: 60 }}>L cm</th>
-                  <th style={{ textAlign: 'right', width: 60 }}>l cm</th>
-                  <th style={{ textAlign: 'right', width: 60 }}>H cm</th>
-                  <th style={{ textAlign: 'right', width: 75 }}>Vol m³</th>
-                  <th style={{ textAlign: 'right', width: 75 }}>Poids kg</th>
-                  <th style={{ width: 40 }}></th>
-                </tr>
-              </thead>
-              <tbody>
-                {container.lignes.map((ligne, index) => (
-                  <tr key={index}>
-                    <td><input className="fi" type="text" value={ligne.ref} onChange={(e) => handleLigneChange(index, 'ref', e.target.value)} /></td>
-                    <td><input className="fi" type="text" value={ligne.nom_fr} onChange={(e) => handleLigneChange(index, 'nom_fr', e.target.value)} /></td>
-                    <td><input className="fi" type="text" value={ligne.nom_zh} onChange={(e) => handleLigneChange(index, 'nom_zh', e.target.value)} /></td>
-                    <td><input className="fi" type="number" value={ligne.qte_colis} min={1} style={{ textAlign: 'right' }} onChange={(e) => handleLigneChange(index, 'qte_colis', Number(e.target.value))} /></td>
-                    <td><input className="fi" type="number" value={ligne.qte_pieces} min={1} style={{ textAlign: 'right' }} onChange={(e) => handleLigneChange(index, 'qte_pieces', Number(e.target.value))} /></td>
-                    <td><input className="fi" type="number" value={ligne.l} min={0} style={{ textAlign: 'right' }} onChange={(e) => handleLigneChange(index, 'l', Number(e.target.value))} /></td>
-                    <td><input className="fi" type="number" value={ligne.L} min={0} style={{ textAlign: 'right' }} onChange={(e) => handleLigneChange(index, 'L', Number(e.target.value))} /></td>
-                    <td><input className="fi" type="number" value={ligne.h} min={0} style={{ textAlign: 'right' }} onChange={(e) => handleLigneChange(index, 'h', Number(e.target.value))} /></td>
-                    <td style={{ textAlign: 'right', fontWeight: 600 }}>{ligne.volume_m3.toFixed(3)}</td>
-                    <td><input className="fi" type="number" value={ligne.poids_net} min={0} style={{ textAlign: 'right' }} onChange={(e) => handleLigneChange(index, 'poids_net', Number(e.target.value))} /></td>
-                    <td>
-                      <button onClick={() => handleRemoveLigne(index)} style={{ color: 'var(--rd)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 16 }}>✕</button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div>
+            <label style={labelStyle}>Destination</label>
+            <select value={form.destination} onChange={e => setForm({ ...form, destination: e.target.value })} style={inputStyle}>
+              {DESTINATIONS.map(d => <option key={d.code} value={d.code}>{d.label}</option>)}
+            </select>
           </div>
+          <div>
+            <label style={labelStyle}>Date départ estimée</label>
+            <input type="date" value={form.date_depart_est} onChange={e => setForm({ ...form, date_depart_est: e.target.value })} style={inputStyle} />
+          </div>
+          <div>
+            <label style={labelStyle}>Date arrivée estimée</label>
+            <input type="date" value={form.date_arrivee_est} onChange={e => setForm({ ...form, date_arrivee_est: e.target.value })} style={inputStyle} />
+          </div>
+        </div>
+      </div>
+
+      {/* Section Ports */}
+      <div style={cardStyle}>
+        <h2 style={sectionTitleStyle}>Ports</h2>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+          <DropdownPorts
+            type="chargement"
+            value={form.port_chargement}
+            onChange={code => setForm({ ...form, port_chargement: code })}
+            label="Port de chargement"
+          />
+          <DropdownPorts
+            type="destination"
+            value={form.port_destination}
+            onChange={code => setForm({ ...form, port_destination: code })}
+            label="Port de destination"
+          />
+        </div>
+      </div>
+
+      {/* Section Infos transporteur */}
+      <div style={cardStyle}>
+        <h2 style={sectionTitleStyle}>Informations transporteur</h2>
+        <p style={{ fontSize: 13, color: '#6B7280', marginTop: 0, marginBottom: 20 }}>
+          À renseigner au départ réel du conteneur (extractible du BL PDF du transporteur).
+        </p>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+          <div>
+            <label style={labelStyle}>N° Conteneur physique</label>
+            <input
+              type="text"
+              placeholder="Ex: APHU7221859"
+              value={form.num_physique}
+              onChange={e => setForm({ ...form, num_physique: e.target.value.toUpperCase() })}
+              style={inputStyle}
+            />
+          </div>
+          <div>
+            <label style={labelStyle}>Voyage Number</label>
+            <input
+              type="text"
+              placeholder="Ex: 1FL2CW1MA"
+              value={form.voyage_number}
+              onChange={e => setForm({ ...form, voyage_number: e.target.value })}
+              style={inputStyle}
+            />
+          </div>
+          <div>
+            <label style={labelStyle}>BL / Waybill Number</label>
+            <input
+              type="text"
+              placeholder="Ex: ZSN0807356"
+              value={form.bl_number}
+              onChange={e => setForm({ ...form, bl_number: e.target.value })}
+              style={inputStyle}
+            />
+          </div>
+          <div>
+            <label style={labelStyle}>SEAL Number</label>
+            <input
+              type="text"
+              placeholder="Ex: M8764995"
+              value={form.seal_number}
+              onChange={e => setForm({ ...form, seal_number: e.target.value })}
+              style={inputStyle}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Section Statut et notes */}
+      <div style={cardStyle}>
+        <h2 style={sectionTitleStyle}>Statut et notes</h2>
+
+        <div style={{ marginBottom: 16 }}>
+          <label style={labelStyle}>Statut du conteneur</label>
+          <select value={form.statut} onChange={e => setForm({ ...form, statut: e.target.value })} style={inputStyle}>
+            {STATUTS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
+          </select>
+        </div>
+
+        <div>
+          <label style={labelStyle}>Notes internes</label>
+          <textarea
+            value={form.notes}
+            onChange={e => setForm({ ...form, notes: e.target.value })}
+            rows={3}
+            style={{ ...inputStyle, fontFamily: 'inherit', resize: 'vertical' }}
+          />
+        </div>
+      </div>
+
+      {/* Section Devis liés (placeholder v35d) */}
+      <div style={cardStyle}>
+        <h2 style={sectionTitleStyle}>Devis liés à ce conteneur</h2>
+        {nbDevis === 0 ? (
+          <p style={{ fontSize: 13, color: '#9CA3AF', fontStyle: 'italic', margin: 0 }}>
+            Aucun devis lié pour l'instant. Les liaisons se feront via les listes d'achat (v35d).
+          </p>
+        ) : (
+          <ul style={{ margin: 0, paddingLeft: 20, fontSize: 14 }}>
+            {conteneur.devis_lies.map((id: string) => (
+              <li key={id}>
+                <Link href={`/admin/devis/${id}`} style={{ color: '#1565C0', fontWeight: 600 }}>
+                  {id}
+                </Link>
+              </li>
+            ))}
+          </ul>
         )}
-      </Card>
-    </>
+      </div>
+
+      {/* Boutons actions */}
+      <div style={{ display: 'flex', gap: 12, marginTop: 24 }}>
+        <button
+          onClick={handleSave}
+          disabled={saving}
+          style={{
+            flex: 1, padding: 14,
+            background: saving ? '#D3D1C7' : '#EA580C',
+            color: '#fff', border: 'none', borderRadius: 12,
+            fontSize: 14, fontWeight: 600,
+            cursor: saving ? 'not-allowed' : 'pointer',
+          }}>
+          {saving ? 'Enregistrement...' : 'Enregistrer les modifications'}
+        </button>
+        <button
+          onClick={handleDelete}
+          style={{
+            padding: 14, background: 'transparent', color: '#DC2626',
+            border: '1.5px solid #FECACA', borderRadius: 12,
+            fontSize: 14, fontWeight: 600, cursor: 'pointer',
+          }}>
+          Supprimer
+        </button>
+      </div>
+    </div>
   );
 }
+
+function timestampToDateInput(ts: any): string {
+  if (!ts) return '';
+  const d = ts.toDate ? ts.toDate() : new Date(ts);
+  if (isNaN(d.getTime())) return '';
+  return d.toISOString().split('T')[0];
+}
+
+const cardStyle: React.CSSProperties = {
+  background: '#fff', border: '1px solid #E5E7EB', borderRadius: 16,
+  padding: 24, marginBottom: 20,
+};
+const sectionTitleStyle: React.CSSProperties = {
+  fontSize: 16, fontWeight: 600, color: '#1E3A5F', marginTop: 0, marginBottom: 20,
+};
+const labelStyle: React.CSSProperties = {
+  display: 'block', fontSize: 12, color: '#6B7280', marginBottom: 6,
+  fontWeight: 600, textTransform: 'uppercase',
+};
+const inputStyle: React.CSSProperties = {
+  width: '100%', padding: '10px 12px', border: '1px solid #E5E7EB',
+  borderRadius: 10, fontSize: 14, background: '#fff', boxSizing: 'border-box',
+};
