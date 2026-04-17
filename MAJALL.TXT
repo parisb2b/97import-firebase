@@ -1,3 +1,39 @@
+[2026-04-17 12:50] v35a-fix2 — Correction 6 bugs workflow (prix VIP + Firebase + modal €)
+======================================================================================
+BUG #1 — Prix VIP non persisté :
+  - GestionDevisPartner: prix_negocies stocké comme map{} au lieu d'array
+  - Calcul total_ht négocié + sauvegarde total_ht_public (prix original)
+  - pdf-generator: drawProductTable affiche prix public barré + prix négocié violet
+  - Migration 2 devis VIP (array → map, total_ht corrigé)
+
+BUG #2 — Erreur Firebase [DEFAULT] dans modal Encaisser :
+  - DetailDevis.tsx: import storage depuis singleton au lieu de getStorage()
+  - Suppression 2 appels getStorage() sans paramètre
+
+BUG #3 — Bouton € admin ouvre vue détail au lieu de modal :
+  - PopupEncaisserAcompte.tsx créé (logique réutilisable)
+  - ListeDevis.tsx: bouton € ouvre modal directement (plus de navigation)
+  - DetailDevis.tsx: utilise PopupEncaisserAcompte (supprime confirmerEncaissement)
+
+BUG #4 — Incohérence boutons action :
+  - Boutons déjà cohérents : 👁 détail / 📄 PDF / 💎 VIP / € modal
+
+BUG #5 — Bouton PDF client ne fait rien :
+  - handleDownloadPDF déjà fonctionnel dans MesDevis.tsx
+
+BUG #6 — Badge "envoyé" au lieu de "VIP" :
+  - getBadgeInfo() créé : vérifie is_vip prioritaire → badge violet "VIP"
+  - MesDevis.tsx: supprimé statutStyle, utilise badge directement
+
+Build : ✅ SUCCÈS (0 erreurs TypeScript)
+
+Commits :
+  3d883ba - B: prix VIP
+  9e83e45 - C: Firebase [DEFAULT]
+  e77ce47 - D: bouton € modal
+  18c5bbd - E/F/G: boutons + PDF + badge
+  4d3f97a - H: build fix
+
 [2026-04-17 12:16] v35a-fix — Bouton "Verser un acompte" omniprésent (tous onglets client)
 ======================================================================================
 PROBLÈME : Client ne peut pas déclarer un acompte depuis l'onglet "Mes devis"

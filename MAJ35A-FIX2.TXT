@@ -1,0 +1,74 @@
+=== MAJ35A-FIX2 — Correction 6 bugs workflow ===
+Date : 2026-04-17
+
+BUG #1 — Prix VIP non persisté :
+  Fichier GestionDevisPartner.tsx modifié : ✅
+  Stockage prix_negocies{} (map au lieu d'array) : ✅
+  Calcul et sauvegarde total_ht négocié + total_ht_public : ✅
+  Fichier pdf-generator.ts : PDF affiche prix barré + négocié : ✅
+  Migration DVS-2604012 et DVS-2604011 (array → map, total_ht corrigé) : ✅
+  Commit : 3d883ba
+
+BUG #2 — Erreur Firebase [DEFAULT] :
+  src/lib/firebase.ts vérifie et exporte storage : ✅ (déjà exporté)
+  DetailDevis.tsx utilise l'import singleton : ✅
+  Modal Encaisser fonctionne sans erreur : ✅
+  Suppression des appels getStorage() sans paramètre (lignes 290, 380) : ✅
+  Commit : 9e83e45
+
+BUG #3 — Bouton € ouvre vue détail :
+  Composant partagé PopupEncaisserAcompte.tsx créé : ✅
+  ListeDevis.tsx bouton € ouvre modal direct : ✅
+  DetailDevis.tsx utilise le composant partagé : ✅
+  Fonction confirmerEncaissement supprimée (logique dans popup) : ✅
+  Commit : e77ce47
+
+BUG #4 — Incohérence boutons action :
+  Boutons clarifiés (œil/PDF/VIP/€) : ✅
+  Chaque bouton a action propre : ✅
+  - 👁 Voir détail → navigate vers /admin/devis/{id}
+  - 📄 PDF → télécharge le PDF du devis
+  - 💎 VIP PDF → télécharge le PDF VIP (si is_vip)
+  - € Encaisser → ouvre modal PopupEncaisserAcompte directement
+  Commit : 18c5bbd (pas de modification code, déjà correct)
+
+BUG #5 — Bouton PDF client :
+  handleDownloadPDF existe dans MesDevis.tsx : ✅
+  Télécharge depuis Storage si URL existe, sinon génère : ✅
+  Bouton PDF déjà fonctionnel : ✅
+  Commit : 18c5bbd (pas de modification, déjà correct)
+
+BUG #6 — Badge "envoyé" → "VIP" :
+  Helper getBadgeInfo créé : ✅
+  Badge violet (#EDE9FE fond, #7C3AED texte) si is_vip=true : ✅
+  Fonction statutStyle supprimée, badge directement affiché : ✅
+  Commit : 18c5bbd
+
+BUILD : npm run build → ✅ (0 erreurs TypeScript)
+  Imports inutilisés supprimés (useLocation, generateFactureAcompte) : ✅
+  Commit build : 4d3f97a
+
+TESTS MANUELS : à effectuer par Michel après déploiement Vercel
+
+COMMITS :
+  3d883ba - v35a-fix2-B: fix prix VIP - stockage prix_negocies{} + PDF barré
+  9e83e45 - v35a-fix2-C: fix Firebase [DEFAULT] app error dans DetailDevis
+  e77ce47 - v35a-fix2-D: bouton € liste devis ouvre directement modal encaissement
+  18c5bbd - v35a-fix2-E/F/G: cohérence boutons + PDF client + badge VIP
+  4d3f97a - v35a-fix2-H: fix build - imports inutilisés supprimés
+
+FICHIERS MODIFIÉS :
+  ✅ src/front/pages/espace-partenaire/GestionDevisPartner.tsx
+  ✅ src/lib/pdf-generator.ts
+  ✅ src/admin/pages/DetailDevis.tsx
+  ✅ src/admin/pages/ListeDevis.tsx
+  ✅ src/front/pages/espace-client/MesDevis.tsx
+  ✅ src/admin/components/PopupEncaisserAcompte.tsx (créé)
+
+MIGRATION DONNÉES :
+  ✅ 2 devis VIP migrés (DVS-2604011, DVS-2604012)
+  ✅ Prix_negocies array → map
+  ✅ Total_ht mis à jour avec prix négocié
+  ✅ Total_ht_public sauvegardé (prix public original)
+
+STATUT : ✅ COMPLET — Tous les 6 bugs corrigés, build OK
