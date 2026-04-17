@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { doc, updateDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import { useToast } from '../../components/Toast';
+import { montantAcompteParDefaut } from '../../../lib/devisHelpers';
 
 interface Props {
   devisId: string;
@@ -35,6 +36,23 @@ export default function PopupAcompte({ devisId, devisNumero, clientNom, onClose,
   const [submitting, setSubmitting] = useState(false);
 
   const rib = RIB_DATA[typeCompte];
+
+  // Calculer le montant par défaut adapté au solde restant
+  useEffect(() => {
+    const fetchDefaultMontant = async () => {
+      try {
+        const snap = await getDocs(query(collection(db, 'quotes'), where('__name__', '==', devisId)));
+        const devisData = snap.docs[0]?.data();
+        if (devisData) {
+          const defaultAmount = montantAcompteParDefaut(devisData);
+          setMontant(defaultAmount);
+        }
+      } catch (err) {
+        console.error('Error fetching devis for default montant:', err);
+      }
+    };
+    fetchDefaultMontant();
+  }, [devisId]);
 
   const handleConfirm = async () => {
     if (montant <= 0) { showToast('Montant invalide', 'error'); return; }
