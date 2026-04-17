@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import PopupAcompte from './PopupAcompte';
@@ -58,34 +58,43 @@ export default function MesVirements({ userId, profile }: MesVirementsProps) {
   }
 
   // Filtre recherche
-  const filtered = virements.filter(v => {
-    if (!searchTerm.trim()) return true;
-    const term = searchTerm.toLowerCase();
-    return (
-      v.devis_id.toLowerCase().includes(term) ||
-      v.ref_fa?.toLowerCase().includes(term) ||
-      v.statut.toLowerCase().includes(term)
-    );
-  });
+  const filtered = useMemo(() => {
+    return virements.filter(v => {
+      if (!searchTerm.trim()) return true;
+      const term = searchTerm.toLowerCase();
+      return (
+        v.devis_id.toLowerCase().includes(term) ||
+        v.ref_fa?.toLowerCase().includes(term) ||
+        v.statut.toLowerCase().includes(term)
+      );
+    });
+  }, [virements, searchTerm]);
 
   // Tri
-  const sorted = [...filtered].sort((a, b) => {
-    let valA: any = a[sortCol === 'devis' ? 'devis_id' : sortCol];
-    let valB: any = b[sortCol === 'devis' ? 'devis_id' : sortCol];
+  const sorted = useMemo(() => {
+    const list = [...filtered];
+    list.sort((a: any, b: any) => {
+      let valA: any = a[sortCol === 'devis' ? 'devis_id' : sortCol];
+      let valB: any = b[sortCol === 'devis' ? 'devis_id' : sortCol];
 
-    if (sortCol === 'date') {
-      valA = new Date(valA).getTime() || 0;
-      valB = new Date(valB).getTime() || 0;
-    }
-    if (typeof valA === 'string') {
-      valA = valA.toLowerCase();
-      valB = valB?.toLowerCase() || '';
-    }
+      if (sortCol === 'date') {
+        valA = new Date(valA).getTime() || 0;
+        valB = new Date(valB).getTime() || 0;
+      }
+      else if (typeof valA === 'string' || typeof valB === 'string') {
+        valA = (valA || '').toString().toLowerCase();
+        valB = (valB || '').toString().toLowerCase();
+      }
 
-    if (valA < valB) return sortDir === 'asc' ? -1 : 1;
-    if (valA > valB) return sortDir === 'asc' ? 1 : -1;
-    return 0;
-  });
+      if (valA === undefined || valA === null) valA = sortDir === 'asc' ? Infinity : -Infinity;
+      if (valB === undefined || valB === null) valB = sortDir === 'asc' ? Infinity : -Infinity;
+
+      if (valA < valB) return sortDir === 'asc' ? -1 : 1;
+      if (valA > valB) return sortDir === 'asc' ? 1 : -1;
+      return 0;
+    });
+    return list;
+  }, [filtered, sortCol, sortDir]);
 
   const toggleSort = (col: SortColumn) => {
     if (sortCol === col) {

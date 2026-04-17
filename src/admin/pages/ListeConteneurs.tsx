@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Link, useLocation } from 'wouter';
 import { collection, getDocs, orderBy, query } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
@@ -47,32 +47,49 @@ export default function ListeConteneurs() {
   };
 
   // Filtrage
-  const filtered = conteneurs.filter(c => {
-    if (statutFilter !== 'TOUS' && c.statut !== statutFilter) return false;
-    if (!searchTerm.trim()) return true;
-    const term = searchTerm.toLowerCase();
-    return (
-      c.numero?.toLowerCase().includes(term) ||
-      c.destination?.toLowerCase().includes(term) ||
-      c.type?.toLowerCase().includes(term) ||
-      c.num_physique?.toLowerCase().includes(term)
-    );
-  });
+  const filtered = useMemo(() => {
+    return conteneurs.filter(c => {
+      if (statutFilter !== 'TOUS' && c.statut !== statutFilter) return false;
+      if (!searchTerm.trim()) return true;
+      const term = searchTerm.toLowerCase();
+      return (
+        c.numero?.toLowerCase().includes(term) ||
+        c.destination?.toLowerCase().includes(term) ||
+        c.type?.toLowerCase().includes(term) ||
+        c.num_physique?.toLowerCase().includes(term)
+      );
+    });
+  }, [conteneurs, statutFilter, searchTerm]);
 
   // Tri
-  const sorted = [...filtered].sort((a: any, b: any) => {
-    let valA = a[sortCol];
-    let valB = b[sortCol];
+  const sorted = useMemo(() => {
+    const list = [...filtered];
+    list.sort((a: any, b: any) => {
+      let valA: any = a[sortCol];
+      let valB: any = b[sortCol];
 
-    if (sortCol === 'date_depart_est') {
-      valA = valA?.toDate ? valA.toDate().getTime() : (valA ? new Date(valA).getTime() : 0);
-      valB = valB?.toDate ? valB.toDate().getTime() : (valB ? new Date(valB).getTime() : 0);
-    }
-    if (typeof valA === 'string') { valA = valA.toLowerCase(); valB = valB?.toLowerCase() || ''; }
-    if (valA < valB) return sortDir === 'asc' ? -1 : 1;
-    if (valA > valB) return sortDir === 'asc' ? 1 : -1;
-    return 0;
-  });
+      // Dates : convertir en timestamp numérique
+      if (sortCol === 'date_depart_est') {
+        valA = valA?.toDate ? valA.toDate().getTime() : (valA ? new Date(valA).getTime() || 0 : 0);
+        valB = valB?.toDate ? valB.toDate().getTime() : (valB ? new Date(valB).getTime() || 0 : 0);
+      }
+
+      // Strings : lowercase pour tri alpha cohérent
+      else if (typeof valA === 'string' || typeof valB === 'string') {
+        valA = (valA || '').toString().toLowerCase();
+        valB = (valB || '').toString().toLowerCase();
+      }
+
+      // Fallback : valeurs undefined mises à la fin
+      if (valA === undefined || valA === null) valA = sortDir === 'asc' ? Infinity : -Infinity;
+      if (valB === undefined || valB === null) valB = sortDir === 'asc' ? Infinity : -Infinity;
+
+      if (valA < valB) return sortDir === 'asc' ? -1 : 1;
+      if (valA > valB) return sortDir === 'asc' ? 1 : -1;
+      return 0;
+    });
+    return list;
+  }, [filtered, sortCol, sortDir]);
 
   const toggleSort = (col: SortColumn) => {
     if (sortCol === col) setSortDir(sortDir === 'asc' ? 'desc' : 'asc');

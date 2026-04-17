@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import PopupAcompte from './PopupAcompte';
@@ -100,26 +100,40 @@ export default function MesFactures({ userId, profile }: MesFacturesProps) {
   }
 
   // Filtre type + recherche
-  const filtered = factures.filter(f => {
-    if (filterType !== 'ALL' && f.type !== filterType) return false;
-    if (!searchTerm.trim()) return true;
-    const term = searchTerm.toLowerCase();
-    return f.devis_id.toLowerCase().includes(term) || f.numero.toLowerCase().includes(term);
-  });
+  const filtered = useMemo(() => {
+    return factures.filter(f => {
+      if (filterType !== 'ALL' && f.type !== filterType) return false;
+      if (!searchTerm.trim()) return true;
+      const term = searchTerm.toLowerCase();
+      return f.devis_id.toLowerCase().includes(term) || f.numero.toLowerCase().includes(term);
+    });
+  }, [factures, filterType, searchTerm]);
 
   // Tri
-  const sorted = [...filtered].sort((a: any, b: any) => {
-    let valA = a[sortCol === 'devis' ? 'devis_id' : sortCol];
-    let valB = b[sortCol === 'devis' ? 'devis_id' : sortCol];
-    if (sortCol === 'date') {
-      valA = new Date(valA).getTime() || 0;
-      valB = new Date(valB).getTime() || 0;
-    }
-    if (typeof valA === 'string') { valA = valA.toLowerCase(); valB = valB?.toLowerCase() || ''; }
-    if (valA < valB) return sortDir === 'asc' ? -1 : 1;
-    if (valA > valB) return sortDir === 'asc' ? 1 : -1;
-    return 0;
-  });
+  const sorted = useMemo(() => {
+    const list = [...filtered];
+    list.sort((a: any, b: any) => {
+      let valA = a[sortCol === 'devis' ? 'devis_id' : sortCol];
+      let valB = b[sortCol === 'devis' ? 'devis_id' : sortCol];
+
+      if (sortCol === 'date') {
+        valA = new Date(valA).getTime() || 0;
+        valB = new Date(valB).getTime() || 0;
+      }
+      else if (typeof valA === 'string' || typeof valB === 'string') {
+        valA = (valA || '').toString().toLowerCase();
+        valB = (valB || '').toString().toLowerCase();
+      }
+
+      if (valA === undefined || valA === null) valA = sortDir === 'asc' ? Infinity : -Infinity;
+      if (valB === undefined || valB === null) valB = sortDir === 'asc' ? Infinity : -Infinity;
+
+      if (valA < valB) return sortDir === 'asc' ? -1 : 1;
+      if (valA > valB) return sortDir === 'asc' ? 1 : -1;
+      return 0;
+    });
+    return list;
+  }, [filtered, sortCol, sortDir]);
 
   const toggleSort = (col: SortColumn) => {
     if (sortCol === col) setSortDir(sortDir === 'asc' ? 'desc' : 'asc');
