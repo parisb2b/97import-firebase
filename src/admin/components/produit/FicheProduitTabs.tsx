@@ -1,4 +1,4 @@
-import { CompletudeProduit } from '../../../lib/productHelpers';
+import { CompletudeProduit, CHAMPS_ESSENTIEL, CHAMPS_DETAILS, CHAMPS_MEDIAS } from '../../../lib/productHelpers';
 
 interface Props {
   activeTab: 'essentiel' | 'details' | 'medias';
@@ -10,9 +10,9 @@ interface Props {
 export default function FicheProduitTabs({ activeTab, onChange, completude, locked }: Props) {
   return (
     <div style={{ display: 'flex', gap: 0, borderBottom: '2px solid #E5E7EB', marginBottom: 24, overflowX: 'auto' }}>
-      <TabButton active={activeTab === 'essentiel'} onClick={() => onChange('essentiel')} required count={completude.essentiel} total={12}>Essentiel</TabButton>
-      <TabButton active={activeTab === 'details'} onClick={() => !locked && onChange('details')} count={completude.details} total={16} locked={locked}>Détails techniques</TabButton>
-      <TabButton active={activeTab === 'medias'} onClick={() => !locked && onChange('medias')} count={completude.medias} total={9} locked={locked}>Médias site web</TabButton>
+      <TabButton active={activeTab === 'essentiel'} onClick={() => onChange('essentiel')} required count={completude.essentiel} total={CHAMPS_ESSENTIEL.length}>Essentiel</TabButton>
+      <TabButton active={activeTab === 'details'} onClick={() => !locked && onChange('details')} count={completude.details} total={CHAMPS_DETAILS.length} locked={locked}>Détails techniques</TabButton>
+      <TabButton active={activeTab === 'medias'} onClick={() => !locked && onChange('medias')} count={completude.medias} total={CHAMPS_MEDIAS.length} locked={locked}>Médias site web</TabButton>
     </div>
   );
 }

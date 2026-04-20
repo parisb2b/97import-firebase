@@ -14,18 +14,21 @@ export interface CompletudeProduit {
 
 export const CHAMPS_ESSENTIEL = [
   'reference', 'categorie', 'nom_fr', 'prix_achat',
-  'fournisseur', 'poids_brut_kg', 'volume_m3', 'code_hs',
+  'fournisseur', 'poids_brut_kg', 'volume_m3',
   'est_kit', 'composition_kit', 'actif', 'image_principale',
 ] as const;
+// ⚠️ 11 champs désormais au lieu de 12 (code_hs déplacé dans CHAMPS_DETAILS)
 
 export const CHAMPS_DETAILS = [
+  'code_hs',
   'nom_zh', 'nom_en',
   'description_courte_fr', 'description_courte_zh', 'description_courte_en',
   'usage_fr', 'usage_zh', 'usage_en',
   'longueur_cm', 'largeur_cm', 'hauteur_cm', 'poids_net_kg',
   'matiere_fr', 'matiere_zh', 'matiere_en',
-  'reference_usine',
+  'reference_usine', 'ville_origine_cn', 'pays_origine',
 ] as const;
+// 20 champs désormais au lieu de 16
 
 export const CHAMPS_MEDIAS = [
   'images_galerie', 'video_url',
@@ -183,4 +186,12 @@ export function genererSlug(nom: string): string {
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '')
     .substring(0, 80);
+}
+
+/**
+ * Détecte si un produit nécessite une alerte Code HS manquant
+ * (utile pour afficher un badge dans la liste)
+ */
+export function manqueCodeHs(product: any): boolean {
+  return !product.code_hs || (typeof product.code_hs === 'string' && product.code_hs.trim() === '');
 }
