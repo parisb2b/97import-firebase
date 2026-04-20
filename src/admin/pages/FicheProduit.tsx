@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useRoute, useLocation, Link } from 'wouter';
-import { doc, getDoc, setDoc, deleteDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { calculerCompletude, CHAMPS_ESSENTIEL } from '../../lib/productHelpers';
 import FicheProduitTabs from '../components/produit/FicheProduitTabs';
@@ -65,46 +65,82 @@ export default function FicheProduit() {
   };
 
   const handleSave = async () => {
-    // Validation essentiel
-    const missing = [];
-    if (!product.reference) missing.push('Référence');
-    if (!product.categorie) missing.push('Catégorie');
-    if (!product.nom_fr) missing.push('Nom (français)');
-    if (typeof product.prix_achat !== 'number' || product.prix_achat <= 0) missing.push('Prix d\'achat');
-    if (!product.fournisseur) missing.push('Fournisseur');
-    if (typeof product.poids_brut_kg !== 'number' || product.poids_brut_kg <= 0) missing.push('Poids brut');
-    if (typeof product.volume_m3 !== 'number' || product.volume_m3 <= 0) missing.push('Volume');
-    if (!product.code_hs) missing.push('Code HS');
-    if (!product.image_principale) missing.push('Image principale');
-    if (product.est_kit && (!Array.isArray(product.composition_kit) || product.composition_kit.length === 0)) {
-      missing.push('Composition du kit (au moins 1 composant)');
-    }
+    if (!product) return;
 
-    if (missing.length > 0) {
-      alert('Champs obligatoires manquants :\n\n' + missing.join('\n'));
+    // === Vérifications STRICTEMENT bloquantes (2 champs uniquement) ===
+    if (!product.reference || product.reference.trim() === '') {
+      alert('❌ La référence est obligatoire pour créer/sauvegarder le produit.');
+      setActiveTab('essentiel');
+      return;
+    }
+    if (!product.categorie || product.categorie.trim() === '') {
+      alert('❌ La catégorie est obligatoire pour créer/sauvegarder le produit.');
+      setActiveTab('essentiel');
       return;
     }
 
+    // === Sauvegarde (toujours tentée même si champs manquants) ===
     setSaving(true);
     try {
-      const toSave = { ...product };
-      if (isCreation) {
-        toSave.created_at = new Date().toISOString();
-      }
-      toSave.updated_at = new Date().toISOString();
+      const ref = product.reference;
 
-      await setDoc(doc(db, 'products', product.reference), toSave, { merge: !isCreation });
+      // Vérifier unicité si création
+      if (isCreation) {
+        const existing = await getDoc(doc(db, 'products', ref));
+        if (existing.exists()) {
+          alert(`⚠️ La référence ${ref} existe déjà. Choisissez une autre référence.`);
+          setSaving(false);
+          return;
+        }
+      }
+
+      // Calcul complétude à jour
+      const completudeActuelle = calculerCompletude(product);
+
+      const data = {
+        ...product,
+        completude: {
+          essentiel: completudeActuelle.essentiel,
+          details: completudeActuelle.details,
+          medias: completudeActuelle.medias,
+          statut: completudeActuelle.statut,
+        },
+        updated_at: serverTimestamp(),
+        ...(isCreation ? { created_at: serverTimestamp() } : {}),
+      };
+
+      await setDoc(doc(db, 'products', ref), data, { merge: !isCreation });
       setDirty(false);
 
-      if (isCreation) {
-        alert('✓ Produit créé avec succès');
-        setLocation(`/admin/produits/${encodeURIComponent(product.reference)}`);
+      // === Message de feedback adapté à la complétude ===
+      const nbManquants = CHAMPS_ESSENTIEL.length - completudeActuelle.essentiel;
+      if (nbManquants === 0) {
+        // Tout OK
+        alert(isCreation
+          ? '✅ Produit créé avec succès'
+          : '✅ Produit enregistré avec succès');
       } else {
-        alert('✓ Modifications enregistrées');
+        // Sauvegarde partielle : info non bloquante
+        const message = `✅ ${isCreation ? 'Produit créé' : 'Produit enregistré'} avec succès\n\n`
+          + `ℹ️ ${nbManquants} champ(s) essentiel(s) reste(nt) à remplir :\n`
+          + completudeActuelle.champs_manquants_essentiel.map(c => `  • ${c}`).join('\n')
+          + '\n\nLe produit reste en statut "Bloquant" jusqu\'à ce qu\'ils soient tous remplis.'
+          + '\nVous pouvez revenir quand vous voulez pour les compléter.';
+        alert(message);
+      }
+
+      // Redirection ou rechargement
+      if (isCreation) {
+        setLocation(`/admin/produits/${encodeURIComponent(ref)}`);
+      } else {
+        // Recharger pour synchroniser avec Firestore
+        const snap = await getDoc(doc(db, 'products', ref));
+        if (snap.exists()) {
+          setProduct({ id: snap.id, ...snap.data() });
+        }
       }
     } catch (err: any) {
-      console.error('Erreur save:', err);
-      alert('Erreur lors de l\'enregistrement: ' + err.message);
+      alert('❌ Erreur lors de la sauvegarde : ' + err.message);
     } finally {
       setSaving(false);
     }
@@ -222,8 +258,14 @@ export default function FicheProduit() {
       {/* Sticky Footer */}
       <div style={{ position: 'sticky', bottom: 0, left: 0, right: 0, background: '#fff', borderTop: '2px solid #E5E7EB', padding: '16px 32px', marginLeft: -32, marginRight: -32, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16, zIndex: 100 }}>
         <div style={{ fontSize: 13, color: '#6B7280' }}>
-          {dirty ? (
+          {isCreation ? (
+            <span>⚠️ Référence et catégorie obligatoires. Les autres champs peuvent être complétés plus tard.</span>
+          ) : dirty ? (
             <span style={{ color: '#EA580C', fontWeight: 600 }}>● Modifications non enregistrées</span>
+          ) : completude.essentiel < CHAMPS_ESSENTIEL.length ? (
+            <span style={{ color: '#92400E' }}>
+              ⚠️ {CHAMPS_ESSENTIEL.length - completude.essentiel} champ(s) essentiel(s) manquant(s) — produit non utilisable en devis
+            </span>
           ) : (
             <span>Aucune modification en attente</span>
           )}
@@ -236,8 +278,21 @@ export default function FicheProduit() {
             </button>
           )}
           <button onClick={handleSave} disabled={saving}
-            style={{ padding: '10px 24px', background: '#EA580C', color: '#fff', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.7 : 1 }}>
-            {saving ? 'Enregistrement...' : isCreation ? 'Créer le produit' : 'Enregistrer'}
+            style={{
+              padding: '10px 24px',
+              background: saving ? '#D1D5DB' : '#EA580C',
+              color: '#fff', border: 'none', borderRadius: 10,
+              fontSize: 14, fontWeight: 600,
+              cursor: saving ? 'not-allowed' : 'pointer',
+              fontFamily: 'inherit',
+            }}>
+            {saving
+              ? 'Enregistrement...'
+              : isCreation
+                ? 'Créer le produit'
+                : completude.essentiel < CHAMPS_ESSENTIEL.length
+                  ? 'Enregistrer (incomplet)'
+                  : 'Enregistrer'}
           </button>
         </div>
       </div>
