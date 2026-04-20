@@ -135,8 +135,8 @@ export default function OngletDetails({ product, onChange }: Props) {
           labelFr="Nom français" valueFr={product.nom_fr || ''} disabledFr
           labelZh="Nom chinois" valueZh={product.nom_zh || ''}
           labelEn="Nom anglais" valueEn={product.nom_en || ''}
-          onChangeZh={v => onChange('nom_zh', v)}
-          onChangeEn={v => onChange('nom_en', v)}
+          onChangeZh={(v: string) => onChange('nom_zh', v)}
+          onChangeEn={(v: string) => onChange('nom_en', v)}
           translating={translating === 'nom_fr'}
           onTranslate={() => handleTranslate('nom_fr', 'nom_zh', 'nom_en')}
         />
@@ -144,9 +144,9 @@ export default function OngletDetails({ product, onChange }: Props) {
           labelFr="Description courte FR" valueFr={product.description_courte_fr || ''}
           labelZh="Description courte ZH" valueZh={product.description_courte_zh || ''}
           labelEn="Description courte EN" valueEn={product.description_courte_en || ''}
-          onChangeFr={v => onChange('description_courte_fr', v)}
-          onChangeZh={v => onChange('description_courte_zh', v)}
-          onChangeEn={v => onChange('description_courte_en', v)}
+          onChangeFr={(v: string) => onChange('description_courte_fr', v)}
+          onChangeZh={(v: string) => onChange('description_courte_zh', v)}
+          onChangeEn={(v: string) => onChange('description_courte_en', v)}
           translating={translating === 'description_courte_fr'}
           onTranslate={() => handleTranslate('description_courte_fr', 'description_courte_zh', 'description_courte_en')}
           textarea
@@ -155,9 +155,9 @@ export default function OngletDetails({ product, onChange }: Props) {
           labelFr="Usage FR (déclaration douane)" valueFr={product.usage_fr || ''}
           labelZh="Usage ZH (中国海关)" valueZh={product.usage_zh || ''}
           labelEn="Usage EN" valueEn={product.usage_en || ''}
-          onChangeFr={v => onChange('usage_fr', v)}
-          onChangeZh={v => onChange('usage_zh', v)}
-          onChangeEn={v => onChange('usage_en', v)}
+          onChangeFr={(v: string) => onChange('usage_fr', v)}
+          onChangeZh={(v: string) => onChange('usage_zh', v)}
+          onChangeEn={(v: string) => onChange('usage_en', v)}
           translating={translating === 'usage_fr'}
           onTranslate={() => handleTranslate('usage_fr', 'usage_zh', 'usage_en')}
         />
@@ -229,9 +229,9 @@ export default function OngletDetails({ product, onChange }: Props) {
           labelFr="Matière FR" valueFr={product.matiere_fr || ''}
           labelZh="Matière ZH" valueZh={product.matiere_zh || ''}
           labelEn="Matière EN" valueEn={product.matiere_en || ''}
-          onChangeFr={v => onChange('matiere_fr', v)}
-          onChangeZh={v => onChange('matiere_zh', v)}
-          onChangeEn={v => onChange('matiere_en', v)}
+          onChangeFr={(v: string) => onChange('matiere_fr', v)}
+          onChangeZh={(v: string) => onChange('matiere_zh', v)}
+          onChangeEn={(v: string) => onChange('matiere_en', v)}
           translating={translating === 'matiere_fr'}
           onTranslate={() => handleTranslate('matiere_fr', 'matiere_zh', 'matiere_en')}
         />
