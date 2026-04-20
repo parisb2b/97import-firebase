@@ -1,0 +1,507 @@
+=== MAJ35G PHASE 2 — Onglet Détails techniques + retrait Code HS Essentiel ===
+Date : 2026-04-20
+Branche : v2
+Build : ✓ OK (0 erreur TypeScript)
+
+OBJECTIF :
+  Implémenter l'onglet Détails techniques complet + 3 modifications sur
+  code existant (retrait code_hs des essentiels, badge alerte dans liste).
+
+================================================================================
+ MODIFICATIONS PARTIE A — productHelpers.ts
+================================================================================
+
+✅ CHAMPS_ESSENTIEL : 12 → 11 champs (code_hs retiré)
+   Avant: reference, categorie, nom_fr, prix_achat, fournisseur, poids_brut_kg,
+          volume_m3, code_hs, est_kit, composition_kit, actif, image_principale
+   Après: reference, categorie, nom_fr, prix_achat, fournisseur, poids_brut_kg,
+          volume_m3, est_kit, composition_kit, actif, image_principale
+
+✅ CHAMPS_DETAILS : 16 → 20 champs (code_hs + 3 nouveaux champs fournisseur)
+   Ajouts:
+   - code_hs (déplacé depuis CHAMPS_ESSENTIEL, en première position)
+   - ville_origine_cn
+   - pays_origine
+   (reference_usine existait déjà)
+
+✅ Ajout fonction manqueCodeHs(product): boolean
+   - Détecte si code_hs est vide ou whitespace
+   - Utilisé pour afficher badges d'alerte dans AdminProduits
+
+✅ Logique complétude adaptée automatiquement
+   - calculerCompletude utilise CHAMPS_ESSENTIEL.length dynamiquement
+   - Non bloquant si code_hs vide (car maintenant dans CHAMPS_DETAILS)
+
+✅ FicheProduitTabs: totaux dynamiques via .length
+   - Essentiel: total={CHAMPS_ESSENTIEL.length} → 11
+   - Détails: total={CHAMPS_DETAILS.length} → 20
+   - Médias: total={CHAMPS_MEDIAS.length} → 9
+
+================================================================================
+ MODIFICATIONS PARTIE B — OngletEssentiel.tsx
+================================================================================
+
+✅ Section "Logistique & Douane" → "Logistique"
+   - Titre simplifié
+   - Subtitle: "génération de devis" au lieu de "déclaration douanière"
+
+✅ FormGrid3 → FormGrid2 (2 champs au lieu de 3)
+   - Poids brut (kg)
+   - Volume (m³) avec hint "Calculé auto si L×l×H renseignés en onglet Détails"
+
+✅ Champ Code HS supprimé
+   - Maintenant dans onglet Détails techniques
+   - Plus dans les champs essentiels obligatoires
+
+✅ FormGrid3 function supprimée (non utilisée)
+
+================================================================================
+ MODIFICATIONS PARTIE C — AdminProduits.tsx
+================================================================================
+
+✅ Import manqueCodeHs + CHAMPS_ESSENTIEL
+
+✅ Stats: ajout code_hs_manquant
+   - Compte produits actifs sans code_hs
+   - stats.code_hs_manquant calculé dans useMemo
+
+✅ StatCard conditionnelle "⚠️ Code HS manquant"
+   - Affichée uniquement si stats.code_hs_manquant > 0
+   - 6ème card avec couleurs warning (jaune/ambre)
+   - GridColumns passe de "repeat(5, 1fr)" à "repeat(6, 1fr)" si >0
+
+✅ Badge orange dans colonne Nom
+   - Badge "⚠️ Code HS manquant" affiché pour produits actifs sans code_hs
+   - Style: bg #FEF3C7, color #92400E, border #FCD34D
+   - Conditionnel: manqueCodeHs(p) && p.actif
+
+✅ Fix calcul % complétude
+   - Remplace hardcodé 12 par CHAMPS_ESSENTIEL.length
+   - Ligne 182: const percent = Math.round((p._completude.essentiel / CHAMPS_ESSENTIEL.length) * 100)
+
+================================================================================
+ NOUVEAU COMPOSANT PARTIE D — OngletDetails.tsx
+================================================================================
+
+Fichier: src/admin/components/produit/OngletDetails.tsx (533 lignes)
+
+✅ Section Code HS douane (mise en valeur)
+   - Card dédiée en haut de l'onglet
+   - Subtitle warning: "⚠️ Requis pour déclaration douane chinoise (Excel BE-EXPORT)"
+   - Input avec bordure orange + fond jaune si code_hs vide
+   - Hint avec message d'alerte si vide: "⚠️ Champ vide — impossible d'exporter vers la Chine sans"
+   - Lien externe vers outil recherche code HS douane (https://eservices.nf.fr/...)
+
+✅ Traductions multilingues FR/ZH/EN avec DeepL
+   Composant TranslationRow réutilisable pour 3 champs trilingues:
+   1. Nom (nom_fr → nom_zh + nom_en)
+      - nom_fr pré-rempli depuis Essentiel (disabled)
+   2. Description courte (description_courte_fr/zh/en)
+      - Textarea avec rows=2, resize vertical
+   3. Usage (usage_fr/zh/en)
+      - Pour déclaration douane: "Usage FR (déclaration douane)" / "Usage ZH (中国海关)"
+
+   Bouton "🌐 Traduire":
+   - Vérifie que champ FR est rempli
+   - Appelle traduireTexte(texteFr, 'ZH') et traduireTexte(texteFr, 'EN') en parallèle
+   - État translating pour feedback visuel "⏳ Traduction..."
+   - Gestion erreurs avec alert
+
+✅ Dimensions physiques + calcul volume auto
+   - FormGrid3 avec 6 champs:
+     * Longueur (cm)
+     * Largeur (cm)
+     * Hauteur (cm)
+     * Poids net (kg) avec hint "Sans emballage"
+     * Poids brut (kg) — voir Essentiel (disabled, lecture seule)
+     * Volume calculé (m³) (disabled, calculé automatiquement)
+
+   - Synchronisation bidirectionnelle avec onglet Essentiel:
+     * onChange pour L/l/H: calcul newVol via calculerVolumeDepuisDimensions()
+     * Si newVol !== null: onChange('volume_m3', newVol) automatique
+     * Affichage formule: "= 120 × 80 × 130 / 1 000 000"
+     * Indicateur vert "✓ Synchronisé avec Essentiel" si volumeCalc existe
+
+   - Champ Volume calculé:
+     * Background vert (#D1FAE5) + color vert (#065F46) si calculé
+     * Background gris (#F9FAFB) + hint si pas encore calculé
+
+✅ Matières & composition
+   - TranslationRow pour matiere_fr/zh/en avec bouton DeepL
+   - FormGrid2 avec 2 champs optionnels:
+     * Couleur (ex: Noir / Gris anodisé)
+     * Marque (ex: JinkoSolar / DEYE)
+
+✅ Données fournisseur Chine SIMPLIFIÉ
+   Card dédiée avec FormGrid2:
+   - Référence usine (chez le fournisseur)
+     * Placeholder: "Ex: JKM-10KW-2026-HYBRID"
+     * Hint: "Apparaît dans le BC-CHINE envoyé au fournisseur"
+   - Ville d'origine (Chine)
+     * Placeholder: "Ex: Shenzhen"
+     * Hint: "Requis pour déclaration douane CN (BE-EXPORT)"
+   - Pays d'origine (full width)
+     * Valeur par défaut: "Chine"
+
+✅ Certification CE avec upload PDF privé
+   - Dropdown statut CE:
+     * — Non renseigné —
+     * ✓ Oui — avec PDF
+     * ✓ Oui — sans PDF disponible
+     * ✗ Non certifié
+     * ⏳ Certification en cours
+
+   - Upload certificat PDF:
+     * Stocké dans Firebase Storage: products/{ref}/certifications/CE_{timestamp}.pdf
+     * Bouton "⬆ Uploader le certificat CE (PDF)"
+     * Validation: PDF uniquement, max 20 Mo
+     * Suppression ancien certificat si existe avant upload nouveau
+     * Preview après upload:
+       - Badge vert "PDF" + lien "📄 Voir le certificat CE" (ouvre nouvel onglet)
+       - Bouton "✕" pour supprimer avec confirmation
+     * Disabled si product.reference n'existe pas (hint: "Enregistrez d'abord le produit")
+
+   - handleUploadCE:
+     * Validation type/taille
+     * Appel uploadCertificatCe(reference, file) via storageHelpers
+     * Auto-set ce_certification: 'oui-pdf' après upload
+
+   - handleRemoveCE:
+     * Confirmation avant suppression
+     * Suppression Firebase Storage via supprimerFichierStorage()
+
+✅ Composants helpers réutilisables
+   - Banner({ type, icon, children })
+     * Types: success, warning, danger, info
+     * Couleurs adaptées par type
+     * Icon circulaire + bordure left 4px
+
+   - TranslationRow({ labelFr, valueFr, onChangeFr, disabledFr, labelZh, valueZh, onChangeZh, labelEn, valueEn, onChangeEn, translating, onTranslate, textarea })
+     * Grid 4 colonnes: FR / ZH / EN / Bouton Traduire
+     * Support input ou textarea (rows=2 si textarea)
+     * LangTag pour chaque langue (FR bleu, ZH rouge, EN vert)
+
+   - LangTag({ type: 'fr' | 'zh' | 'en' })
+     * Petit badge coloré "FR" / "ZH" / "EN"
+
+   - Card, FormGrid2, FormGrid3, Field, Hint
+     * Styles identiques à Phase 1 (navy/orange/gray, border-radius 16px, padding 24px)
+
+✅ Banner warning en haut de l'onglet
+   - "Champs optionnels mais recommandés"
+   - Message: "S'ils sont vides, les Excel afficheront 'À compléter' en italique gris — non bloquant mais moins professionnel"
+
+================================================================================
+ INTÉGRATION FICHE PRODUIT
+================================================================================
+
+src/admin/pages/FicheProduit.tsx:
+
+✅ Import OngletDetails + CHAMPS_ESSENTIEL
+
+✅ Placeholder Phase 2 remplacé
+   Avant:
+   {activeTab === 'details' && !isCreation && (
+     <div>Onglet Détails techniques — Disponible en Phase 2 de v35g.</div>
+   )}
+
+   Après:
+   {activeTab === 'details' && !isCreation && (
+     <OngletDetails product={product} onChange={handleChange} />
+   )}
+
+✅ Fix calcul message bloquant
+   - Remplace hardcodé 12 par CHAMPS_ESSENTIEL.length
+   - Ligne 161: message: `Il manque ${CHAMPS_ESSENTIEL.length - completude.essentiel} champ(s)...`
+
+✅ Placeholder Phase 3 toujours présent
+   - Onglet Médias affiche toujours "Disponible en Phase 3 de v35g"
+
+================================================================================
+ COMMITS (5)
+================================================================================
+
+1. 1e28e15 — v35g-P2-A: retrait code_hs des essentiels, ajout dans détails + helper manqueCodeHs
+   - productHelpers.ts: CHAMPS_ESSENTIEL 12→11, CHAMPS_DETAILS 16→20
+   - FicheProduitTabs: totaux dynamiques .length
+
+2. 3dfcf1c — v35g-P2-B: retrait champ Code HS de OngletEssentiel (déplacé vers Détails)
+   - Section "Logistique & Douane" → "Logistique"
+   - FormGrid3 → FormGrid2, champ Code HS supprimé
+
+3. bc9ed59 — v35g-P2-C: badges et compteur 'Code HS manquant' dans liste AdminProduits
+   - Import manqueCodeHs + CHAMPS_ESSENTIEL
+   - Stats code_hs_manquant + 6ème StatCard conditionnelle
+   - Badge orange dans colonne Nom
+   - Fix: calcul % avec .length au lieu de 12
+
+4. 2fbac24 — v35g-P2-D: création OngletDetails.tsx + intégration dans FicheProduit
+   - OngletDetails.tsx (533 lignes) avec toutes les sections
+   - FicheProduit: import + remplacement placeholder + fix message bloquant
+
+5. 3dfe61a — v35g-P2-D fix: corrections TypeScript pour build success
+   - OngletDetails: types explicites pour params v
+   - OngletEssentiel: suppression FormGrid3 non utilisé
+   - Build: ✓ 0 erreur
+
+================================================================================
+ DÉPENDANCES
+================================================================================
+
+✓ deepl-node (installé en Phase 1)
+  - Utilisé dans OngletDetails pour traductions FR→ZH/EN
+  - deeplService.traduireTexte(texte, 'ZH'|'EN')
+
+✓ Firebase Storage (existant)
+  - uploadCertificatCe(reference, file) pour certificats CE
+  - supprimerFichierStorage(url) pour nettoyage
+
+⚠️ Clé DeepL API
+  - À configurer dans .env.local: VITE_DEEPL_API_KEY=...
+  - Si non configurée: traductions retourneront erreur (géré par alert)
+
+================================================================================
+ TESTS MANUELS À EFFECTUER
+================================================================================
+
+[ ] Test 1 : Retrait Code HS de Essentiel
+    1. Admin → Produits → ouvrir un produit existant
+    2. ✓ Vérifier: champ Code HS n'apparaît plus dans onglet Essentiel (section Logistique)
+    3. ✓ Vérifier: compteur onglet Essentiel affiche "X / 11" (au lieu de "X / 12")
+    4. ✓ Vérifier: section "Logistique & Douane" renommée "Logistique"
+    5. ✓ Vérifier: FormGrid2 avec 2 champs uniquement (Poids brut, Volume)
+
+[ ] Test 2 : Code HS dans Détails (mise en valeur)
+    1. Aller dans onglet Détails techniques
+    2. ✓ Vérifier: première section = "Code HS douane" avec subtitle warning
+    3. Si vide:
+       - ✓ Input avec bordure orange (#F59E0B)
+       - ✓ Background jaune clair (#FFFBEB)
+       - ✓ Hint avec message "⚠️ Champ vide — impossible d'exporter vers la Chine sans"
+    4. Si rempli:
+       - ✓ Input avec apparence normale (bordure grise #E5E7EB)
+    5. ✓ Lien "🌐 Rechercher sur site douanes →" fonctionne (ouvre nouvel onglet)
+
+[ ] Test 3 : Badge Code HS manquant dans la liste
+    1. Revenir à la liste produits (/admin/produits)
+    2. ✓ Vérifier: produits actifs sans code_hs affichent badge orange "⚠️ Code HS manquant"
+    3. ✓ Vérifier: produits masqués (actif=false) n'affichent PAS ce badge
+    4. ✓ Vérifier: nouvelle stat card "⚠️ Code HS manquant" apparaît si au moins 1 produit concerné
+    5. ✓ Vérifier: compteur correct dans la stat card
+
+[ ] Test 4 : Traduction DeepL
+    1. Fiche produit → onglet Détails
+    2. Section Traductions multilingues:
+       - ✓ Vérifier: nom FR pré-rempli (depuis Essentiel) et grisé (disabled)
+    3. Remplir un texte dans "Description courte FR"
+    4. Cliquer "🌐 Traduire"
+    5. ✓ Vérifier: icône change en "⏳ Traduction..."
+    6. ✓ Vérifier: après quelques secondes, ZH et EN se remplissent automatiquement
+    7. Tester aussi avec "Usage FR" → ZH + EN
+    8. Tester avec champ FR vide → alert "Remplissez d'abord le champ français"
+    9. (Si erreur clé API manquante: alert "Erreur traduction")
+
+[ ] Test 5 : Calcul volume automatique synchronisé
+    1. Onglet Détails → section Dimensions physiques
+    2. Remplir L=120, l=80, H=130
+    3. ✓ Vérifier: champ "Volume calculé" affiche 1.248 m³
+    4. ✓ Vérifier: background vert (#D1FAE5), color vert (#065F46)
+    5. ✓ Vérifier: hint affiche formule "= 120 × 80 × 130 / 1 000 000"
+    6. ✓ Vérifier: hint affiche "✓ Synchronisé avec Essentiel" en vert
+    7. Retourner onglet Essentiel
+    8. ✓ Vérifier: champ Volume (m³) = 1.248 (synchronisé automatiquement)
+    9. Modifier L dans Détails (ex: 150)
+    10. ✓ Vérifier: volume recalculé instantanément (1.56 m³)
+    11. ✓ Vérifier: synchronisation dans Essentiel après modification
+
+[ ] Test 6 : Upload certificat CE
+    1. Onglet Détails → section Certification CE
+    2. Sélectionner "Oui — avec PDF" dans le dropdown
+    3. Cliquer "⬆ Uploader le certificat CE (PDF)"
+    4. Choisir un fichier PDF (certificat CE ou tout PDF test)
+    5. ✓ Vérifier: upload en cours (bouton "⏳ Upload en cours...")
+    6. ✓ Vérifier: après upload (quelques secondes):
+       - Bouton remplacé par preview vert
+       - Badge "PDF" vert + lien "📄 Voir le certificat CE"
+    7. Cliquer sur le lien → ✓ PDF s'ouvre dans nouvel onglet
+    8. Cliquer sur "✕" → ✓ Confirmation "Supprimer le certificat CE ?"
+    9. Confirmer → ✓ Fichier supprimé, bouton upload réapparaît
+    10. Test validation:
+        - Essayer uploader fichier non-PDF → ✓ Alert "Seul le format PDF est accepté"
+        - Essayer uploader PDF >20 Mo → ✓ Alert "Le fichier est trop volumineux"
+    11. Test avant save:
+        - Sur nouveau produit pas encore enregistré → ✓ Bouton disabled + hint "Enregistrez d'abord le produit"
+
+[ ] Test 7 : Complétude mise à jour
+    1. Produit avec 11/11 champs essentiels remplis:
+       - ✓ Badge statut = "● Prêt pour le site" (si ≥2 médias) ou "● À enrichir"
+       - ✓ Compteur essentiel "11 / 11" en vert
+    2. Produit sans code_hs mais avec tout l'essentiel:
+       - ✓ Reste statut non-bloquant (pret_site ou a_enrichir)
+       - ✓ Pas d'erreur à la sauvegarde
+    3. Ajouter code_hs dans Détails:
+       - ✓ Compteur Détails passe de "X / 20" à "(X+1) / 20"
+       - ✓ Barre de progression augmente
+    4. Produit avec <11 essentiels:
+       - ✓ Badge "● Bloquant" rouge
+       - ✓ Message: "Il manque X champ(s) essentiel(s)" (avec bon décompte)
+
+[ ] Test 8 : Fournisseur Chine
+    1. Onglet Détails → section Données fournisseur Chine
+    2. ✓ Remplir "Référence usine" (ex: JKM-10KW-2026-HYBRID)
+    3. ✓ Remplir "Ville d'origine" (ex: Shenzhen)
+    4. ✓ Vérifier "Pays d'origine" pré-rempli avec "Chine"
+    5. Sauvegarder
+    6. Recharger la page
+    7. ✓ Vérifier: données fournisseur persistées correctement
+
+[ ] Test 9 : Matières & composition
+    1. Onglet Détails → section Matières & composition
+    2. Remplir "Matière FR" (ex: Aluminium anodisé)
+    3. Cliquer "🌐 Traduire"
+    4. ✓ Vérifier: Matière ZH + Matière EN remplies automatiquement
+    5. Remplir "Couleur" (ex: Noir mat)
+    6. Remplir "Marque" (ex: JinkoSolar)
+    7. Sauvegarder et recharger
+    8. ✓ Vérifier: toutes les données persistées
+
+[ ] Test 10 : Navigation onglets
+    1. Créer nouveau produit
+    2. ✓ Vérifier: onglets Détails et Médias locked (🔒 Après save)
+    3. ✓ Vérifier: impossible de cliquer dessus
+    4. Remplir essentiel minimum et sauvegarder
+    5. ✓ Vérifier: onglets Détails et Médias déverrouillés
+    6. Cliquer onglet Détails
+    7. ✓ Vérifier: OngletDetails s'affiche correctement
+    8. Cliquer onglet Médias
+    9. ✓ Vérifier: placeholder "Disponible en Phase 3 de v35g" toujours présent
+
+================================================================================
+ BACKLOG RESTANT
+================================================================================
+
+⏳ Phase 3 : Onglet Médias complet
+   - Galerie images (upload multiple + drag & drop réorganisation)
+   - Upload PDF manuel + PDF fiche technique
+   - Traductions marketing FR→ZH/EN
+   - Métadonnées SEO (slug_url, meta_title)
+   - Intégration @dnd-kit pour drag & drop galerie
+
+⏳ v35f : Commissions partenaires
+   - Système de commissions automatiques
+   - Calcul selon profils partenaires
+
+⏳ v35b-enhance : CTA emails signés
+   - Boutons d'action dans emails
+   - Signature cryptographique pour sécurité
+
+⏳ Optimisation performances
+   - Code splitting pour réduire bundle size (warning actuel: 2.5 MB)
+   - Dynamic imports pour OngletDetails/OngletMedias
+
+================================================================================
+ NOTES TECHNIQUES
+================================================================================
+
+FIREBASE STRUCTURE ÉTENDUE:
+  Collection: products/
+  Nouveaux champs Phase 2:
+    - code_hs: string (déplacé depuis essentiel)
+    - nom_zh: string
+    - nom_en: string
+    - description_courte_fr/zh/en: string
+    - usage_fr/zh/en: string
+    - longueur_cm: number
+    - largeur_cm: number
+    - hauteur_cm: number
+    - poids_net_kg: number
+    - matiere_fr/zh/en: string
+    - couleur: string
+    - marque: string
+    - reference_usine: string
+    - ville_origine_cn: string
+    - pays_origine: string (default: "Chine")
+    - ce_certification: 'oui-pdf' | 'oui-sans-pdf' | 'non' | 'en-cours' | ''
+    - ce_certificat_pdf_url: string (Firebase Storage URL)
+
+FIREBASE STORAGE STRUCTURE:
+  products/{reference}/certifications/CE_{timestamp}.pdf
+  - Fichiers privés (pas affichés sur site)
+  - URL signée Firebase Storage
+  - Suppression automatique si remplacement
+
+CALCUL COMPLÉTUDE PHASE 2:
+  Essentiel (11 champs):
+    reference, categorie, nom_fr, prix_achat, fournisseur,
+    poids_brut_kg, volume_m3, est_kit, composition_kit, actif, image_principale
+
+  Détails (20 champs):
+    code_hs, nom_zh, nom_en,
+    description_courte_fr, description_courte_zh, description_courte_en,
+    usage_fr, usage_zh, usage_en,
+    longueur_cm, largeur_cm, hauteur_cm, poids_net_kg,
+    matiere_fr, matiere_zh, matiere_en,
+    reference_usine, ville_origine_cn, pays_origine
+
+  Médias (9 champs - Phase 3):
+    images_galerie, video_url,
+    description_marketing_fr, description_marketing_zh, description_marketing_en,
+    points_forts, documents_pdf,
+    slug_url, meta_title
+
+STATUT COMPLÉTUDE:
+  - complet: 40/40 (11 essentiel + 20 détails + 9 médias)
+  - pret_site: 11/11 essentiel + ≥2 médias, < 40 total
+  - a_enrichir: 11/11 essentiel, < 2 médias
+  - bloquant: < 11 essentiel
+
+DEEPL API:
+  - Endpoint: https://api-free.deepl.com/v2/translate (ou api.deepl.com pour version payante)
+  - Clé API: VITE_DEEPL_API_KEY dans .env.local
+  - Langues supportées: FR → ZH (chinois simplifié) + EN (anglais)
+  - Gestion erreurs: alert si clé manquante ou quota dépassé
+
+SYNCHRONISATION VOLUME:
+  - onChange pour longueur_cm/largeur_cm/hauteur_cm dans OngletDetails
+  - Calcul: (L × l × H) / 1_000_000 via calculerVolumeDepuisDimensions()
+  - onChange('volume_m3', newVol) automatique → synchronise avec Essentiel
+  - Affichage lecture seule "Volume calculé (m³)" avec formule
+
+BADGES CODE HS:
+  - Liste AdminProduits: badge si manqueCodeHs(p) && p.actif
+  - Onglet Détails: bordure orange + fond jaune si code_hs vide
+  - Stat card "⚠️ Code HS manquant" apparaît si >0 produits concernés
+
+================================================================================
+ CONCLUSION
+================================================================================
+
+✅ PHASE 2 LIVRÉE AVEC SUCCÈS
+
+L'onglet Détails techniques est opérationnel avec toutes les fonctionnalités:
+- Code HS mise en valeur avec alerte visuelle
+- Traductions automatiques FR→ZH/EN via DeepL
+- Calcul volume automatique synchronisé avec Essentiel
+- Upload certificat CE avec stockage Firebase privé
+- Données fournisseur Chine simplifiées
+
+Le code HS a été retiré des champs essentiels bloquants tout en restant
+requis pour l'export Chine. Un système d'alertes visuelles (badges dans la
+liste + bordure orange dans le formulaire) guide l'utilisateur.
+
+La complétude produit passe désormais sur 40 champs au lieu de 37:
+- Essentiel: 11 champs (au lieu de 12)
+- Détails: 20 champs (au lieu de 16)
+- Médias: 9 champs (inchangé)
+
+Le build compile sans erreur TypeScript.
+Les 5 commits documentent la progression par partie.
+
+👉 PRÊT POUR VALIDATION MICHEL
+
+Après validation ET tests manuels réussis, lancer Phase 3 (Onglet Médias complet).
+
+================================================================================
+Rapport généré le 2026-04-20 par Claude Code (Opus 4.6)
+Phase 2 v35g — Durée totale: ~40 minutes
+================================================================================
