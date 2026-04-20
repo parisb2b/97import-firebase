@@ -3,6 +3,12 @@ import { useLocation, useRoute, Link } from 'wouter';
 import { doc, getDoc, updateDoc, deleteDoc, serverTimestamp, Timestamp } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import DropdownPorts from '../components/DropdownPorts';
+import PopupSelectionClientExcel from '../components/PopupSelectionClientExcel';
+import { generateBdInvoice } from '../../lib/excel-generators/generateBdInvoice';
+import { generateBdPackingList } from '../../lib/excel-generators/generateBdPackingList';
+import { generateBdMaritime } from '../../lib/excel-generators/generateBdMaritime';
+import { generateBeExport } from '../../lib/excel-generators/generateBeExport';
+import { downloadExcel, InfosClient } from '../../lib/excel-generators/excelTypes';
 
 const STATUTS = [
   { value: 'preparation', label: 'En préparation', color: '#1565C0' },
@@ -27,6 +33,9 @@ export default function DetailConteneur() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState<any>({});
+  const [showClientModal, setShowClientModal] = useState(false);
+  const [currentGenerator, setCurrentGenerator] = useState<'invoice' | 'packing' | 'maritime' | 'export' | null>(null);
+  const [generatingExcel, setGeneratingExcel] = useState(false);
 
   useEffect(() => {
     if (params?.id) loadConteneur(params.id);
@@ -107,6 +116,51 @@ export default function DetailConteneur() {
       setLocation('/admin/conteneurs');
     } catch (err: any) {
       alert('Erreur: ' + err.message);
+    }
+  };
+
+  const openGeneratorModal = (type: 'invoice' | 'packing' | 'maritime' | 'export') => {
+    setCurrentGenerator(type);
+    setShowClientModal(true);
+  };
+
+  const handleClientSelected = async (clientNom: string, infosClient: InfosClient) => {
+    if (!conteneur || !currentGenerator) return;
+    setShowClientModal(false);
+    setGeneratingExcel(true);
+
+    try {
+      let buffer: ArrayBuffer;
+      let filename: string;
+      const date = new Date().toISOString().slice(0, 10);
+
+      switch (currentGenerator) {
+        case 'invoice':
+          buffer = await generateBdInvoice(conteneur.id, clientNom, infosClient);
+          filename = `BD-INVOICE_${conteneur.numero}_${clientNom}_${date}.xlsx`;
+          break;
+        case 'packing':
+          buffer = await generateBdPackingList(conteneur.id, clientNom, infosClient);
+          filename = `BD-PACKINGLIST_${conteneur.numero}_${clientNom}_${date}.xlsx`;
+          break;
+        case 'maritime':
+          buffer = await generateBdMaritime(conteneur.id, clientNom, infosClient);
+          filename = `BD-MARITIME_${conteneur.numero}_${clientNom}_${date}.xlsx`;
+          break;
+        case 'export':
+          buffer = await generateBeExport(conteneur.id, clientNom);
+          filename = `BE-EXPORT_${conteneur.numero}_${clientNom}_${date}.xlsx`;
+          break;
+        default:
+          throw new Error('Générateur inconnu');
+      }
+
+      downloadExcel(buffer, filename);
+    } catch (err: any) {
+      alert('Erreur génération Excel: ' + err.message);
+    } finally {
+      setGeneratingExcel(false);
+      setCurrentGenerator(null);
     }
   };
 
@@ -290,6 +344,74 @@ export default function DetailConteneur() {
         )}
       </div>
 
+      {/* Section Générateurs Excel (v35e-suite) */}
+      <div style={cardStyle}>
+        <h2 style={sectionTitleStyle}>Documents Excel bilingues FR/ZH</h2>
+        <p style={{ fontSize: 13, color: '#6B7280', marginTop: 0, marginBottom: 20 }}>
+          Générez les documents commerciaux et douaniers pour ce conteneur. Sélectionnez le client concerné.
+        </p>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          <button
+            onClick={() => openGeneratorModal('invoice')}
+            disabled={generatingExcel || nbDevis === 0}
+            style={{
+              padding: 14,
+              background: (generatingExcel || nbDevis === 0) ? '#D3D1C7' : '#EA580C',
+              color: '#fff', border: 'none', borderRadius: 12,
+              fontSize: 14, fontWeight: 600,
+              cursor: (generatingExcel || nbDevis === 0) ? 'not-allowed' : 'pointer',
+            }}>
+            📄 BD-INVOICE
+          </button>
+
+          <button
+            onClick={() => openGeneratorModal('packing')}
+            disabled={generatingExcel || nbDevis === 0}
+            style={{
+              padding: 14,
+              background: (generatingExcel || nbDevis === 0) ? '#D3D1C7' : '#EA580C',
+              color: '#fff', border: 'none', borderRadius: 12,
+              fontSize: 14, fontWeight: 600,
+              cursor: (generatingExcel || nbDevis === 0) ? 'not-allowed' : 'pointer',
+            }}>
+            📦 BD-PACKINGLIST
+          </button>
+
+          <button
+            onClick={() => openGeneratorModal('maritime')}
+            disabled={generatingExcel || nbDevis === 0}
+            style={{
+              padding: 14,
+              background: (generatingExcel || nbDevis === 0) ? '#D3D1C7' : '#EA580C',
+              color: '#fff', border: 'none', borderRadius: 12,
+              fontSize: 14, fontWeight: 600,
+              cursor: (generatingExcel || nbDevis === 0) ? 'not-allowed' : 'pointer',
+            }}>
+            🚢 BD-MARITIME
+          </button>
+
+          <button
+            onClick={() => openGeneratorModal('export')}
+            disabled={generatingExcel || nbDevis === 0}
+            style={{
+              padding: 14,
+              background: (generatingExcel || nbDevis === 0) ? '#D3D1C7' : '#EA580C',
+              color: '#fff', border: 'none', borderRadius: 12,
+              fontSize: 14, fontWeight: 600,
+              cursor: (generatingExcel || nbDevis === 0) ? 'not-allowed' : 'pointer',
+            }}>
+            🛃 BE-EXPORT
+          </button>
+        </div>
+
+        {generatingExcel && (
+          <p style={{ fontSize: 13, color: '#1565C0', marginTop: 12, textAlign: 'center' }}>
+            Génération en cours...
+          </p>
+        )}
+      </div>
+
       {/* Boutons actions */}
       <div style={{ display: 'flex', gap: 12, marginTop: 24 }}>
         <button
@@ -314,6 +436,18 @@ export default function DetailConteneur() {
           Supprimer
         </button>
       </div>
+
+      {/* Modal sélection client */}
+      {showClientModal && (
+        <PopupSelectionClientExcel
+          ctnId={conteneur.id}
+          onClose={() => {
+            setShowClientModal(false);
+            setCurrentGenerator(null);
+          }}
+          onSelect={handleClientSelected}
+        />
+      )}
     </div>
   );
 }
