@@ -1,0 +1,228 @@
+═══════════════════════════════════════════════════════════════════════════════
+  MAJ35E-SUITE — Générateurs Excel BD/BE + Modal Sélection Client
+  Date : 2026-04-20
+  Révision : v35e-suite TERMINÉ ✅
+═══════════════════════════════════════════════════════════════════════════════
+
+RÉSUMÉ
+------
+Suite et finalisation de v35e : implémentation des 4 générateurs Excel restants
+(BD-INVOICE, BD-PACKINGLIST, BD-MARITIME, BE-EXPORT), création du modal de
+sélection client multi-client, et intégration complète dans DetailConteneur.
+
+Tous les documents sont bilingues FR/ZH avec fallback "À compléter" en italique
+gris pour les champs vides, suivant le pattern établi par BC-CHINE (v35e).
+
+═══════════════════════════════════════════════════════════════════════════════
+
+FICHIERS CRÉÉS
+--------------
+
+1. src/lib/excel-generators/firestoreHelpers.ts (70 lignes)
+   - getTauxRmb(): charge le taux RMB depuis admin_params/taux_rmb (fallback 7.82)
+   - enrichirLigne(): enrichit une LigneProduit avec les données Firestore products/
+   - getInfosClientDevis(): charge les infos client depuis quotes/
+
+2. src/lib/excel-generators/luxentHeader.ts (51 lignes)
+   - insertLuxentHeader(): insère le bloc d'en-tête LUXENT FRANCE
+   - Utilisé par BD-INVOICE, BD-PACKINGLIST, BD-MARITIME
+   - Retourne la ligne suivante disponible pour le contenu
+
+3. src/lib/excel-generators/buildLignesCtn.ts (86 lignes)
+   - buildLignesCtn(): agrège toutes les lignes d'un conteneur par client
+   - Parcourt toutes les LA liées au conteneur (devis_lies)
+   - Filtre par client (optionnel)
+   - Enrichit chaque ligne avec enrichirLigne()
+   - Retourne Map<clientNom, LigneProduit[]>
+
+4. src/lib/excel-generators/generateBdInvoice.ts (176 lignes)
+   - Facture commerciale (Commercial Invoice)
+   - Colonnes: N°, Réf, Product Name (EN), Brand, Qty, Unit Price €, Total €
+   - En-tête LUXENT + bloc client + tableau produits
+   - Total EUR + conversion CNY
+   - Note légale : "This invoice is for customs purposes only..."
+
+5. src/lib/excel-generators/generateBdPackingList.ts (180 lignes)
+   - Liste de colisage (Packing List)
+   - Colonnes: N°, Réf, Product Name (EN), Qty, L(cm), W(cm), H(cm), Net(kg), Gross(kg)
+   - En-tête LUXENT + bloc client + tableau avec dimensions/poids
+   - Totaux: Qté, Poids Net, Poids Brut
+   - Note : "All measurements are approximate..."
+
+6. src/lib/excel-generators/generateBdMaritime.ts (161 lignes)
+   - Frais maritimes (Maritime Costs)
+   - Colonnes: N°, Libellé, Description, Montant €
+   - Charge frais_maritimes depuis le conteneur
+   - Descriptions auto-générées selon le type de frais (fret, douane, manutention, etc.)
+   - Total des frais maritimes
+
+7. src/lib/excel-generators/generateBeExport.ts (155 lignes)
+   - Déclaration d'exportation douanière (Export Declaration)
+   - Colonnes: N°, Réf, Nom ZH 中文, Code HS, Qté, Usage CN 用途, Ville origine 产地, Prix unit. ¥, Total ¥
+   - Titre bilingue : "BE-EXPORT 出口报关单 — EXPORT DECLARATION"
+   - Total CNY + conversion EUR
+   - Note douanière : "Documents requis : Code HS, Usage CN, Ville origine CN..."
+
+8. src/admin/components/PopupSelectionClientExcel.tsx (229 lignes)
+   - Modal de sélection du client pour générer les documents
+   - Liste tous les clients uniques ayant des produits dans le conteneur
+   - Interface : liste sélectionnable + boutons Annuler/Confirmer
+   - Charge automatiquement les InfosClient via getInfosClientDevis()
+   - Gestion des états : loading, error, selectedClient, loadingInfos
+
+═══════════════════════════════════════════════════════════════════════════════
+
+FICHIERS MODIFIÉS
+-----------------
+
+1. src/lib/excel-generators/excelTypes.ts
+   + Ajout du champ "qte: number" dans LigneProduit
+   (était manquant, causait erreurs TypeScript)
+
+2. src/admin/pages/DetailConteneur.tsx (+134 lignes)
+   + Imports : 4 générateurs + modal + downloadExcel + InfosClient
+   + État : showClientModal, currentGenerator, generatingExcel
+   + openGeneratorModal(): ouvre le modal avec le type de générateur
+   + handleClientSelected(): génère le document Excel après sélection client
+   + Section "Documents Excel bilingues FR/ZH" avec 4 boutons :
+     - 📄 BD-INVOICE
+     - 📦 BD-PACKINGLIST
+     - 🚢 BD-MARITIME
+     - 🛃 BE-EXPORT
+   + Rendu conditionnel du modal PopupSelectionClientExcel
+
+═══════════════════════════════════════════════════════════════════════════════
+
+CORRECTIFS TYPESCRIPT
+---------------------
+
+1. PopupSelectionClientExcel.tsx
+   - Suppression import React (non utilisé)
+
+2. buildLignesCtn.ts
+   - Suppression imports collection, query, where, getDocs (non utilisés)
+
+3. generateBdInvoice.ts
+   - Suppression variable dataStartRow (non utilisée)
+
+4. generateBdMaritime.ts
+   - Renommage paramètre clientNom → _clientNom (intentionnellement non utilisé)
+   - Cast montant as number dans numVal()
+
+5. excelTypes.ts
+   - Ajout champ qte: number dans LigneProduit
+
+Résultat : npm run build ✅ SUCCESS (0 erreur TypeScript)
+
+═══════════════════════════════════════════════════════════════════════════════
+
+WORKFLOW UTILISATEUR (BACK-OFFICE)
+-----------------------------------
+
+1. Admin ouvre /admin/conteneurs/:id (DetailConteneur)
+2. Section "Documents Excel bilingues FR/ZH" affiche 4 boutons
+3. Clic sur un bouton → PopupSelectionClientExcel s'ouvre
+4. Modal liste tous les clients ayant des produits dans le conteneur
+5. Admin sélectionne le client → clic "Confirmer"
+6. Génération du document Excel pour ce client
+7. Téléchargement automatique du fichier .xlsx
+8. Nom fichier : BD-INVOICE_CTN-260001_ClientNom_2026-04-20.xlsx
+
+═══════════════════════════════════════════════════════════════════════════════
+
+DÉPENDANCES FIRESTORE
+----------------------
+
+Collections utilisées :
+- conteneurs/ : infos conteneur, frais_maritimes, devis_lies
+- listes_achat/ : lignes produits avec conteneur_assigne, client_nom, devis_id
+- products/ : données produits (nom_zh, nom_en, marque, dimensions, poids, etc.)
+- quotes/ : infos client (client_nom, client_adresse, client_siret, etc.)
+- admin_params/taux_rmb : taux de change EUR → CNY
+
+Champs clés :
+- ligne.conteneur_assigne : filtre les lignes d'un conteneur
+- ligne.client_nom : groupe par client
+- ligne.devis_id : lien vers quotes/ pour infos client
+
+═══════════════════════════════════════════════════════════════════════════════
+
+ARCHITECTURE TECHNIQUE
+----------------------
+
+Pattern de génération Excel (commun aux 5 générateurs) :
+1. Charger conteneur + lignes avec buildLignesCtn() ou directement
+2. Enrichir les lignes avec enrichirLigne() (si besoin)
+3. Créer workbook ExcelJS + worksheet
+4. Définir largeurs colonnes
+5. Titre + en-tête LUXENT (BD-*) ou info conteneur (BC-*, BE-*)
+6. Bloc client (si applicable)
+7. En-têtes tableau avec styleOrangeHeader() ou styleNavyHeader()
+8. Lignes de données avec styleData()
+9. Ligne TOTAL avec styleTotal()
+10. Conversions CNY ↔ EUR (si applicable)
+11. Notes / mentions légales
+12. Générer buffer : workbook.xlsx.writeBuffer()
+
+Helpers réutilisables :
+- firestoreHelpers.ts : getTauxRmb, enrichirLigne, getInfosClientDevis
+- luxentHeader.ts : insertLuxentHeader (BD-* seulement)
+- buildLignesCtn.ts : agrégation lignes par client
+- excelTypes.ts : strVal, numVal, formatIdExcel, todayFr, downloadExcel
+- excelStyles.ts : styleNavyHeader, styleOrangeHeader, styleData, styleTotal
+
+═══════════════════════════════════════════════════════════════════════════════
+
+TESTS RECOMMANDÉS
+-----------------
+
+[ ] Conteneur avec 1 seul client → modal affiche 1 client
+[ ] Conteneur avec plusieurs clients → modal affiche tous les clients
+[ ] Générer BD-INVOICE → fichier téléchargé, colonnes correctes
+[ ] Générer BD-PACKINGLIST → dimensions/poids affichés
+[ ] Générer BD-MARITIME → frais_maritimes chargés depuis conteneur
+[ ] Générer BE-EXPORT → codes HS, usage CN, ville origine CN
+[ ] Champs vides → affiche "À compléter" en italique gris
+[ ] Conversion CNY/EUR → taux RMB correct depuis admin_params
+[ ] Fermer modal sans sélection → aucun téléchargement
+[ ] Build production → 0 erreur TypeScript
+
+═══════════════════════════════════════════════════════════════════════════════
+
+COMMITS GIT
+-----------
+
+2b5b443  fix(v35e-suite): corrections TypeScript (imports, types, params)
+9aa8b31  feat(v35e-suite): intégration 4 générateurs Excel dans DetailConteneur
+f1b4f01  feat(v35e-suite): PopupSelectionClientExcel modal pour sélection client
+17daadf  feat(v35e-suite): generateBeExport pour déclaration export douanière
+339b69e  feat(v35e-suite): generateBdMaritime pour frais maritimes
+03c752f  feat(v35e-suite): generateBdPackingList pour liste de colisage
+0a2363a  feat(v35e-suite): generateBdInvoice pour facture commerciale
+2d9d159  feat(v35e-suite): buildLignesCtn pour agrégation lignes conteneur par client
+c06e7d9  feat(v35e-suite): luxentHeader pour en-tête LUXENT FRANCE
+34852ea  feat(v35e-suite): firestoreHelpers (getTauxRmb, enrichirLigne, getInfosClientDevis)
+
+Total : 10 commits
+Branche : v2
+Statut : MERGED & PUSHED ✅
+
+═══════════════════════════════════════════════════════════════════════════════
+
+PROCHAINES ÉTAPES (hors scope v35e-suite)
+------------------------------------------
+
+1. Tester en conditions réelles avec données conteneur
+2. Ajuster layout Excel selon feedback utilisateur
+3. Ajouter validation des données avant génération (alerte si champs critiques vides)
+4. Implémenter cache des InfosClient pour éviter re-fetch à chaque génération
+5. Ajouter preview Excel dans modal avant téléchargement (v36+ ?)
+6. Générer plusieurs documents en batch (ZIP multi-clients)
+
+═══════════════════════════════════════════════════════════════════════════════
+
+STATUT FINAL : v35e-suite TERMINÉ ✅
+DATE : 2026-04-20
+AUTEUR : Claude Opus 4.6
+
+═══════════════════════════════════════════════════════════════════════════════
