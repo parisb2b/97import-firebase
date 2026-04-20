@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { CATEGORIES, SOUS_CATEGORIES, calculerPrixDerives, genererReferenceAuto } from '../../../lib/productHelpers';
+import { uploadImagePrincipale, supprimerFichierStorage } from '../../../lib/storageHelpers';
 import CompositionKitEditor from './CompositionKitEditor';
 
 interface Props {
@@ -15,6 +16,71 @@ export default function OngletEssentiel({ product, onChange, isCreation }: Props
     ? calculerPrixDerives(product.prix_achat) : null;
 
   const sousCats = product.categorie ? SOUS_CATEGORIES[product.categorie] || [] : [];
+
+  // === Gestion upload image principale ===
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleUploadImagePrincipale = async (file: File) => {
+    if (!product.reference && !isCreation) {
+      alert('⚠️ Enregistrez d\'abord le produit pour uploader une image');
+      return;
+    }
+
+    // Pour la création : exiger une référence saisie
+    if (isCreation && (!product.reference || product.reference.trim() === '')) {
+      alert('⚠️ Saisissez d\'abord une référence produit avant d\'uploader l\'image');
+      return;
+    }
+
+    setUploadingImage(true);
+    try {
+      // Supprimer ancienne image si elle existe et vient de Firebase Storage
+      if (product.image_principale && product.image_principale.includes('firebasestorage')) {
+        await supprimerFichierStorage(product.image_principale);
+      }
+
+      const url = await uploadImagePrincipale(product.reference, file);
+      onChange('image_principale', url);
+    } catch (err: any) {
+      alert('❌ Erreur upload : ' + err.message);
+    } finally {
+      setUploadingImage(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) handleUploadImagePrincipale(file);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) handleUploadImagePrincipale(file);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(true);
+  };
+
+  const handleDragLeave = () => {
+    setDragOver(false);
+  };
+
+  const handleRemoveImage = async () => {
+    if (!confirm('Supprimer l\'image principale ?')) return;
+    const url = product.image_principale;
+    onChange('image_principale', '');
+    // Suppression Storage uniquement si c'est une URL Firebase
+    if (url && url.includes('firebasestorage')) {
+      await supprimerFichierStorage(url);
+    }
+  };
 
   // Auto-génération référence quand catégorie/sous-cat/modèle change (création uniquement)
   useEffect(() => {
@@ -143,24 +209,148 @@ export default function OngletEssentiel({ product, onChange, isCreation }: Props
       </Card>
 
       {/* Image principale */}
-      <Card title="Image principale" subtitle="Image affichée partout (site, devis, PDF)">
-        <FormGrid2>
-          <div>
-            <div style={imagePreviewStyle}>
-              {product.image_principale ? (
-                <img src={product.image_principale} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+      <Card title="Image principale" subtitle="Image affichée partout (site, devis, PDF). Glissez-déposez depuis votre ordinateur ou collez une URL.">
+        {/* Si une image existe, afficher preview + bouton supprimer */}
+        {product.image_principale ? (
+          <FormGrid2>
+            <div>
+              <div style={{
+                width: '100%',
+                aspectRatio: '1',
+                background: '#F3F4F6',
+                borderRadius: 12,
+                overflow: 'hidden',
+                border: '1px solid #E5E7EB',
+                position: 'relative',
+              }}>
+                <img
+                  src={product.image_principale}
+                  alt=""
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                />
+              </div>
+            </div>
+            <div>
+              <div style={{ display: 'flex', gap: 10, marginBottom: 12 }}>
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploadingImage}
+                  style={{
+                    flex: 1,
+                    padding: '10px 16px',
+                    background: '#EA580C',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: 10,
+                    fontSize: 13,
+                    fontWeight: 600,
+                    cursor: uploadingImage ? 'wait' : 'pointer',
+                    fontFamily: 'inherit',
+                  }}
+                >
+                  {uploadingImage ? '⏳ Upload...' : '🔄 Remplacer'}
+                </button>
+                <button
+                  onClick={handleRemoveImage}
+                  style={{
+                    padding: '10px 16px',
+                    background: '#fff',
+                    color: '#DC2626',
+                    border: '1.5px solid #FECACA',
+                    borderRadius: 10,
+                    fontSize: 13,
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    fontFamily: 'inherit',
+                  }}
+                >
+                  🗑 Supprimer
+                </button>
+              </div>
+              <Field label="URL (lecture seule)">
+                <input
+                  type="text"
+                  value={product.image_principale || ''}
+                  readOnly
+                  style={{
+                    ...inputStyle,
+                    background: '#F9FAFB',
+                    color: '#6B7280',
+                    fontSize: 11,
+                  }}
+                />
+                <Hint>URL Firebase Storage (ou externe)</Hint>
+              </Field>
+            </div>
+          </FormGrid2>
+        ) : (
+          // Aucune image : zone drag & drop + input URL
+          <>
+            <div
+              onDrop={handleDrop}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onClick={() => fileInputRef.current?.click()}
+              style={{
+                width: '100%',
+                padding: 40,
+                background: dragOver ? '#FFF7ED' : '#F9FAFB',
+                border: `2px dashed ${dragOver ? '#EA580C' : '#E5E7EB'}`,
+                borderRadius: 12,
+                textAlign: 'center',
+                cursor: uploadingImage ? 'wait' : 'pointer',
+                transition: 'all 0.15s',
+                marginBottom: 14,
+              }}
+            >
+              {uploadingImage ? (
+                <>
+                  <div style={{ fontSize: 40, marginBottom: 8 }}>⏳</div>
+                  <div style={{ fontSize: 14, fontWeight: 500, color: '#374151' }}>
+                    Upload en cours...
+                  </div>
+                  <div style={{ fontSize: 12, color: '#6B7280', marginTop: 4 }}>
+                    Compression et envoi vers Firebase Storage
+                  </div>
+                </>
               ) : (
-                <span style={{ color: '#9CA3AF' }}>Aucune image</span>
+                <>
+                  <div style={{ fontSize: 40, color: '#9CA3AF', marginBottom: 8 }}>⬆</div>
+                  <div style={{ fontSize: 14, fontWeight: 500, color: '#374151' }}>
+                    Glissez-déposez une image ici
+                  </div>
+                  <div style={{ fontSize: 12, color: '#6B7280', marginTop: 4 }}>
+                    ou cliquez pour parcourir — JPG, PNG, WebP (compression auto)
+                  </div>
+                </>
               )}
             </div>
-          </div>
-          <Field label="URL de l'image principale" required>
-            <input type="text" value={product.image_principale || ''}
-              onChange={e => onChange('image_principale', e.target.value)}
-              placeholder="URL Firebase Storage ou URL externe" style={inputStyle} />
-            <Hint>Pour uploader une image, utilisez l'onglet Médias site web</Hint>
-          </Field>
-        </FormGrid2>
+
+            <div style={{ textAlign: 'center', margin: '12px 0', fontSize: 12, color: '#9CA3AF' }}>
+              — ou —
+            </div>
+
+            <Field label="URL externe de l'image">
+              <input
+                type="text"
+                value={product.image_principale || ''}
+                onChange={e => onChange('image_principale', e.target.value)}
+                placeholder="https://..."
+                style={inputStyle}
+              />
+              <Hint>Pour coller une URL d'image hébergée ailleurs (optionnel)</Hint>
+            </Field>
+          </>
+        )}
+
+        {/* Input file caché */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          style={{ display: 'none' }}
+          onChange={handleFileSelect}
+        />
       </Card>
 
       {/* Statut */}
