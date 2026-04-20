@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { Link, useLocation } from 'wouter';
 import { collection, getDocs, orderBy, query } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
-import { calculerCompletude, CATEGORIES, StatutCompletude } from '../../lib/productHelpers';
+import { calculerCompletude, CATEGORIES, StatutCompletude, manqueCodeHs, CHAMPS_ESSENTIEL } from '../../lib/productHelpers';
 
 interface Product {
   id: string;
@@ -56,8 +56,11 @@ export default function AdminProduits() {
     products.map(p => ({ ...p, _completude: calculerCompletude(p) })), [products]);
 
   const stats = useMemo(() => {
-    const s = { total: productsAvecCompletude.length, complet: 0, pret_site: 0, a_enrichir: 0, bloquant: 0 };
-    for (const p of productsAvecCompletude) s[p._completude.statut]++;
+    const s = { total: productsAvecCompletude.length, complet: 0, pret_site: 0, a_enrichir: 0, bloquant: 0, code_hs_manquant: 0 };
+    for (const p of productsAvecCompletude) {
+      s[p._completude.statut]++;
+      if (manqueCodeHs(p) && p.actif) s.code_hs_manquant++;
+    }
     return s;
   }, [productsAvecCompletude]);
 
@@ -117,12 +120,15 @@ export default function AdminProduits() {
       </div>
 
       {/* Stats */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12, marginBottom: 20 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: stats.code_hs_manquant > 0 ? 'repeat(6, 1fr)' : 'repeat(5, 1fr)', gap: 12, marginBottom: 20 }}>
         <StatCard label="Total" value={stats.total} bg="#fff" color="#111827" border="#E5E7EB" />
         <StatCard label="Complets" value={stats.complet} bg="#D1FAE5" color="#065F46" border="#6EE7B7" />
         <StatCard label="Prêts site" value={stats.pret_site} bg="#DBEAFE" color="#1E40AF" border="#93C5FD" />
         <StatCard label="À enrichir" value={stats.a_enrichir} bg="#FEF3C7" color="#92400E" border="#FCD34D" />
         <StatCard label="Bloquants" value={stats.bloquant} bg="#FEE2E2" color="#991B1B" border="#FCA5A5" />
+        {stats.code_hs_manquant > 0 && (
+          <StatCard label="⚠️ Code HS manquant" value={stats.code_hs_manquant} bg="#FEF3C7" color="#92400E" border="#FCD34D" />
+        )}
       </div>
 
       {/* Filtres */}
@@ -173,7 +179,7 @@ export default function AdminProduits() {
               {sorted.map(p => {
                 const badge = STATUT_BADGE[p._completude.statut];
                 const catLabel = CATEGORIES.find(c => c.id === p.categorie)?.label || p.categorie || '—';
-                const percent = Math.round((p._completude.essentiel / 12) * 100);
+                const percent = Math.round((p._completude.essentiel / CHAMPS_ESSENTIEL.length) * 100);
                 return (
                   <tr key={p.id}
                     onClick={() => setLocation(`/admin/produits/${encodeURIComponent(p.reference)}`)}
@@ -186,6 +192,21 @@ export default function AdminProduits() {
                       {p.est_kit && Array.isArray(p.composition_kit) && (
                         <div style={{ fontSize: 11, color: '#6B7280', marginTop: 2 }}>
                           🔧 Kit composé de {p.composition_kit.length} produit{p.composition_kit.length > 1 ? 's' : ''}
+                        </div>
+                      )}
+                      {manqueCodeHs(p) && p.actif && (
+                        <div style={{
+                          display: 'inline-block',
+                          fontSize: 10,
+                          color: '#92400E',
+                          background: '#FEF3C7',
+                          border: '1px solid #FCD34D',
+                          padding: '2px 8px',
+                          borderRadius: 10,
+                          marginTop: 4,
+                          fontWeight: 600,
+                        }}>
+                          ⚠️ Code HS manquant
                         </div>
                       )}
                     </td>
