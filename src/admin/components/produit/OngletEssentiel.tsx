@@ -127,9 +127,9 @@ export default function OngletEssentiel({ product, onChange, isCreation }: Props
         </FormGrid2>
       </Card>
 
-      {/* Logistique & Douane */}
-      <Card title="Logistique & Douane" subtitle="Informations indispensables pour les Excel et la déclaration douanière">
-        <FormGrid3>
+      {/* Logistique */}
+      <Card title="Logistique" subtitle="Informations indispensables pour les Excel et la génération de devis">
+        <FormGrid2>
           <Field label="Poids brut (kg)" required>
             <input type="number" step="0.1" value={product.poids_brut_kg ?? ''}
               onChange={e => onChange('poids_brut_kg', parseFloat(e.target.value) || 0)} style={inputStyle} />
@@ -137,15 +137,9 @@ export default function OngletEssentiel({ product, onChange, isCreation }: Props
           <Field label="Volume (m³)" required>
             <input type="number" step="0.001" value={product.volume_m3 ?? ''}
               onChange={e => onChange('volume_m3', parseFloat(e.target.value) || 0)} style={inputStyle} />
-            <Hint>Calculé auto si L×l×H renseignés en onglet Détails</Hint>
+            <Hint>Calculé auto si L×l×H renseignés en onglet Détails techniques</Hint>
           </Field>
-          <Field label="Code HS (douane)" required>
-            <input type="text" value={product.code_hs || ''}
-              onChange={e => onChange('code_hs', e.target.value)}
-              placeholder="Ex: 85016190" style={inputStyle} />
-            <Hint>Code HS à 8 ou 10 chiffres</Hint>
-          </Field>
-        </FormGrid3>
+        </FormGrid2>
       </Card>
 
       {/* Image principale */}
