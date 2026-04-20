@@ -686,3 +686,41 @@ COLLECTION :
   listes_achat/ : {numero, statut, lignes[], total_cny, notes, dates}
 
 BUILD : ✅ 0 erreur TypeScript
+
+=== v35e — Excel Bilingues FR/ZH (PARTIEL 1/5) ===
+Date : 20/04/2026
+
+OBJECTIF :
+  Génération 5 fichiers Excel bilingues FR/ZH pour documents commerciaux chinois
+
+COMMITS :
+  d163768 v35e-A: install exceljs
+  e5dc66c v35e-B: BC-CHINE generator + shared infrastructure
+
+STATUT : ⚠️ PARTIEL (1/5 complet)
+
+IMPLÉMENTÉ :
+  ✅ BC-CHINE (liste d'achat → fournisseurs chinois)
+  ✅ Infrastructure partagée (types, styles, helpers)
+  ✅ Bouton dans DetailListeAchat
+  ✅ Auto-fetch nom_zh + fournisseur depuis products/
+  ✅ Fallback "À compléter" (italic gris) pour champs vides
+  ✅ Conversion CNY → EUR avec taux_rmb
+
+NON IMPLÉMENTÉ (documenté dans MAJ35E.TXT) :
+  ❌ BD-INVOICE (commercial invoice)
+  ❌ BD-PACKINGLIST (packing list)
+  ❌ BD-MARITIME (frais maritimes EUR)
+  ❌ BE-EXPORT (douane chinoise)
+  ❌ ModalSelectionClient (sélection client conteneur)
+  ❌ Boutons dans DetailConteneur
+
+FICHIERS CRÉÉS :
+  ✅ src/lib/excel-generators/excelTypes.ts (117 lignes)
+  ✅ src/lib/excel-generators/excelStyles.ts (65 lignes)
+  ✅ src/lib/excel-generators/generateBcChine.ts (130 lignes)
+
+BUNDLE SIZE : +950KB (exceljs) → 2.47MB total
+BUILD : ✅ 0 erreur TypeScript
+
+EFFORT RESTANT : ~5h pour 4 générateurs + modal + UI integration
