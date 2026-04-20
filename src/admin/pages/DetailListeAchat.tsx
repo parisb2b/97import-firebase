@@ -2,6 +2,8 @@ import { useState, useEffect, useMemo } from 'react';
 import { useLocation, useRoute, Link } from 'wouter';
 import { doc, getDoc, updateDoc, collection, getDocs, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
+import { generateBcChine } from '../../lib/excel-generators/generateBcChine';
+import { downloadExcel } from '../../lib/excel-generators/excelTypes';
 
 export default function DetailListeAchat() {
   const [, params] = useRoute('/admin/listes-achat/:id');
@@ -9,6 +11,7 @@ export default function DetailListeAchat() {
   const [la, setLa] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [generatingExcel, setGeneratingExcel] = useState(false);
   const [conteneurs, setConteneurs] = useState<any[]>([]);
   const [showModal, setShowModal] = useState(false);
 
@@ -125,6 +128,25 @@ export default function DetailListeAchat() {
       alert('Erreur: ' + err.message);
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleGenerateBCChine = async () => {
+    if (!la) return;
+    setGeneratingExcel(true);
+    try {
+      // Lire taux RMB
+      const tauxSnap = await getDoc(doc(db, 'admin_params', 'taux_rmb'));
+      const tauxRmb = tauxSnap.exists() ? (tauxSnap.data().valeur || 7.82) : 7.82;
+
+      const buffer = await generateBcChine(la.id, tauxRmb);
+      const date = new Date().toISOString().slice(0, 10);
+      downloadExcel(buffer, `BC-CHINE_${la.numero}_${date}.xlsx`);
+    } catch (err: any) {
+      alert('Erreur génération Excel: ' + err.message);
+      console.error('Erreur Excel:', err);
+    } finally {
+      setGeneratingExcel(false);
     }
   };
 
@@ -345,7 +367,7 @@ export default function DetailListeAchat() {
       </div>
 
       {/* Actions */}
-      <div style={{ display: 'flex', gap: 12, marginTop: 24 }}>
+      <div style={{ display: 'flex', gap: 12, marginTop: 24, flexWrap: 'wrap' }}>
         {readOnly ? (
           <div style={{
             flex: 1, padding: 14, background: '#F3F4F6',
@@ -381,6 +403,18 @@ export default function DetailListeAchat() {
             </button>
           </>
         )}
+        <button
+          onClick={handleGenerateBCChine}
+          disabled={generatingExcel || lignes.length === 0}
+          style={{
+            padding: 14,
+            background: (generatingExcel || lignes.length === 0) ? '#D3D1C7' : '#1565C0',
+            color: '#fff', border: 'none', borderRadius: 12,
+            fontSize: 14, fontWeight: 600,
+            cursor: (generatingExcel || lignes.length === 0) ? 'not-allowed' : 'pointer',
+          }}>
+          {generatingExcel ? 'Génération...' : '📊 BC-CHINE (Excel)'}
+        </button>
       </div>
 
       {/* Modal ajout produits */}
