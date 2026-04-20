@@ -23,9 +23,8 @@ import DetailConteneur from './pages/DetailConteneur';
 import Stock from './pages/Stock';
 import SAVListe from './pages/SAVListe';
 import SAVDetail from './pages/SAVDetail';
-import CatalogueProduits from './pages/CatalogueProduits';
-import NouveauProduit from './pages/NouveauProduit';
-import EditProduit from './pages/EditProduit';
+import AdminProduits from './pages/AdminProduits';
+import FicheProduit from './pages/FicheProduit';
 import Clients from './pages/Clients';
 import Partenaires from './pages/Partenaires';
 import TauxRMB from './pages/TauxRMB';
@@ -312,9 +311,9 @@ export default function AdminApp() {
               <Route path="/admin/sav" component={SAVListe} />
               <Route path="/admin/sav/:id" component={SAVDetail} />
               <Route path="/admin/stock" component={Stock} />
-              <Route path="/admin/produits" component={CatalogueProduits} />
-              <Route path="/admin/produits/nouveau" component={NouveauProduit} />
-              <Route path="/admin/produits/:id" component={EditProduit} />
+              <Route path="/admin/produits/nouveau" component={FicheProduit} />
+              <Route path="/admin/produits/:ref" component={FicheProduit} />
+              <Route path="/admin/produits" component={AdminProduits} />
               <Route path="/admin/clients/:id" component={DetailClient} />
               <Route path="/admin/clients" component={Clients} />
               <Route path="/admin/partenaires/:id" component={DetailPartenaire} />
