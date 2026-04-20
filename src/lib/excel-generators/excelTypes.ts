@@ -16,6 +16,7 @@ export interface LigneProduit {
   nom_fr: string;
   nom_zh?: string;
   nom_en?: string;
+  qte: number;
   marque?: string;
   ref_usine?: string;
   matiere_zh?: string;

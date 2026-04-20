@@ -9,13 +9,13 @@ import { insertLuxentHeader } from './luxentHeader';
  * Génère le document BD-MARITIME (frais maritimes)
  *
  * @param ctnId - ID du conteneur
- * @param clientNom - Nom du client pour filtrer les lignes
+ * @param _clientNom - Nom du client (non utilisé, frais maritimes globaux au conteneur)
  * @param infosClient - Informations du client destinataire
  * @returns ArrayBuffer du fichier Excel généré
  */
 export async function generateBdMaritime(
   ctnId: string,
-  clientNom: string,
+  _clientNom: string,
   infosClient: InfosClient
 ): Promise<ArrayBuffer> {
   // 1) Charger conteneur
@@ -101,7 +101,7 @@ export async function generateBdMaritime(
   row++;
 
   fraisEntries.forEach(([libelle, montant], idx) => {
-    const montantNum = numVal(montant);
+    const montantNum = numVal(montant as number);
     totalEur += montantNum;
 
     // Description des frais standards

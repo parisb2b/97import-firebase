@@ -1,5 +1,5 @@
 import { db } from '../firebase';
-import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
+import { doc, getDoc } from 'firebase/firestore';
 import { LigneProduit, numVal } from './excelTypes';
 import { enrichirLigne } from './firestoreHelpers';
 

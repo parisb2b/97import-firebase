@@ -111,7 +111,6 @@ export async function generateBdInvoice(
   // 10) Lignes produits
   let totalEur = 0;
   row++;
-  const dataStartRow = row;
 
   for (let idx = 0; idx < lignes.length; idx++) {
     const ligne = lignes[idx];
