@@ -3,7 +3,6 @@ import { useLocation, useRoute, Link } from 'wouter';
 import { doc, getDoc, updateDoc, collection, getDocs, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { generateBcChine } from '../../lib/excel-generators/generateBcChine';
-import { downloadExcel } from '../../lib/excel-generators/excelTypes';
 
 export default function DetailListeAchat() {
   const [, params] = useRoute('/admin/listes-achat/:id');
@@ -135,13 +134,7 @@ export default function DetailListeAchat() {
     if (!la) return;
     setGeneratingExcel(true);
     try {
-      // Lire taux RMB
-      const tauxSnap = await getDoc(doc(db, 'admin_params', 'taux_rmb'));
-      const tauxRmb = tauxSnap.exists() ? (tauxSnap.data().valeur || 7.82) : 7.82;
-
-      const buffer = await generateBcChine(la.id, tauxRmb);
-      const date = new Date().toISOString().slice(0, 10);
-      downloadExcel(buffer, `BC-CHINE_${la.numero}_${date}.xlsx`);
+      await generateBcChine(la.id);
     } catch (err: any) {
       alert('Erreur génération Excel: ' + err.message);
       console.error('Erreur Excel:', err);
