@@ -2,9 +2,10 @@ import { useState, useEffect, useMemo } from 'react';
 import { useRoute, useLocation, Link } from 'wouter';
 import { doc, getDoc, setDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
-import { calculerCompletude } from '../../lib/productHelpers';
+import { calculerCompletude, CHAMPS_ESSENTIEL } from '../../lib/productHelpers';
 import FicheProduitTabs from '../components/produit/FicheProduitTabs';
 import OngletEssentiel from '../components/produit/OngletEssentiel';
+import OngletDetails from '../components/produit/OngletDetails';
 
 export default function FicheProduit() {
   const [, params] = useRoute('/admin/produits/:ref');
@@ -158,7 +159,7 @@ export default function FicheProduit() {
     bloquant: {
       bg: '#FEE2E2', color: '#991B1B', border: '#FCA5A5',
       icon: '✗', title: 'Champs essentiels manquants',
-      message: `Il manque ${12 - completude.essentiel} champ(s) essentiel(s). Complétez l'onglet Essentiel avant de pouvoir sauvegarder.`,
+      message: `Il manque ${CHAMPS_ESSENTIEL.length - completude.essentiel} champ(s) essentiel(s). Complétez l'onglet Essentiel avant de pouvoir sauvegarder.`,
     },
   }[completude.statut];
 
@@ -205,12 +206,9 @@ export default function FicheProduit() {
         <OngletEssentiel product={product} onChange={handleChange} isCreation={isCreation} />
       )}
 
-      {/* Onglet Détails — Placeholder Phase 2 */}
+      {/* Onglet Détails */}
       {activeTab === 'details' && !isCreation && (
-        <div style={{ padding: 60, textAlign: 'center', background: '#F9FAFB', border: '1px dashed #E5E7EB', borderRadius: 12, color: '#6B7280' }}>
-          <h3 style={{ color: '#1E3A5F', margin: '0 0 8px' }}>Onglet Détails techniques</h3>
-          <p>Disponible en Phase 2 de v35g.</p>
-        </div>
+        <OngletDetails product={product} onChange={handleChange} />
       )}
 
       {/* Onglet Médias — Placeholder Phase 3 */}
