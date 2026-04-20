@@ -1,0 +1,141 @@
+=======================================================
+MAJ35E-FIX-BC.TXT — Correction generateBcChine
+Date : 2026-04-20 16:00
+Problème : Excel généré avait 8 colonnes simplifiées au lieu des 24 colonnes du template
+Solution : Réécriture complète de generateBcChine.ts depuis la lecture du template local
+=======================================================
+
+TEMPLATE LU :
+  ./src/templates/BC-CHINE-中国采购单.xlsx
+  Feuille : BC CHINE 中国采购单
+  Dimensions : 9 lignes × 24 colonnes
+  Couleur header : #1E3A5F (NAVY)
+
+COLONNES DU TEMPLATE (24 colonnes A-X) :
+  A:  号码 / N°
+  B:  快递单号 / N° Colis envoi
+  C:  内部型号 / N° Interne
+  D:  法语品名 / Nom Produit FR
+  E:  中文品名 / Nom Produit ZH
+  F:  件数 / Qté Colis
+  G:  数量 / Qté Pièces Total
+  H:  长 Longueur (cm)
+  I:  宽 Largeur (cm)
+  J:  高 Hauteur (cm)
+  K:  体积 / Volume (m³)
+  L:  净重 / Poids Net (kg)
+  M:  毛重 / Poids Brut (kg)
+  N:  英语品名 / Nom Produit EN
+  O:  品牌 / Marque
+  P:  厂家款号 / Réf. Usine
+  Q:  中文材质 / Matière ZH
+  R:  英语材质 / Matière EN
+  S:  单价 / Prix Achat (¥)
+  T:  CE / PDF / Certification
+  U:  报价单日期 / Date Devis
+  V:  报价单号 / N° Devis
+  W:  客户 / Client
+  X:  集装箱号 / N° Conteneur
+
+STRUCTURE DU TEMPLATE :
+  Ligne 1 (h=28) : Titre fusionné A1:X1, fond navy, texte blanc, centré
+  Ligne 2 (h=16) : Métadonnées A2:P2 (gauche) + Note calcul Q2:X2 (droite)
+  Ligne 3 (h=18) : Totaux en paires fusionnées (6 blocs)
+    - A3:B3 = TOTAL LIGNES
+    - C3:D3 = TOTAL COLIS
+    - E3:F3 = TOTAL PIÈCES
+    - G3:H3 = VOLUME TOTAL m³
+    - I3:J3 = POIDS NET TOTAL
+    - K3:L3 = POIDS BRUT TOTAL
+  Ligne 4 (h=36) : En-têtes bilingues fond navy #1E3A5F, texte blanc, wrap activé
+  Ligne 5+ : Données produits (hauteur 18)
+  Dernière ligne : TOTAL avec fusion A:E + valeurs dans colonnes F,G,K,L,M
+  Ligne warning : Fusionné A:X, fond jaune clair, texte italique
+
+LARGEURS COLONNES (exactes depuis template) :
+  [6, 14, 16, 28, 26, 8, 8, 10, 10, 10, 12, 10, 10, 28, 12, 16, 18, 18, 14, 14, 12, 14, 20, 16]
+
+FICHIERS MODIFIÉS :
+  1. src/lib/excel-generators/generateBcChine.ts — réécrit entièrement (265 lignes)
+     - Constantes BC_HEADERS (24 en-têtes bilingues exacts)
+     - Constantes BC_COL_WIDTHS (24 largeurs exactes)
+     - Constantes BC_ROW_HEIGHTS (ligne 1,2,3,4)
+     - Helpers locaux : getTauxRmb(), enrichirLigne()
+     - Fonction principale : generateBcChine(laId)
+     - Structure exacte : titre → métadonnées → totaux → headers → data → total → warning
+     - Téléchargement automatique via downloadExcel()
+
+  2. src/admin/pages/DetailListeAchat.tsx — simplifié l'appel (5 lignes supprimées)
+     - Supprimé lecture manuelle taux RMB (géré dans generateBcChine)
+     - Supprimé import downloadExcel (géré dans generateBcChine)
+     - Simplifié handleGenerateBCChine() : await generateBcChine(la.id)
+
+ENRICHISSEMENT PRODUIT :
+  Chaque ligne de la liste d'achat est enrichie avec les données depuis products/{reference} :
+  - nom_zh, nom_en (noms bilingues)
+  - marque (via marque ou fournisseur)
+  - ref_usine (référence usine)
+  - matiere_zh, matiere_en (matières bilingues)
+  - prix_achat (converti en CNY via taux_rmb)
+  - longueur_cm, largeur_cm, hauteur_cm (dimensions)
+  - poids_net_kg, poids_brut_kg (poids)
+  - ce_certification (certification CE)
+
+CALCULS AUTOMATIQUES :
+  - Volume m³ = (L × l × H) / 1,000,000 (fonction calcVolM3)
+  - Prix CNY = prix_achat_eur × taux_rmb (depuis admin_params/taux_rmb)
+  - Totaux : lignes, colis, pièces, volume, poids net, poids brut
+
+MAPPING DONNÉES FIRESTORE → EXCEL :
+  - la.lignes[].ref → C (Réf Interne) + enrichissement products/
+  - la.lignes[].nom_fr → D (Nom FR)
+  - la.lignes[].nom_zh → E (Nom ZH) ou fallback nom_fr
+  - la.lignes[].qte_colis → F (Qté Colis) ou 1
+  - la.lignes[].qte_pieces → G (Qté Pièces) ou 1
+  - la.lignes[].longueur_cm → H (Longueur)
+  - la.lignes[].largeur_cm → I (Largeur)
+  - la.lignes[].hauteur_cm → J (Hauteur)
+  - la.lignes[].poids_net_kg → L (Poids Net)
+  - la.lignes[].poids_brut_kg → M (Poids Brut)
+  - la.lignes[].nom_en → N (Nom EN) ou fallback nom_fr
+  - la.lignes[].marque → O (Marque) avec strVal('À compléter')
+  - la.lignes[].ref_usine → P (Réf Usine) avec strVal('À compléter')
+  - la.lignes[].matiere_zh → Q (Matière ZH) avec strVal('À compléter')
+  - la.lignes[].matiere_en → R (Matière EN) avec strVal('À compléter')
+  - la.lignes[].prix_achat_eur × taux → S (Prix CNY)
+  - la.lignes[].ce_certification → T (CE) avec strVal('À compléter')
+  - la.lignes[].date_devis → U (Date Devis)
+  - la.lignes[].devis_id → V (N° Devis) avec formatIdExcel()
+  - la.lignes[].client_nom → W (Client)
+  - la.lignes[].conteneur_assigne → X (N° CTN) avec formatIdExcel()
+
+RÉSULTAT :
+  ✅ Excel généré = structure identique au template
+  ✅ 24 colonnes bilingues FR/ZH (A-X)
+  ✅ En-têtes fond navy #1E3A5F, texte blanc, wrap activé
+  ✅ Ligne 1 titre + Ligne 2 métadonnées + Ligne 3 totaux + Ligne 4 en-têtes
+  ✅ Lignes de données enrichies avec products/
+  ✅ Ligne TOTAL avec calculs automatiques
+  ✅ Ligne warning fusionnée
+  ✅ Champs vides affichent "À compléter" en italique gris
+  ✅ Volume calculé automatiquement (L×l×H)/1M
+  ✅ Prix convertis en CNY via taux RMB
+  ✅ Téléchargement automatique via downloadExcel()
+
+BUILD : ✅ OK (0 erreur TypeScript)
+
+COMMITS :
+  8c286f9  fix(v35e): generateBcChine restructuré conforme template 24 colonnes bilingues FR/ZH
+
+FICHIER TEMPLATE SOURCE :
+  ./src/templates/BC-CHINE-中国采购单.xlsx
+
+AVANT / APRÈS :
+  AVANT : 8 colonnes simplifiées (N°, Réf, Nom FR, Nom ZH, Qté, Fournisseur, Prix unit, Total)
+  APRÈS : 24 colonnes complètes bilingues FR/ZH identiques au template de référence
+
+=======================================================
+FIN MAJ35E-FIX-BC.TXT
+Date : 2026-04-20 16:00
+Statut : ✅ TERMINÉ
+=======================================================
