@@ -6,6 +6,7 @@ import { calculerCompletude, CHAMPS_ESSENTIEL, migrerGalerieImages } from '../..
 import FicheProduitTabs from '../components/produit/FicheProduitTabs';
 import OngletEssentiel from '../components/produit/OngletEssentiel';
 import OngletDetails from '../components/produit/OngletDetails';
+import OngletMedias from '../components/produit/OngletMedias';
 
 export default function FicheProduit() {
   const [, params] = useRoute('/admin/produits/:ref');
@@ -251,10 +252,7 @@ export default function FicheProduit() {
 
       {/* Onglet Médias — Placeholder Phase 3 */}
       {activeTab === 'medias' && !isCreation && (
-        <div style={{ padding: 60, textAlign: 'center', background: '#F9FAFB', border: '1px dashed #E5E7EB', borderRadius: 12, color: '#6B7280' }}>
-          <h3 style={{ color: '#1E3A5F', margin: '0 0 8px' }}>Onglet Médias site web</h3>
-          <p>Disponible en Phase 3 de v35g.</p>
-        </div>
+        <OngletMedias product={product} onChange={handleChange} />
       )}
 
       {/* Sticky Footer */}
