@@ -63,15 +63,13 @@ export async function calculateCommission(devis: Devis): Promise<CommissionResul
     const qte = ligne.qte ?? 1;
 
     // 1. Récupérer le prix_achat
-    let prix_achat = ligne.prix_achat;
-    if (prix_achat === undefined || prix_achat === null) {
+    let prix_achat: number = ligne.prix_achat ?? 0;
+    if (prix_achat === 0 && ligne.prix_achat === undefined) {
       // Fetcher depuis products/
       try {
         const productSnap = await getDoc(doc(db, 'products', ligne.ref));
         if (productSnap.exists()) {
           prix_achat = productSnap.data().prix_achat ?? 0;
-        } else {
-          prix_achat = 0;
         }
       } catch {
         prix_achat = 0;
