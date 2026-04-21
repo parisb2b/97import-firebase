@@ -360,7 +360,7 @@ export default function ModalNouvelleCommission({ onClose, onSuccess }: Props) {
                     <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
                       <thead>
                         <tr style={{ background: '#F9FAFB', borderBottom: '1px solid #E5E7EB' }}>
-                          <th style={thStyle} width="40"></th>
+                          <th style={{ ...thStyle, width: 40 }}></th>
                           <th style={thStyle}>Devis</th>
                           <th style={thStyle}>Client</th>
                           <th style={{ ...thStyle, textAlign: 'right' }}>Total HT</th>
