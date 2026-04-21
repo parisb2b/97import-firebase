@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import { useToast } from '../../components/Toast';
+import { calculateCommission, estEligibleCommission } from '../../../lib/commissionHelpers';
 
 interface DevisLine {
   ref: string;
@@ -26,14 +27,13 @@ interface Devis {
   createdAt: any;
 }
 
-const COMMISSION_RATE = 0.05; // 5%
-
 export default function MesCommissionsPartner({ partnerCode }: { partnerCode: string }) {
   const { showToast } = useToast();
   const [devis, setDevis] = useState<Devis[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [search, setSearch] = useState('');
+  const [commissions, setCommissions] = useState<Map<string, number>>(new Map());
 
   useEffect(() => {
     const load = async () => {
@@ -42,11 +42,23 @@ export default function MesCommissionsPartner({ partnerCode }: { partnerCode: st
         const q = query(collection(db, 'quotes'), where('partenaire_code', '==', partnerCode));
         const snap = await getDocs(q);
         const all = snap.docs.map(d => ({ id: d.id, ...d.data() } as Devis));
-        // Only devis with at least one encaissed acompte
+
+        // Filtrer les devis éligibles (acompte encaissé)
         const filtered = all
-          .filter(d => d.acomptes?.some((a: any) => a.statut === 'encaisse'))
+          .filter(estEligibleCommission)
           .sort((a, b) => (b.createdAt?.toMillis?.() || b.createdAt?.seconds * 1000 || 0) - (a.createdAt?.toMillis?.() || a.createdAt?.seconds * 1000 || 0));
+
         setDevis(filtered);
+
+        // Calculer les commissions en parallèle
+        const commissionsMap = new Map<string, number>();
+        await Promise.all(
+          filtered.map(async (d) => {
+            const result = await calculateCommission(d);
+            commissionsMap.set(d.id, result.commission_totale);
+          })
+        );
+        setCommissions(commissionsMap);
       } catch (err) {
         console.error(err);
         showToast('Erreur de chargement', 'error');
@@ -57,6 +69,8 @@ export default function MesCommissionsPartner({ partnerCode }: { partnerCode: st
     load();
   }, [partnerCode]);
 
+  const getCommission = (d: Devis) => commissions.get(d.id) ?? 0;
+
   const getCommissionStatut = (d: Devis) => {
     if ((d as any).commission_payee) return { bg: '#065F46', color: '#fff', label: 'Payée' };
     if (d.statut === 'livre' || d.statut === 'paye_complet') return { bg: '#DCFCE7', color: '#166534', label: 'Confirmée' };
@@ -66,9 +80,9 @@ export default function MesCommissionsPartner({ partnerCode }: { partnerCode: st
   const confirmees = devis.filter(d => d.statut === 'livre' || d.statut === 'paye_complet' || (d as any).commission_payee);
   const enAttente = devis.filter(d => d.statut !== 'livre' && d.statut !== 'paye_complet' && !(d as any).commission_payee);
 
-  const totalConfirmees = confirmees.reduce((s, d) => s + d.total_ht * COMMISSION_RATE, 0);
-  const totalEnAttente = enAttente.reduce((s, d) => s + d.total_ht * COMMISSION_RATE, 0);
-  const totalEstime = devis.reduce((s, d) => s + d.total_ht * COMMISSION_RATE, 0);
+  const totalConfirmees = confirmees.reduce((s, d) => s + getCommission(d), 0);
+  const totalEnAttente = enAttente.reduce((s, d) => s + getCommission(d), 0);
+  const totalEstime = devis.reduce((s, d) => s + getCommission(d), 0);
 
   const filtered = devis.filter(d => {
     if (!search) return true;
@@ -81,7 +95,7 @@ export default function MesCommissionsPartner({ partnerCode }: { partnerCode: st
   return (
     <div>
       <h1 style={{ fontSize: 22, fontWeight: 800, color: '#1565C0', marginBottom: 4 }}>Mes commissions</h1>
-      <p style={{ fontSize: 13, color: '#6B7280', marginBottom: 20 }}>Suivi de vos commissions (5% sur chaque devis validé).</p>
+      <p style={{ fontSize: 13, color: '#6B7280', marginBottom: 20 }}>Suivi de vos commissions (marge sur prix VIP négocié).</p>
 
       {/* KPIs */}
       <div style={{ display: 'flex', gap: 12, marginBottom: 20 }}>
@@ -113,13 +127,13 @@ export default function MesCommissionsPartner({ partnerCode }: { partnerCode: st
         <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 2px 8px rgba(0,0,0,0.04)', overflow: 'hidden' }}>
           {/* Header */}
           <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr 120px 120px 100px', padding: '12px 16px', borderBottom: '2px solid #E5E7EB', fontSize: 11, fontWeight: 600, color: '#6B7280' }}>
-            <span>N° Devis</span><span>Client</span><span>Montant devis</span><span>Commission (5%)</span><span>Statut</span>
+            <span>N° Devis</span><span>Client</span><span>Montant devis</span><span>Commission</span><span>Statut</span>
           </div>
 
           {filtered.map(d => {
             const isOpen = expandedId === d.id;
             const cs = getCommissionStatut(d);
-            const commission = d.total_ht * COMMISSION_RATE;
+            const commission = getCommission(d);
             const n = d.numero?.replace(/^DVS-/, '') || '';
 
             return (
@@ -162,12 +176,12 @@ export default function MesCommissionsPartner({ partnerCode }: { partnerCode: st
                         <span style={{ fontWeight: 600, color: '#166534' }}>{d.total_ht?.toLocaleString('fr-FR')} €</span>
                       </div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, marginTop: 4 }}>
-                        <span style={{ color: '#166534' }}>Taux commission</span>
-                        <span style={{ fontWeight: 600, color: '#166534' }}>5%</span>
+                        <span style={{ color: '#166534' }}>Votre commission</span>
+                        <span style={{ fontWeight: 600, color: '#166534' }}>Marge négociée</span>
                       </div>
                       <div style={{ borderTop: '1px solid rgba(22,101,52,.2)', marginTop: 8, paddingTop: 8, display: 'flex', justifyContent: 'space-between', fontSize: 15 }}>
                         <span style={{ fontWeight: 700, color: '#166534' }}>Commission</span>
-                        <span style={{ fontWeight: 800, color: '#166534' }}>{Math.round(commission).toLocaleString('fr-FR')} €</span>
+                        <span style={{ fontWeight: 800, color: '#166534' }}>{Math.round(getCommission(d)).toLocaleString('fr-FR')} €</span>
                       </div>
                     </div>
 
