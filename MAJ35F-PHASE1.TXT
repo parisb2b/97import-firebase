@@ -1,0 +1,101 @@
+=== MAJ35F PHASE 1 — Correctifs commission + Coefficients configurables ===
+Date : 21/04/2026 17:30
+Branche : v2
+Build : OK (0 erreur TypeScript)
+
+OBJECTIF :
+  Corriger le bug critique de calcul commission (5% forfait → formule marge)
+  + créer l'infrastructure de coefficients configurables.
+
+BUGS CORRIGÉS :
+
+1. BUG CRITIQUE — Calcul commission 5% forfait
+   AVANT : commission = total_ht × 5%
+   APRÈS : commission = Σ (prix_VIP_ligne - prix_achat × coef_partner) × qte
+   Fichier : src/front/pages/espace-partenaire/MesCommissionsPartner.tsx
+
+2. BUG taux_commission vs commission_taux
+   Fichier : src/admin/pages/DetailPartenaire.tsx
+   Correctif : ligne supprimée (non pertinente avec nouvelle formule)
+
+3. BUG KPI "Clients apportés" = nb commissions
+   Fichier : src/admin/pages/DetailPartenaire.tsx
+   Correctif : calcul du Set de client_nom/client_id
+
+4. FAIBLESSE — Pas de userId lors création partenaire
+   Fichier : src/admin/pages/Partenaires.tsx
+   Correctif : ajout champ optionnel dans formulaire
+
+5. FAIBLESSE — Pas de validation unicité code
+   Fichier : src/admin/pages/Partenaires.tsx
+   Correctif : vérification query avant création
+
+INFRASTRUCTURE AJOUTÉE :
+
+1. src/lib/coefficientsHelpers.ts (~120 lignes)
+   - getCoefficients() avec cache 30s
+   - setCoefficients(coefs, adminEmail)
+   - calculerPrixDerives(prixAchat)
+   - CoefficientsPrix interface
+
+2. src/lib/commissionHelpers.ts (~130 lignes)
+   - calculateCommission(devis) : formule centralisée
+   - calculateCommissionTotale(devis)
+   - estEligibleCommission(devis) : partenaire + acompte encaissé
+
+3. src/admin/pages/Parametres.tsx (section ajoutée)
+   - Section "Coefficients de prix" dans page Paramètres existante
+   - Validations : partner > 1, user > partner, VIP min >= partner, VIP max <= user
+   - Affichage exemple dynamique (produit à 1000€)
+   - Bouton enregistrement séparé
+
+COLLECTION FIRESTORE CRÉÉE :
+  admin_params/coefficients_prix
+    - coefficient_partner: number (défaut 1.2)
+    - coefficient_user: number (défaut 2.0)
+    - coefficient_vip_min: number (défaut 1.2)
+    - coefficient_vip_max: number (défaut 2.0)
+    - updated_at, updated_by
+
+VALIDATION PRIX VIP CÔTÉ PARTENAIRE :
+  Fichier : src/front/pages/espace-partenaire/GestionDevisPartner.tsx
+  - Affichage dynamique des bornes min/max par ligne
+  - Input en rouge si hors bornes
+  - Blocage envoi devis VIP si prix invalide
+
+COMMITS (7) :
+  1c3c5d8 v35f-P1-G: fix TypeScript errors (prix_achat type safety)
+  1b19764 v35f-P1-F: fix bugs admin partenaires (commission_taux + clients uniques + userId + unicité code)
+  0821fd7 v35f-P1-E: validation bornes prix VIP côté partenaire (coefs configurables)
+  f1e490d v35f-P1-D: fix calcul commission 5% -> formule marge VIP réelle
+  4f50049 v35f-P1-C: page AdminParametres (config coefficients prix)
+  1572e73 v35f-P1-B: helper commissionHelpers.ts (calcul centralisé marge VIP)
+  65c9db5 v35f-P1-A: helper coefficientsHelpers.ts (lecture/écriture coefs prix)
+
+ROUTE AJOUTÉE :
+  /admin/parametres → Section "Coefficients de prix" dans Parametres existant
+
+TESTS MANUELS À FAIRE PAR MICHEL :
+  [ ] Test 1 : Page /admin/parametres - section Coefficients (lecture/écriture)
+  [ ] Test 2 : Calcul commission (plus de 5%, maintenant marge réelle)
+  [ ] Test 3 : Validation prix VIP (bornes dynamiques, input rouge si hors limites)
+  [ ] Test 4 : Fix bugs admin partenaires (plus de taux_commission, clients uniques)
+  [ ] Test 5 : Création partenaire avec userId + unicité code (validation)
+  [ ] Test 6 : Impact coef_user sur prix affichés site (changer 2.0 → 2.5 → observer)
+
+BACKLOG V35F-P2 :
+  - Page AdminNouvelleCommission.tsx (création NC via UI)
+  - Modal "Marquer payée" avec traçabilité
+  - Génération PDF NC depuis la nouvelle interface
+  - Envoi email manuel au partenaire
+
+BACKLOG V35F-P3 :
+  - Security Rules Firestore (partners, quotes, commissions)
+  - Notifications email auto (création NC, paiement NC)
+  - Historique des paiements (sous-collection)
+
+═══════════════════════════════════════════════════════════
+  v35f PHASE 1 TERMINÉE ✅
+  Build: OK (0 erreur TypeScript)
+  7 commits pushed sur branche v2
+═══════════════════════════════════════════════════════════

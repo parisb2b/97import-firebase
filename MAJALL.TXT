@@ -734,3 +734,5 @@ v35g-phase3 — 2026-04-21 — Onglet Médias complet (galerie photos + vidéos 
 v35g V2 TOTALEMENT COMPLET — refonte back-office produits livrée de bout en bout
 
 nettoyage-catalogue — 2026-04-21 — Nettoyage Firestore : 13 suppressions + 99 catégories uniformisées + 14 nouveaux produits (12 kits solaires + 2 fixations) — OK
+
+v35f-phase1 — 2026-04-21 — Correctifs commission + coefficients configurables + fix bugs admin — OK
