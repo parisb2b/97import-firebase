@@ -4,6 +4,7 @@ import { db } from '../../../lib/firebase';
 import { generateDevis, downloadPDF } from '../../../lib/pdf-generator';
 import { useToast } from '../../components/Toast';
 import { notifyDevisVipEnvoye } from '../../../lib/emailService';
+import { getCoefficients, CoefficientsPrix, COEFFICIENTS_DEFAULT } from '../../../lib/coefficientsHelpers';
 
 interface DevisLine {
   ref: string;
@@ -12,6 +13,7 @@ interface DevisLine {
   prix_unitaire: number;
   total: number;
   prix_negocie?: number;
+  prix_achat?: number;
 }
 
 interface Devis {
@@ -43,6 +45,7 @@ export default function GestionDevisPartner({ partnerCode }: { partnerCode: stri
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [editedPrices, setEditedPrices] = useState<Record<string, number[]>>({});
+  const [coefs, setCoefs] = useState<CoefficientsPrix>(COEFFICIENTS_DEFAULT);
 
   const loadDevis = async () => {
     setLoading(true);
@@ -63,6 +66,10 @@ export default function GestionDevisPartner({ partnerCode }: { partnerCode: stri
 
   useEffect(() => { loadDevis(); }, [partnerCode]);
 
+  useEffect(() => {
+    getCoefficients().then(setCoefs);
+  }, []);
+
   const updatePrixNegocie = (devisId: string, index: number, value: number) => {
     setEditedPrices(prev => {
       const current = [...(prev[devisId] || [])];
@@ -73,6 +80,36 @@ export default function GestionDevisPartner({ partnerCode }: { partnerCode: stri
 
   const handleSendVIP = async (d: Devis) => {
     const prices = editedPrices[d.id] || [];
+
+    // Validation des bornes
+    const coefs = await getCoefficients();
+    let hasError = false;
+    const errors: string[] = [];
+
+    for (let i = 0; i < d.lignes.length; i++) {
+      const ligne = d.lignes[i];
+      const prixNegocie = prices[i] !== undefined ? prices[i] : (ligne.prix_negocie ?? ligne.prix_unitaire ?? 0);
+      const prixAchat = ligne.prix_achat ?? 0;
+
+      if (prixAchat > 0) {
+        const prixMin = prixAchat * coefs.coefficient_vip_min;
+        const prixMax = prixAchat * coefs.coefficient_vip_max;
+
+        if (prixNegocie < prixMin) {
+          errors.push(`${ligne.nom_fr || ligne.ref} : prix ${prixNegocie}€ < min ${prixMin.toFixed(2)}€`);
+          hasError = true;
+        }
+        if (prixNegocie > prixMax) {
+          errors.push(`${ligne.nom_fr || ligne.ref} : prix ${prixNegocie}€ > max ${prixMax.toFixed(2)}€`);
+          hasError = true;
+        }
+      }
+    }
+
+    if (hasError) {
+      alert('❌ Prix invalides :\n\n' + errors.join('\n'));
+      return;
+    }
 
     // Construire le map prix_negocies (objet, pas array)
     const prixNegociesMap: Record<string, number> = {};
@@ -89,25 +126,21 @@ export default function GestionDevisPartner({ partnerCode }: { partnerCode: stri
     try {
       await updateDoc(doc(db, 'quotes', d.id), {
         is_vip: true,
-        prix_negocies: prixNegociesMap,  // Map au lieu d'array
-        total_ht_public: d.total_ht,      // Garder le prix public original
-        total_ht: totalHtNegocie,         // Nouveau total négocié
+        prix_negocies: prixNegociesMap,
+        total_ht_public: d.total_ht,
+        total_ht: totalHtNegocie,
         statut: 'vip_envoye',
         updatedAt: new Date(),
       });
 
       // Notification email
       try {
-        // Recharger le devis à jour
         const devisSnap = await getDoc(doc(db, 'quotes', d.id));
         const devisAJour = { id: d.id, numero: d.numero, ...devisSnap.data() };
-
-        // Récupérer le nom du partenaire
         const partenaireSnap = await getDoc(doc(db, 'partners', partnerCode));
         const partenaireName = partenaireSnap.exists()
           ? `${partenaireSnap.data().prenom || ''} ${partenaireSnap.data().nom || ''}`.trim() || undefined
           : undefined;
-
         await notifyDevisVipEnvoye(devisAJour, partenaireName);
       } catch (err) {
         console.error('Erreur notification VIP:', err);
@@ -184,30 +217,49 @@ export default function GestionDevisPartner({ partnerCode }: { partnerCode: stri
                 {isOpen && (
                   <div style={{ borderTop: '1px solid #F3F4F6', padding: 20 }}>
                     {/* Products with editable VIP prices */}
-                    {d.lignes?.map((l, i) => (
-                      <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '12px 0', borderBottom: '1px solid #F9FAFB' }}>
-                        <div style={{ flex: 1 }}>
-                          <p style={{ fontSize: 14, fontWeight: 600, color: '#1565C0' }}>{l.nom_fr}</p>
-                          <p style={{ fontSize: 12, color: '#9CA3AF' }}>
-                            Réf: {l.ref} · x{l.qte} · <span style={{ textDecoration: 'line-through', color: '#9CA3AF' }}>{l.prix_unitaire?.toLocaleString('fr-FR')} €</span> (prix public)
-                          </p>
+                    {d.lignes?.map((l, i) => {
+                      const prixAchat = l.prix_achat ?? 0;
+                      const prixMin = prixAchat > 0 ? parseFloat((prixAchat * coefs.coefficient_vip_min).toFixed(2)) : 0;
+                      const prixMax = prixAchat > 0 ? parseFloat((prixAchat * coefs.coefficient_vip_max).toFixed(2)) : (l.prix_unitaire ?? 0);
+                      const prixActuel = prices[i] !== undefined ? prices[i] : (l.prix_negocie ?? l.prix_unitaire ?? 0);
+                      const estValide = prixActuel >= prixMin && prixActuel <= prixMax;
+
+                      return (
+                        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '12px 0', borderBottom: '1px solid #F9FAFB' }}>
+                          <div style={{ flex: 1 }}>
+                            <p style={{ fontSize: 14, fontWeight: 600, color: '#1565C0' }}>{l.nom_fr}</p>
+                            <p style={{ fontSize: 12, color: '#9CA3AF' }}>
+                              Réf: {l.ref} · x{l.qte} · <span style={{ textDecoration: 'line-through', color: '#9CA3AF' }}>{(l.prix_unitaire ?? 0).toLocaleString('fr-FR')} €</span> (prix public)
+                            </p>
+                          </div>
+                          <div style={{ textAlign: 'center' }}>
+                            <label style={{ fontSize: 10, color: '#7C3AED', fontWeight: 600, display: 'block', marginBottom: 4 }}>Prix négocié</label>
+                            <input
+                              type="number"
+                              step="0.01"
+                              value={prixActuel}
+                              onChange={e => updatePrixNegocie(d.id, i, Number(e.target.value))}
+                              style={{
+                                width: 100,
+                                padding: '6px 10px',
+                                border: `2px solid ${estValide ? '#7C3AED' : '#EF4444'}`,
+                                borderRadius: 8,
+                                fontSize: 14,
+                                fontWeight: 700,
+                                color: estValide ? '#7C3AED' : '#DC2626',
+                                textAlign: 'center',
+                                background: estValide ? '#EDE9FE' : '#FEF2F2',
+                                outline: 'none',
+                              }}
+                            />
+                            <div style={{ fontSize: 10, color: '#6B7280', marginTop: 2 }}>
+                              Min: {prixMin.toFixed(2)} € · Max: {prixMax.toFixed(2)} €
+                              {!estValide && <span style={{ color: '#DC2626', fontWeight: 600 }}> ⚠️ Hors bornes</span>}
+                            </div>
+                          </div>
                         </div>
-                        <div style={{ textAlign: 'center' }}>
-                          <label style={{ fontSize: 10, color: '#7C3AED', fontWeight: 600, display: 'block', marginBottom: 4 }}>Prix négocié</label>
-                          <input
-                            type="number"
-                            value={prices[i] !== undefined ? prices[i] : (l.prix_negocie || l.prix_unitaire)}
-                            onChange={e => updatePrixNegocie(d.id, i, Number(e.target.value))}
-                            style={{
-                              width: 100, padding: '6px 10px',
-                              border: '2px solid #7C3AED', borderRadius: 8,
-                              fontSize: 14, fontWeight: 700, color: '#7C3AED',
-                              textAlign: 'center', background: '#EDE9FE', outline: 'none',
-                            }}
-                          />
-                        </div>
-                      </div>
-                    ))}
+                      );
+                    })}
 
                     {/* Actions */}
                     <div style={{ display: 'flex', gap: 12, marginTop: 20 }}>
