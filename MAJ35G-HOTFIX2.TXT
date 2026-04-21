@@ -1,0 +1,107 @@
+=== MAJ35G HOTFIX 2 — Fix DeepL via Vercel Serverless Function ===
+Date : 21/04/2026 14:21
+Branche : v2
+Build : OK (0 erreur TypeScript)
+
+OBJECTIF :
+  Résoudre l'erreur "Failed to fetch" lors des traductions DeepL.
+  Cause : blocage CORS lors d'appels directs navigateur → DeepL API.
+  Solution : proxy via Vercel Serverless Function.
+
+ARCHITECTURE AVANT :
+  Navigateur → DeepL API (❌ bloqué par CORS)
+
+ARCHITECTURE APRÈS :
+  Navigateur → /api/translate (Vercel) → DeepL API (✅ fonctionne)
+
+FICHIERS CRÉÉS :
+  ✅ api/translate.ts (Vercel Serverless Function, 162 lignes)
+     - Runtime : edge (rapide, gratuit)
+     - Accepte POST avec body {text, target_lang, source_lang}
+     - Détecte auto endpoint free/pro selon suffixe ":fx" de la clé
+     - Gestion erreurs : 403 (clé invalide), 429 (quota), 456 (quota mensuel)
+     - Headers CORS pour autoriser les appels client
+  ✅ api/README.md (documentation)
+
+FICHIERS MODIFIÉS :
+  ✅ src/lib/deeplService.ts (54 lignes changées)
+     - Suppression appel direct à api.deepl.com
+     - Appel à /api/translate (même origine, pas de CORS)
+     - Clé API DeepL cachée côté serveur (plus dans le bundle client)
+     - Fonction bonus : traduireFrVersZhEn() pour parallélisation
+
+CONFIGURATION REQUISE (ACTION MICHEL) :
+  ⚠️ VARIABLE D'ENVIRONNEMENT VERCEL :
+     - Supprimer : VITE_DEEPL_API_KEY (si présent)
+     - Ajouter : DEEPL_API_KEY = 3fae7c40-bed9-48ee-88d9-26c5f719caf3:fx
+     - Scopes : Production + Preview + Development
+     - Puis redéployer
+
+  Comment faire :
+  1. Aller sur https://vercel.com/dashboard
+  2. Cliquer sur le projet 97import-firebase
+  3. Menu Settings → Environment Variables
+  4. Supprimer VITE_DEEPL_API_KEY si présent
+  5. Ajouter :
+     - Key: DEEPL_API_KEY
+     - Value: 3fae7c40-bed9-48ee-88d9-26c5f719caf3:fx
+     - Environments: cocher Production + Preview + Development
+  6. Save
+  7. Menu Deployments → dernier déploiement → ⋯ → Redeploy
+
+AVANTAGES :
+  ✅ Contournement CORS définitif
+  ✅ Clé API DeepL sécurisée (pas exposée dans le bundle JS)
+  ✅ Rate limiting géré côté serveur si besoin
+  ✅ Logs d'erreurs centralisés dans Vercel dashboard
+  ✅ Zero cost (inclus dans plan Vercel gratuit)
+
+COMMITS (3) :
+  f0fb860 v35g-hotfix2-A: création Vercel Serverless Function /api/translate
+  58fd98e v35g-hotfix2-B: refonte deeplService pour utiliser proxy
+  132c70b v35g-hotfix2-C: documentation API + instructions déploiement
+
+BUILD :
+  ✅ npm run build → 0 erreur TypeScript
+  ✅ api/translate.ts non inclus dans bundle client (normal, c'est serverless)
+  ⚠️ Chunk size warning 2.5MB (existant, pas lié au hotfix)
+
+TESTS MANUELS À EFFECTUER PAR MICHEL :
+  [ ] Test 1 : GET /api/translate retourne "Méthode non autorisée"
+       → Aller sur https://97import-firebase-git-v2-parisb2bs-projects.vercel.app/api/translate
+       → Devrait afficher : {"error":"Méthode non autorisée. Utilisez POST."}
+       → Si 404 → problème de déploiement
+
+  [ ] Test 2 : CURL POST fonctionne (optionnel)
+       → curl -X POST https://ton-url.vercel.app/api/translate \
+            -H "Content-Type: application/json" \
+            -d '{"text":"Bonjour le monde","target_lang":"ZH"}'
+       → Devrait retourner : {"text":"你好,世界","target_lang":"ZH","source_lang":"FR"}
+
+  [ ] Test 3 : Bouton Traduire dans admin fonctionne
+       → Ouvrir admin → produit → onglet Détails techniques
+       → Section "Traductions multilingues"
+       → Remplir "Description courte FR" : "Kit solaire complet 10kW"
+       → Cliquer "🌐 Traduire"
+       → Vérifier : bouton devient "⏳ Traduction..."
+       → Après 1-2s : champs ZH et EN se remplissent
+       → Plus d'erreur "Failed to fetch"
+
+  [ ] Test 4 : 3 groupes traduction (Nom / Description / Usage) OK
+       → Tester les 3 boutons Traduire dans l'onglet Détails
+       → Tous doivent fonctionner sans erreur CORS
+
+DIAGNOSTIC SI ERREUR PERSISTE :
+  1. Variable Vercel bien créée avec nom exact "DEEPL_API_KEY" (sans VITE_) ?
+  2. Redéploiement effectué après ajout variable ?
+  3. URL /api/translate répond "Méthode non autorisée" sur GET ?
+  4. Clé DeepL valide : 3fae7c40-bed9-48ee-88d9-26c5f719caf3:fx ?
+  5. Console navigateur (F12) → Network → voir détail erreur
+
+BACKLOG RESTANT :
+  - Phase 3 : Onglet Médias complet (galerie photos + vidéos + drag&drop)
+  - v35f : commissions partenaires
+
+👉 PRÊT POUR DÉPLOIEMENT ET VALIDATION MICHEL
+
+Après configuration Vercel + tests → prêt pour Phase 3 ou v35f.

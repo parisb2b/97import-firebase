@@ -726,3 +726,5 @@ BUILD : ✅ 0 erreur TypeScript
 EFFORT RESTANT : ~5h pour 4 générateurs + modal + UI integration
 
 v35g-phase2 — 2026-04-20 — Onglet Détails techniques + retrait Code HS Essentiel + badge alerte liste — OK
+
+v35g-hotfix2 — 2026-04-21 — Fix DeepL via Vercel Serverless Function (proxy CORS) — OK
