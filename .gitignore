@@ -22,3 +22,8 @@ service-account.json
 Thumbs.db
 .vercel
 scripts/serviceAccountKey.json
+
+# Scripts temporaires audit/nettoyage
+scripts/nettoyage-catalogue.js
+RAPPORT-NETTOYAGE-*.TXT
+backup-products-*.json
