@@ -195,3 +195,32 @@ export function genererSlug(nom: string): string {
 export function manqueCodeHs(product: any): boolean {
   return !product.code_hs || (typeof product.code_hs === 'string' && product.code_hs.trim() === '');
 }
+
+/**
+ * Migre l'ancienne structure images_galerie (string[])
+ * vers la nouvelle structure (array d'objets)
+ * Appelé au chargement de chaque produit
+ */
+export function migrerGalerieImages(product: any): any {
+  if (!product) return product;
+
+  // Migration images_galerie si format string[]
+  if (Array.isArray(product.images_galerie) && product.images_galerie.length > 0) {
+    const first = product.images_galerie[0];
+    if (typeof first === 'string') {
+      // Ancien format : string[] → convertir en objets
+      product.images_galerie = product.images_galerie.map((url: string, i: number) => ({
+        url,
+        visible_site: true,
+        nom: `Image ${i + 1}`,
+      }));
+    }
+  }
+
+  // Initialiser videos_galerie si absent
+  if (!product.videos_galerie) {
+    product.videos_galerie = [];
+  }
+
+  return product;
+}

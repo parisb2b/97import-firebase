@@ -131,3 +131,131 @@ export async function uploadImagePrincipale(
   await uploadBytes(storageRef, compressedFile);
   return await getDownloadURL(storageRef);
 }
+
+// ═══════════════════════════════════════════════════════
+// UPLOAD VIDÉOS MP4
+// ═══════════════════════════════════════════════════════
+
+/**
+ * Upload d'une vidéo MP4 vers Firebase Storage
+ * Path: products/{ref}/videos/{timestamp}_{name}.mp4
+ */
+export async function uploadVideoProduit(
+  productRef: string,
+  file: File,
+  onProgress?: (percent: number) => void
+): Promise<string> {
+  if (!file.type.startsWith('video/')) {
+    throw new Error('Le fichier doit être une vidéo (MP4, MOV, WebM)');
+  }
+
+  const timestamp = Date.now();
+  const safeName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+  const path = `products/${productRef}/videos/${timestamp}_${safeName}`;
+  const storageRef = ref(storage, path);
+
+  // Upload simple (progression non supportée sur Firebase JS v9 sans observer)
+  await uploadBytes(storageRef, file);
+  if (onProgress) onProgress(100);
+
+  return await getDownloadURL(storageRef);
+}
+
+/**
+ * Upload du thumbnail d'une vidéo (image extraite)
+ */
+export async function uploadVideoThumbnail(
+  productRef: string,
+  videoFileName: string,
+  thumbnailBlob: Blob
+): Promise<string> {
+  const timestamp = Date.now();
+  const path = `products/${productRef}/videos/thumbnails/thumb_${timestamp}.jpg`;
+  const storageRef = ref(storage, path);
+  await uploadBytes(storageRef, thumbnailBlob);
+  return await getDownloadURL(storageRef);
+}
+
+/**
+ * Extrait un thumbnail à 1s d'une vidéo (côté client)
+ * Retourne un Blob JPEG + la durée en secondes
+ */
+export async function extraireThumbnailVideo(file: File): Promise<{ thumbnailBlob: Blob; duree_sec: number }> {
+  return new Promise((resolve, reject) => {
+    const video = document.createElement('video');
+    video.preload = 'metadata';
+    video.muted = true;
+    video.playsInline = true;
+
+    const url = URL.createObjectURL(file);
+    video.src = url;
+
+    video.onloadedmetadata = () => {
+      // Aller à 1 seconde (ou 10% de la durée si plus courte)
+      video.currentTime = Math.min(1, video.duration * 0.1);
+    };
+
+    video.onseeked = () => {
+      try {
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          URL.revokeObjectURL(url);
+          reject(new Error('Canvas non supporté'));
+          return;
+        }
+
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        canvas.toBlob((blob) => {
+          URL.revokeObjectURL(url);
+          if (!blob) {
+            reject(new Error('Impossible de créer le thumbnail'));
+            return;
+          }
+          resolve({
+            thumbnailBlob: blob,
+            duree_sec: Math.round(video.duration),
+          });
+        }, 'image/jpeg', 0.8);
+      } catch (err: any) {
+        URL.revokeObjectURL(url);
+        reject(err);
+      }
+    };
+
+    video.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error('Impossible de charger la vidéo'));
+    };
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// UPLOAD IMAGES GALERIE (avec compression)
+// ═══════════════════════════════════════════════════════
+
+/**
+ * Upload d'une image de galerie produit
+ * Path: products/{ref}/galerie/{timestamp}_{name}.jpg
+ */
+export async function uploadImageGalerie(
+  productRef: string,
+  file: File
+): Promise<string> {
+  if (!file.type.startsWith('image/')) {
+    throw new Error('Le fichier doit être une image (JPG, PNG, WebP)');
+  }
+
+  // Compression
+  const compressedFile = await compresserImage(file);
+
+  const timestamp = Date.now();
+  const safeName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_').replace(/\.(png|webp|gif)$/i, '.jpg');
+  const path = `products/${productRef}/galerie/${timestamp}_${safeName}`;
+  const storageRef = ref(storage, path);
+  await uploadBytes(storageRef, compressedFile);
+  return await getDownloadURL(storageRef);
+}

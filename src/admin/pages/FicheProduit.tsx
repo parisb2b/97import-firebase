@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useRoute, useLocation, Link } from 'wouter';
 import { doc, getDoc, setDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
-import { calculerCompletude, CHAMPS_ESSENTIEL } from '../../lib/productHelpers';
+import { calculerCompletude, CHAMPS_ESSENTIEL, migrerGalerieImages } from '../../lib/productHelpers';
 import FicheProduitTabs from '../components/produit/FicheProduitTabs';
 import OngletEssentiel from '../components/produit/OngletEssentiel';
 import OngletDetails from '../components/produit/OngletDetails';
@@ -48,7 +48,9 @@ export default function FicheProduit() {
           setLocation('/admin/produits');
           return;
         }
-        setProduct({ id: snap.id, ...snap.data() });
+        const data = { id: snap.id, ...snap.data() };
+        const migrated = migrerGalerieImages(data);
+        setProduct(migrated);
       } catch (err) {
         console.error('Erreur chargement:', err);
         alert('Erreur de chargement');
