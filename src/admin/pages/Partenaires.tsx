@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { collection, query, orderBy, getDocs, doc, updateDoc, addDoc } from 'firebase/firestore';
+import { collection, query, orderBy, getDocs, doc, updateDoc, addDoc, where } from 'firebase/firestore';
 import { useLocation } from 'wouter';
 import { db } from '../../lib/firebase';
 import { Card, Kpi, Pill, Button, IconButton, EyeIcon } from '../components/Icons';
@@ -19,7 +19,7 @@ export default function Partenaires() {
   const [loading, setLoading] = useState(true);
   const [, setLocation] = useLocation();
   const [showAdd, setShowAdd] = useState(false);
-  const [newP, setNewP] = useState({ nom: '', email: '', code: '', telephone: '' });
+  const [newP, setNewP] = useState({ nom: '', email: '', code: '', telephone: '', userId: '' });
   const [successMsg, setSuccessMsg] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
 
@@ -56,17 +56,34 @@ export default function Partenaires() {
   const handleAddPartner = async () => {
     if (!newP.nom || !newP.code) return;
     try {
+      // Validation format
+      if (!/^[A-Z]{2,3}$/.test(newP.code)) {
+        setErrorMsg('Le code doit contenir 2 ou 3 lettres en majuscules');
+        setTimeout(() => setErrorMsg(''), 3000);
+        return;
+      }
+
+      // Vérifier unicité du code
+      const existingQ = query(collection(db, 'partners'), where('code', '==', newP.code));
+      const existingSnap = await getDocs(existingQ);
+      if (!existingSnap.empty) {
+        setErrorMsg(`Le code "${newP.code}" est déjà utilisé par un autre partenaire`);
+        setTimeout(() => setErrorMsg(''), 3000);
+        return;
+      }
+
       await addDoc(collection(db, 'partners'), {
         nom: newP.nom,
         email: newP.email,
         code: newP.code,
         tel: newP.telephone,
+        userId: newP.userId || null,
         commission_taux: 0,
         actif: true,
         createdAt: new Date(),
       });
       setShowAdd(false);
-      setNewP({ nom: '', email: '', code: '', telephone: '' });
+      setNewP({ nom: '', email: '', code: '', telephone: '', userId: '' });
       setSuccessMsg('Partenaire ajouté avec succès');
       setTimeout(() => setSuccessMsg(''), 3000);
       load();
@@ -135,6 +152,20 @@ export default function Partenaires() {
               <input className="fi" placeholder="Email" type="email" value={newP.email} onChange={e => setNewP({...newP, email: e.target.value})} />
               <input className="fi" placeholder="Code (2-3 lettres)" value={newP.code} onChange={e => setNewP({...newP, code: e.target.value.toUpperCase().slice(0,3)})} maxLength={3} />
               <input className="fi" placeholder="Telephone (optionnel)" value={newP.telephone} onChange={e => setNewP({...newP, telephone: e.target.value})} />
+              <div>
+                <label style={{ fontSize: 11, color: '#6B7280', display: 'block', marginBottom: 4, fontWeight: 600 }}>
+                  User ID Firebase (pour espace partenaire)
+                </label>
+                <input
+                  className="fi"
+                  placeholder="Ex: AbC123XyZ..."
+                  value={newP.userId}
+                  onChange={e => setNewP({...newP, userId: e.target.value})}
+                />
+                <div style={{ fontSize: 10, color: '#9CA3AF', marginTop: 2 }}>
+                  Optionnel. Se trouve dans Firebase Console → Authentication → UID
+                </div>
+              </div>
             </div>
             <div style={{ display: 'flex', gap: 12, marginTop: 20, justifyContent: 'flex-end' }}>
               <button className="btn" onClick={() => setShowAdd(false)}>Annuler</button>

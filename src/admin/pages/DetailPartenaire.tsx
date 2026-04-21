@@ -44,7 +44,14 @@ export default function DetailPartenaire() {
       <div className="kgrid">
         <Kpi label="Total dues" value={`${totalDues.toLocaleString('fr-FR')}€`} color="or" />
         <Kpi label="Total payées" value={`${totalPayees.toLocaleString('fr-FR')}€`} color="gr" />
-        <Kpi label="Clients apportés" value={commissions.length} color="pu" />
+        {(() => {
+          const uniqueClients = new Set(
+            commissions
+              .map(c => c.client_nom || c.client_id)
+              .filter(Boolean)
+          ).size;
+          return <Kpi label="Clients apportés" value={uniqueClients} color="pu" />;
+        })()}
       </div>
 
       <Card title="Informations partenaire">
@@ -53,7 +60,6 @@ export default function DetailPartenaire() {
           <InfoRow label="Code" value={<Pill variant="pu">{partner.code}</Pill>} />
           <InfoRow label="Email" value={partner.email || '—'} />
           <InfoRow label="Téléphone" value={partner.tel || '—'} />
-          <InfoRow label="Taux commission" value={`${partner.taux_commission || 0}%`} />
           <InfoRow label="Actif" value={<Pill variant={partner.actif ? 'gr' : 'rd'}>{partner.actif ? 'Actif' : 'Inactif'}</Pill>} />
         </div>
       </Card>
