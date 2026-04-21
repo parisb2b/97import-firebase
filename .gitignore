@@ -27,3 +27,8 @@ scripts/serviceAccountKey.json
 scripts/nettoyage-catalogue.js
 RAPPORT-NETTOYAGE-*.TXT
 backup-products-*.json
+
+# Audit partenaires
+scripts/audit-partenaires.js
+AUDIT-PARTENAIRES-*.md
+AUDIT-SYSTEME-PARTENAIRES-*.md
