@@ -1,0 +1,142 @@
+=== NETTOYAGE CATALOGUE FIRESTORE ===
+Date : 21/04/2026 16:14:45
+Mode : EXÉCUTION RÉELLE (après validation dry-run)
+
+ÉTAT AVANT :
+  - 111 produits
+  - 5 docs TEST parasites
+  - Catégories incohérentes (Mini-Pelle vs mini-pelle, Maisons, Solaire, etc.)
+  - 3 kits solaires avec composition_kit vide
+  - 4 options KS-*-OPT-* redondantes
+  - 1 doublon SOL-5KW-001
+  - Mini-pelles variantes indistinguables (même nom_fr)
+
+ÉTAT APRÈS :
+  - ~114 produits (111 - 13 suppressions + 14 créations + 2 fixations)
+  - 0 doc TEST
+  - 0 option KS-*-OPT-*
+  - Catégories uniformisées kebab-case : mini-pelle, maison-modulaire, solaire, agricole, divers, logistique
+  - 12 kits solaires KS-XK-00X avec composition_kit remplie (5 composants chacun)
+  - 2 fixations KS-FIX-TOIT-001, KS-FIX-SOL-001
+  - Mini-pelles variantes identifiables par suffixe chenilles
+
+MODIFICATIONS EFFECTUÉES :
+
+SUPPRESSIONS (13 docs) :
+  - 5 docs TEST-* : TEST-ACC-GD20, TEST-LOG-MQ, TEST-MP-R22, TEST-MS-20, TEST-SOL-10
+  - 4 options KS-*-OPT-* : KS-10K-OPT-PGD, KS-10K-OPT-SOL, KS-12K-OPT-SOL, KS-20K-OPT-SOL
+  - 1 doublon SOL : SOL-5KW-001
+  - 3 anciens kits : KS-10K-001, KS-12K-001, KS-20K-001 (remplacés par 12 variantes)
+
+CATÉGORIES UNIFORMISÉES (99 produits) :
+  Mini-Pelle → mini-pelle (25 accessoires + 16 mini-pelles)
+  Maisons → maison-modulaire (24 produits)
+  Solaire → solaire (14 produits)
+  Divers → divers (7 produits)
+  Agricole → agricole (8 produits)
+  Logistique → logistique (8 produits)
+
+MINI-PELLES RENOMMÉES (12 produits) :
+  MP-R18-001 → Mini-pelle R18 PRO — Chenilles caoutchouc
+  MP-R18-002 → Mini-pelle R18 PRO — Chenilles métal
+  MP-R18-003 → Mini-pelle R18 PRO — Double chenilles
+  MP-R22-001 → Mini-pelle R22 PRO — Chenilles caoutchouc
+  MP-R22-002 → Mini-pelle R22 PRO — Chenilles métal
+  MP-R22-003 → Mini-pelle R22 PRO — Double chenilles
+  MP-R32-001/002/003 : idem avec suffixes
+  MP-R57-001/002/003 : idem avec suffixes
+
+CRÉATIONS (14 nouveaux produits) :
+  Fixations (2) :
+    KS-FIX-TOIT-001 — Kit fixation toiture (rails alu + crochets + boulons inox)
+    KS-FIX-SOL-001  — Kit fixation sol (structures au sol)
+
+  Kits solaires (12 variantes) :
+    10 kW (4 variantes) :
+      KS-10K-001 — Toiture + Petits panneaux (16× KS-PAN-S-001)
+      KS-10K-002 — Toiture + Grands panneaux (16× KS-PAN-L-001)
+      KS-10K-003 — Sol + Petits panneaux
+      KS-10K-004 — Sol + Grands panneaux
+
+    12 kW (4 variantes) :
+      KS-12K-001 — Toiture + Petits panneaux (20× KS-PAN-S-001)
+      KS-12K-002 — Toiture + Grands panneaux (20× KS-PAN-L-001)
+      KS-12K-003 — Sol + Petits panneaux
+      KS-12K-004 — Sol + Grands panneaux
+
+    20 kW (4 variantes) :
+      KS-20K-001 — Toiture + Petits panneaux (33× KS-PAN-S-001)
+      KS-20K-002 — Toiture + Grands panneaux (33× KS-PAN-L-001)
+      KS-20K-003 — Sol + Petits panneaux
+      KS-20K-004 — Sol + Grands panneaux
+
+COMPOSITION DES KITS (remplie automatiquement) :
+  Chaque kit contient 5 composants :
+    - Panneaux (qte variable : 16, 20 ou 33 selon puissance)
+    - 1× Onduleur (DEYE 10K mono / 12K mono / 20K tri)
+    - 1× Batterie (10K / 12K / 20K)
+    - 1× Câblage (KS-CAB-001)
+    - 1× Fixation (KS-FIX-TOIT-001 ou KS-FIX-SOL-001)
+
+  Variante Toiture vs Sol : détermine le type de fixation
+  Variante Petits vs Grands panneaux : détermine KS-PAN-S ou KS-PAN-L
+
+BACKUP DE SÉCURITÉ :
+  backup-products-1776780885840.json à la racine du projet
+  111 produits sauvegardés AVANT modifications
+  À conserver au moins 7 jours
+
+PROCHAINES ÉTAPES POUR MICHEL :
+
+1. Vérifier le back-office admin :
+   - Liste produits affiche bien les nouveaux kits
+   - Filtres catégories fonctionnent (kebab-case)
+   - Mini-pelles distinguables par nom
+
+2. Enrichir les nouveaux produits :
+   PRIORITÉ HAUTE (kits solaires + fixations) :
+     - Prix d'achat par composant (panneaux, onduleurs, batteries, fixations)
+     - Codes HS
+     - Dimensions (longueur, largeur, hauteur)
+     - Poids (brut + net)
+     - Traductions nom_zh, usage_zh, ville_origine_cn
+     - Images principales (drag & drop)
+
+   PRIORITÉ MOYENNE (mini-pelles) :
+     - Compléter les champs manquants (prix, poids, dimensions)
+     - Ajouter photos galeries pour distinguer les variantes
+
+3. Tester génération Excel :
+   - BC-CHINE avec un kit solaire complet
+   - BE-EXPORT après ajout codes HS
+   - Packing List après ajout dimensions
+
+4. Documents de backup :
+   - Conserver backup-products-*.json au moins 7 jours
+   - Possibilité de restauration si besoin
+
+CHAMPS ENRICHIS EN PRIORITÉ (pour Excel BC-CHINE et BE-EXPORT) :
+  PRIORITÉ 1 — douane chinoise :
+    code_hs, nom_zh, usage_zh, ville_origine_cn
+  PRIORITÉ 2 — Packing List :
+    longueur_cm, largeur_cm, hauteur_cm, poids_net_kg, poids_brut_kg
+  PRIORITÉ 3 — site public :
+    image_principale, description_marketing_fr, images_galerie
+
+BILAN TECHNIQUE :
+  ✅ 111 produits analysés
+  ✅ 13 documents supprimés
+  ✅ 99 catégories uniformisées
+  ✅ 12 mini-pelles renommées
+  ✅ 14 nouveaux produits créés
+  ✅ Backup JSON créé automatiquement
+  ✅ Rapports DRY-RUN + EXEC générés
+  ✅ 0 erreur d'exécution
+  ⏱️ Durée totale : ~2 minutes
+
+RÉSULTAT FINAL :
+  Catalogue Firestore assaini et structuré
+  Prêt pour enrichissement progressif par Michel
+  Kits solaires opérationnels avec composition détaillée
+  Catégories cohérentes (kebab-case)
+  Produits identifiables sans ambiguïté

@@ -732,3 +732,5 @@ v35g-hotfix2 — 2026-04-21 — Fix DeepL via Vercel Serverless Function (proxy 
 v35g-phase3 — 2026-04-21 — Onglet Médias complet (galerie photos + vidéos MP4 + drag&drop + visibilité individuelle + thumbnail auto + SEO) — OK
 
 v35g V2 TOTALEMENT COMPLET — refonte back-office produits livrée de bout en bout
+
+nettoyage-catalogue — 2026-04-21 — Nettoyage Firestore : 13 suppressions + 99 catégories uniformisées + 14 nouveaux produits (12 kits solaires + 2 fixations) — OK
