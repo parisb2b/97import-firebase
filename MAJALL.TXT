@@ -736,3 +736,5 @@ v35g V2 TOTALEMENT COMPLET — refonte back-office produits livrée de bout en b
 nettoyage-catalogue — 2026-04-21 — Nettoyage Firestore : 13 suppressions + 99 catégories uniformisées + 14 nouveaux produits (12 kits solaires + 2 fixations) — OK
 
 v35f-phase1 — 2026-04-21 — Correctifs commission + coefficients configurables + fix bugs admin — OK
+
+v35f-phase2 — 2026-04-21 — Création NC via UI (modal 2 étapes) + modal marquer payée (traçabilité) + envoi email fonctionnel — OK

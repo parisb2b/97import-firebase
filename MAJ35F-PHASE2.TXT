@@ -1,0 +1,94 @@
+=== MAJ35F PHASE 2 — Création NC via UI + Traçabilité paiement ===
+Date : 2026-04-21
+Branche : v2
+Build : OK (0 erreur TypeScript)
+
+OBJECTIF :
+  Remplacer création manuelle NC (Firebase Console) par interface admin complète
+  + ajouter traçabilité des paiements (date + méthode + référence)
+
+NOUVEAUX FICHIERS :
+
+1. src/lib/ncNumerotation.ts (~47 lignes)
+   - genererNumeroNC() : format NC-AAMM-NNN
+   - Compteur atomique Firestore (collection counters)
+   - Reset mensuel automatique
+
+2. src/admin/components/commission/ModalNouvelleCommission.tsx (~524 lignes)
+   - Modal 2 étapes : choix partenaire → choix devis
+   - Recherche partenaire par nom/code/email
+   - Chargement auto des devis éligibles (partenaire + acompte encaissé)
+   - Détection des devis déjà inclus dans une NC (grisés)
+   - Calcul commission auto via calculateCommission() (Phase 1)
+   - Checkbox multi-sélection + "Tout sélectionner"
+   - Total commission affiché en temps réel
+   - Création Firestore + numérotation auto
+
+3. src/admin/components/commission/ModalMarquerPayee.tsx (~196 lignes)
+   - Formulaire : date + méthode + référence + note
+   - Validations : référence recommandée (sauf espèces)
+   - Mise à jour Firestore avec objet paiement complet
+   - Timestamp marque_paye_at
+
+FICHIERS MODIFIÉS :
+
+4. src/admin/pages/NotesCommission.tsx
+   + Bouton "+ Nouvelle NC" dans header
+   + handleSendNC() : envoi email réel via collection mail/ (Firestore Trigger Email)
+   + Intégration ModalNouvelleCommission
+   + Intégration ModalMarquerPayee
+   + Affichage infos paiement dans colonne statut (date, méthode, référence)
+
+5. src/admin/pages/DetailCommission.tsx
+   + Si payée : bloc vert avec toutes les infos paiement + bouton "Annuler paiement"
+   + Si en attente : bouton vert "Marquer comme payée" → ouvre modal
+   + Intégration ModalMarquerPayee
+
+STRUCTURE FIRESTORE ENRICHIE :
+
+Collection commissions/{commId} :
+  + Tous les champs existants
+  + paiement: {
+      date: string (YYYY-MM-DD)
+      methode: 'virement' | 'cheque' | 'especes' | 'autre'
+      reference: string | null
+      note: string | null
+      marque_paye_at: Timestamp
+    }
+  + date_envoi: Timestamp (quand email envoyé)
+
+Collection counters/nc_AAMM :
+  + value: number (compteur courant)
+  + prefix: "NC"
+  + period: "2604" (ex)
+  + updated_at: Timestamp
+
+ENVOI EMAIL NC :
+  Utilise l'extension Firebase "Trigger Email" déjà installée
+  Collection mail/ → Resend → partenaire.email
+  Email HTML avec CTA vers espace partenaire
+  PDF en pièce jointe PAS inclus en Phase 2 (Phase 3)
+
+COMMITS (6) :
+  d2829ac v35f-P2-A: helper numérotation NC format NC-AAMM-NNN
+  b4be2f7 v35f-P2-B: modal création NC
+  8463d20 v35f-P2-C: modal marquer payée avec traçabilité
+  1b5a91f v35f-P2-D: intégration modals dans NotesCommission
+  acd6c7f v35f-P2-E: intégration modal dans DetailCommission
+  a7c7b45 v35f-P2-F: fix TypeScript error (width attribute)
+
+TESTS MANUELS (6 tests à exécuter par Michel) :
+  [ ] Test 1 : Création NC via UI (2 étapes)
+  [ ] Test 2 : Vérifier structure Firestore créée
+  [ ] Test 3 : Marquer payée depuis la liste
+  [ ] Test 4 : Marquer payée depuis le détail
+  [ ] Test 5 : Envoi email au partenaire
+  [ ] Test 6 : Devis déjà inclus grisés dans nouvelle NC
+
+BACKLOG V35F-P3 :
+  - Génération PDF NC automatique en pièce jointe email
+  - Security Rules Firestore (partners, quotes, commissions)
+  - Notifications email automatiques (création NC = email auto)
+  - Historique des paiements (sous-collection history)
+  - Export CSV commissions
+  - Stats dashboard partenaires
