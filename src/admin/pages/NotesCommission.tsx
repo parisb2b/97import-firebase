@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
-import { collection, query, orderBy, getDocs, doc, getDoc, updateDoc } from 'firebase/firestore';
+import { collection, query, orderBy, getDocs, doc, getDoc, updateDoc, addDoc, serverTimestamp } from 'firebase/firestore';
 import { useLocation } from 'wouter';
 import { db } from '../../lib/firebase';
 import { Card, Pill, IconButton, Kpi, FileIcon, DownloadIcon, EuroIcon, SendIcon, DollarIcon, EyeIcon } from '../components/Icons';
 import { generateDevis, generateNoteCommission, downloadPDF } from '../../lib/pdf-generator';
+import ModalNouvelleCommission from '@/admin/components/commission/ModalNouvelleCommission';
+import ModalMarquerPayee from '@/admin/components/commission/ModalMarquerPayee';
 
 interface Commission {
   id: string;
@@ -27,6 +29,8 @@ export default function NotesCommission() {
   const [filterStatut, setFilterStatut] = useState('');
   const [emetteurData, setEmetteurData] = useState<any>(null);
   const [, setLocation] = useLocation();
+  const [showNouvelleModal, setShowNouvelleModal] = useState(false);
+  const [commissionAPayer, setCommissionAPayer] = useState<any>(null);
 
   useEffect(() => {
     const fetchEmetteur = async () => {
@@ -40,19 +44,22 @@ export default function NotesCommission() {
     fetchEmetteur();
   }, []);
 
+  const loadCommissions = async () => {
+    try {
+      const q = query(collection(db, 'commissions'), orderBy('createdAt', 'desc'));
+      const snap = await getDocs(q);
+      setCommissions(snap.docs.map((d) => ({ id: d.id, ...d.data() } as Commission)));
+    } catch (err) {
+      console.error('Error loading commissions:', err);
+    }
+  };
+
   useEffect(() => {
     const timeout = setTimeout(() => setLoading(false), 3000);
     const load = async () => {
-      try {
-        const q = query(collection(db, 'commissions'), orderBy('createdAt', 'desc'));
-        const snap = await getDocs(q);
-        setCommissions(snap.docs.map((d) => ({ id: d.id, ...d.data() } as Commission)));
-      } catch (err) {
-        console.error('Error loading commissions:', err);
-      } finally {
-        clearTimeout(timeout);
-        setLoading(false);
-      }
+      await loadCommissions();
+      clearTimeout(timeout);
+      setLoading(false);
     };
     load();
     return () => clearTimeout(timeout);
@@ -121,12 +128,92 @@ export default function NotesCommission() {
   };
 
   const handleTogglePaid = async (c: Commission) => {
-    const newStatut = c.statut === 'payee' ? 'en_attente' : 'payee';
+    if (c.statut === 'payee') {
+      // Inverser : remettre en attente (simple toggle)
+      if (confirm(`Remettre ${c.numero} en attente ?`)) {
+        try {
+          await updateDoc(doc(db, 'commissions', c.id), {
+            statut: 'en_attente',
+            paiement: null,
+            updated_at: serverTimestamp(),
+          });
+          await loadCommissions();
+        } catch (err) {
+          console.error('Erreur toggle:', err);
+        }
+      }
+    } else {
+      // Passer en payé : ouvrir modal avec formulaire
+      setCommissionAPayer(c);
+    }
+  };
+
+  const handleSendNC = async (c: Commission) => {
+    if (!c.partenaire_nom) {
+      alert('⚠️ Ce partenaire n\'a pas d\'email enregistré. Ajoutez-le dans la fiche partenaire d\'abord.');
+      return;
+    }
+
+    // Get partner email from partners collection
+    let partnerEmail = '';
     try {
-      await updateDoc(doc(db, 'commissions', c.id), { statut: newStatut });
-      setCommissions(commissions.map(x => x.id === c.id ? { ...x, statut: newStatut } : x));
+      const partnersSnap = await getDocs(collection(db, 'partners'));
+      const partner = partnersSnap.docs.find(d => d.data().code === c.partenaire_code);
+      if (partner?.data().email) {
+        partnerEmail = partner.data().email;
+      }
     } catch (err) {
-      console.error('Erreur toggle:', err);
+      console.error('Error fetching partner email:', err);
+    }
+
+    if (!partnerEmail) {
+      alert('⚠️ Ce partenaire n\'a pas d\'email enregistré. Ajoutez-le dans la fiche partenaire d\'abord.');
+      return;
+    }
+
+    if (!confirm(
+      `Envoyer la note de commission ${c.numero} à :\n` +
+      `${c.partenaire_nom} <${partnerEmail}> ?\n\n` +
+      `(Email simple avec lien vers l'espace partenaire. PDF en pièce jointe sera ajouté en Phase 3.)`
+    )) return;
+
+    try {
+      // Utiliser le système mail Firestore (Trigger Email extension déjà configuré)
+      await addDoc(collection(db, 'mail'), {
+        to: partnerEmail,
+        message: {
+          subject: `Nouvelle note de commission ${c.numero}`,
+          html: `
+          <h2 style="color:#1E3A5F">Nouvelle commission disponible</h2>
+          <p>Bonjour ${c.partenaire_nom},</p>
+          <p>Une nouvelle note de commission est disponible dans votre espace partenaire :</p>
+          <ul>
+            <li><strong>Numéro :</strong> ${c.numero}</li>
+            <li><strong>Montant :</strong> ${c.total_commission?.toFixed(2)} €</li>
+            <li><strong>Nombre de devis :</strong> ${c.lignes?.length || 0}</li>
+          </ul>
+          <p>
+            <a href="https://97import.com/mon-compte"
+               style="background:#EA580C;color:#fff;padding:10px 20px;border-radius:8px;text-decoration:none;display:inline-block">
+              Voir dans mon espace partenaire
+            </a>
+          </p>
+          <p style="color:#6B7280;font-size:12px">
+            Cet email est envoyé automatiquement par 97import.com
+          </p>
+        `,
+        },
+      });
+
+      // Mettre à jour date envoi
+      await updateDoc(doc(db, 'commissions', c.id), {
+        date_envoi: serverTimestamp(),
+      });
+
+      alert('✅ Email envoyé au partenaire');
+      await loadCommissions();
+    } catch (err: any) {
+      alert('❌ Erreur envoi : ' + err.message);
     }
   };
 
@@ -157,6 +244,33 @@ export default function NotesCommission() {
 
   return (
     <>
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 20,
+      }}>
+        <div>
+          <h1 style={{ margin: 0, fontSize: 24, fontWeight: 700, color: '#1E3A5F' }}>
+            Notes de Commission
+          </h1>
+          <p style={{ margin: '4px 0 0', fontSize: 14, color: '#6B7280' }}>
+            Gestion des commissions partenaires
+          </p>
+        </div>
+        <button
+          onClick={() => setShowNouvelleModal(true)}
+          style={{
+            padding: '10px 20px', background: '#EA580C',
+            color: '#fff', border: 'none', borderRadius: 10,
+            fontSize: 14, fontWeight: 600, cursor: 'pointer',
+            fontFamily: 'inherit',
+          }}
+        >
+          + Nouvelle NC
+        </button>
+      </div>
+
       <div className="kgrid">
         <Kpi label="Total dues" value={`${totalDues.toLocaleString('fr-FR')}€`} color="or" />
         <Kpi label="Total payées" value={`${totalPayees.toLocaleString('fr-FR')}€`} color="gr" />
@@ -219,16 +333,28 @@ export default function NotesCommission() {
                   {(c.total_commission || 0).toLocaleString('fr-FR')}€
                 </td>
                 <td>
-                  <Pill variant={c.statut === 'payee' ? 'gr' : c.statut === 'en_attente' ? 'or' : 'gy'}>
-                    {c.statut === 'payee' ? 'Payée' : c.statut === 'en_attente' ? 'En attente' : c.statut || 'Brouillon'}
-                  </Pill>
+                  {c.statut === 'payee' ? (
+                    <div>
+                      <Pill variant="gr">Payée</Pill>
+                      {(c as any).paiement?.date && (
+                        <div style={{ fontSize: 10, color: '#6B7280', marginTop: 4 }}>
+                          {new Date((c as any).paiement.date).toLocaleDateString('fr-FR')} · {(c as any).paiement.methode}
+                          {(c as any).paiement.reference && ` (${(c as any).paiement.reference})`}
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <Pill variant={c.statut === 'en_attente' ? 'or' : 'gy'}>
+                      {c.statut === 'en_attente' ? 'En attente' : c.statut || 'Brouillon'}
+                    </Pill>
+                  )}
                 </td>
                 <td className="tda">
                   <IconButton icon={<EyeIcon />} tooltip="Voir détail" variant="eye" onClick={(e: any) => { e.stopPropagation(); setLocation('/admin/commissions/' + c.id); }} />
                   <IconButton icon={<FileIcon />} tooltip="Devis PDF" variant="eye" onClick={(e: any) => { e.stopPropagation(); handleDevisPDF(c); }} />
                   <IconButton icon={<DollarIcon />} tooltip="NC PDF" variant="nc" onClick={() => handleNCPDF(c)} />
                   <IconButton icon={<DownloadIcon />} tooltip="Télécharger" variant="dl" onClick={() => handleNCPDF(c)} />
-                  <IconButton icon={<SendIcon />} tooltip="Envoyer" variant="send" onClick={() => alert(`Envoi NC ${c.numero} à ${c.partenaire_nom}`)} />
+                  <IconButton icon={<SendIcon />} tooltip="Envoyer" variant="send" onClick={() => handleSendNC(c)} />
                   <IconButton
                     icon={<EuroIcon />}
                     tooltip={c.statut === 'payee' ? 'Marquer non payée' : 'Marquer payée'}
@@ -242,6 +368,27 @@ export default function NotesCommission() {
           </tbody>
         </table>
       </Card>
+
+      {showNouvelleModal && (
+        <ModalNouvelleCommission
+          onClose={() => setShowNouvelleModal(false)}
+          onSuccess={() => {
+            setShowNouvelleModal(false);
+            loadCommissions();
+          }}
+        />
+      )}
+
+      {commissionAPayer && (
+        <ModalMarquerPayee
+          commission={commissionAPayer}
+          onClose={() => setCommissionAPayer(null)}
+          onSuccess={() => {
+            setCommissionAPayer(null);
+            loadCommissions();
+          }}
+        />
+      )}
     </>
   );
 }
