@@ -1,0 +1,116 @@
+=== MAJ35G PHASE 3 — Onglet Médias site web complet ===
+Date : 2026-04-21 14:47
+Branche : v2
+Build : OK (0 erreur TypeScript)
+
+OBJECTIF :
+  Implémenter l'onglet Médias complet avec galerie photos + vidéos MP4 +
+  description marketing + points forts + PDF publics + SEO.
+
+NOUVEAUTÉS MAJEURES :
+
+1. GALERIE VIDÉOS MP4 (nouveau, jusqu'à 6 vidéos)
+  ✅ Upload drag & drop + multiple
+  ✅ Avertissement si > 200 Mo (coût bande passante)
+  ✅ Thumbnail auto extraite à 1s (HTML5 Canvas)
+  ✅ Player preview HTML5 dans modal
+  ✅ Durée affichée (MM:SS)
+  ✅ Toggle "Public / Privé" par vidéo
+  ✅ Drag & drop réorganisation
+  ✅ Suppression avec confirmation
+
+2. GALERIE PHOTOS (amélioration, jusqu'à 6 photos)
+  ✅ Upload drag & drop + multiple
+  ✅ Compression auto (JPEG 80%, max 1920px)
+  ✅ Toggle "Public / Privé" par photo (NOUVEAU)
+  ✅ Drag & drop réorganisation
+  ✅ Indicateur visuel privé (opacity 0.4 + bordure rouge)
+
+3. MIGRATION AUTOMATIQUE
+  ✅ Ancien format images_galerie: string[] → nouveau format array d'objets
+  ✅ Appliqué au chargement de chaque produit (loadProduct)
+  ✅ Rétrocompatible
+
+4. ORDRE D'AFFICHAGE SITE
+  ✅ Vidéos affichées AVANT les photos sur le site public
+  ✅ Dans chaque galerie : ordre du tableau Firestore
+
+FICHIERS CRÉÉS :
+  ✅ src/admin/components/produit/GalerieVideos.tsx (~400 lignes)
+  ✅ src/admin/components/produit/GaleriePhotos.tsx (~250 lignes)
+  ✅ src/admin/components/produit/OngletMedias.tsx (~400 lignes)
+
+FICHIERS MODIFIÉS :
+  ✅ src/lib/storageHelpers.ts
+     + uploadVideoProduit()
+     + uploadVideoThumbnail()
+     + extraireThumbnailVideo() (HTML5 Canvas)
+     + uploadImageGalerie()
+  ✅ src/lib/productHelpers.ts
+     + migrerGalerieImages() (compatibilité ancien format)
+  ✅ src/admin/pages/FicheProduit.tsx
+     + Import OngletMedias
+     + Application migration dans loadProduct
+     + Placeholder Phase 3 remplacé par composant réel
+
+STRUCTURE FIRESTORE (nouvelle) :
+  images_galerie: [{ url, visible_site, nom, date_upload }]
+  videos_galerie: [{ url, visible_site, nom, taille_mo, duree_sec, thumbnail_url, date_upload }]
+  documents_pdf: [{ nom, url, taille_mo, date_upload }]
+
+COMMITS (5) :
+  48ffe2d v35g-P3-A: helpers médias + migration ancienne structure
+  224e2bf v35g-P3-B: composant GalerieVideos
+  6ee84b4 v35g-P3-C: composant GaleriePhotos
+  1b956d4 v35g-P3-D: OngletMedias principal + intégration FicheProduit
+  ba4f602 v35g-P3-E fix: corrections TypeScript pour build success
+
+FIREBASE STORAGE PATHS :
+  products/{ref}/principale/main_{timestamp}.jpg        (image principale)
+  products/{ref}/galerie/{timestamp}_{name}.jpg         (photos galerie)
+  products/{ref}/videos/{timestamp}_{name}.mp4          (vidéos MP4)
+  products/{ref}/videos/thumbnails/thumb_{timestamp}.jpg (thumbnails vidéos)
+  products/{ref}/documents/{timestamp}_{name}.pdf       (documents publics)
+  products/{ref}/certifications/CE_{timestamp}.pdf      (certificats CE privés)
+
+TESTS MANUELS (14 tests à exécuter) :
+  [ ] Test 1  : Migration auto ancienne structure
+  [ ] Test 2  : Upload vidéo MP4
+  [ ] Test 3  : Avertissement vidéo lourde
+  [ ] Test 4  : Preview vidéo modal
+  [ ] Test 5  : Toggle visibilité vidéo
+  [ ] Test 6  : Drag & drop vidéos
+  [ ] Test 7  : Upload photos multiple
+  [ ] Test 8  : Toggle visibilité photo
+  [ ] Test 9  : Traduction description marketing
+  [ ] Test 10 : Points forts
+  [ ] Test 11 : Upload PDF public
+  [ ] Test 12 : SEO slug auto
+  [ ] Test 13 : Sauvegarde globale
+  [ ] Test 14 : Complétude "Complet"
+
+ACTION POUR LE SITE PUBLIC (à faire plus tard) :
+  Quand Michel voudra afficher les produits sur le site, le code site devra :
+
+  const mediasVisibles = [
+    ...videos_galerie.filter(v => v.visible_site === true),
+    ...images_galerie.filter(i => i.visible_site === true),
+  ];
+
+  Vidéos AVANT photos dans le carousel.
+
+v35g V2 TOTALEMENT COMPLET :
+  ✅ Phase 1 : Fondations + Essentiel (12→11 champs)
+  ✅ Phase 2 : Détails techniques + Code HS déplacé
+  ✅ Hotfix 1 : Sauvegarde partielle + Drag&drop image principale
+  ✅ Hotfix 2 : Fix DeepL via Vercel Serverless Function
+  ✅ Phase 3 : Médias complets avec vidéos MP4
+
+BACKLOG RESTANT :
+  - v35f : commissions partenaires
+  - v35b-enhance : CTA emails signés (tokens deep-link)
+  - v35h : import/export CSV bulk produits
+  - Bug tri colonnes (non bloquant)
+  - Activation kits solaires côté front public
+  - Page /partenaire recrutement
+  - TikTok @direxport (scripts Week 1)

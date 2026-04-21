@@ -728,3 +728,7 @@ EFFORT RESTANT : ~5h pour 4 générateurs + modal + UI integration
 v35g-phase2 — 2026-04-20 — Onglet Détails techniques + retrait Code HS Essentiel + badge alerte liste — OK
 
 v35g-hotfix2 — 2026-04-21 — Fix DeepL via Vercel Serverless Function (proxy CORS) — OK
+
+v35g-phase3 — 2026-04-21 — Onglet Médias complet (galerie photos + vidéos MP4 + drag&drop + visibilité individuelle + thumbnail auto + SEO) — OK
+
+v35g V2 TOTALEMENT COMPLET — refonte back-office produits livrée de bout en bout
