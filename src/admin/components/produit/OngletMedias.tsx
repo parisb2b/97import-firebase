@@ -362,12 +362,13 @@ function Hint({ children }: any) {
 }
 
 function Banner({ type, icon, children }: any) {
-  const c: any = {
+  const colors: Record<string, any> = {
     success: { bg: '#D1FAE5', color: '#065F46', border: '#10B981' },
     warning: { bg: '#FEF3C7', color: '#92400E', border: '#F59E0B' },
     danger: { bg: '#FEE2E2', color: '#991B1B', border: '#EF4444' },
     info: { bg: '#DBEAFE', color: '#1E40AF', border: '#3B82F6' },
-  }[type] || { bg: '#DBEAFE', color: '#1E40AF', border: '#3B82F6' };
+  };
+  const c = colors[type] || colors['info'];
   return (
     <div style={{
       padding: '14px 18px', borderRadius: 12, marginBottom: 20,

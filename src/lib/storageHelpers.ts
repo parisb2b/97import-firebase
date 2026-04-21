@@ -166,7 +166,7 @@ export async function uploadVideoProduit(
  */
 export async function uploadVideoThumbnail(
   productRef: string,
-  videoFileName: string,
+  _videoFileName: string,
   thumbnailBlob: Blob
 ): Promise<string> {
   const timestamp = Date.now();
