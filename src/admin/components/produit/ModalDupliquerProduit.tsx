@@ -2,7 +2,7 @@
 // Modal pour dupliquer un produit avec nouvelle référence
 
 import { useState } from 'react';
-import { collection, query, where, getDocs, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 
 interface Props {
@@ -71,10 +71,10 @@ export default function ModalDupliquerProduit({ produit, onClose, onSuccess }: P
       nouveauProduit.created_at = serverTimestamp();
       nouveauProduit.updated_at = serverTimestamp();
 
-      // Créer le document
-      const docRef = await addDoc(collection(db, 'products'), nouveauProduit);
+      // Créer le document avec la référence comme ID Firestore
+      await setDoc(doc(db, 'products', nouvelleRef.trim()), nouveauProduit);
 
-      onSuccess(docRef.id, nouvelleRef.trim());
+      onSuccess(nouvelleRef.trim(), nouvelleRef.trim());
     } catch (err: any) {
       console.error('Erreur duplication:', err);
       setErreur('Erreur lors de la duplication : ' + (err.message || 'inconnue'));
