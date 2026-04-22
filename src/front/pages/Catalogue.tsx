@@ -38,9 +38,31 @@ export default function Catalogue() {
       try {
         const snap = await getDocs(collection(db, 'products'));
         const all: any[] = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+        // Helper local pour normaliser les catégories (gère anciennes et nouvelles)
+        const normalizeCategorie = (cat: string | undefined): string => {
+          if (!cat) return '';
+          // Normaliser : tout en minuscule, remplacer espaces par tirets
+          return cat.toLowerCase().trim().replace(/\s+/g, '-');
+        };
+
+        // Catégories à exclure du catalogue public (services internes)
+        const CATEGORIES_EXCLUES = ['logistique'];
+
         const filtered = categorie
-          ? all.filter(p => p.categorie === categorie && p.actif !== false && p.type !== 'service')
-          : all.filter(p => p.actif !== false && p.categorie !== 'Logistique' && p.type !== 'service');
+          ? all.filter(p => {
+              const catNormalisee = normalizeCategorie(p.categorie);
+              const catRecherchee = normalizeCategorie(categorie);
+              return catNormalisee === catRecherchee &&
+                     p.actif !== false &&
+                     p.type !== 'service';
+            })
+          : all.filter(p => {
+              const catNormalisee = normalizeCategorie(p.categorie);
+              return p.actif !== false &&
+                     !CATEGORIES_EXCLUES.includes(catNormalisee) &&
+                     p.type !== 'service';
+            });
         setProducts(filtered);
       } catch (err) {
         console.error('Error loading products:', err);
