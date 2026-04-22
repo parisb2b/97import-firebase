@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { collection, query, where, getDocs, doc, updateDoc, getDoc } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import { generateDevis, downloadPDF } from '../../../lib/pdf-generator';
-import { useToast } from '../../components/Toast';
+import { toast } from '../../../lib/useToast';
 import { notifyDevisVipEnvoye } from '../../../lib/emailService';
 import { getCoefficients, CoefficientsPrix, COEFFICIENTS_DEFAULT } from '../../../lib/coefficientsHelpers';
 
@@ -39,7 +39,6 @@ const STATUT_COLORS: Record<string, { bg: string; color: string; label: string }
 };
 
 export default function GestionDevisPartner({ partnerCode }: { partnerCode: string }) {
-  const { showToast } = useToast();
   const [devis, setDevis] = useState<Devis[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -58,7 +57,7 @@ export default function GestionDevisPartner({ partnerCode }: { partnerCode: stri
       setDevis(list);
     } catch (err) {
       console.error(err);
-      showToast('Erreur de chargement', 'error');
+      toast.error('Erreur de chargement');
     } finally {
       setLoading(false);
     }
@@ -107,7 +106,7 @@ export default function GestionDevisPartner({ partnerCode }: { partnerCode: stri
     }
 
     if (hasError) {
-      alert('❌ Prix invalides :\n\n' + errors.join('\n'));
+      toast.error('Prix invalides : ' + errors.join(', '));
       return;
     }
 
@@ -146,11 +145,11 @@ export default function GestionDevisPartner({ partnerCode }: { partnerCode: stri
         console.error('Erreur notification VIP:', err);
       }
 
-      showToast(`Devis VIP envoyé à ${d.client_nom || d.client_email} ✅`);
+      toast.success(`Devis VIP envoyé à ${d.client_nom || d.client_email}`);
       await loadDevis();
     } catch (err) {
       console.error(err);
-      showToast('Erreur lors de l\'envoi', 'error');
+      toast.error('Erreur lors de l\'envoi');
     }
   };
 
@@ -162,7 +161,7 @@ export default function GestionDevisPartner({ partnerCode }: { partnerCode: stri
       if (!quoteSnap.exists()) return;
       downloadPDF(generateDevis(quoteSnap.data(), emetteur), `${d.numero}.pdf`);
     } catch (err) {
-      showToast('Erreur PDF', 'error');
+      toast.error('Erreur PDF');
     }
   };
 

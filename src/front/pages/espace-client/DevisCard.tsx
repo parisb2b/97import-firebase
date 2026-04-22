@@ -4,6 +4,7 @@ import { peutVerserAcompte } from '../../../lib/devisHelpers';
 import { db } from '../../../lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import { generateDevis, downloadPDF } from '../../../lib/pdf-generator';
+import { toast } from '../../../lib/useToast';
 
 interface DevisCardProps {
   devis: any;
@@ -54,7 +55,7 @@ export default function DevisCard({ devis, profile, onRefresh, forceOpen = false
       downloadPDF(pdf, `${devis.numero}.pdf`);
     } catch (err) {
       console.error('Erreur PDF:', err);
-      alert('Erreur lors du téléchargement du PDF');
+      toast.error('Erreur lors du téléchargement du PDF');
     }
   };
 

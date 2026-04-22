@@ -1,6 +1,7 @@
 import { Route, Switch } from 'wouter';
 import Header from './components/Header';
 import Footer from './components/Footer';
+import ToastContainer from '../components/ToastContainer';
 
 // Pages
 import Home from './pages/Home';
@@ -47,6 +48,7 @@ export default function FrontApp() {
         </Switch>
       </main>
       <Footer />
+      <ToastContainer />
     </div>
   );
 }

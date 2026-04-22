@@ -11,6 +11,7 @@ import {
 } from '@/lib/productMediaHelpers';
 import PriceDisplay from '@/front/components/PriceDisplay';
 import ProductCard from '@/front/components/ProductCard';
+import { toast } from '@/lib/useToast';
 
 type Tab = 'description' | 'specs' | 'forts' | 'documents';
 
@@ -160,11 +161,11 @@ export default function Produit() {
       }
 
       localStorage.setItem('cart', JSON.stringify(cart));
-      alert(`✅ ${product.nom_fr} ajouté au panier (x${quantity})`);
+      toast.success(`${product.nom_fr} ajouté au panier (x${quantity})`);
       // Rafraîchir le badge panier dans le header
       window.dispatchEvent(new Event('storage'));
     } catch (err: any) {
-      alert('Erreur ajout panier : ' + err.message);
+      toast.error('Erreur ajout panier : ' + err.message);
     }
   };
 
