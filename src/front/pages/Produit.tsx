@@ -7,6 +7,13 @@ import { useI18n } from '../../i18n';
 import Breadcrumb from '../components/Breadcrumb';
 import PriceDisplay, { getProductPrice } from '../components/PriceDisplay';
 import { useToast } from '../components/Toast';
+import {
+  getImagePrincipale,
+  getMediasOrdonnesPourSite,
+  getDocumentsPdf,
+  getDescriptionMarketing,
+  getPointsForts,
+} from '@/lib/productMediaHelpers';
 
 const B = '#1565C0';
 
@@ -16,8 +23,7 @@ export default function Produit() {
   const [, params] = useRoute('/produit/:id');
   const [product, setProduct] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [selectedImg, setSelectedImg] = useState(0);
-  const [showVideo, setShowVideo] = useState(false);
+  const [selectedMediaIndex, setSelectedMediaIndex] = useState(0);
   const [_user, setUser] = useState<User | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
   const [hasAccessoires, setHasAccessoires] = useState(false);
@@ -59,8 +65,7 @@ export default function Produit() {
       }
     };
     load();
-    setSelectedImg(0);
-    setShowVideo(false);
+    setSelectedMediaIndex(0);
   }, [params?.id]);
 
   if (loading) return <div style={{ padding: 60, textAlign: 'center', color: '#6B7280' }}>...</div>;
@@ -75,11 +80,13 @@ export default function Produit() {
   const pMat = (p: any) =>
     lang === 'zh' ? (p.matiere_zh || p.matiere_fr) : lang === 'en' ? (p.matiere_en || p.matiere_fr) : p.matiere_fr;
 
-  const images = product.images_urls || [];
-  const hasVideoUrl = !!product.video_url;
+  // Médias unifiés : vidéos d'abord, puis photos (selon visible_site)
+  const medias = getMediasOrdonnesPourSite(product);
+  // Image principale pour fallback
+  const imagePrincipale = getImagePrincipale(product);
 
-  const prevImage = () => setSelectedImg(i => i > 0 ? i - 1 : images.length - 1);
-  const nextImage = () => setSelectedImg(i => i < images.length - 1 ? i + 1 : 0);
+  const prevMedia = () => setSelectedMediaIndex(i => i > 0 ? i - 1 : medias.length - 1);
+  const nextMedia = () => setSelectedMediaIndex(i => i < medias.length - 1 ? i + 1 : 0);
 
   const handleAddToCart = () => {
     const saved = localStorage.getItem('cart');
@@ -94,7 +101,7 @@ export default function Produit() {
         nom_fr: product.nom_fr || product.nom || product.numero_interne,
         prix: getProductPrice(product, userRole),
         qte: 1,
-        image: product.images_urls?.[0] || '',
+        image: getImagePrincipale(product) || '',
       });
     }
     localStorage.setItem('cart', JSON.stringify(cart));
@@ -141,47 +148,51 @@ export default function Produit() {
 
         {/* LEFT — Gallery */}
         <div>
-          {/* Main image / video */}
+          {/* Main media viewer */}
           <div style={{ position: 'relative', borderRadius: 20, overflow: 'hidden', background: '#F5F7FA' }}>
-            {showVideo && product.video_url ? (
+            {medias.length > 0 ? (
               <>
-                {product.video_url.includes('youtube') || product.video_url.includes('youtu.be') ? (
-                  <iframe
-                    src={product.video_url.replace('watch?v=', 'embed/').replace('youtu.be/', 'youtube.com/embed/')}
-                    style={{ width: '100%', height: 400, border: 'none' }}
-                    allowFullScreen
+                {medias[selectedMediaIndex]?.type === 'video' ? (
+                  <video
+                    src={medias[selectedMediaIndex].url}
+                    controls
+                    poster={medias[selectedMediaIndex].thumbnail}
+                    style={{ width: '100%', height: 400, objectFit: 'contain' }}
                   />
                 ) : (
-                  <video src={product.video_url} controls style={{ width: '100%', height: 400, objectFit: 'contain' }} />
+                  <img
+                    src={medias[selectedMediaIndex]?.url}
+                    alt={pName(product)}
+                    style={{ width: '100%', height: 400, objectFit: 'contain', padding: 20 }}
+                  />
                 )}
-                <button onClick={() => setShowVideo(false)} style={{
-                  position: 'absolute', top: 12, right: 12, width: 36, height: 36, borderRadius: '50%',
-                  background: 'rgba(0,0,0,.6)', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 16,
-                }}>✕</button>
+
+                {/* Arrows */}
+                {medias.length > 1 && (
+                  <>
+                    <button onClick={prevMedia} style={{
+                      position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)',
+                      width: 40, height: 40, borderRadius: '50%', border: 'none',
+                      background: 'rgba(255,255,255,.9)', boxShadow: '0 2px 8px rgba(0,0,0,.15)',
+                      fontSize: 18, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}>←</button>
+                    <button onClick={nextMedia} style={{
+                      position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)',
+                      width: 40, height: 40, borderRadius: '50%', border: 'none',
+                      background: 'rgba(255,255,255,.9)', boxShadow: '0 2px 8px rgba(0,0,0,.15)',
+                      fontSize: 18, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}>→</button>
+                  </>
+                )}
               </>
-            ) : images.length > 0 ? (
-              <img src={images[selectedImg]} alt={pName(product)}
-                style={{ width: '100%', height: 400, objectFit: 'contain', padding: 20 }} />
+            ) : imagePrincipale ? (
+              <img
+                src={imagePrincipale}
+                alt={pName(product)}
+                style={{ width: '100%', height: 400, objectFit: 'contain', padding: 20 }}
+              />
             ) : (
               <div style={{ height: 400, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 64 }}>📦</div>
-            )}
-
-            {/* Arrows */}
-            {images.length > 1 && !showVideo && (
-              <>
-                <button onClick={prevImage} style={{
-                  position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)',
-                  width: 40, height: 40, borderRadius: '50%', border: 'none',
-                  background: 'rgba(255,255,255,.9)', boxShadow: '0 2px 8px rgba(0,0,0,.15)',
-                  fontSize: 18, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                }}>←</button>
-                <button onClick={nextImage} style={{
-                  position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)',
-                  width: 40, height: 40, borderRadius: '50%', border: 'none',
-                  background: 'rgba(255,255,255,.9)', boxShadow: '0 2px 8px rgba(0,0,0,.15)',
-                  fontSize: 18, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                }}>→</button>
-              </>
             )}
           </div>
 
@@ -191,36 +202,51 @@ export default function Produit() {
           </p>
 
           {/* Thumbnails */}
-          <div style={{ display: 'flex', gap: 10, marginTop: 12 }}>
-            {hasVideoUrl && (
-              <div onClick={() => { setShowVideo(true); }} style={{
-                width: 74, height: 74, borderRadius: 12, background: '#1565C0',
-                cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                position: 'relative', flexShrink: 0,
-              }}>
-                <span style={{ fontSize: 24, color: '#fff' }}>▶</span>
-                <span style={{ position: 'absolute', bottom: 4, fontSize: 8, color: 'rgba(255,255,255,.7)' }}>Vidéo</span>
-              </div>
-            )}
-            {images.map((img: string, i: number) => (
-              <img key={i} src={img} onClick={() => { setSelectedImg(i); setShowVideo(false); }} style={{
-                width: 74, height: 74, borderRadius: 12, objectFit: 'cover', cursor: 'pointer',
-                border: `2px solid ${i === selectedImg && !showVideo ? B : 'transparent'}`,
-                opacity: i === selectedImg && !showVideo ? 1 : 0.7,
-                transition: 'all .2s', flexShrink: 0,
-              }} />
-            ))}
-            {product.fiche_pdf_url && (
-              <a href={product.fiche_pdf_url} target="_blank" rel="noopener" style={{
-                width: 74, height: 74, borderRadius: 12, background: '#F5F7FA',
-                border: '2px solid #E8ECF4', cursor: 'pointer', textDecoration: 'none',
-                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, flexShrink: 0,
-              }}>
-                <span style={{ fontSize: 20 }}>📄</span>
-                <span style={{ fontSize: 9, color: '#6B7280' }}>Fiche PDF</span>
-              </a>
-            )}
-          </div>
+          {medias.length > 1 && (
+            <div style={{ display: 'flex', gap: 10, marginTop: 12, flexWrap: 'wrap' }}>
+              {medias.slice(0, 8).map((m, i) => (
+                <button
+                  key={i}
+                  onClick={() => setSelectedMediaIndex(i)}
+                  style={{
+                    width: 74,
+                    height: 74,
+                    borderRadius: 12,
+                    background: '#F5F7FA',
+                    border: `2px solid ${selectedMediaIndex === i ? B : '#E8ECF4'}`,
+                    cursor: 'pointer',
+                    padding: 0,
+                    position: 'relative',
+                    flexShrink: 0,
+                    overflow: 'hidden',
+                    opacity: selectedMediaIndex === i ? 1 : 0.7,
+                    transition: 'all .2s',
+                  }}
+                >
+                  <img
+                    src={m.type === 'video' ? (m.thumbnail || m.url) : m.url}
+                    alt=""
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  />
+                  {m.type === 'video' && (
+                    <div style={{
+                      position: 'absolute',
+                      top: '50%', left: '50%',
+                      transform: 'translate(-50%, -50%)',
+                      background: 'rgba(0,0,0,0.7)',
+                      color: '#fff',
+                      width: 24, height: 24,
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: 10,
+                    }}>▶</div>
+                  )}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* RIGHT — Product info */}
@@ -327,6 +353,117 @@ export default function Produit() {
           </div>
         </div>
       )}
+
+      {/* Description marketing */}
+      {(() => {
+        const description = getDescriptionMarketing(product, 'fr');
+        if (!description) return null;
+        return (
+          <div style={{ maxWidth: 1280, margin: '0 auto', padding: '32px 20px 0' }}>
+            <h2 style={{ fontSize: 20, color: B, marginBottom: 12, fontWeight: 700 }}>Description</h2>
+            <div style={{
+              fontSize: 15,
+              lineHeight: 1.6,
+              color: '#374151',
+              whiteSpace: 'pre-wrap',
+            }}>
+              {description}
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* Points forts */}
+      {(() => {
+        const points = getPointsForts(product);
+        if (points.length === 0) return null;
+        return (
+          <div style={{ maxWidth: 1280, margin: '0 auto', padding: '24px 20px 0' }}>
+            <h3 style={{ fontSize: 18, color: B, marginBottom: 12, fontWeight: 700 }}>Points forts</h3>
+            <ul style={{
+              listStyle: 'none',
+              padding: 0,
+              margin: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 8,
+            }}>
+              {points.map((pt, i) => (
+                <li key={i} style={{
+                  fontSize: 14,
+                  color: '#374151',
+                  paddingLeft: 24,
+                  position: 'relative',
+                }}>
+                  <span style={{
+                    position: 'absolute',
+                    left: 0,
+                    color: '#10B981',
+                    fontWeight: 700,
+                  }}>✓</span>
+                  {pt.replace(/^✓\s*/, '')}
+                </li>
+              ))}
+            </ul>
+          </div>
+        );
+      })()}
+
+      {/* Documents PDF téléchargeables */}
+      {(() => {
+        const docs = getDocumentsPdf(product);
+        if (docs.length === 0) return null;
+        return (
+          <div style={{ maxWidth: 1280, margin: '0 auto', padding: '24px 20px 0' }}>
+            <h3 style={{ fontSize: 18, color: B, marginBottom: 12, fontWeight: 700 }}>
+              Documents techniques
+            </h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {docs.map((d, i) => (
+                <a
+                  key={i}
+                  href={d.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 12,
+                    padding: '12px 16px',
+                    background: '#F9FAFB',
+                    border: '1px solid #E5E7EB',
+                    borderRadius: 10,
+                    textDecoration: 'none',
+                    color: B,
+                    transition: 'background 0.15s',
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.background = '#F3F4F6'}
+                  onMouseLeave={e => e.currentTarget.style.background = '#F9FAFB'}
+                >
+                  <div style={{
+                    width: 40, height: 40,
+                    background: '#FEE2E2',
+                    color: '#991B1B',
+                    borderRadius: 8,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: 11,
+                    fontWeight: 700,
+                  }}>PDF</div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: 500 }}>{d.nom}</div>
+                    <div style={{ fontSize: 12, color: '#6B7280', marginTop: 2 }}>
+                      {d.taille_mo} Mo
+                    </div>
+                  </div>
+                  <div style={{ color: '#EA580C', fontSize: 18 }}>↓</div>
+                </a>
+              ))}
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Accessoires banner */}
       {hasAccessoires && (
