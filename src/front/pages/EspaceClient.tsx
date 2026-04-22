@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { useLocation, Redirect } from 'wouter';
-import { onAuthStateChanged } from 'firebase/auth';
+import { useLocation } from 'wouter';
 import { doc, getDoc } from 'firebase/firestore';
-import { clientAuth, db } from '../../lib/firebase';
+import { db, clientAuth } from '../../lib/firebase';
+import { useClientAuth } from '@/front/hooks/useClientAuth';
 
 // Import des onglets
 import MesDevis from './espace-client/MesDevis';
@@ -17,30 +17,37 @@ import SAV from './espace-client/SAV';
 
 export default function EspaceClient() {
   const [activeTab, setActiveTab] = useState('devis');
-  const [user, setUser] = useState<any>(null);
+  const { user, role, loading } = useClientAuth();
   const [profile, setProfile] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
   const [, navigate] = useLocation();
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(clientAuth, async (u) => {
-      if (!u) { setLoading(false); setUser(null); return; }
-      setUser(u);
-      try {
-        const snap = await getDoc(doc(db, 'users', u.uid));
-        const p = snap.exists() ? snap.data() : null;
-        setProfile(p);
-        if (p?.role === 'partner') navigate('/espace-partenaire');
-      } catch (err) {
-        console.error(err);
-      }
-      setLoading(false);
-    });
-    return () => unsub();
-  }, []);
+    if (!loading && !user) {
+      navigate('/connexion');
+    }
+  }, [loading, user, navigate]);
+
+  useEffect(() => {
+    if (!loading && user && role === 'partner') {
+      navigate('/espace-partenaire');
+    }
+  }, [loading, user, role, navigate]);
+
+  useEffect(() => {
+    if (user) {
+      (async () => {
+        try {
+          const snap = await getDoc(doc(db, 'users', user.uid));
+          setProfile(snap.exists() ? snap.data() : null);
+        } catch (err) {
+          console.error(err);
+        }
+      })();
+    }
+  }, [user]);
 
   if (loading) return <div style={{ padding: 60, textAlign: 'center', color: '#6B7280' }}>Chargement...</div>;
-  if (!user) return <Redirect to="/connexion" />;
+  if (!user) return null;
   if (!profile) return <div style={{ padding: 60, textAlign: 'center', color: '#6B7280' }}>Chargement du profil...</div>;
 
   const tabs = [

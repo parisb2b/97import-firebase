@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { useLocation, Redirect } from 'wouter';
-import { onAuthStateChanged } from 'firebase/auth';
+import { useLocation } from 'wouter';
 import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
-import { clientAuth, db } from '../../lib/firebase';
+import { db, clientAuth } from '../../lib/firebase';
+import { useClientAuth } from '@/front/hooks/useClientAuth';
 
 // Réutilisation des onglets client v29
 import MesDevis from './espace-client/MesDevis';
@@ -22,37 +22,45 @@ import MesCommissionsPartner from './espace-partenaire/MesCommissionsPartner';
 
 export default function EspacePartenaire() {
   const [activeTab, setActiveTab] = useState('devis');
-  const [user, setUser] = useState<any>(null);
+  const { user, role, loading } = useClientAuth();
   const [profile, setProfile] = useState<any>(null);
   const [partnerCode, setPartnerCode] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
   const [, navigate] = useLocation();
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(clientAuth, async (u) => {
-      if (!u) { setLoading(false); setUser(null); return; }
-      setUser(u);
-      try {
-        // Load profile
-        const snap = await getDoc(doc(db, 'users', u.uid));
-        const p = snap.exists() ? snap.data() : null;
-        setProfile(p);
+    if (!loading && !user) {
+      navigate('/connexion');
+    }
+  }, [loading, user, navigate]);
 
-        // Load partner code
-        const pSnap = await getDocs(query(collection(db, 'partners'), where('userId', '==', u.uid)));
-        if (!pSnap.empty) {
-          setPartnerCode(pSnap.docs[0].data().code);
+  useEffect(() => {
+    if (!loading && user && role !== 'partner') {
+      navigate('/espace-client'); // Not a partner → redirect to client space
+    }
+  }, [loading, user, role, navigate]);
+
+  useEffect(() => {
+    if (user) {
+      (async () => {
+        try {
+          // Load profile
+          const snap = await getDoc(doc(db, 'users', user.uid));
+          setProfile(snap.exists() ? snap.data() : null);
+
+          // Load partner code
+          const pSnap = await getDocs(query(collection(db, 'partners'), where('userId', '==', user.uid)));
+          if (!pSnap.empty) {
+            setPartnerCode(pSnap.docs[0].data().code);
+          }
+        } catch (err) {
+          console.error(err);
         }
-      } catch (err) {
-        console.error(err);
-      }
-      setLoading(false);
-    });
-    return () => unsub();
-  }, []);
+      })();
+    }
+  }, [user]);
 
   if (loading) return <div style={{ padding: 60, textAlign: 'center', color: '#6B7280' }}>Chargement...</div>;
-  if (!user) return <Redirect to="/connexion" />;
+  if (!user) return null;
   if (!profile) return <div style={{ padding: 60, textAlign: 'center', color: '#6B7280' }}>Chargement du profil...</div>;
 
   const clientTabs = [
