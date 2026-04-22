@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'wouter';
-import { clientAuth } from '../../lib/firebase';
+import { clientAuth, db } from '../../lib/firebase';
+import { doc, setDoc, getDoc, serverTimestamp, collection, query, where, getDocs } from 'firebase/firestore';
+import { getNextNumber } from '../../lib/counters';
 import { useI18n } from '../../i18n';
 import { useToast } from '../components/Toast';
-import TunnelCommande from '@/front/components/TunnelCommande';
+import { notifyDevisCree } from '../../lib/emailService';
 
 interface CartItem {
   id: string;
@@ -17,18 +19,79 @@ interface CartItem {
   lien?: string;
 }
 
+interface Partner {
+  id: string;
+  code: string;
+  nom: string;
+  actif: boolean;
+}
+
+// ─── Popup overlay ───
+function Overlay({ children, onClose }: { children: React.ReactNode; onClose: () => void }) {
+  return (
+    <div style={{
+      position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1000,
+      display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20,
+    }} onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+      <div style={{
+        background: 'white', borderRadius: 20, maxWidth: 560, width: '100%',
+        padding: 32, maxHeight: '90vh', overflow: 'auto',
+        boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+      }}>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+// ─── Step indicator ───
+function Steps({ current }: { current: number }) {
+  const labels = ['Partenaire', 'Acompte', 'Virement'];
+  return (
+    <div style={{ display: 'flex', justifyContent: 'center', gap: 12, marginBottom: 24 }}>
+      {labels.map((l, i) => (
+        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <div style={{
+            width: 28, height: 28, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 13, fontWeight: 700,
+            background: i < current ? '#16A34A' : i === current ? '#1565C0' : '#E5E7EB',
+            color: i <= current ? 'white' : '#9CA3AF',
+          }}>
+            {i < current ? '✓' : i + 1}
+          </div>
+          <span style={{ fontSize: 12, color: i === current ? '#1565C0' : '#9CA3AF', fontWeight: i === current ? 600 : 400 }}>{l}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function Panier() {
   const { t } = useI18n();
   const { showToast } = useToast();
-  const [, navigate] = useLocation();
+  const [, setLocation] = useLocation();
   const [cart, setCart] = useState<CartItem[]>([]);
-  const [showTunnel, setShowTunnel] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   // Custom product form
   const [customNom, setCustomNom] = useState('');
   const [customQte, setCustomQte] = useState(1);
   const [customDesc, setCustomDesc] = useState('');
   const [customLien, setCustomLien] = useState('');
+
+  // Popup state
+  const [popupStep, setPopupStep] = useState<number | null>(null); // null=closed, 0=partner, 1=acompte, 2=rib
+
+  // Partner popup
+  const [partners, setPartners] = useState<Partner[]>([]);
+  const [selectedPartner, setSelectedPartner] = useState<string | null>(null);
+
+  // Acompte popup
+  const [typeCompte, setTypeCompte] = useState<'personnel' | 'professionnel'>('personnel');
+  const [montantAcompte, setMontantAcompte] = useState(500);
+
+  // Quote number (generated on confirm)
+  const [quoteNumero, setQuoteNumero] = useState('');
 
   useEffect(() => {
     const saved = localStorage.getItem('cart');
@@ -64,19 +127,165 @@ export default function Panier() {
     setCustomNom(''); setCustomQte(1); setCustomDesc(''); setCustomLien('');
   };
 
-  // ─── Open tunnel to request quote ───
-  const handleRequestQuote = () => {
+  // ─── Open popup flow ───
+  const handleOpenPopup = async () => {
     const user = clientAuth.currentUser;
-    if (!user) {
-      navigate('/connexion');
-      return;
-    }
+    if (!user) { setLocation('/connexion'); return; }
     if (cart.length === 0) {
       showToast('Votre panier est vide', 'warning');
       return;
     }
-    setShowTunnel(true);
+
+    // Load partners
+    try {
+      const q = query(collection(db, 'partners'), where('actif', '==', true));
+      const snap = await getDocs(q);
+      setPartners(snap.docs.map(d => ({ id: d.id, ...d.data() } as Partner)));
+    } catch { setPartners([]); }
+
+    setSelectedPartner(null);
+    setPopupStep(0);
   };
+
+  // ─── Confirm & create quote ───
+  const handleConfirmVirement = async () => {
+    const user = clientAuth.currentUser;
+    if (!user) return;
+    setSubmitting(true);
+    try {
+      const numero = await getNextNumber('DVS');
+      setQuoteNumero(numero);
+      const devisId = numero.replace(/[^a-zA-Z0-9]/g, '-');
+      const lignes = cart.map(item => ({
+        ref: item.ref, nom_fr: item.nom_fr, qte: item.qte,
+        prix_unitaire: item.prix, total: item.prix * item.qte,
+        type: item.type || 'product',
+        ...(item.description ? { description: item.description } : {}),
+        ...(item.lien ? { lien: item.lien } : {}),
+      }));
+
+      // Charger le profil client pour inclure toutes les infos
+      let userProfile: any = {};
+      try {
+        const userSnap = await getDoc(doc(db, 'users', user.uid));
+        if (userSnap.exists()) userProfile = userSnap.data();
+      } catch {}
+
+      const devisData = {
+        numero,
+        client_id: user.uid,
+        client_email: userProfile.email || user.email,
+        client_nom: user.displayName || `${userProfile.firstName || ''} ${userProfile.lastName || ''}`.trim(),
+        client_prenom: userProfile.firstName || userProfile.prenom || '',
+        client_tel: userProfile.phone || userProfile.telephone || '',
+        client_adresse: [userProfile.adresse, userProfile.codePostal, userProfile.ville, userProfile.pays].filter(Boolean).join(', '),
+        client_siret: userProfile.siret || '',
+        statut: 'nouveau',
+        destination: userProfile.pays || 'Martinique',
+        pays_livraison: userProfile.pays || 'Martinique',
+        is_vip: false,
+        lignes,
+        total_ht: total,
+        partenaire_code: selectedPartner || null,
+        acomptes: [{
+          montant: montantAcompte,
+          date: new Date().toISOString(),
+          type_compte: typeCompte,
+          statut: 'declare',
+        }],
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      };
+
+      await setDoc(doc(db, 'quotes', devisId), devisData);
+
+      // Notification email
+      try {
+        await notifyDevisCree(devisData);
+      } catch (err) {
+        console.error('Erreur notification devis créé:', err);
+      }
+
+      localStorage.removeItem('cart');
+      window.dispatchEvent(new Event('cart-updated'));
+      setCart([]);
+      setPopupStep(null);
+      showToast('Devis ' + numero + ' créé avec succès !');
+      setLocation('/espace-client');
+    } catch (err) {
+      console.error('Error creating quote:', err);
+      showToast('Erreur lors de la création du devis', 'error');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  // ─── Download without deposit ───
+  const handleSansAcompte = async () => {
+    const user = clientAuth.currentUser;
+    if (!user) return;
+    setSubmitting(true);
+    try {
+      const numero = await getNextNumber('DVS');
+      const devisId = numero.replace(/[^a-zA-Z0-9]/g, '-');
+      const lignes = cart.map(item => ({
+        ref: item.ref, nom_fr: item.nom_fr, qte: item.qte,
+        prix_unitaire: item.prix, total: item.prix * item.qte,
+        type: item.type || 'product',
+      }));
+
+      // Charger le profil client pour inclure toutes les infos
+      let userProfile: any = {};
+      try {
+        const userSnap = await getDoc(doc(db, 'users', user.uid));
+        if (userSnap.exists()) userProfile = userSnap.data();
+      } catch {}
+
+      const devisData = {
+        numero,
+        client_id: user.uid,
+        client_email: userProfile.email || user.email,
+        client_nom: user.displayName || `${userProfile.firstName || ''} ${userProfile.lastName || ''}`.trim(),
+        client_prenom: userProfile.firstName || userProfile.prenom || '',
+        client_tel: userProfile.phone || userProfile.telephone || '',
+        client_adresse: [userProfile.adresse, userProfile.codePostal, userProfile.ville, userProfile.pays].filter(Boolean).join(', '),
+        client_siret: userProfile.siret || '',
+        statut: 'brouillon',
+        destination: userProfile.pays || 'Martinique',
+        pays_livraison: userProfile.pays || 'Martinique',
+        is_vip: false,
+        lignes,
+        total_ht: total,
+        partenaire_code: selectedPartner || null,
+        acomptes: [],
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      };
+
+      await setDoc(doc(db, 'quotes', devisId), devisData);
+
+      // Notification email
+      try {
+        await notifyDevisCree(devisData);
+      } catch (err) {
+        console.error('Erreur notification devis créé:', err);
+      }
+
+      localStorage.removeItem('cart');
+      window.dispatchEvent(new Event('cart-updated'));
+      setCart([]);
+      setPopupStep(null);
+      showToast('Devis créé — sans acompte');
+      setLocation('/espace-client');
+    } catch (err) {
+      console.error('Error creating quote:', err);
+      showToast('Erreur lors de la création du devis', 'error');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const closePopup = () => setPopupStep(null);
 
   const btnStyle = (bg: string, color: string = 'white'): React.CSSProperties => ({
     width: '100%', padding: '14px 0', border: 'none', borderRadius: 10,
@@ -221,8 +430,8 @@ export default function Panier() {
                   {t('cart.horsLivraison')}
                 </p>
 
-                <button onClick={handleRequestQuote}
-                  style={{ ...btnStyle('#EA580C'), marginTop: 20 }}>
+                <button onClick={handleOpenPopup} disabled={submitting}
+                  style={{ ...btnStyle('#EA580C'), marginTop: 20, opacity: submitting ? 0.5 : 1 }}>
                   {t('cart.genererDevis')}
                 </button>
 
@@ -236,28 +445,177 @@ export default function Panier() {
       </div>
 
       {/* ═══════════════════════════════════════════════ */}
-      {/* TUNNEL COMMANDE                                 */}
+      {/* POPUP 1 — Partenaire                           */}
       {/* ═══════════════════════════════════════════════ */}
-      {showTunnel && (
-        <TunnelCommande
-          items={cart.map(item => ({
-            ref: item.ref,
-            nom_fr: item.nom_fr,
-            prix_unitaire: item.prix,
-            qte: item.qte,
-            categorie: item.type === 'custom' ? 'Sur mesure' : undefined,
-          }))}
-          total={total}
-          onClose={() => setShowTunnel(false)}
-          onSuccess={(quoteNumber) => {
-            setShowTunnel(false);
-            localStorage.removeItem('cart');
-            setCart([]);
-            window.dispatchEvent(new Event('cart-updated'));
-            showToast('Devis ' + quoteNumber + ' créé avec succès !');
-            navigate('/espace-client');
-          }}
-        />
+      {popupStep === 0 && (
+        <Overlay onClose={closePopup}>
+          <Steps current={0} />
+          <div style={{ textAlign: 'center', marginBottom: 20 }}>
+            <span style={{ fontSize: 48 }}>🤝</span>
+            <h2 style={{ fontSize: 22, fontWeight: 800, color: '#1565C0', marginTop: 8 }}>{t('popup.partenaireTitle')}</h2>
+            <p style={{ fontSize: 14, color: '#6B7280', marginTop: 4 }}>
+              {t('popup.partenaireDesc')}
+            </p>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 20 }}>
+            {partners.map(p => (
+              <button key={p.id} onClick={() => setSelectedPartner(p.code)}
+                style={{
+                  padding: 16, borderRadius: 12, cursor: 'pointer', textAlign: 'center',
+                  border: selectedPartner === p.code ? '2px solid #1565C0' : '2px solid #E5E7EB',
+                  background: selectedPartner === p.code ? '#EFF6FF' : 'white',
+                }}>
+                <div style={{ fontSize: 18, fontWeight: 800, color: '#1565C0' }}>{p.code}</div>
+                <div style={{ fontSize: 13, color: '#6B7280' }}>{p.nom}</div>
+              </button>
+            ))}
+          </div>
+
+          <button onClick={() => { setSelectedPartner(null); setPopupStep(1); }}
+            style={{
+              width: '100%', padding: '12px 0', border: '2px dashed #E5E7EB', borderRadius: 10,
+              background: 'white', color: '#6B7280', fontSize: 14, cursor: 'pointer', marginBottom: 12,
+            }}>
+            {t('popup.sansPartenaire')} →
+          </button>
+
+          <button onClick={() => setPopupStep(1)}
+            disabled={!selectedPartner}
+            style={{ ...btnStyle(selectedPartner ? '#1565C0' : '#D1D5DB'), opacity: selectedPartner ? 1 : 0.5 }}>
+            {t('popup.confirmer')} →
+          </button>
+        </Overlay>
+      )}
+
+      {/* ═══════════════════════════════════════════════ */}
+      {/* POPUP 2 — Acompte                              */}
+      {/* ═══════════════════════════════════════════════ */}
+      {popupStep === 1 && (
+        <Overlay onClose={closePopup}>
+          <Steps current={1} />
+          <div style={{ textAlign: 'center', marginBottom: 20 }}>
+            <span style={{ fontSize: 48 }}>💰</span>
+            <h2 style={{ fontSize: 22, fontWeight: 800, color: '#1565C0', marginTop: 8 }}>{t('popup.acompteTitle')}</h2>
+          </div>
+
+          {/* Recap */}
+          <div style={{ background: '#F9FAFB', borderRadius: 12, padding: 16, marginBottom: 20 }}>
+            {cart.map(item => (
+              <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, marginBottom: 4 }}>
+                <span>{item.nom_fr} x{item.qte}</span>
+                <span style={{ fontWeight: 600 }}>{item.prix > 0 ? `${(item.prix * item.qte).toLocaleString('fr-FR')} €` : 'Sur devis'}</span>
+              </div>
+            ))}
+            <div style={{ borderTop: '1px solid #E5E7EB', marginTop: 8, paddingTop: 8, display: 'flex', justifyContent: 'space-between', fontWeight: 700 }}>
+              <span>{t('cart.totalHT')}</span>
+              <span>{total.toLocaleString('fr-FR')} €</span>
+            </div>
+          </div>
+
+          {/* Type de compte */}
+          <p style={{ fontSize: 13, fontWeight: 600, color: '#1565C0', marginBottom: 8 }}>{t('popup.typeCompte')}</p>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 20 }}>
+            <button onClick={() => setTypeCompte('personnel')}
+              style={{
+                padding: 14, borderRadius: 10, cursor: 'pointer', textAlign: 'center',
+                border: typeCompte === 'personnel' ? '2px solid #1565C0' : '2px solid #E5E7EB',
+                background: typeCompte === 'personnel' ? '#EFF6FF' : 'white',
+              }}>
+              <div style={{ fontSize: 24 }}>👤</div>
+              <div style={{ fontSize: 13, fontWeight: 600, marginTop: 4 }}>{t('popup.comptePerso')}</div>
+            </button>
+            <button onClick={() => setTypeCompte('professionnel')}
+              style={{
+                padding: 14, borderRadius: 10, cursor: 'pointer', textAlign: 'center',
+                border: typeCompte === 'professionnel' ? '2px solid #1565C0' : '2px solid #E5E7EB',
+                background: typeCompte === 'professionnel' ? '#EFF6FF' : 'white',
+              }}>
+              <div style={{ fontSize: 24 }}>🏢</div>
+              <div style={{ fontSize: 13, fontWeight: 600, marginTop: 4 }}>{t('popup.comptePro')}</div>
+            </button>
+          </div>
+
+          {/* Montant acompte */}
+          <p style={{ fontSize: 13, fontWeight: 600, color: '#1565C0', marginBottom: 8 }}>Montant de l'acompte (€)</p>
+          <input type="number" value={montantAcompte} onChange={e => setMontantAcompte(Number(e.target.value) || 0)}
+            style={{ width: '100%', padding: '12px 14px', borderRadius: 8, border: '1px solid #E5E7EB', fontSize: 16, fontWeight: 700, textAlign: 'center', marginBottom: 20, outline: 'none', boxSizing: 'border-box' }} />
+
+          <button onClick={() => setPopupStep(2)}
+            style={btnStyle('#1565C0')}>
+            {t('popup.jaiVire')} →
+          </button>
+
+          <button onClick={handleSansAcompte} disabled={submitting}
+            style={{
+              width: '100%', padding: '12px 0', border: 'none', borderRadius: 10,
+              background: 'transparent', color: '#6B7280', fontSize: 13, cursor: 'pointer', marginTop: 8,
+              textDecoration: 'underline',
+            }}>
+            {t('popup.sansAcompte')}
+          </button>
+        </Overlay>
+      )}
+
+      {/* ═══════════════════════════════════════════════ */}
+      {/* POPUP 3 — RIB                                  */}
+      {/* ═══════════════════════════════════════════════ */}
+      {popupStep === 2 && (
+        <Overlay onClose={closePopup}>
+          <Steps current={2} />
+          <div style={{ textAlign: 'center', marginBottom: 20 }}>
+            <span style={{ fontSize: 48 }}>🏦</span>
+            <h2 style={{ fontSize: 22, fontWeight: 800, color: '#1565C0', marginTop: 8 }}>{t('popup.ribTitle')}</h2>
+          </div>
+
+          {/* RIB Card */}
+          <div style={{
+            background: 'linear-gradient(135deg, #1565C0, #1565C0)', borderRadius: 16, padding: 24, color: 'white', marginBottom: 24,
+          }}>
+            <p style={{ fontSize: 16, fontWeight: 700, marginBottom: 16 }}>
+              LUXENT LIMITED — Compte {typeCompte}
+            </p>
+            <div style={{ display: 'grid', gap: 12, fontSize: 13 }}>
+              <div>
+                <span style={{ color: 'rgba(255,255,255,0.6)' }}>IBAN</span>
+                <p style={{ fontWeight: 600, fontFamily: 'monospace', fontSize: 15, letterSpacing: 1 }}>DE76 2022 0800 0059 5688 30</p>
+              </div>
+              <div>
+                <span style={{ color: 'rgba(255,255,255,0.6)' }}>SWIFT / BIC</span>
+                <p style={{ fontWeight: 600 }}>SXPYDEHH</p>
+              </div>
+              <div>
+                <span style={{ color: 'rgba(255,255,255,0.6)' }}>Banque</span>
+                <p style={{ fontWeight: 600 }}>Banking Circle S.A. — Munich</p>
+              </div>
+              <div>
+                <span style={{ color: 'rgba(255,255,255,0.6)' }}>Beneficiaire</span>
+                <p style={{ fontWeight: 600 }}>LUXENT LIMITED</p>
+              </div>
+              <div style={{ borderTop: '1px solid rgba(255,255,255,0.2)', paddingTop: 12 }}>
+                <span style={{ color: 'rgba(255,255,255,0.6)' }}>Reference</span>
+                <p style={{ fontWeight: 600 }}>{quoteNumero || 'DVS-...'} / {clientAuth.currentUser?.displayName || clientAuth.currentUser?.email || ''}</p>
+              </div>
+              <div>
+                <span style={{ color: 'rgba(255,255,255,0.6)' }}>Montant</span>
+                <p style={{ fontWeight: 800, fontSize: 20, color: '#EA580C' }}>{montantAcompte.toLocaleString('fr-FR')} €</p>
+              </div>
+            </div>
+          </div>
+
+          <button onClick={handleConfirmVirement} disabled={submitting}
+            style={{ ...btnStyle('#16A34A'), opacity: submitting ? 0.5 : 1 }}>
+            {submitting ? '...' : t('popup.confirmerVirement')}
+          </button>
+
+          <button onClick={closePopup}
+            style={{
+              width: '100%', padding: '12px 0', border: 'none', borderRadius: 10,
+              background: 'transparent', color: '#6B7280', fontSize: 13, cursor: 'pointer', marginTop: 8,
+            }}>
+            {t('popup.plusTard')}
+          </button>
+        </Overlay>
       )}
     </>
   );
