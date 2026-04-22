@@ -1,622 +1,277 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'wouter';
-import { clientAuth, db } from '../../lib/firebase';
-import { doc, setDoc, getDoc, serverTimestamp, collection, query, where, getDocs } from 'firebase/firestore';
-import { getNextNumber } from '../../lib/counters';
-import { useI18n } from '../../i18n';
-import { useToast } from '../components/Toast';
-import { notifyDevisCree } from '../../lib/emailService';
+import TunnelCommande from '@/front/components/TunnelCommande';
 
 interface CartItem {
-  id: string;
   ref: string;
   nom_fr: string;
-  prix: number;
+  prix_unitaire: number;
   qte: number;
-  image?: string;
-  type?: 'product' | 'custom';
-  description?: string;
-  lien?: string;
-}
-
-interface Partner {
-  id: string;
-  code: string;
-  nom: string;
-  actif: boolean;
-}
-
-// ─── Popup overlay ───
-function Overlay({ children, onClose }: { children: React.ReactNode; onClose: () => void }) {
-  return (
-    <div style={{
-      position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1000,
-      display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20,
-    }} onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
-      <div style={{
-        background: 'white', borderRadius: 20, maxWidth: 560, width: '100%',
-        padding: 32, maxHeight: '90vh', overflow: 'auto',
-        boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
-      }}>
-        {children}
-      </div>
-    </div>
-  );
-}
-
-// ─── Step indicator ───
-function Steps({ current }: { current: number }) {
-  const labels = ['Partenaire', 'Acompte', 'Virement'];
-  return (
-    <div style={{ display: 'flex', justifyContent: 'center', gap: 12, marginBottom: 24 }}>
-      {labels.map((l, i) => (
-        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <div style={{
-            width: 28, height: 28, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 13, fontWeight: 700,
-            background: i < current ? '#16A34A' : i === current ? '#1565C0' : '#E5E7EB',
-            color: i <= current ? 'white' : '#9CA3AF',
-          }}>
-            {i < current ? '✓' : i + 1}
-          </div>
-          <span style={{ fontSize: 12, color: i === current ? '#1565C0' : '#9CA3AF', fontWeight: i === current ? 600 : 400 }}>{l}</span>
-        </div>
-      ))}
-    </div>
-  );
+  image?: string | null;
+  categorie?: string;
 }
 
 export default function Panier() {
-  const { t } = useI18n();
-  const { showToast } = useToast();
-  const [, setLocation] = useLocation();
-  const [cart, setCart] = useState<CartItem[]>([]);
-  const [submitting, setSubmitting] = useState(false);
-
-  // Custom product form
-  const [customNom, setCustomNom] = useState('');
-  const [customQte, setCustomQte] = useState(1);
-  const [customDesc, setCustomDesc] = useState('');
-  const [customLien, setCustomLien] = useState('');
-
-  // Popup state
-  const [popupStep, setPopupStep] = useState<number | null>(null); // null=closed, 0=partner, 1=acompte, 2=rib
-
-  // Partner popup
-  const [partners, setPartners] = useState<Partner[]>([]);
-  const [selectedPartner, setSelectedPartner] = useState<string | null>(null);
-
-  // Acompte popup
-  const [typeCompte, setTypeCompte] = useState<'personnel' | 'professionnel'>('personnel');
-  const [montantAcompte, setMontantAcompte] = useState(500);
-
-  // Quote number (generated on confirm)
-  const [quoteNumero, setQuoteNumero] = useState('');
+  const [, navigate] = useLocation();
+  const [items, setItems] = useState<CartItem[]>([]);
+  const [showTunnel, setShowTunnel] = useState(false);
 
   useEffect(() => {
-    const saved = localStorage.getItem('cart');
-    if (saved) setCart(JSON.parse(saved));
+    loadCart();
+    window.addEventListener('storage', loadCart);
+    return () => window.removeEventListener('storage', loadCart);
   }, []);
 
-  const saveCart = (newCart: CartItem[]) => {
-    setCart(newCart);
-    localStorage.setItem('cart', JSON.stringify(newCart));
-    window.dispatchEvent(new Event('cart-updated'));
-  };
-
-  const updateQte = (id: string, qte: number) => {
-    if (qte < 1) return;
-    saveCart(cart.map(item => item.id === id ? { ...item, qte } : item));
-  };
-
-  const removeItem = (id: string) => {
-    saveCart(cart.filter(item => item.id !== id));
-  };
-
-  const total = cart.reduce((sum, item) => sum + item.prix * item.qte, 0);
-
-  // ─── Add custom product ───
-  const handleAddCustom = () => {
-    if (!customNom.trim()) return;
-    const id = `custom_${Date.now()}`;
-    const newItem: CartItem = {
-      id, ref: 'SUR-MESURE', nom_fr: customNom.trim(), prix: 0, qte: customQte,
-      type: 'custom', description: customDesc, lien: customLien,
-    };
-    saveCart([...cart, newItem]);
-    setCustomNom(''); setCustomQte(1); setCustomDesc(''); setCustomLien('');
-  };
-
-  // ─── Open popup flow ───
-  const handleOpenPopup = async () => {
-    const user = clientAuth.currentUser;
-    if (!user) { setLocation('/connexion'); return; }
-    if (cart.length === 0) {
-      showToast('Votre panier est vide', 'warning');
-      return;
-    }
-
-    // Load partners
+  const loadCart = () => {
     try {
-      const q = query(collection(db, 'partners'), where('actif', '==', true));
-      const snap = await getDocs(q);
-      setPartners(snap.docs.map(d => ({ id: d.id, ...d.data() } as Partner)));
-    } catch { setPartners([]); }
-
-    setSelectedPartner(null);
-    setPopupStep(0);
+      const stored = localStorage.getItem('cart');
+      setItems(stored ? JSON.parse(stored) : []);
+    } catch { setItems([]); }
   };
 
-  // ─── Confirm & create quote ───
-  const handleConfirmVirement = async () => {
-    const user = clientAuth.currentUser;
-    if (!user) return;
-    setSubmitting(true);
-    try {
-      const numero = await getNextNumber('DVS');
-      setQuoteNumero(numero);
-      const devisId = numero.replace(/[^a-zA-Z0-9]/g, '-');
-      const lignes = cart.map(item => ({
-        ref: item.ref, nom_fr: item.nom_fr, qte: item.qte,
-        prix_unitaire: item.prix, total: item.prix * item.qte,
-        type: item.type || 'product',
-        ...(item.description ? { description: item.description } : {}),
-        ...(item.lien ? { lien: item.lien } : {}),
-      }));
-
-      // Charger le profil client pour inclure toutes les infos
-      let userProfile: any = {};
-      try {
-        const userSnap = await getDoc(doc(db, 'users', user.uid));
-        if (userSnap.exists()) userProfile = userSnap.data();
-      } catch {}
-
-      const devisData = {
-        numero,
-        client_id: user.uid,
-        client_email: userProfile.email || user.email,
-        client_nom: user.displayName || `${userProfile.firstName || ''} ${userProfile.lastName || ''}`.trim(),
-        client_prenom: userProfile.firstName || userProfile.prenom || '',
-        client_tel: userProfile.phone || userProfile.telephone || '',
-        client_adresse: [userProfile.adresse, userProfile.codePostal, userProfile.ville, userProfile.pays].filter(Boolean).join(', '),
-        client_siret: userProfile.siret || '',
-        statut: 'nouveau',
-        destination: userProfile.pays || 'Martinique',
-        pays_livraison: userProfile.pays || 'Martinique',
-        is_vip: false,
-        lignes,
-        total_ht: total,
-        partenaire_code: selectedPartner || null,
-        acomptes: [{
-          montant: montantAcompte,
-          date: new Date().toISOString(),
-          type_compte: typeCompte,
-          statut: 'declare',
-        }],
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-      };
-
-      await setDoc(doc(db, 'quotes', devisId), devisData);
-
-      // Notification email
-      try {
-        await notifyDevisCree(devisData);
-      } catch (err) {
-        console.error('Erreur notification devis créé:', err);
-      }
-
-      localStorage.removeItem('cart');
-      window.dispatchEvent(new Event('cart-updated'));
-      setCart([]);
-      setPopupStep(null);
-      showToast('Devis ' + numero + ' créé avec succès !');
-      setLocation('/espace-client');
-    } catch (err) {
-      console.error('Error creating quote:', err);
-      showToast('Erreur lors de la création du devis', 'error');
-    } finally {
-      setSubmitting(false);
-    }
+  const updateQty = (ref: string, newQty: number) => {
+    if (newQty < 1) return;
+    const updated = items.map(it => it.ref === ref ? { ...it, qte: newQty } : it);
+    setItems(updated);
+    localStorage.setItem('cart', JSON.stringify(updated));
+    window.dispatchEvent(new Event('storage'));
   };
 
-  // ─── Download without deposit ───
-  const handleSansAcompte = async () => {
-    const user = clientAuth.currentUser;
-    if (!user) return;
-    setSubmitting(true);
-    try {
-      const numero = await getNextNumber('DVS');
-      const devisId = numero.replace(/[^a-zA-Z0-9]/g, '-');
-      const lignes = cart.map(item => ({
-        ref: item.ref, nom_fr: item.nom_fr, qte: item.qte,
-        prix_unitaire: item.prix, total: item.prix * item.qte,
-        type: item.type || 'product',
-      }));
-
-      // Charger le profil client pour inclure toutes les infos
-      let userProfile: any = {};
-      try {
-        const userSnap = await getDoc(doc(db, 'users', user.uid));
-        if (userSnap.exists()) userProfile = userSnap.data();
-      } catch {}
-
-      const devisData = {
-        numero,
-        client_id: user.uid,
-        client_email: userProfile.email || user.email,
-        client_nom: user.displayName || `${userProfile.firstName || ''} ${userProfile.lastName || ''}`.trim(),
-        client_prenom: userProfile.firstName || userProfile.prenom || '',
-        client_tel: userProfile.phone || userProfile.telephone || '',
-        client_adresse: [userProfile.adresse, userProfile.codePostal, userProfile.ville, userProfile.pays].filter(Boolean).join(', '),
-        client_siret: userProfile.siret || '',
-        statut: 'brouillon',
-        destination: userProfile.pays || 'Martinique',
-        pays_livraison: userProfile.pays || 'Martinique',
-        is_vip: false,
-        lignes,
-        total_ht: total,
-        partenaire_code: selectedPartner || null,
-        acomptes: [],
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-      };
-
-      await setDoc(doc(db, 'quotes', devisId), devisData);
-
-      // Notification email
-      try {
-        await notifyDevisCree(devisData);
-      } catch (err) {
-        console.error('Erreur notification devis créé:', err);
-      }
-
-      localStorage.removeItem('cart');
-      window.dispatchEvent(new Event('cart-updated'));
-      setCart([]);
-      setPopupStep(null);
-      showToast('Devis créé — sans acompte');
-      setLocation('/espace-client');
-    } catch (err) {
-      console.error('Error creating quote:', err);
-      showToast('Erreur lors de la création du devis', 'error');
-    } finally {
-      setSubmitting(false);
-    }
+  const removeItem = (ref: string) => {
+    if (!confirm('Supprimer cet article ?')) return;
+    const updated = items.filter(it => it.ref !== ref);
+    setItems(updated);
+    localStorage.setItem('cart', JSON.stringify(updated));
+    window.dispatchEvent(new Event('storage'));
   };
 
-  const closePopup = () => setPopupStep(null);
+  const clearCart = () => {
+    if (!confirm('Vider tout le panier ?')) return;
+    setItems([]);
+    localStorage.removeItem('cart');
+    window.dispatchEvent(new Event('storage'));
+  };
 
-  const btnStyle = (bg: string, color: string = 'white'): React.CSSProperties => ({
-    width: '100%', padding: '14px 0', border: 'none', borderRadius: 10,
-    fontSize: 15, fontWeight: 700, cursor: 'pointer', background: bg, color,
-  });
+  const total = items.reduce((s, it) => s + (it.prix_unitaire * it.qte), 0);
+
+  if (items.length === 0) {
+    return (
+      <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 40 }}>
+        <div style={{ background: '#fff', padding: 48, borderRadius: 'var(--radius-lg)', textAlign: 'center', maxWidth: 480 }}>
+          <div style={{ fontSize: 64, marginBottom: 16 }}>🛒</div>
+          <h2 style={{ fontFamily: 'var(--font-head)', fontSize: 24, marginBottom: 8 }}>
+            Votre panier est vide
+          </h2>
+          <p style={{ color: 'var(--text-3)', marginBottom: 24 }}>
+            Découvrez nos produits et ajoutez-les à votre demande de devis.
+          </p>
+          <Link href="/catalogue" style={{
+            display: 'inline-block', padding: '12px 24px', background: 'var(--orange)',
+            color: '#fff', textDecoration: 'none', borderRadius: 'var(--radius)', fontWeight: 600,
+          }}>
+            Voir le catalogue
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <>
-      {/* Banner */}
-      <div style={{ background: 'linear-gradient(135deg, #1565C0, #1565C0)', padding: '32px 0' }}>
-        <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px' }}>
-          <h1 style={{ color: 'white', fontSize: 28, fontWeight: 800 }}>{t('cart.title')}</h1>
-          <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 14, marginTop: 4 }}>
-            {cart.length === 0 ? t('cart.panierVide') : `${cart.length} ${t('cart.articles')}`}
-          </p>
+    <div style={{ minHeight: '100vh', background: 'var(--bg-2)', padding: '32px 0' }}>
+      <div style={{ maxWidth: 1400, margin: '0 auto', padding: '0 24px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+          <h1 style={{ fontFamily: 'var(--font-head)', fontSize: 28, fontWeight: 800, margin: 0 }}>
+            Mon panier ({items.length} article{items.length > 1 ? 's' : ''})
+          </h1>
+          <button onClick={clearCart} style={{
+            padding: '8px 14px', background: 'transparent', color: 'var(--danger)',
+            border: '1px solid var(--danger)', borderRadius: 'var(--radius)',
+            fontSize: 13, cursor: 'pointer', fontFamily: 'inherit',
+          }}>
+            Vider le panier
+          </button>
+        </div>
+
+        <div className="cart-layout" style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: 24 }}>
+          <div style={{ background: '#fff', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
+            <div style={{
+              display: 'flex', alignItems: 'center', padding: '14px 20px',
+              background: 'var(--bg-2)', borderBottom: '1px solid var(--border)',
+              fontSize: 11, fontWeight: 700, color: 'var(--text-3)',
+              textTransform: 'uppercase', letterSpacing: 0.5,
+            }}>
+              <div style={{ flex: 2 }}>Produit</div>
+              <div style={{ width: 110, textAlign: 'center' }}>Quantité</div>
+              <div style={{ width: 110, textAlign: 'right' }}>Prix unit.</div>
+              <div style={{ width: 110, textAlign: 'right' }}>Sous-total</div>
+              <div style={{ width: 40 }}></div>
+            </div>
+
+            {items.map(it => (
+              <div key={it.ref} style={{
+                display: 'flex', alignItems: 'center', padding: '20px',
+                borderBottom: '1px solid var(--border)',
+              }}>
+                <div style={{ flex: 2, display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <div style={{
+                    width: 60, height: 60, background: 'var(--bg-2)',
+                    borderRadius: 'var(--radius)', display: 'flex',
+                    alignItems: 'center', justifyContent: 'center',
+                    overflow: 'hidden', flexShrink: 0,
+                  }}>
+                    {it.image ? (
+                      <img src={it.image} alt={it.nom_fr} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    ) : <span style={{ fontSize: 24 }}>📦</span>}
+                  </div>
+                  <div>
+                    <Link href={`/produit/${it.ref}`} style={{
+                      display: 'block', fontWeight: 600, color: 'var(--text)',
+                      textDecoration: 'none', marginBottom: 4,
+                    }}>
+                      {it.nom_fr}
+                    </Link>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: 'var(--text-3)' }}>
+                      <code>{it.ref}</code>
+                      {it.categorie && (
+                        <span style={{
+                          padding: '2px 8px', background: 'var(--blue-light)',
+                          color: 'var(--blue)', borderRadius: 'var(--radius-full)',
+                          fontSize: 10, fontWeight: 600,
+                        }}>{it.categorie}</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{ width: 110, display: 'flex', justifyContent: 'center' }}>
+                  <div style={{
+                    display: 'flex', alignItems: 'center',
+                    border: '1px solid var(--border)', borderRadius: 'var(--radius)',
+                    background: '#fff', overflow: 'hidden',
+                  }}>
+                    <button onClick={() => updateQty(it.ref, it.qte - 1)} style={qtyBtnStyle}>−</button>
+                    <input type="number" value={it.qte}
+                      onChange={e => updateQty(it.ref, parseInt(e.target.value) || 1)}
+                      style={qtyInputStyle} />
+                    <button onClick={() => updateQty(it.ref, it.qte + 1)} style={qtyBtnStyle}>+</button>
+                  </div>
+                </div>
+
+                <div style={{ width: 110, textAlign: 'right', fontWeight: 600 }}>
+                  {it.prix_unitaire.toLocaleString('fr-FR')} €
+                </div>
+
+                <div style={{ width: 110, textAlign: 'right', fontWeight: 700, color: 'var(--blue)' }}>
+                  {(it.prix_unitaire * it.qte).toLocaleString('fr-FR')} €
+                </div>
+
+                <div style={{ width: 40, textAlign: 'right' }}>
+                  <button onClick={() => removeItem(it.ref)} style={{
+                    background: 'transparent', border: 'none', cursor: 'pointer',
+                    fontSize: 18, padding: 4,
+                  }}>🗑️</button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <aside style={{
+            background: '#fff', padding: 24, borderRadius: 'var(--radius-lg)',
+            height: 'fit-content', position: 'sticky', top: 84,
+          }}>
+            <h3 style={{ marginTop: 0, marginBottom: 16, fontFamily: 'var(--font-head)' }}>
+              Récapitulatif
+            </h3>
+
+            <div style={recapRowStyle}>
+              <span>Sous-total HT</span>
+              <span style={{ fontWeight: 600 }}>{total.toLocaleString('fr-FR')} €</span>
+            </div>
+            <div style={recapRowStyle}>
+              <span>Livraison</span>
+              <span style={{ fontWeight: 600, color: 'var(--text-3)' }}>À calculer</span>
+            </div>
+            <div style={{
+              ...recapRowStyle, borderTop: '2px solid var(--border)',
+              paddingTop: 14, marginTop: 8,
+            }}>
+              <span style={{ fontSize: 16, fontWeight: 700 }}>Total HT</span>
+              <span style={{ fontSize: 22, fontWeight: 800, color: 'var(--blue)' }}>
+                {total.toLocaleString('fr-FR')} €
+              </span>
+            </div>
+
+            <button onClick={() => setShowTunnel(true)} style={{
+              width: '100%', padding: '14px 20px', background: 'var(--orange)',
+              color: '#fff', border: 'none', borderRadius: 'var(--radius)',
+              fontSize: 15, fontWeight: 700, cursor: 'pointer',
+              fontFamily: 'inherit', marginTop: 16, marginBottom: 8,
+            }}>
+              📋 Demander un devis
+            </button>
+
+            <Link href="/catalogue" style={{
+              display: 'block', width: '100%', padding: 10,
+              color: 'var(--text-2)', textAlign: 'center',
+              textDecoration: 'none', fontSize: 13,
+            }}>
+              ← Continuer mes achats
+            </Link>
+
+            <div style={{
+              marginTop: 20, padding: 16, background: 'var(--bg-2)',
+              borderRadius: 'var(--radius)', display: 'flex',
+              flexDirection: 'column', gap: 8,
+            }}>
+              {[
+                { icon: '🚢', text: 'Livraison maritime DOM-TOM' },
+                { icon: '📋', text: 'Dédouanement inclus' },
+                { icon: '💬', text: 'Devis gratuit sous 24h' },
+              ].map((a, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 12, color: 'var(--text-2)' }}>
+                  <span>{a.icon}</span><span>{a.text}</span>
+                </div>
+              ))}
+            </div>
+          </aside>
         </div>
       </div>
 
-      <div style={{ maxWidth: 1280, margin: '0 auto', padding: '32px 20px 60px' }}>
-        {cart.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: 60 }}>
-            <p style={{ color: '#6B7280', marginBottom: 16 }}>Votre panier est vide</p>
-            <Link href="/catalogue">
-              <span style={{ color: '#1565C0', fontWeight: 600, cursor: 'pointer' }}>Voir le catalogue</span>
-            </Link>
-          </div>
-        ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: 32, alignItems: 'start' }}>
-
-            {/* ═══ LEFT — Products ═══ */}
-            <div>
-              {/* Cart items */}
-              <div style={{ background: 'white', borderRadius: 16, boxShadow: '0 2px 12px rgba(0,0,0,0.06)', overflow: 'hidden' }}>
-                {cart.map(item => (
-                  <div key={item.id} style={{
-                    display: 'flex', alignItems: 'center', gap: 16, padding: 16,
-                    borderBottom: '1px solid #F3F4F6',
-                  }}>
-                    {/* Thumbnail */}
-                    <div style={{
-                      width: 64, height: 64, borderRadius: 8, background: '#F9FAFB', overflow: 'hidden',
-                      flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    }}>
-                      {item.image ? (
-                        <img src={item.image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                      ) : (
-                        <span style={{ fontSize: 24, color: '#D1D5DB' }}>{item.type === 'custom' ? '📦' : '🏷️'}</span>
-                      )}
-                    </div>
-
-                    {/* Info */}
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{ fontSize: 12, color: '#9CA3AF' }}>{item.ref}</p>
-                      <p style={{ fontWeight: 600, color: '#1565C0', fontSize: 14 }}>{item.nom_fr}</p>
-                      {item.type === 'custom' && (
-                        <p style={{ fontSize: 11, color: '#EA580C', fontWeight: 500 }}>Produit sur mesure</p>
-                      )}
-                    </div>
-
-                    {/* Quantity */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                      <button onClick={() => updateQte(item.id, item.qte - 1)}
-                        style={{ width: 28, height: 28, border: '1px solid #E5E7EB', borderRadius: 6, background: 'white', cursor: 'pointer', fontSize: 14 }}>-</button>
-                      <span style={{ width: 28, textAlign: 'center', fontSize: 14, fontWeight: 600 }}>{item.qte}</span>
-                      <button onClick={() => updateQte(item.id, item.qte + 1)}
-                        style={{ width: 28, height: 28, border: '1px solid #E5E7EB', borderRadius: 6, background: 'white', cursor: 'pointer', fontSize: 14 }}>+</button>
-                    </div>
-
-                    {/* Price */}
-                    <div style={{ width: 90, textAlign: 'right' }}>
-                      {item.prix > 0 ? (
-                        <p style={{ fontWeight: 700, color: '#1565C0', fontSize: 14 }}>
-                          {(item.prix * item.qte).toLocaleString('fr-FR')} €
-                        </p>
-                      ) : (
-                        <p style={{ fontSize: 12, color: '#9CA3AF' }}>Sur devis</p>
-                      )}
-                    </div>
-
-                    {/* Delete */}
-                    <button onClick={() => removeItem(item.id)}
-                      style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 16, color: '#EF4444', padding: 4 }}>
-                      🗑
-                    </button>
-                  </div>
-                ))}
-              </div>
-
-              {/* ═══ Custom product form ═══ */}
-              <div style={{
-                marginTop: 24, border: '2px dashed #EA580C', borderRadius: 16, padding: 24, background: '#FFF7ED',
-              }}>
-                <h3 style={{ fontSize: 16, fontWeight: 700, color: '#1565C0', marginBottom: 16 }}>
-                  {t('cart.customProduct')}
-                </h3>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 12, marginBottom: 12 }}>
-                  <input value={customNom} onChange={e => setCustomNom(e.target.value)}
-                    placeholder="Nom du produit souhaité"
-                    style={{ padding: '10px 14px', borderRadius: 8, border: '1px solid #E5E7EB', fontSize: 14, outline: 'none' }} />
-                  <input type="number" min={1} value={customQte} onChange={e => setCustomQte(Number(e.target.value) || 1)}
-                    style={{ width: 70, padding: '10px 14px', borderRadius: 8, border: '1px solid #E5E7EB', fontSize: 14, textAlign: 'center', outline: 'none' }} />
-                </div>
-                <textarea value={customDesc} onChange={e => setCustomDesc(e.target.value)}
-                  placeholder="Description détaillée (dimensions, matériaux, usage...)"
-                  rows={3}
-                  style={{ width: '100%', padding: '10px 14px', borderRadius: 8, border: '1px solid #E5E7EB', fontSize: 14, resize: 'vertical', marginBottom: 12, outline: 'none', boxSizing: 'border-box' }} />
-                <input value={customLien} onChange={e => setCustomLien(e.target.value)}
-                  placeholder="Lien YouTube ou site (optionnel)"
-                  style={{ width: '100%', padding: '10px 14px', borderRadius: 8, border: '1px solid #E5E7EB', fontSize: 14, marginBottom: 12, outline: 'none', boxSizing: 'border-box' }} />
-                <button onClick={handleAddCustom}
-                  style={{ ...btnStyle('#EA580C'), width: 'auto', padding: '10px 24px' }}>
-                  📦 Ajouter au devis
-                </button>
-                <p style={{ fontSize: 11, color: '#92400E', marginTop: 8 }}>
-                  ⚠️ L'ajout d'un produit sur mesure envoie une notification a l'equipe 97import
-                </p>
-              </div>
-            </div>
-
-            {/* ═══ RIGHT — Recap (sticky) ═══ */}
-            <div style={{ position: 'sticky', top: 20 }}>
-              <div style={{
-                background: 'white', borderRadius: 16, boxShadow: '0 2px 12px rgba(0,0,0,0.06)', padding: 24,
-              }}>
-                <h2 style={{ fontSize: 18, fontWeight: 700, color: '#1565C0', marginBottom: 16 }}>{t('cart.recap')}</h2>
-
-                {cart.map(item => (
-                  <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: 13 }}>
-                    <span style={{ color: '#4B5563' }}>{item.nom_fr} x{item.qte}</span>
-                    <span style={{ fontWeight: 600, color: '#1565C0' }}>
-                      {item.prix > 0 ? `${(item.prix * item.qte).toLocaleString('fr-FR')} €` : 'Sur devis'}
-                    </span>
-                  </div>
-                ))}
-
-                <div style={{ borderTop: '2px solid #1565C0', marginTop: 16, paddingTop: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: 16, fontWeight: 700, color: '#1565C0' }}>{t('cart.totalHT')}</span>
-                  <span style={{ fontSize: 24, fontWeight: 800, color: '#1565C0' }}>{total.toLocaleString('fr-FR')} €</span>
-                </div>
-
-                <p style={{ fontSize: 11, color: '#9CA3AF', marginTop: 8 }}>
-                  {t('cart.horsLivraison')}
-                </p>
-
-                <button onClick={handleOpenPopup} disabled={submitting}
-                  style={{ ...btnStyle('#EA580C'), marginTop: 20, opacity: submitting ? 0.5 : 1 }}>
-                  {t('cart.genererDevis')}
-                </button>
-
-                <p style={{ fontSize: 11, color: '#9CA3AF', textAlign: 'center', marginTop: 8 }}>
-                  {t('cart.devisNote')}
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* ═══════════════════════════════════════════════ */}
-      {/* POPUP 1 — Partenaire                           */}
-      {/* ═══════════════════════════════════════════════ */}
-      {popupStep === 0 && (
-        <Overlay onClose={closePopup}>
-          <Steps current={0} />
-          <div style={{ textAlign: 'center', marginBottom: 20 }}>
-            <span style={{ fontSize: 48 }}>🤝</span>
-            <h2 style={{ fontSize: 22, fontWeight: 800, color: '#1565C0', marginTop: 8 }}>{t('popup.partenaireTitle')}</h2>
-            <p style={{ fontSize: 14, color: '#6B7280', marginTop: 4 }}>
-              {t('popup.partenaireDesc')}
-            </p>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 20 }}>
-            {partners.map(p => (
-              <button key={p.id} onClick={() => setSelectedPartner(p.code)}
-                style={{
-                  padding: 16, borderRadius: 12, cursor: 'pointer', textAlign: 'center',
-                  border: selectedPartner === p.code ? '2px solid #1565C0' : '2px solid #E5E7EB',
-                  background: selectedPartner === p.code ? '#EFF6FF' : 'white',
-                }}>
-                <div style={{ fontSize: 18, fontWeight: 800, color: '#1565C0' }}>{p.code}</div>
-                <div style={{ fontSize: 13, color: '#6B7280' }}>{p.nom}</div>
-              </button>
-            ))}
-          </div>
-
-          <button onClick={() => { setSelectedPartner(null); setPopupStep(1); }}
-            style={{
-              width: '100%', padding: '12px 0', border: '2px dashed #E5E7EB', borderRadius: 10,
-              background: 'white', color: '#6B7280', fontSize: 14, cursor: 'pointer', marginBottom: 12,
-            }}>
-            {t('popup.sansPartenaire')} →
-          </button>
-
-          <button onClick={() => setPopupStep(1)}
-            disabled={!selectedPartner}
-            style={{ ...btnStyle(selectedPartner ? '#1565C0' : '#D1D5DB'), opacity: selectedPartner ? 1 : 0.5 }}>
-            {t('popup.confirmer')} →
-          </button>
-        </Overlay>
+      {showTunnel && (
+        <TunnelCommande
+          items={items} total={total}
+          onClose={() => setShowTunnel(false)}
+          onSuccess={(quoteNumber) => {
+            setShowTunnel(false);
+            localStorage.removeItem('cart');
+            setItems([]);
+            window.dispatchEvent(new Event('storage'));
+            alert(`✅ Devis ${quoteNumber} créé avec succès !`);
+            navigate('/mon-compte');
+          }}
+        />
       )}
 
-      {/* ═══════════════════════════════════════════════ */}
-      {/* POPUP 2 — Acompte                              */}
-      {/* ═══════════════════════════════════════════════ */}
-      {popupStep === 1 && (
-        <Overlay onClose={closePopup}>
-          <Steps current={1} />
-          <div style={{ textAlign: 'center', marginBottom: 20 }}>
-            <span style={{ fontSize: 48 }}>💰</span>
-            <h2 style={{ fontSize: 22, fontWeight: 800, color: '#1565C0', marginTop: 8 }}>{t('popup.acompteTitle')}</h2>
-          </div>
-
-          {/* Recap */}
-          <div style={{ background: '#F9FAFB', borderRadius: 12, padding: 16, marginBottom: 20 }}>
-            {cart.map(item => (
-              <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, marginBottom: 4 }}>
-                <span>{item.nom_fr} x{item.qte}</span>
-                <span style={{ fontWeight: 600 }}>{item.prix > 0 ? `${(item.prix * item.qte).toLocaleString('fr-FR')} €` : 'Sur devis'}</span>
-              </div>
-            ))}
-            <div style={{ borderTop: '1px solid #E5E7EB', marginTop: 8, paddingTop: 8, display: 'flex', justifyContent: 'space-between', fontWeight: 700 }}>
-              <span>{t('cart.totalHT')}</span>
-              <span>{total.toLocaleString('fr-FR')} €</span>
-            </div>
-          </div>
-
-          {/* Type de compte */}
-          <p style={{ fontSize: 13, fontWeight: 600, color: '#1565C0', marginBottom: 8 }}>{t('popup.typeCompte')}</p>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 20 }}>
-            <button onClick={() => setTypeCompte('personnel')}
-              style={{
-                padding: 14, borderRadius: 10, cursor: 'pointer', textAlign: 'center',
-                border: typeCompte === 'personnel' ? '2px solid #1565C0' : '2px solid #E5E7EB',
-                background: typeCompte === 'personnel' ? '#EFF6FF' : 'white',
-              }}>
-              <div style={{ fontSize: 24 }}>👤</div>
-              <div style={{ fontSize: 13, fontWeight: 600, marginTop: 4 }}>{t('popup.comptePerso')}</div>
-            </button>
-            <button onClick={() => setTypeCompte('professionnel')}
-              style={{
-                padding: 14, borderRadius: 10, cursor: 'pointer', textAlign: 'center',
-                border: typeCompte === 'professionnel' ? '2px solid #1565C0' : '2px solid #E5E7EB',
-                background: typeCompte === 'professionnel' ? '#EFF6FF' : 'white',
-              }}>
-              <div style={{ fontSize: 24 }}>🏢</div>
-              <div style={{ fontSize: 13, fontWeight: 600, marginTop: 4 }}>{t('popup.comptePro')}</div>
-            </button>
-          </div>
-
-          {/* Montant acompte */}
-          <p style={{ fontSize: 13, fontWeight: 600, color: '#1565C0', marginBottom: 8 }}>Montant de l'acompte (€)</p>
-          <input type="number" value={montantAcompte} onChange={e => setMontantAcompte(Number(e.target.value) || 0)}
-            style={{ width: '100%', padding: '12px 14px', borderRadius: 8, border: '1px solid #E5E7EB', fontSize: 16, fontWeight: 700, textAlign: 'center', marginBottom: 20, outline: 'none', boxSizing: 'border-box' }} />
-
-          <button onClick={() => setPopupStep(2)}
-            style={btnStyle('#1565C0')}>
-            {t('popup.jaiVire')} →
-          </button>
-
-          <button onClick={handleSansAcompte} disabled={submitting}
-            style={{
-              width: '100%', padding: '12px 0', border: 'none', borderRadius: 10,
-              background: 'transparent', color: '#6B7280', fontSize: 13, cursor: 'pointer', marginTop: 8,
-              textDecoration: 'underline',
-            }}>
-            {t('popup.sansAcompte')}
-          </button>
-        </Overlay>
-      )}
-
-      {/* ═══════════════════════════════════════════════ */}
-      {/* POPUP 3 — RIB                                  */}
-      {/* ═══════════════════════════════════════════════ */}
-      {popupStep === 2 && (
-        <Overlay onClose={closePopup}>
-          <Steps current={2} />
-          <div style={{ textAlign: 'center', marginBottom: 20 }}>
-            <span style={{ fontSize: 48 }}>🏦</span>
-            <h2 style={{ fontSize: 22, fontWeight: 800, color: '#1565C0', marginTop: 8 }}>{t('popup.ribTitle')}</h2>
-          </div>
-
-          {/* RIB Card */}
-          <div style={{
-            background: 'linear-gradient(135deg, #1565C0, #1565C0)', borderRadius: 16, padding: 24, color: 'white', marginBottom: 24,
-          }}>
-            <p style={{ fontSize: 16, fontWeight: 700, marginBottom: 16 }}>
-              LUXENT LIMITED — Compte {typeCompte}
-            </p>
-            <div style={{ display: 'grid', gap: 12, fontSize: 13 }}>
-              <div>
-                <span style={{ color: 'rgba(255,255,255,0.6)' }}>IBAN</span>
-                <p style={{ fontWeight: 600, fontFamily: 'monospace', fontSize: 15, letterSpacing: 1 }}>DE76 2022 0800 0059 5688 30</p>
-              </div>
-              <div>
-                <span style={{ color: 'rgba(255,255,255,0.6)' }}>SWIFT / BIC</span>
-                <p style={{ fontWeight: 600 }}>SXPYDEHH</p>
-              </div>
-              <div>
-                <span style={{ color: 'rgba(255,255,255,0.6)' }}>Banque</span>
-                <p style={{ fontWeight: 600 }}>Banking Circle S.A. — Munich</p>
-              </div>
-              <div>
-                <span style={{ color: 'rgba(255,255,255,0.6)' }}>Beneficiaire</span>
-                <p style={{ fontWeight: 600 }}>LUXENT LIMITED</p>
-              </div>
-              <div style={{ borderTop: '1px solid rgba(255,255,255,0.2)', paddingTop: 12 }}>
-                <span style={{ color: 'rgba(255,255,255,0.6)' }}>Reference</span>
-                <p style={{ fontWeight: 600 }}>{quoteNumero || 'DVS-...'} / {clientAuth.currentUser?.displayName || clientAuth.currentUser?.email || ''}</p>
-              </div>
-              <div>
-                <span style={{ color: 'rgba(255,255,255,0.6)' }}>Montant</span>
-                <p style={{ fontWeight: 800, fontSize: 20, color: '#EA580C' }}>{montantAcompte.toLocaleString('fr-FR')} €</p>
-              </div>
-            </div>
-          </div>
-
-          <button onClick={handleConfirmVirement} disabled={submitting}
-            style={{ ...btnStyle('#16A34A'), opacity: submitting ? 0.5 : 1 }}>
-            {submitting ? '...' : t('popup.confirmerVirement')}
-          </button>
-
-          <button onClick={closePopup}
-            style={{
-              width: '100%', padding: '12px 0', border: 'none', borderRadius: 10,
-              background: 'transparent', color: '#6B7280', fontSize: 13, cursor: 'pointer', marginTop: 8,
-            }}>
-            {t('popup.plusTard')}
-          </button>
-        </Overlay>
-      )}
-    </>
+      <style>{`
+        @media (max-width: 1024px) { .cart-layout { grid-template-columns: 1fr !important; } }
+      `}</style>
+    </div>
   );
 }
+
+const qtyBtnStyle: React.CSSProperties = {
+  padding: '6px 10px', background: 'transparent', border: 'none',
+  cursor: 'pointer', fontSize: 14, fontWeight: 600, fontFamily: 'inherit',
+};
+
+const qtyInputStyle: React.CSSProperties = {
+  width: 40, padding: '6px 0', border: 'none',
+  borderLeft: '1px solid var(--border)', borderRight: '1px solid var(--border)',
+  textAlign: 'center', fontSize: 13, fontWeight: 600, outline: 'none',
+  fontFamily: 'inherit',
+};
+
+const recapRowStyle: React.CSSProperties = {
+  display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+  padding: '8px 0', fontSize: 14,
+};
