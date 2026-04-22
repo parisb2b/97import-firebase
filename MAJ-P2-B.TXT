@@ -1,0 +1,105 @@
+=== MAJ P2-B — Refonte page Accueil ===
+Date : 22/04/2026 12:12
+Branche : v2
+Build : OK (0 erreur TypeScript)
+
+OBJECTIF :
+  Refonte complète page Accueil selon maquette OK-97import-accueil-v1.html
+
+NOUVEAUX FICHIERS :
+  public/images/hero/cargo.png (196K) — cargo animé pour hero
+  public/images/categories/mini-pelle.webp — image catégorie mini-pelles
+  public/images/categories/maison-modulaire.jpg — image catégorie maisons
+  public/images/categories/solaire.webp — image catégorie solaire
+  (agricole et divers utilisent fallback CSS coloré)
+
+FICHIERS MODIFIÉS :
+  src/front/pages/Home.tsx — refonte complète (696 lignes ajoutées)
+
+SECTIONS CRÉÉES :
+
+1. HERO SECTION
+   ✅ Gradient bleu 135deg (#0D47A1 → #1565C0 → #1E88E5)
+   ✅ Cargo image avec animation float (classe anim-float de animations.css)
+   ✅ Titre "Importation directe Chine → DOM-TOM" avec orange highlight
+   ✅ Search bar centrée avec bouton orange
+   ✅ 3 stats compacts (5+ années, 500+ conteneurs, 300+ clients)
+   ✅ Vague clip-path en bas (ellipse CSS)
+   ✅ Responsive : hero passe en 1 colonne < 1024px
+
+2. CATEGORIES SECTION
+   ✅ Grid 5 catégories adaptative (auto-fit minmax(220px, 1fr))
+   ✅ Cards avec image + icône overlay + titre + description + count
+   ✅ Images réelles pour mini-pelle, maison-modulaire, solaire
+   ✅ Fallback CSS dégradé coloré pour agricole/divers (si image manquante)
+   ✅ Count produits dynamique depuis Firestore
+   ✅ Hover effect (via transition CSS var(--transition))
+
+3. POURQUOI 97IMPORT SECTION
+   ✅ Background gris (var(--bg-2))
+   ✅ 4 stats grandes (5+ années, 500+ conteneurs, 300+ clients, 110+ produits)
+   ✅ 4 avantages : Direct usine, Logistique maritime, Dédouanement inclus, Garantie
+   ✅ Icons : 🏭 🚢 📋 ✅
+   ✅ Layout grid adaptatif
+
+4. PARTENAIRES SECTION
+   ✅ Grid 4 partenaires : Jinko Solar, Deye, RIPPA, Banking Circle
+   ✅ Descriptions : Panneaux Tiger Neo, Onduleurs hybrides, Mini-pelles, Paiement sécurisé
+   ✅ Cards avec border subtle (var(--border))
+
+5. CTA FINAL SECTION
+   ✅ Background gradient orange (var(--orange) → var(--orange-2))
+   ✅ Titre "Prêt à lancer votre projet d'importation ?"
+   ✅ 2 boutons : "Demander un devis" (blanc) + "Voir le catalogue" (transparent border blanc)
+   ✅ Liens fonctionnels vers /contact et /catalogue
+
+ANIMATIONS UTILISÉES :
+  ✅ .anim-float sur cargo (définie dans animations.css)
+  ✅ Transitions CSS var(--transition-fast) et var(--transition)
+
+VARIABLES CSS UTILISÉES :
+  --blue, --orange, --orange-2, --orange-light
+  --text, --text-2, --text-3
+  --bg, --bg-2, --bg-3
+  --border
+  --font-head, --font-body
+  --radius, --radius-lg, --radius-full
+  --shadow, --shadow-sm, --shadow-xl
+  --transition, --transition-fast
+
+COMMITS (3) :
+  189428b P2-B-A: copie images hero + category cards
+  a512856 P2-B-B: refonte page Accueil (hero + 5 categories + stats + partners + CTA)
+  174fef6 P2-B-C: fix TypeScript error (productsCount type)
+
+TESTS À EFFECTUER PAR MICHEL (9) :
+  [ ] Test 1 : Hero avec cargo qui flotte (animation float)
+  [ ] Test 2 : Gradient bleu sur hero visible
+  [ ] Test 3 : Search bar fonctionnelle (tape "mini-pelle" → redirige /catalogue?search=mini-pelle)
+  [ ] Test 4 : 5 category cards affichées avec images
+  [ ] Test 5 : Hover effect sur cards (transition)
+  [ ] Test 6 : Clic card → ouvre /catalogue/{categorie}
+  [ ] Test 7 : Section stats + 4 avantages affichés
+  [ ] Test 8 : Section partenaires visible (Jinko, Deye, RIPPA, Banking Circle)
+  [ ] Test 9 : CTA orange avec 2 boutons fonctionnels
+  [ ] Test 10 : Responsive mobile (hero en colonne, cards adaptées)
+
+COMPATIBILITÉ :
+  ✅ Conserve le Header et Footer P2-A (inchangés)
+  ✅ Utilise toutes les variables CSS de P2-A
+  ✅ Utilise les animations CSS de P2-A
+  ✅ Aucune régression sur autres pages (Catalogue, Produit, etc.)
+
+PROCHAINE ÉTAPE :
+  P2-C : Refonte ProductCard + page Catalogue avec filtres latéraux
+  - ProductCard avec badges (stock, promo, nouveau)
+  - Filtres par gamme, prix, stock
+  - Tri (prix croissant/décroissant, nouveautés)
+  - Design aligné maquettes SPA catégories
+
+═══════════════════════════════════════════════════════════
+  P2-B TERMINÉE ✅
+  Build: OK (0 erreur TypeScript)
+  3 commits pushed sur branche v2
+  Page Accueil refonte selon maquette validée
+═══════════════════════════════════════════════════════════
