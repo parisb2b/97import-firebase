@@ -96,11 +96,11 @@ export default function Header() {
 
   const navItems = [
     { path: '/', label: t('nav.accueil'), icon: '🏠', exact: true },
-    { path: '/catalogue/Mini-Pelle', label: t('nav.miniPelles'), icon: '🚜' },
-    { path: '/catalogue/Maisons', label: t('nav.maisons'), icon: '🏠' },
-    { path: '/catalogue/Solaire', label: t('nav.solaire'), icon: '☀️' },
-    { path: '/catalogue/Agricole', label: t('nav.agricole'), icon: '🌾' },
-    { path: '/catalogue/Divers', label: t('nav.divers'), icon: '📦' },
+    { path: '/catalogue/mini-pelle', label: t('nav.miniPelles'), icon: '🚜' },
+    { path: '/catalogue/maison-modulaire', label: t('nav.maisons'), icon: '🏠' },
+    { path: '/catalogue/solaire', label: t('nav.solaire'), icon: '☀️' },
+    { path: '/catalogue/agricole', label: t('nav.agricole'), icon: '🌾' },
+    { path: '/catalogue/divers', label: t('nav.divers'), icon: '📦' },
     { path: '/services', label: t('nav.services'), icon: '🔧' },
     { path: '/contact', label: t('nav.contact'), icon: '✉️' },
   ];
@@ -172,9 +172,13 @@ export default function Header() {
             return (
               <Link key={item.path} href={item.path}>
                 <span style={{
-                  padding: '6px 10px',
+                  display: 'inline-flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 2,
+                  padding: '4px 10px',
                   borderRadius: 6,
-                  fontSize: 12,
                   cursor: 'pointer',
                   color: isActive ? B : '#6B7280',
                   background: isActive ? '#EFF6FF' : 'transparent',
@@ -182,7 +186,8 @@ export default function Header() {
                   transition: 'all 0.2s',
                   whiteSpace: 'nowrap',
                 }}>
-                  {item.icon} {item.label}
+                  <span style={{ fontSize: 18, lineHeight: 1 }}>{item.icon}</span>
+                  <span style={{ fontSize: 11, fontWeight: 500 }}>{item.label}</span>
                 </span>
               </Link>
             );
