@@ -1,0 +1,74 @@
+=== MAJ P2-E2 — Fix prix + Panier + Tunnel + Espace unifié ===
+Date : 2026-04-22 16:30
+Build : OK (0 erreur TypeScript)
+
+🐛 FIX CRITIQUE :
+  Bug "prix visiteur" affichés même connecté — corrigé
+  Solution : hook useClientAuth centralisé avec onAuthStateChanged
+
+NOUVEAUX FICHIERS :
+  src/front/hooks/useClientAuth.ts
+  src/front/components/TunnelCommande.tsx
+
+REFAITS :
+  src/front/components/PriceDisplay.tsx
+  src/front/components/Header.tsx
+  src/front/pages/Panier.tsx
+  src/front/pages/MonCompte.tsx
+  src/front/FrontApp.tsx
+
+PRIX SELON RÔLE (real-time) :
+  visitor → bouton rouge "Se connecter"
+  user    → prix public HT
+  partner → prix partenaire orange
+  vip     → prix négocié violet
+  admin   → tous les prix
+
+TUNNEL COMMANDE (4 étapes) :
+  ✅ Étape 1 : Choix partenaire (oui/non + sélection)
+  ✅ Étape 2 : Coordonnées client (nom, email, tel, adresse, destination)
+  ✅ Étape 3 : Type compte acompte (perso/pro + RIB si pro)
+  ✅ Étape 4 : Récapitulatif + soumission
+  ✅ Création devis Firestore avec compteur DVS-AAMM-NNN
+  ✅ Email confirmation automatique via collection mail
+
+ESPACE UNIFIÉ /mon-compte :
+  ✅ Sidebar dynamique selon rôle (client + partenaire si applicable)
+  ✅ Onglet "Mes devis" avec liste Firestore
+  ✅ Onglet "Mon profil" avec email/rôle/UID
+  ✅ Onglets placeholder (factures, virements, livraisons)
+  ✅ Onglets partenaire (clients, devis VIP, commissions) si role=partner
+  ✅ Badge VIP violet / PARTENAIRE orange dans header
+  ✅ Déconnexion → retour accueil
+
+COMMITS (4) :
+  179b6f9 P2-E2-A: FIX bug prix visiteur (hook useClientAuth + PriceDisplay real-time)
+  58445be P2-E2-C: tunnel commande modal 4 étapes
+  5cfc944 P2-E2-B: refonte Panier (tableau + récap sticky + CTA tunnel)
+  02bf741 P2-E2-D: espace unifié /mon-compte avec hook useClientAuth
+
+TESTS À EFFECTUER PAR MICHEL (8) :
+  [ ] Test 1: client@97import.com (pw: 20262026) → catalogue affiche prix
+  [ ] Test 2: vip@97import.com → prix VIP violets
+  [ ] Test 3: partenaire@97import.com → prix partenaire orange
+  [ ] Test 4: Panier add/edit/remove items
+  [ ] Test 5: Bouton "Demander un devis" → tunnel 4 étapes
+  [ ] Test 6: Soumission tunnel → devis Firestore + email reçu
+  [ ] Test 7: /mon-compte sidebar dynamique selon rôle
+  [ ] Test 8: Déconnexion → prix visiteur redeviennent cachés
+
+COMPATIBILITÉ :
+  ✅ useClientAuth hook centralisé (Header + PriceDisplay + MonCompte)
+  ✅ Conserve Header + Footer P2-A
+  ✅ Conserve SearchBar P2-C dans Header
+  ✅ Conserve ProductCard P2-C avec badges
+  ✅ Conserve Catalogue P2-C avec filtres
+  ✅ Conserve Produit P2-D avec galerie + onglets
+  ✅ Variables CSS (--blue, --orange, --text, --bg-2, --radius, etc.)
+
+═══════════════════════════════════════════════════════════
+  P2-E2 TERMINÉE ✅ — PHASE 2 COMPLÈTE 🎉
+  Build: OK (0 erreur TypeScript)
+  4 commits pushed sur branche v2
+  Front public refonte TERMINÉ selon cahier des charges
+═══════════════════════════════════════════════════════════

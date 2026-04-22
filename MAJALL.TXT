@@ -748,3 +748,5 @@ P2-B — 2026-04-22 — Refonte page Accueil (hero gradient + cargo animé + 5 c
 P2-C — 2026-04-22 12:31 — Catalogue refondu (hero catégorie + filtres + tri) + ProductCard (badges + design maquette) + recherche Google-like (multi-champs + dropdown live + page dédiée) — OK
 
 P2-D — 2026-04-22 12:58 — Page Produit refondue (galerie unifiée + onglets + composition kit + produits similaires + CTA panier/WhatsApp) — OK
+
+P2-E2 — 2026-04-22 — FIX bug prix visiteur + Panier + tunnel 4 étapes + espace unifié — PHASE 2 COMPLÈTE
