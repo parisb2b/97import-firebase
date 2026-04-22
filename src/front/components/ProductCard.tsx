@@ -1,5 +1,6 @@
 import { Link } from 'wouter';
 import PriceDisplay from './PriceDisplay';
+import { getImagePrincipale } from '@/lib/productMediaHelpers';
 
 const CAT_ICONS: Record<string, string> = {
   'Mini-Pelle': '🏗️', 'Maisons': '🏠', 'Solaire': '☀️',
@@ -13,7 +14,7 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product, userRole, lang = 'fr' }: ProductCardProps) {
-  const img = product.images_urls?.[0];
+  const img = getImagePrincipale(product);
   const icon = CAT_ICONS[product.categorie] || '📦';
   const name = lang === 'zh' ? (product.nom_zh || product.nom_fr) : lang === 'en' ? (product.nom_en || product.nom_fr) : product.nom_fr;
 
