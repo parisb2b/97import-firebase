@@ -6,6 +6,7 @@ import { db, clientAuth } from '../../lib/firebase';
 import { useI18n } from '../../i18n';
 import Breadcrumb from '../components/Breadcrumb';
 import ProductCard from '../components/ProductCard';
+import { regrouperProduitsParGroupe } from '../../lib/productGroupHelpers';
 
 const CATEGORIES_INFO: Record<string, { label: string; desc: string; image: string | null; color: string; icon: string }> = {
   'mini-pelle': {
@@ -19,28 +20,28 @@ const CATEGORIES_INFO: Record<string, { label: string; desc: string; image: stri
     label: 'Maisons Modulaires',
     desc: 'Maisons préfabriquées Standard et Premium 20/30/40 pieds. Livraison clé-en-main.',
     image: '/images/categories/maison-modulaire.jpg',
-    color: '#10B981',
+    color: '#1565C0',
     icon: '🏠',
   },
   'solaire': {
     label: 'Kits Solaires',
     desc: 'Kits photovoltaïques 10/12/20kW avec panneaux Jinko Solar et onduleurs Deye.',
     image: '/images/categories/solaire.webp',
-    color: '#F59E0B',
+    color: '#1565C0',
     icon: '☀️',
   },
   'agricole': {
     label: 'Matériel Agricole',
     desc: 'Tracteurs compacts, motoculteurs et accessoires adaptés aux exploitations DOM-TOM.',
     image: null,
-    color: '#84CC16',
+    color: '#1565C0',
     icon: '🌾',
   },
   'divers': {
     label: 'Produits Divers',
     desc: 'Groupes électrogènes, climatisations, mobilier sur mesure et équipements professionnels.',
     image: null,
-    color: '#8B5CF6',
+    color: '#1565C0',
     icon: '📦',
   },
 };
@@ -101,7 +102,10 @@ export default function Catalogue() {
                      !CATEGORIES_EXCLUES.includes(catNormalisee) &&
                      p.type !== 'service';
             });
-        setProducts(filtered);
+
+        // Regrouper les variantes (ex: MP-R22-001/002/003 → 1 seule carte R22)
+        const grouped = regrouperProduitsParGroupe(filtered);
+        setProducts(grouped);
       } catch (err) {
         console.error('Error loading products:', err);
       } finally {
