@@ -1,0 +1,95 @@
+=== MAJ P2-MAQUETTES-STRICT — Design des 6 maquettes ===
+Date : 2026-04-22 16:45
+Branche : v2
+Build : ✅ OK (0 erreur TypeScript, built in 3.50s)
+
+OBJECTIF :
+  Appliquer le DESIGN des maquettes validées sur Home et Catalogue,
+  SANS toucher au reste du site ni à la logique métier.
+
+FICHIERS MODIFIÉS (exclusivement) :
+  ✅ src/front/pages/Home.tsx (271 insertions, 67 deletions)
+  ✅ src/front/pages/Catalogue.tsx (131 insertions, 31 deletions)
+  ℹ️ src/front/components/ProductCard.tsx — NON MODIFIÉ (design déjà cohérent)
+
+FICHIERS CRÉÉS :
+  ✅ public/images/hero/cargo.png
+  ✅ public/images/categories/mini-pelle.webp
+  ✅ public/images/categories/maison-modulaire.jpg
+  ✅ public/images/categories/solaire.webp
+
+FICHIERS INTERDITS (100% intacts) :
+  ✅ Produit.tsx, Panier.tsx, EspaceClient.tsx, EspacePartenaire.tsx
+  ✅ Contact.tsx, Services.tsx, Connexion.tsx, Inscription.tsx
+  ✅ Header.tsx, Footer.tsx, SearchBar.tsx, PriceDisplay.tsx
+  ✅ FrontApp.tsx
+  ✅ Tous les composants popup devis
+  ✅ Toute la lib, hooks, contexts
+
+HOME (selon maquette accueil) :
+  ✅ Hero gradient bleu + cargo animé float
+  ✅ 5 category cards (3 avec images + 2 fond coloré CSS)
+  ✅ Section "Pourquoi 97import" (4 stats + 3 avantages)
+  ✅ Section "Nos fournisseurs partenaires" (Jinko, Deye, RIPPA — SANS Banking Circle)
+  ✅ CTA final orange
+  ✅ Responsive mobile (@media 1024px)
+  ✅ Logique métier conservée à 100% (useEffect products loading, useMemo, SearchBar)
+
+CATALOGUE (selon 5 maquettes SPA) :
+  ✅ Hero catégorie dynamique (image + titre + desc + couleur + icône)
+  ✅ Filtres gammes existants CONSERVÉS
+  ✅ Tri existant CONSERVÉ
+  ✅ Breadcrumb existant CONSERVÉ (intégré dans hero)
+  ✅ ProductCard utilisé tel quel (NON MODIFIÉ)
+  ✅ Clic produit → /produit/:id (page Produit inchangée)
+  ✅ Logique Firestore INCHANGÉE (normalizeCategorie, filtres, mainProducts)
+
+COULEURS HERO CATÉGORIES :
+  mini-pelle     → bleu #1565C0 + image mini-pelle.webp
+  maison         → vert #10B981 + image maison-modulaire.jpg
+  solaire        → orange #F59E0B + image solaire.webp
+  agricole       → vert clair #84CC16 (fond coloré, pas d'image)
+  divers         → violet #8B5CF6 (fond coloré, pas d'image)
+
+COMMITS :
+  3a5e765 P2-MAQ: copie images depuis ~/97import-OK/images/
+  cf3a299 P2-MAQ: refonte design Home selon maquette OK-97import-accueil-v1.html
+  458d000 P2-MAQ: refonte design Catalogue selon 5 maquettes SPA
+  04af264 P2-MAQ: fix TypeScript unused vars in Home.tsx
+
+TESTS À EFFECTUER (11) :
+  [ ] Home hero + category cards
+  [ ] Clic category card → redirige vers /catalogue/:categorie
+  [ ] Catalogue mini-pelle (hero bleu + image)
+  [ ] Catalogue maison (hero vert + image)
+  [ ] Catalogue solaire (hero orange + image)
+  [ ] Catalogue agricole (hero vert sans image, icône 🌾)
+  [ ] Catalogue divers (hero violet sans image, icône 📦)
+  [ ] Panier inchangé et fonctionnel
+  [ ] Workflow 3 popups devis inchangé
+  [ ] Page produit inchangée
+  [ ] Header + Footer inchangés
+
+RESPECT DES RÈGLES STRICTES :
+  ✅ Périmètre strict : 2 fichiers modifiés (Home, Catalogue) + images
+  ✅ Aucun fichier hors scope modifié (validation par git diff)
+  ✅ Pas de refactorisation
+  ✅ Pas de nouvelles dépendances (npm packages)
+  ✅ Logique métier 100% préservée (useState, useEffect, Firebase, auth, filtres)
+  ✅ Build réussi (0 erreur TypeScript)
+
+STATISTIQUES :
+  404 lignes ajoutées
+  101 lignes supprimées
+  2 fichiers modifiés
+  4 images ajoutées
+  4 commits
+
+PHASE 2 COMPLÈTE ✅
+
+══════════════════════════════════════════════
+  P2-MAQUETTES-STRICT TERMINÉ ✅
+  Build: OK (0 erreur TypeScript)
+  Design appliqué sur Home + Catalogue uniquement
+  Scope strict 100% respecté
+══════════════════════════════════════════════
