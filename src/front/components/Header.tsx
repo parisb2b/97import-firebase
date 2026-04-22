@@ -117,7 +117,7 @@ export default function Header() {
               <span>{times.paris}</span>
             </div>
             <div style={clockMiniStyle}>
-              <span style={{ fontSize: 11 }}>🏝️</span>
+              <span style={{ fontSize: 11 }}>🇲🇶</span>
               <span>{times.martinique}</span>
             </div>
             <div style={clockMiniStyle}>
