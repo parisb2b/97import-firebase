@@ -66,6 +66,7 @@ export default function Header() {
     { label: t('nav.solaire'), icon: '☀️', path: '/catalogue/solaire' },
     { label: t('nav.agricole'), icon: '🌾', path: '/catalogue/agricole' },
     { label: t('nav.divers'), icon: '📦', path: '/catalogue/divers' },
+    { label: 'Services', icon: '⚙️', path: '/services' },
     { label: t('nav.contact'), icon: '📞', path: '/contact' },
   ];
 
