@@ -1,111 +1,37 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'wouter';
-import { onAuthStateChanged, User } from 'firebase/auth';
+import { onAuthStateChanged, User, signOut as firebaseSignOut } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { clientAuth, db } from '../../lib/firebase';
 import { useI18n } from '../../i18n';
 
-const B = '#1565C0'; // bleu hero
+export default function Header() {
+  const [location] = useLocation();
+  const { t, lang, setLang } = useI18n();
+  const [user, setUser] = useState<User | null>(null);
+  const [userRole, setUserRole] = useState<string | null>(null);
+  const [cartCount, setCartCount] = useState(0);
+  const [currentTime, setCurrentTime] = useState('');
+  const [showLangMenu, setShowLangMenu] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-function Clocks() {
-  const [times, setTimes] = useState({ mq: '--:--', fr: '--:--', cn: '--:--' });
-
+  // Horloge locale (mise à jour chaque minute)
   useEffect(() => {
-    const update = () => {
-      const fmt = (tz: string) =>
-        new Date().toLocaleTimeString('fr-FR', { timeZone: tz, hour: '2-digit', minute: '2-digit' });
-      setTimes({ mq: fmt('America/Martinique'), fr: fmt('Europe/Paris'), cn: fmt('Asia/Shanghai') });
+    const updateTime = () => {
+      const now = new Date();
+      setCurrentTime(now.toLocaleTimeString('fr-FR', {
+        hour: '2-digit',
+        minute: '2-digit',
+        timeZone: 'Europe/Paris',
+      }));
     };
-    update();
-    const interval = setInterval(update, 30000);
+    updateTime();
+    const interval = setInterval(updateTime, 60000);
     return () => clearInterval(interval);
   }, []);
 
-  return (
-    <div style={{ display: 'flex', gap: 8, fontSize: 11, color: '#94A3B8' }}>
-      <span>🇲🇶 {times.mq}</span>
-      <span>·</span>
-      <span>🇫🇷 {times.fr}</span>
-      <span>·</span>
-      <span>🇨🇳 {times.cn}</span>
-    </div>
-  );
-}
-
-function LangDropdown() {
-  const { lang, setLang } = useI18n();
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  const labels: Record<string, string> = { fr: 'FR', en: 'EN', zh: 'CN' };
-  const options = [
-    { code: 'fr' as const, flag: '🇫🇷', label: 'Français (FR)' },
-    { code: 'zh' as const, flag: '🇨🇳', label: '中文 (CN)' },
-    { code: 'en' as const, flag: '🇬🇧', label: 'English (EN)' },
-  ];
-
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-    };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, []);
-
-  return (
-    <div ref={ref} style={{ position: 'relative' }}>
-      <button onClick={() => setOpen(!open)} style={{
-        display: 'flex', alignItems: 'center', gap: 6,
-        border: '1px solid #E8ECF4', borderRadius: 20, padding: '4px 12px',
-        background: 'transparent', cursor: 'pointer', fontSize: 12, color: B, fontWeight: 600,
-      }}>
-        🌐 {labels[lang]} ▾
-      </button>
-      {open && (
-        <div style={{
-          position: 'absolute', top: 'calc(100% + 6px)', right: 0,
-          background: '#fff', borderRadius: 12, boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
-          padding: 6, zIndex: 200, minWidth: 160,
-        }}>
-          {options.map(o => (
-            <div key={o.code} onClick={() => { setLang(o.code); setOpen(false); }}
-              style={{
-                display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px',
-                borderRadius: 8, cursor: 'pointer', fontSize: 13, color: '#374151',
-                background: lang === o.code ? '#F0F4F8' : 'transparent',
-                fontWeight: lang === o.code ? 600 : 400,
-              }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#F5F7FA'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = lang === o.code ? '#F0F4F8' : 'transparent'; }}
-            >
-              <span style={{ fontSize: 16 }}>{o.flag}</span>
-              <span>{o.label}</span>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-export default function Header() {
-  const [user, setUser] = useState<User | null>(null);
-  const [userRole, setUserRole] = useState<string | null>(null);
-  const { t } = useI18n();
-  const [location] = useLocation();
-
-  const navItems = [
-    { path: '/', label: t('nav.accueil'), icon: '🏠', exact: true },
-    { path: '/catalogue/Mini-Pelle', label: t('nav.miniPelles'), icon: '🚜' },
-    { path: '/catalogue/Maisons', label: t('nav.maisons'), icon: '🏠' },
-    { path: '/catalogue/Solaire', label: t('nav.solaire'), icon: '☀️' },
-    { path: '/catalogue/Agricole', label: t('nav.agricole'), icon: '🌾' },
-    { path: '/catalogue/Divers', label: t('nav.divers'), icon: '📦' },
-    { path: '/services', label: t('nav.services'), icon: '🔧' },
-    { path: '/contact', label: t('nav.contact'), icon: '✉️' },
-  ];
-  const [cartCount, setCartCount] = useState(0);
-
+  // Récupérer le compte panier
   useEffect(() => {
     const updateCount = () => {
       try {
@@ -120,8 +46,9 @@ export default function Header() {
       window.removeEventListener('cart-updated', updateCount);
       window.removeEventListener('storage', updateCount);
     };
-  }, []);
+  }, [location]);
 
+  // Auth listener
   useEffect(() => {
     const unsub = onAuthStateChanged(clientAuth, async (u) => {
       setUser(u);
@@ -137,130 +64,494 @@ export default function Header() {
     return () => unsub();
   }, []);
 
+  const handleSignOut = async () => {
+    try {
+      await firebaseSignOut(clientAuth);
+      setShowUserMenu(false);
+    } catch (err) {
+      console.error('Error signing out:', err);
+    }
+  };
+
+  // Items de navigation
+  const navItems = [
+    { label: t('nav.accueil'), icon: '🏠', path: '/', exact: true },
+    { label: t('nav.miniPelles'), icon: '🚜', path: '/catalogue/mini-pelle' },
+    { label: t('nav.maisons'), icon: '🏡', path: '/catalogue/maison-modulaire' },
+    { label: t('nav.solaire'), icon: '☀️', path: '/catalogue/solaire' },
+    { label: t('nav.agricole'), icon: '🌾', path: '/catalogue/agricole' },
+    { label: t('nav.divers'), icon: '📦', path: '/catalogue/divers' },
+    { label: t('nav.contact'), icon: '📞', path: '/contact' },
+  ];
+
   return (
-    <header style={{
-      background: '#FFFFFF',
-      color: B,
-      position: 'sticky',
-      top: 0,
-      zIndex: 100,
-      borderBottom: '1px solid #E8ECF4',
-    }}>
-      <div style={{
-        maxWidth: 1280,
-        margin: '0 auto',
-        padding: '0 20px',
-        height: 64,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-      }}>
-        {/* Logo */}
-        <Link href="/">
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
-            <span style={{ fontSize: 24 }}>🚢</span>
-            <span style={{ fontWeight: 800, fontSize: 20, letterSpacing: -0.5, color: B }}>
-              97<span style={{ color: '#EA580C' }}>IMPORT</span>
-            </span>
+    <header style={headerStyle}>
+      <div style={headerInnerStyle}>
+
+        {/* ═══ LOGO ═══ */}
+        <Link href="/" style={logoStyle}>
+          <div style={logoIconStyle}>🚢</div>
+          <div>
+            <div style={logoTextStyle}>
+              97<span style={{ color: 'var(--orange)' }}>import</span>
+              <span style={logoDomainStyle}>.com</span>
+            </div>
+            <div style={logoTaglineStyle}>{t('header.tagline') || 'Direct usine Chine'}</div>
           </div>
         </Link>
 
-        {/* Navigation */}
-        <nav style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+        {/* ═══ NAVIGATION CENTRALE (desktop only) ═══ */}
+        <nav className="nav-desktop" style={navStyle}>
           {navItems.map(item => {
-            const isActive = (item as any).exact ? location === item.path : location.startsWith(item.path);
+            const isActive = (item as any).exact
+              ? location === item.path
+              : location.startsWith(item.path) && item.path !== '/';
             return (
-              <Link key={item.path} href={item.path}>
-                <span style={{
-                  padding: '6px 10px',
-                  borderRadius: 6,
-                  fontSize: 12,
-                  cursor: 'pointer',
-                  color: isActive ? B : '#6B7280',
-                  background: isActive ? '#EFF6FF' : 'transparent',
-                  fontWeight: isActive ? 600 : 400,
-                  transition: 'all 0.2s',
-                  whiteSpace: 'nowrap',
-                }}>
-                  {item.icon} {item.label}
-                </span>
+              <Link
+                key={item.path}
+                href={item.path}
+                style={{
+                  ...navItemStyle,
+                  ...(isActive ? navItemActiveStyle : {}),
+                }}
+              >
+                <span style={navIconStyle}>{item.icon}</span>
+                <span style={navLabelStyle}>{item.label}</span>
               </Link>
             );
           })}
         </nav>
 
-        {/* Right section */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <Clocks />
-          <LangDropdown />
+        {/* ═══ ZONE DROITE ═══ */}
+        <div style={rightZoneStyle}>
 
-          {/* Panier */}
-          <Link href="/panier">
-            <div style={{
-              position: 'relative',
-              background: '#FFFFFF',
-              border: `1px solid ${B}`,
-              borderRadius: 10,
-              padding: '8px 16px',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6,
-              fontSize: 14,
-              fontWeight: 600,
-              color: B,
-            }}>
-              🛒
-              {cartCount > 0 && <span style={{
-                position: 'absolute', top: -6, right: -6,
-                background: '#EF4444',
-                color: '#fff',
-                borderRadius: '50%',
-                width: 18,
-                height: 18,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: 10,
-                fontWeight: 700,
-                border: '2px solid #fff',
-              }}>{cartCount}</span>}
-            </div>
+          {/* Horloge locale (cachée sur mobile) */}
+          <div className="header-clock" style={clockChipStyle}>
+            <span>🕐</span>
+            <span>{currentTime}</span>
+            <span style={{ color: 'var(--text-3)', fontSize: 11 }}>Paris</span>
+          </div>
+
+          {/* Sélecteur langue */}
+          <div style={{ position: 'relative' }}>
+            <button
+              onClick={() => setShowLangMenu(!showLangMenu)}
+              style={langButtonStyle}
+            >
+              <span>{lang === 'fr' ? '🇫🇷' : lang === 'zh' ? '🇨🇳' : '🇬🇧'}</span>
+              <span style={{ fontSize: 12, fontWeight: 600 }}>{lang.toUpperCase()}</span>
+              <span style={{ fontSize: 10, color: 'var(--text-3)' }}>▾</span>
+            </button>
+
+            {showLangMenu && (
+              <div style={langDropdownStyle}>
+                {[
+                  { code: 'fr' as const, label: 'Français', flag: '🇫🇷' },
+                  { code: 'zh' as const, label: '中文', flag: '🇨🇳' },
+                  { code: 'en' as const, label: 'English', flag: '🇬🇧' },
+                ].map(l => (
+                  <button
+                    key={l.code}
+                    onClick={() => { setLang(l.code); setShowLangMenu(false); }}
+                    style={langOptionStyle}
+                  >
+                    <span>{l.flag}</span>
+                    <span>{l.label}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Bouton panier avec badge */}
+          <Link href="/panier" style={cartButtonStyle}>
+            <span style={{ fontSize: 18 }}>🛒</span>
+            {cartCount > 0 && (
+              <span style={cartBadgeStyle}>{cartCount}</span>
+            )}
           </Link>
 
-          {/* Connexion */}
+          {/* Avatar utilisateur ou bouton connexion */}
           {user ? (
-            <Link href={userRole === 'partner' ? '/espace-partenaire' : '/espace-client'}>
-              <div style={{
-                display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer',
-                border: '1px solid #E5E7EB', borderRadius: 12, padding: '6px 14px',
-              }}>
-                <div style={{
-                  width: 24, height: 24, borderRadius: '50%', background: B, color: '#fff',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700,
-                }}>
-                  {user.displayName?.[0]?.toUpperCase() || '👤'}
+            <div style={{ position: 'relative' }}>
+              <button
+                onClick={() => setShowUserMenu(!showUserMenu)}
+                style={userButtonStyle}
+              >
+                <div style={avatarStyle}>
+                  {user.email?.[0]?.toUpperCase() || '👤'}
                 </div>
-                <span style={{ fontSize: 12, color: '#374151' }}>{user.displayName || user.email?.split('@')[0]}</span>
-              </div>
-            </Link>
+                <span className="user-email" style={{ fontSize: 13, fontWeight: 500 }}>
+                  {user.email?.split('@')[0] || 'Mon compte'}
+                </span>
+                <span style={{ fontSize: 10, color: 'var(--text-3)' }}>▾</span>
+              </button>
+
+              {showUserMenu && (
+                <div style={userDropdownStyle}>
+                  <Link
+                    href={userRole === 'partner' ? '/espace-partenaire' : '/espace-client'}
+                    style={userOptionStyle}
+                    onClick={() => setShowUserMenu(false)}
+                  >
+                    {t('header.mySpace') || 'Mon espace'}
+                  </Link>
+                  <Link
+                    href="/mon-compte"
+                    style={userOptionStyle}
+                    onClick={() => setShowUserMenu(false)}
+                  >
+                    {t('header.myAccount') || 'Mon compte'}
+                  </Link>
+                  <hr style={{ margin: '6px 0', border: 'none', borderTop: '1px solid var(--border)' }} />
+                  <button
+                    onClick={handleSignOut}
+                    style={{ ...userOptionStyle, color: 'var(--danger)', textAlign: 'left', width: '100%' }}
+                  >
+                    {t('auth.deconnexion') || 'Déconnexion'}
+                  </button>
+                </div>
+              )}
+            </div>
           ) : (
-            <Link href="/connexion">
-              <span style={{
-                border: `1px solid ${B}`,
-                borderRadius: 12,
-                padding: '6px 16px',
-                fontSize: 13,
-                cursor: 'pointer',
-                color: B,
-                fontWeight: 600,
-              }}>
-                {t('auth.connexion')}
-              </span>
+            <Link href="/connexion" style={connectionButtonStyle}>
+              {t('auth.connexion') || 'Connexion'}
             </Link>
           )}
+
+          {/* Burger menu mobile */}
+          <button
+            className="burger-menu"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            style={burgerButtonStyle}
+          >
+            ☰
+          </button>
         </div>
       </div>
+
+      {/* ═══ MENU MOBILE OVERLAY ═══ */}
+      {mobileMenuOpen && (
+        <div style={mobileMenuStyle}>
+          {navItems.map(item => (
+            <Link
+              key={item.path}
+              href={item.path}
+              onClick={() => setMobileMenuOpen(false)}
+              style={mobileNavItemStyle}
+            >
+              <span style={{ fontSize: 20 }}>{item.icon}</span>
+              <span>{item.label}</span>
+            </Link>
+          ))}
+        </div>
+      )}
+
+      {/* ═══ STYLES RESPONSIVE ═══ */}
+      <style>{`
+        @media (max-width: 1024px) {
+          .nav-desktop { display: none !important; }
+          .burger-menu { display: flex !important; }
+        }
+        @media (min-width: 1025px) {
+          .burger-menu { display: none !important; }
+        }
+        @media (max-width: 768px) {
+          .header-clock { display: none !important; }
+          .user-email { display: none !important; }
+        }
+      `}</style>
     </header>
   );
 }
+
+/* ═══════════════════════════════════════════════════════
+   STYLES (utilisent les variables CSS de variables.css)
+   ═══════════════════════════════════════════════════════ */
+
+const headerStyle: React.CSSProperties = {
+  background: 'var(--bg)',
+  borderBottom: '1px solid var(--border)',
+  position: 'sticky',
+  top: 0,
+  zIndex: 100,
+  boxShadow: 'var(--shadow-sm)',
+};
+
+const headerInnerStyle: React.CSSProperties = {
+  maxWidth: 1400,
+  margin: '0 auto',
+  height: 68,
+  padding: '0 24px',
+  display: 'flex',
+  alignItems: 'center',
+  gap: 16,
+};
+
+const logoStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: 10,
+  textDecoration: 'none',
+  flexShrink: 0,
+};
+
+const logoIconStyle: React.CSSProperties = {
+  fontSize: 28,
+  lineHeight: 1,
+};
+
+const logoTextStyle: React.CSSProperties = {
+  fontFamily: 'var(--font-head)',
+  fontSize: 18,
+  fontWeight: 800,
+  color: 'var(--blue)',
+  lineHeight: 1.1,
+};
+
+const logoDomainStyle: React.CSSProperties = {
+  color: 'var(--text-3)',
+  fontWeight: 400,
+};
+
+const logoTaglineStyle: React.CSSProperties = {
+  fontSize: 10,
+  color: 'var(--text-3)',
+  marginTop: 2,
+};
+
+const navStyle: React.CSSProperties = {
+  display: 'flex',
+  gap: 4,
+  flex: 1,
+  justifyContent: 'center',
+};
+
+const navItemStyle: React.CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  gap: 2,
+  padding: '8px 12px',
+  borderRadius: 'var(--radius)',
+  textDecoration: 'none',
+  color: 'var(--text-2)',
+  transition: 'var(--transition-fast)',
+  cursor: 'pointer',
+};
+
+const navItemActiveStyle: React.CSSProperties = {
+  background: 'var(--blue-light)',
+  color: 'var(--blue)',
+};
+
+const navIconStyle: React.CSSProperties = {
+  fontSize: 18,
+  lineHeight: 1,
+};
+
+const navLabelStyle: React.CSSProperties = {
+  fontSize: 11,
+  fontWeight: 500,
+};
+
+const rightZoneStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: 10,
+  flexShrink: 0,
+  marginLeft: 'auto',
+};
+
+const clockChipStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: 6,
+  padding: '6px 12px',
+  background: 'var(--bg-2)',
+  borderRadius: 'var(--radius-full)',
+  fontSize: 12,
+  fontWeight: 500,
+  color: 'var(--text-2)',
+};
+
+const langButtonStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: 4,
+  padding: '8px 12px',
+  background: 'transparent',
+  border: '1px solid var(--border)',
+  borderRadius: 'var(--radius)',
+  cursor: 'pointer',
+  fontFamily: 'inherit',
+  transition: 'var(--transition-fast)',
+};
+
+const langDropdownStyle: React.CSSProperties = {
+  position: 'absolute',
+  top: 'calc(100% + 4px)',
+  right: 0,
+  background: 'var(--bg)',
+  border: '1px solid var(--border)',
+  borderRadius: 'var(--radius)',
+  boxShadow: 'var(--shadow-lg)',
+  minWidth: 140,
+  padding: 6,
+  zIndex: 200,
+};
+
+const langOptionStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: 10,
+  width: '100%',
+  padding: '8px 12px',
+  background: 'transparent',
+  border: 'none',
+  borderRadius: 'var(--radius-sm)',
+  cursor: 'pointer',
+  fontSize: 13,
+  textAlign: 'left',
+  color: 'var(--text)',
+  fontFamily: 'inherit',
+};
+
+const cartButtonStyle: React.CSSProperties = {
+  position: 'relative',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: 40,
+  height: 40,
+  background: 'var(--bg-2)',
+  borderRadius: 'var(--radius)',
+  textDecoration: 'none',
+  color: 'var(--text)',
+  transition: 'var(--transition-fast)',
+};
+
+const cartBadgeStyle: React.CSSProperties = {
+  position: 'absolute',
+  top: -4,
+  right: -4,
+  minWidth: 18,
+  height: 18,
+  padding: '0 5px',
+  background: 'var(--orange)',
+  color: '#fff',
+  borderRadius: 'var(--radius-full)',
+  fontSize: 10,
+  fontWeight: 700,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  animation: 'pulse 2s ease-in-out infinite',
+};
+
+const userButtonStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: 8,
+  padding: '6px 12px 6px 6px',
+  background: 'var(--bg-2)',
+  border: '1px solid var(--border)',
+  borderRadius: 'var(--radius-full)',
+  cursor: 'pointer',
+  fontFamily: 'inherit',
+  transition: 'var(--transition-fast)',
+};
+
+const avatarStyle: React.CSSProperties = {
+  width: 28,
+  height: 28,
+  background: 'linear-gradient(135deg, var(--blue), var(--blue-2))',
+  color: '#fff',
+  borderRadius: 'var(--radius-full)',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  fontWeight: 700,
+  fontSize: 13,
+};
+
+const userDropdownStyle: React.CSSProperties = {
+  position: 'absolute',
+  top: 'calc(100% + 6px)',
+  right: 0,
+  background: 'var(--bg)',
+  border: '1px solid var(--border)',
+  borderRadius: 'var(--radius)',
+  boxShadow: 'var(--shadow-lg)',
+  minWidth: 180,
+  padding: 6,
+  zIndex: 200,
+};
+
+const userOptionStyle: React.CSSProperties = {
+  display: 'block',
+  width: '100%',
+  padding: '8px 12px',
+  background: 'transparent',
+  border: 'none',
+  borderRadius: 'var(--radius-sm)',
+  cursor: 'pointer',
+  fontSize: 13,
+  textAlign: 'left',
+  color: 'var(--text)',
+  textDecoration: 'none',
+  fontFamily: 'inherit',
+};
+
+const connectionButtonStyle: React.CSSProperties = {
+  padding: '8px 16px',
+  background: 'var(--orange)',
+  color: '#fff',
+  textDecoration: 'none',
+  borderRadius: 'var(--radius)',
+  fontSize: 13,
+  fontWeight: 600,
+  transition: 'var(--transition-fast)',
+};
+
+const burgerButtonStyle: React.CSSProperties = {
+  display: 'none',
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: 40,
+  height: 40,
+  background: 'var(--bg-2)',
+  border: 'none',
+  borderRadius: 'var(--radius)',
+  fontSize: 20,
+  cursor: 'pointer',
+  fontFamily: 'inherit',
+};
+
+const mobileMenuStyle: React.CSSProperties = {
+  position: 'fixed',
+  top: 68,
+  left: 0,
+  right: 0,
+  background: 'var(--bg)',
+  borderBottom: '1px solid var(--border)',
+  boxShadow: 'var(--shadow-lg)',
+  padding: 16,
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 4,
+  zIndex: 99,
+};
+
+const mobileNavItemStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: 12,
+  padding: '12px 16px',
+  background: 'var(--bg-2)',
+  borderRadius: 'var(--radius)',
+  textDecoration: 'none',
+  color: 'var(--text)',
+  fontSize: 14,
+  fontWeight: 500,
+};
