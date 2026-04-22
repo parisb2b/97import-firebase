@@ -12,23 +12,24 @@ export default function Header() {
   const [user, setUser] = useState<User | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
   const [cartCount, setCartCount] = useState(0);
-  const [currentTime, setCurrentTime] = useState('');
+  const [times, setTimes] = useState({ paris: '', martinique: '', chine: '' });
   const [showLangMenu, setShowLangMenu] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
 
-  // Horloge locale (mise à jour chaque minute)
+  // 3 horloges (mise à jour chaque minute)
   useEffect(() => {
-    const updateTime = () => {
+    const updateTimes = () => {
       const now = new Date();
-      setCurrentTime(now.toLocaleTimeString('fr-FR', {
-        hour: '2-digit',
-        minute: '2-digit',
-        timeZone: 'Europe/Paris',
-      }));
+      setTimes({
+        paris: now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Paris' }),
+        martinique: now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Martinique' }),
+        chine: now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Shanghai' }),
+      });
     };
-    updateTime();
-    const interval = setInterval(updateTime, 60000);
+    updateTimes();
+    const interval = setInterval(updateTimes, 60000);
     return () => clearInterval(interval);
   }, []);
 
@@ -123,20 +124,33 @@ export default function Header() {
           })}
         </nav>
 
-        {/* ═══ SEARCH BAR (desktop only) ═══ */}
-        <div className="header-search" style={{ flex: '0 1 320px' }}>
-          <SearchBar variant="header" />
-        </div>
-
         {/* ═══ ZONE DROITE ═══ */}
         <div style={rightZoneStyle}>
 
-          {/* Horloge locale (cachée sur mobile) */}
-          <div className="header-clock" style={clockChipStyle}>
-            <span>🕐</span>
-            <span>{currentTime}</span>
-            <span style={{ color: 'var(--text-3)', fontSize: 11 }}>Paris</span>
+          {/* 3 horloges (cachées sur mobile) */}
+          <div className="header-clock" style={clocksContainerStyle}>
+            <div style={clockMiniStyle}>
+              <span style={{ fontSize: 11 }}>🇫🇷</span>
+              <span>{times.paris}</span>
+            </div>
+            <div style={clockMiniStyle}>
+              <span style={{ fontSize: 11 }}>🏝️</span>
+              <span>{times.martinique}</span>
+            </div>
+            <div style={clockMiniStyle}>
+              <span style={{ fontSize: 11 }}>🇨🇳</span>
+              <span>{times.chine}</span>
+            </div>
           </div>
+
+          {/* Bouton recherche */}
+          <button
+            onClick={() => setSearchOpen(true)}
+            style={searchIconButtonStyle}
+            title="Rechercher"
+          >
+            🔍
+          </button>
 
           {/* Sélecteur langue */}
           <div style={{ position: 'relative' }}>
@@ -221,7 +235,7 @@ export default function Header() {
             </div>
           ) : (
             <Link href="/connexion" style={connectionButtonStyle}>
-              {t('auth.connexion') || 'Connexion'}
+              Se connecter
             </Link>
           )}
 
@@ -253,11 +267,31 @@ export default function Header() {
         </div>
       )}
 
+      {/* ═══ OVERLAY RECHERCHE ═══ */}
+      {searchOpen && (
+        <div
+          onClick={() => setSearchOpen(false)}
+          style={searchOverlayStyle}
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            style={searchOverlayInnerStyle}
+          >
+            <SearchBar variant="hero" placeholder="Rechercher un produit..." />
+            <button
+              onClick={() => setSearchOpen(false)}
+              style={searchCloseStyle}
+            >
+              Annuler
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* ═══ STYLES RESPONSIVE ═══ */}
       <style>{`
         @media (max-width: 1024px) {
           .nav-desktop { display: none !important; }
-          .header-search { display: none !important; }
           .burger-menu { display: flex !important; }
         }
         @media (min-width: 1025px) {
@@ -288,11 +322,11 @@ const headerStyle: React.CSSProperties = {
 const headerInnerStyle: React.CSSProperties = {
   maxWidth: 1400,
   margin: '0 auto',
-  height: 68,
-  padding: '0 24px',
+  height: 64,
+  padding: '0 20px',
   display: 'flex',
   alignItems: 'center',
-  gap: 16,
+  gap: 12,
 };
 
 const logoStyle: React.CSSProperties = {
@@ -370,16 +404,23 @@ const rightZoneStyle: React.CSSProperties = {
   marginLeft: 'auto',
 };
 
-const clockChipStyle: React.CSSProperties = {
+const clocksContainerStyle: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
   gap: 6,
-  padding: '6px 12px',
+  padding: '4px 8px',
   background: 'var(--bg-2)',
-  borderRadius: 'var(--radius-full)',
-  fontSize: 12,
-  fontWeight: 500,
+  borderRadius: 'var(--radius)',
+};
+
+const clockMiniStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: 4,
+  fontSize: 11,
+  fontWeight: 600,
   color: 'var(--text-2)',
+  padding: '2px 6px',
 };
 
 const langButtonStyle: React.CSSProperties = {
@@ -511,14 +552,64 @@ const userOptionStyle: React.CSSProperties = {
 };
 
 const connectionButtonStyle: React.CSSProperties = {
-  padding: '8px 16px',
-  background: 'var(--orange)',
+  padding: '6px 12px',
+  background: '#DC2626',
   color: '#fff',
   textDecoration: 'none',
   borderRadius: 'var(--radius)',
-  fontSize: 13,
+  fontSize: 12,
   fontWeight: 600,
   transition: 'var(--transition-fast)',
+  whiteSpace: 'nowrap',
+};
+
+const searchIconButtonStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: 40,
+  height: 40,
+  background: 'var(--bg-2)',
+  border: 'none',
+  borderRadius: 'var(--radius)',
+  fontSize: 18,
+  cursor: 'pointer',
+  fontFamily: 'inherit',
+};
+
+const searchOverlayStyle: React.CSSProperties = {
+  position: 'fixed',
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  background: 'rgba(0,0,0,0.5)',
+  zIndex: 9998,
+  display: 'flex',
+  alignItems: 'flex-start',
+  justifyContent: 'center',
+  paddingTop: 80,
+};
+
+const searchOverlayInnerStyle: React.CSSProperties = {
+  width: '100%',
+  maxWidth: 700,
+  padding: 20,
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 12,
+};
+
+const searchCloseStyle: React.CSSProperties = {
+  alignSelf: 'center',
+  padding: '8px 16px',
+  background: 'transparent',
+  color: '#fff',
+  border: '1px solid rgba(255,255,255,0.3)',
+  borderRadius: 'var(--radius)',
+  cursor: 'pointer',
+  fontFamily: 'inherit',
+  fontSize: 13,
 };
 
 const burgerButtonStyle: React.CSSProperties = {
