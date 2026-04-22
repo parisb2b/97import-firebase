@@ -1,0 +1,106 @@
+=== MAJ P2-D — Page Produit refondue ===
+Date : 22/04/2026 13:30
+Branche : v2
+Build : OK (0 erreur TypeScript)
+
+FICHIER REFAIT :
+  src/front/pages/Produit.tsx — refonte complète (833 insertions, 417 deletions)
+
+SECTIONS CRÉÉES :
+  ✅ Breadcrumb (Accueil › Catégorie › Produit)
+  ✅ Layout 2 colonnes responsive (galerie | info)
+  ✅ Galerie unifiée vidéos + photos avec navigation miniatures
+  ✅ Player HTML5 vidéo avec poster
+  ✅ Catégorie chip cliquable
+  ✅ Référence + badge VIP
+  ✅ Description courte
+  ✅ PriceDisplay selon rôle utilisateur
+  ✅ Sélecteur quantité (+/-)
+  ✅ CTA Panier (orange) + Devis + WhatsApp (vert #25D366)
+  ✅ 3 avantages (livraison maritime, dédouanement, CE)
+  ✅ Section composition kit (si est_kit)
+  ✅ Onglets : Description / Specs / Points forts / Documents
+  ✅ Tableau specs techniques (matière, dimensions, poids, HS, fournisseur, CE)
+  ✅ Points forts avec ✓ verts
+  ✅ Documents PDF téléchargeables (icône rouge)
+  ✅ Produits similaires (4 max, même catégorie)
+  ✅ Responsive mobile (<1024px : 1 colonne)
+
+GALERIE :
+  ✅ Média principal avec aspect-ratio 4:3
+  ✅ Miniatures grid (70px, 8 max)
+  ✅ Border orange sur miniature sélectionnée
+  ✅ Icône ▶ overlay pour vidéos
+  ✅ Support vidéo MP4 avec HTML5 player
+  ✅ Fallback placeholder 📦 si pas d'image
+
+INFO PRODUIT :
+  ✅ Chip catégorie cliquable (→ /catalogue/{cat})
+  ✅ Nom H1 responsive (clamp 22-32px)
+  ✅ Référence code monospace
+  ✅ Badge VIP violet (#7c3aed)
+  ✅ Description courte
+  ✅ Prix dans bloc var(--bg-2)
+  ✅ Quantité input number avec boutons +/-
+  ✅ Bouton "Ajouter au panier" → localStorage + event storage
+  ✅ Bouton "Demander un devis" → /contact
+  ✅ Bouton WhatsApp → wa.me avec message prérempli
+
+ONGLETS :
+  ✅ Description marketing (pre-wrap pour retours ligne)
+  ✅ Specs techniques (tableau 2 colonnes, colonne gauche bg gris)
+  ✅ Points forts (liste avec ✓ verts var(--success))
+  ✅ Documents PDF (cards téléchargeables avec icône rouge)
+  ✅ Tabs affichés uniquement si données disponibles
+
+COMPOSITION KIT :
+  ✅ Section affichée si product.est_kit && composition_kit[]
+  ✅ Tableau : Quantité | Référence | Désignation
+  ✅ Résolution références composants depuis collection products
+  ✅ Champ _qte_par_kit pour quantité par kit
+
+PRODUITS SIMILAIRES :
+  ✅ Filtre même catégorie, exclu produit courant
+  ✅ Exclu ref_parente, actif=false
+  ✅ Max 4 produits
+  ✅ Utilise ProductCard P2-C (badges, design unifié)
+  ✅ Grid responsive auto-fill 240px
+
+COMMITS (2) :
+  0d0db0c P2-D: refonte page Produit (galerie + onglets + composition kit + similaires + CTA)
+  35d0437 P2-D: fix TypeScript unused var (navigate)
+
+TESTS À EFFECTUER PAR MICHEL (10) :
+  [ ] Test 1 : Page /produit/MP-R18-001 → galerie + infos affichées
+  [ ] Test 2 : Click miniature → l'image principale change
+  [ ] Test 3 : Vidéo MP4 lisible avec player HTML5
+  [ ] Test 4 : Onglet Description marketing affiché si rempli
+  [ ] Test 5 : Onglet Spécifications avec tableau dimensions/poids/HS
+  [ ] Test 6 : Onglet Points forts avec ✓ verts
+  [ ] Test 7 : Bouton "Ajouter au panier" → ajoute localStorage + alerte succès + badge header rafraîchi
+  [ ] Test 8 : Bouton WhatsApp → ouvre nouveau onglet wa.me avec message prérempli
+  [ ] Test 9 : Section "Produits similaires" en bas avec 4 ProductCards
+  [ ] Test 10 : Si kit solaire (KS-10K-001) → tableau composition kit affiché
+
+COMPATIBILITÉ :
+  ✅ Utilise productMediaHelpers pour médias (v35g)
+  ✅ Utilise PriceDisplay selon rôle
+  ✅ Utilise ProductCard P2-C (badges, design)
+  ✅ Utilise variables CSS (--blue, --orange, --radius, etc.)
+  ✅ Conserve Header + Footer P2-A
+  ✅ Conserve SearchBar P2-C dans Header
+  ✅ Responsive mobile avec className="product-layout"
+
+PROCHAINE ÉTAPE :
+  P2-E : Refonte Panier + tunnel commande + Espace client/partenaire unifié
+  - Page Panier redesignée (tableau + total + CTA)
+  - Tunnel commande multi-étapes
+  - Espace client unifié (commandes, devis, profil)
+  - Espace partenaire unifié (produits, commissions)
+
+═══════════════════════════════════════════════════════════
+  P2-D TERMINÉE ✅
+  Build: OK (0 erreur TypeScript)
+  2 commits pushed sur branche v2
+  Page Produit refondue selon maquette validée
+═══════════════════════════════════════════════════════════
