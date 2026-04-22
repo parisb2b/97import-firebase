@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Link, useLocation } from 'wouter';
+import { Link } from 'wouter';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import SearchBar from '@/front/components/SearchBar';
 
 export default function Home() {
-  const [, navigate] = useLocation();
   const [productsCount, setProductsCount] = useState<Record<string, number>>({
     'mini-pelle': 0,
     'maison-modulaire': 0,

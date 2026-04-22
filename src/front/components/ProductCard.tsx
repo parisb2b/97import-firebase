@@ -7,7 +7,7 @@ interface Props {
   onAddToCart?: () => void;
 }
 
-export default function ProductCard({ product, onAddToCart }: Props) {
+export default function ProductCard({ product }: Props) {
   const img = getImagePrincipale(product);
   const ref = product.reference || product.id;
 
