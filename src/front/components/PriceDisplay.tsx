@@ -1,151 +1,104 @@
-import { Link } from 'wouter';
-import { useI18n } from '../../i18n';
+import { useClientAuth } from '@/front/hooks/useClientAuth';
 
-interface PriceDisplayProps {
+interface Props {
   product: any;
-  userRole?: string | null; // null = visitor, 'user', 'partner', 'vip', 'admin'
-  size?: 'sm' | 'md' | 'lg';
 }
 
-function getAchat(product: any): number {
-  return product.prix_achat_eur || product.prix_achat || 0;
-}
+export default function PriceDisplay({ product }: Props) {
+  const { role, loading } = useClientAuth();
 
-function getAchatCNY(product: any): number {
-  return product.prix_achat_cny || product.prix_achat_yuan || 0;
-}
+  if (loading) {
+    return <div style={{ fontSize: 13, color: 'var(--text-3)' }}>...</div>;
+  }
 
-function getPublic(product: any): number {
-  return product.prix_public_eur || product.prix_public || Math.round(getAchat(product) * 2) || 0;
-}
+  const prixAchat = product.prix_achat || 0;
 
-export function getProductPrice(product: any, role: string | null | undefined): number {
-  const achat = getAchat(product);
-  const pub = getPublic(product);
-  if (!achat && !pub) return 0;
-  if (role === 'partner') return Math.round(achat * 1.2) || Math.round(pub * 0.6);
-  return pub || Math.round(achat * 2);
-}
-
-export default function PriceDisplay({ product, userRole, size = 'md' }: PriceDisplayProps) {
-  const { t } = useI18n();
-  const achat = getAchat(product);
-  const achatCNY = getAchatCNY(product);
-  const pub = getPublic(product);
-  const partner = Math.round(achat * 1.2) || Math.round(pub * 0.6);
-
-  // Visitor — locked
-  if (!userRole) {
-    if (size === 'sm') {
-      return (
+  if (role === 'visitor') {
+    return (
+      <div>
         <div style={{
-          background: 'linear-gradient(135deg, #B71C1C, #C62828)', color: 'white', borderRadius: 12,
-          padding: '6px 12px', fontSize: 11, fontWeight: 600, textAlign: 'center',
+          padding: '10px 12px', background: 'var(--bg-2)',
+          borderLeft: '3px solid var(--orange)',
+          borderRadius: 'var(--radius-sm)', marginBottom: 8,
         }}>
-          🔒 {t('auth.connexion')}
+          <div style={{ fontSize: 12, color: 'var(--text-2)', fontWeight: 600, marginBottom: 4 }}>
+            🔒 Prix réservé aux utilisateurs
+          </div>
+          <div style={{ fontSize: 11, color: 'var(--text-3)' }}>
+            Connectez-vous pour voir les prix
+          </div>
         </div>
-      );
-    }
-    return (
-      <div style={{
-        background: 'linear-gradient(135deg, #B71C1C, #C62828)', borderRadius: 16, padding: 24, textAlign: 'center',
-      }}>
-        <div style={{ fontSize: 36, marginBottom: 8 }}>🔒</div>
-        <h3 style={{ color: '#fff', fontSize: 18, fontWeight: 700, marginBottom: 8 }}>{t('price.connectez')}</h3>
-        <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 13, marginBottom: 14 }}>{t('price.connectezDesc')}</p>
-        <Link href="/connexion">
-          <span style={{
-            display: 'inline-block', background: '#fff', color: '#C62828', borderRadius: 10,
-            padding: '12px 28px', fontSize: 14, fontWeight: 700, cursor: 'pointer',
-          }}>
-            {t('price.connectezBtn')}
-          </span>
-        </Link>
+        <a href="/connexion" style={{
+          display: 'inline-block', padding: '6px 12px',
+          background: '#DC2626', color: '#fff', textDecoration: 'none',
+          borderRadius: 'var(--radius-sm)', fontSize: 12, fontWeight: 600,
+        }}>
+          Se connecter
+        </a>
       </div>
     );
   }
 
-  // No price data
-  if (!achat && !pub) return <span style={{ fontSize: 12, color: '#6B7280' }}>{t('price.surDevis')}</span>;
-
-  // Admin — show all 4 prices
-  if (userRole === 'admin') {
-    if (size === 'sm') {
-      return (
-        <div>
-          <div style={{ fontSize: 14, fontWeight: 800, color: '#1565C0' }}>{achat.toLocaleString('fr-FR')} €</div>
-          <div style={{ fontSize: 10, color: '#9CA3AF' }}>{t('price.achatEur')} · {t('price.publicSmall')}: {pub.toLocaleString('fr-FR')}€</div>
-        </div>
-      );
-    }
-    const prices = [
-      achatCNY > 0 && { label: t('price.achatCny'), value: achatCNY, suffix: ' ¥', dim: true },
-      achat > 0 && { label: t('price.achatEur'), value: achat, suffix: ' €', dim: false },
-      partner > 0 && { label: t('price.partnerPrice'), value: partner, suffix: ' €', dim: false },
-      pub > 0 && { label: t('price.publicSmall'), value: pub, suffix: ' €', dim: false },
-    ].filter(Boolean) as { label: string; value: number; suffix: string; dim: boolean }[];
-
+  if (role === 'vip' && product.prix_vip_negocie && product.prix_vip_negocie > 0) {
+    const prixPublic = prixAchat * 2;
     return (
-      <div style={{
-        background: 'linear-gradient(135deg, #1565C0, #1565C0)', borderRadius: 16, padding: 20,
-      }}>
-        {prices.map((p, i) => (
-          <div key={i} style={{
-            display: 'flex', justifyContent: 'space-between', padding: '6px 0',
-            borderBottom: i < prices.length - 1 ? '1px solid rgba(255,255,255,0.1)' : 'none',
-          }}>
-            <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: 13 }}>{p.label}</span>
-            <span style={{ color: p.dim ? 'rgba(255,255,255,0.5)' : '#fff', fontSize: 18, fontWeight: 700 }}>
-              {Math.round(p.value).toLocaleString('fr-FR')}{p.suffix}
-            </span>
-          </div>
-        ))}
-      </div>
-    );
-  }
-
-  // Partner — big price + public strikethrough
-  if (userRole === 'partner') {
-    if (size === 'sm') {
-      return (
-        <div>
-          <div style={{ textDecoration: 'line-through', fontSize: 11, color: '#9CA3AF' }}>
-            {pub.toLocaleString('fr-FR')} €
-          </div>
-          <div style={{ fontSize: 14, fontWeight: 800, color: '#FF9800' }}>
-            {partner.toLocaleString('fr-FR')} €
-          </div>
+      <div>
+        <div style={{ fontSize: 11, color: 'var(--text-3)', marginBottom: 2 }}>Prix public :</div>
+        <div style={{
+          fontSize: 14, color: 'var(--text-3)',
+          textDecoration: 'line-through', marginBottom: 8
+        }}>
+          {prixPublic.toLocaleString('fr-FR')} €
         </div>
-      );
-    }
-    return (
-      <div style={{
-        background: 'linear-gradient(135deg, #1565C0, #1565C0)', borderRadius: 16, padding: 20,
-      }}>
-        <div style={{ textDecoration: 'line-through', color: 'rgba(255,255,255,0.45)', fontSize: 14, marginBottom: 4 }}>
-          {t('price.publicSmall')} : {pub.toLocaleString('fr-FR')} €
+        <div style={{ fontSize: 11, color: '#7c3aed', marginBottom: 2, fontWeight: 600 }}>
+          Prix VIP négocié HT :
         </div>
-        <div style={{ color: 'rgba(255,255,255,0.65)', fontSize: 12, marginBottom: 3 }}>
-          {t('price.partner')}
-        </div>
-        <div style={{ fontSize: 38, fontWeight: 800, color: '#FF9800' }}>
-          {partner.toLocaleString('fr-FR')} €
-        </div>
-        <div style={{ color: 'rgba(255,255,255,0.55)', fontSize: 12 }}>
-          {t('price.horsLivraison')}
+        <div style={{ fontSize: 22, fontWeight: 800, color: '#7c3aed' }}>
+          {product.prix_vip_negocie.toLocaleString('fr-FR')} €
         </div>
       </div>
     );
   }
 
-  // User / VIP
-  const fontSize = size === 'lg' ? 28 : size === 'md' ? 20 : 14;
+  if (role === 'admin') {
+    return (
+      <div style={{ fontSize: 12, color: 'var(--text-2)' }}>
+        <div style={{ marginBottom: 4 }}><strong>Admin</strong> — Tous les prix :</div>
+        <div>💼 Achat : <strong>{prixAchat.toLocaleString('fr-FR')} €</strong></div>
+        <div style={{ color: 'var(--orange)' }}>🤝 Partenaire : <strong>{(prixAchat * 1.2).toLocaleString('fr-FR')} €</strong></div>
+        <div style={{ color: 'var(--blue)' }}>🏷️ Public : <strong>{(prixAchat * 2).toLocaleString('fr-FR')} €</strong></div>
+        {product.prix_vip_negocie && (
+          <div style={{ color: '#7c3aed' }}>
+            ⭐ VIP : <strong>{product.prix_vip_negocie.toLocaleString('fr-FR')} €</strong>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // user, vip sans prix négocié, partner
+  let prixAffiche = 0;
+  let libelle = '';
+  let couleur = 'var(--blue)';
+
+  if (role === 'partner') {
+    prixAffiche = prixAchat * 1.2;
+    libelle = 'Prix partenaire HT';
+    couleur = 'var(--orange)';
+  } else {
+    prixAffiche = prixAchat * 2;
+    libelle = 'Prix public HT';
+    couleur = 'var(--blue)';
+  }
+
   return (
     <div>
-      <div style={{ fontSize, fontWeight: 800, color: '#1565C0' }}>
-        {pub.toLocaleString('fr-FR')} € <span style={{ fontSize: 12, fontWeight: 400, color: '#6B7280' }}>HT</span>
+      <div style={{ fontSize: 11, color: 'var(--text-3)', marginBottom: 2, fontWeight: 500 }}>
+        {libelle} :
       </div>
-      {size !== 'sm' && <div style={{ fontSize: 11, color: '#6B7280' }}>{t('price.public')} · {t('price.horsLivraison')}</div>}
+      <div style={{ fontSize: 22, fontWeight: 800, color: couleur }}>
+        {prixAffiche.toLocaleString('fr-FR')} €
+      </div>
     </div>
   );
 }

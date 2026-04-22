@@ -1,16 +1,15 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'wouter';
-import { onAuthStateChanged, User, signOut as firebaseSignOut } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
-import { clientAuth, db } from '../../lib/firebase';
+import { signOut as firebaseSignOut } from 'firebase/auth';
+import { clientAuth } from '../../lib/firebase';
 import { useI18n } from '../../i18n';
 import SearchBar from './SearchBar';
+import { useClientAuth } from '../hooks/useClientAuth';
 
 export default function Header() {
   const [location] = useLocation();
   const { t, lang, setLang } = useI18n();
-  const [user, setUser] = useState<User | null>(null);
-  const [userRole, setUserRole] = useState<string | null>(null);
+  const { user, role } = useClientAuth();
   const [cartCount, setCartCount] = useState(0);
   const [times, setTimes] = useState({ paris: '', martinique: '', chine: '' });
   const [showLangMenu, setShowLangMenu] = useState(false);
@@ -49,22 +48,6 @@ export default function Header() {
       window.removeEventListener('storage', updateCount);
     };
   }, [location]);
-
-  // Auth listener
-  useEffect(() => {
-    const unsub = onAuthStateChanged(clientAuth, async (u) => {
-      setUser(u);
-      if (u) {
-        try {
-          const snap = await getDoc(doc(db, 'users', u.uid));
-          setUserRole(snap.data()?.role || 'user');
-        } catch { setUserRole('user'); }
-      } else {
-        setUserRole(null);
-      }
-    });
-    return () => unsub();
-  }, []);
 
   const handleSignOut = async () => {
     try {
@@ -210,7 +193,7 @@ export default function Header() {
               {showUserMenu && (
                 <div style={userDropdownStyle}>
                   <Link
-                    href={userRole === 'partner' ? '/espace-partenaire' : '/espace-client'}
+                    href={role === 'partner' ? '/espace-partenaire' : '/espace-client'}
                     style={userOptionStyle}
                     onClick={() => setShowUserMenu(false)}
                   >
