@@ -314,14 +314,18 @@ export default function Produit() {
               </button>
             </div>
 
-            <div style={secondaryCtaStyle}>
-              <Link href="/contact" style={btnSecondaryStyle}>
-                📋 Demander un devis
-              </Link>
-              <button onClick={handleWhatsApp} style={btnWhatsappStyle}>
-                💬 WhatsApp
-              </button>
-            </div>
+            <button
+              onClick={handleWhatsApp}
+              style={{
+                ...btnWhatsappStyle,
+                width: '100%',
+                marginTop: 8,
+                padding: '12px 20px',
+                fontSize: 14,
+              }}
+            >
+              💬 Contacter sur WhatsApp
+            </button>
 
             {/* Avantages */}
             <div style={advantagesStyle}>
@@ -720,30 +724,6 @@ const btnAddCartStyle: React.CSSProperties = {
   cursor: 'pointer',
   fontFamily: 'inherit',
   transition: 'var(--transition)',
-};
-
-const secondaryCtaStyle: React.CSSProperties = {
-  display: 'grid',
-  gridTemplateColumns: '1fr 1fr',
-  gap: 12,
-  marginBottom: 24,
-};
-
-const btnSecondaryStyle: React.CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  gap: 8,
-  padding: '11px 16px',
-  background: 'var(--bg)',
-  color: 'var(--blue)',
-  border: '1px solid var(--blue)',
-  borderRadius: 'var(--radius)',
-  fontSize: 13,
-  fontWeight: 600,
-  textDecoration: 'none',
-  cursor: 'pointer',
-  fontFamily: 'inherit',
 };
 
 const btnWhatsappStyle: React.CSSProperties = {
