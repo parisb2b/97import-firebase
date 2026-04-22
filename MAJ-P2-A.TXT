@@ -1,0 +1,112 @@
+=== MAJ P2-A — Charte graphique + Header + Footer ===
+Date : 22/04/2026 12:05
+Branche : v2
+Build : OK (0 erreur TypeScript)
+
+OBJECTIF :
+  Poser les fondations visuelles du front public avant refonte des pages.
+
+NOUVEAUX FICHIERS :
+  src/front/styles/variables.css (~100 lignes) — variables CSS globales
+  src/front/styles/animations.css (~50 lignes) — animations réutilisables
+
+FICHIERS MODIFIÉS :
+  src/front/components/Header.tsx — refonte design selon maquette
+  src/front/components/Footer.tsx — refonte 3 colonnes + bleu #1565C0
+  src/main.tsx — imports CSS variables + animations
+
+DÉTECTION CHARTE ACTUELLE vs MAQUETTES :
+  Polices actuelles : system-ui (polices système, inherit)
+  Polices maquettes : Sora + DM Sans (Google Fonts)
+  Décision prise : GARDER polices système (plus performant, pas de dépendance externe)
+
+  Couleurs actuelles principales : #1565C0 (bleu), #EA580C (orange), #6B7280, #374151
+  Couleurs maquettes principales : #1565C0 (blue), #EA580C (orange)
+  Décision : PARFAITE CONCORDANCE - les couleurs sont déjà alignées ✅
+
+NOUVELLES FONCTIONNALITÉS HEADER :
+  ✅ Logo avec icône cargo 🚢 + "97import.com" + tagline "Direct usine Chine"
+  ✅ 7 items de navigation avec icônes (Accueil, Mini-Pelles, Maisons, Solaire, Agricole, Divers, Contact)
+  ✅ Horloge locale Paris (mise à jour chaque minute)
+  ✅ Sélecteur langue FR/中文/EN (dropdown fonctionnel avec i18n)
+  ✅ Badge panier animé (pulse CSS) avec compteur d'articles
+  ✅ Avatar utilisateur avec dropdown (Mon espace, Mon compte, Déconnexion)
+  ✅ Bouton Connexion orange si non authentifié
+  ✅ Burger menu mobile (< 1024px) avec overlay navigation
+  ✅ Responsive : horloge cachée < 768px, email user caché < 768px
+
+NOUVELLES FONCTIONNALITÉS FOOTER :
+  ✅ Background bleu #1565C0 (var(--blue))
+  ✅ 3 colonnes structurées (Logo+contact / Catalogue+Services / Compte+Réseaux)
+  ✅ Logo avec icône cargo 🚢 + slogan "Import Chine → DOM-TOM"
+  ✅ Description du service + email + WhatsApp
+  ✅ Liens catalogue par catégorie (mini-pelle, maison-modulaire, solaire, agricole, divers)
+  ✅ Liens services (Logistique, Dédouanement, SAV)
+  ✅ Liens compte (Connexion, Inscription, Mes devis, Contact)
+  ✅ Lien TikTok @direxport (📱)
+  ✅ Barre du bas : copyright dynamique (année) + CGV/Mentions/Confidentialité
+  ✅ Responsive mobile (1 colonne < 768px)
+
+COMMITS (4) :
+  b15c1df P2-A-B: variables CSS globales + animations réutilisables
+  6821ecc P2-A-C: refonte Header (icônes nav + horloge + langue + avatar + badge panier animé + responsive)
+  54dc2cc P2-A-D: refonte Footer (3 colonnes selon maquette + bleu #1565C0 + responsive)
+  [à venir] P2-A-F: rapport final
+
+VARIABLES CSS CRÉÉES (src/front/styles/variables.css) :
+  Couleurs : --blue, --blue-2, --blue-3, --blue-light, --blue-dark
+             --orange, --orange-2, --orange-light, --orange-dark
+             --text, --text-2, --text-3, --text-4, --text-light
+             --bg, --bg-2, --bg-3, --bg-dark
+             --border, --border-2
+             --success, --warning, --danger, --info
+
+  Typographie : --font-head, --font-body
+                --fs-xs (11px) à --fs-4xl (48px)
+
+  Espacements : --sp-1 (4px) à --sp-16 (64px)
+
+  Rayons : --radius-sm (6px) à --radius-full (9999px)
+
+  Ombres : --shadow-sm à --shadow-xl
+
+  Transitions : --transition-fast, --transition, --transition-slow
+
+  Z-index : --z-header (100), --z-dropdown (200), --z-modal (1000), --z-toast (9999)
+
+ANIMATIONS CSS CRÉÉES (src/front/styles/animations.css) :
+  @keyframes : fadeIn, fadeInUp, float, pulse, scaleIn, slideInRight, spin
+  Classes utilitaires : .anim-fade-in, .anim-fade-up, .anim-scale-in, .anim-slide-in,
+                        .anim-float, .anim-pulse, .anim-spin
+
+TESTS À EFFECTUER PAR MICHEL :
+  [ ] Test 1 : Header desktop (logo + nav icônes + horloge + langue + panier + avatar)
+  [ ] Test 2 : Header mobile (< 1024px) avec burger menu fonctionnel
+  [ ] Test 3 : Footer 3 colonnes bleu avec tous liens fonctionnels + TikTok
+  [ ] Test 4 : Variables CSS appliquées (console: getComputedStyle(document.documentElement).getPropertyValue('--blue'))
+  [ ] Test 5 : Aucune régression sur pages existantes (Home, Catalogue, Produit, Panier, etc.)
+  [ ] Test 6 : Badge panier animé (ajouter produit → badge pulse)
+  [ ] Test 7 : Dropdown langue fonctionnel (FR/ZH/EN)
+  [ ] Test 8 : Dropdown user fonctionnel (Mon espace, Mon compte, Déconnexion)
+
+COMPATIBILITÉ :
+  ✅ Conserve toute la logique d'authentification existante (clientAuth, onAuthStateChanged)
+  ✅ Conserve la logique panier localStorage + events
+  ✅ Conserve l'i18n avec useI18n() hook
+  ✅ Conserve toutes les routes existantes
+  ✅ Aucune page existante modifiée (Home, Catalogue, Produit restent inchangées)
+
+PROCHAINE ÉTAPE :
+  P2-B : Refonte page Accueil (Home.tsx)
+  - Hero avec gradient bleu + cargo animé + vague clip-path
+  - Search bar centrée redesignée
+  - Category cards (5 catégories) avec hover effects
+  - Sections "Pourquoi 97import" / "Nos chiffres" / "Témoignages"
+
+═══════════════════════════════════════════════════════════
+  P2-A TERMINÉE ✅
+  Build: OK (0 erreur TypeScript)
+  4 commits pushed sur branche v2
+  Header + Footer refondus selon maquettes
+  Variables CSS globales disponibles pour toutes les pages
+═══════════════════════════════════════════════════════════

@@ -740,3 +740,5 @@ v35f-phase1 — 2026-04-21 — Correctifs commission + coefficients configurable
 v35f-phase2 — 2026-04-21 — Création NC via UI (modal 2 étapes) + modal marquer payée (traçabilité) + envoi email fonctionnel — OK
 
 v35h-phase1 — 2026-04-22 — Liaison front catalogue v35g (image_principale + galeries unifiées + filtres kebab-case + description marketing) — OK
+
+P2-A — 2026-04-22 — Charte graphique unifiée + refonte Header (icônes/horloge/langue/avatar/badge panier/responsive) + refonte Footer (3 colonnes bleu + responsive) — OK
