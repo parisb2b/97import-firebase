@@ -218,11 +218,6 @@ export default function Home() {
               desc="Conteneurs 20 ou 40 pieds, livraison clé-en-main en DOM-TOM"
             />
             <Advantage
-              icon="📋"
-              title="Dédouanement inclus"
-              desc="Nous gérons toutes les formalités douanières pour vous"
-            />
-            <Advantage
               icon="✅"
               title="Garantie produits"
               desc="Tous nos produits sont conformes CE et garantis"

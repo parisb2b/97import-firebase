@@ -330,10 +330,6 @@ export default function Produit() {
                 <span>Livraison maritime DOM-TOM</span>
               </div>
               <div style={advantageRowStyle}>
-                <span>📋</span>
-                <span>Dédouanement inclus</span>
-              </div>
-              <div style={advantageRowStyle}>
                 <span>✅</span>
                 <span>Conformité CE garantie</span>
               </div>
