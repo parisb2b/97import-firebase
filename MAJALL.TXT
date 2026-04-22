@@ -740,3 +740,5 @@ v35f-phase1 — 2026-04-21 — Correctifs commission + coefficients configurable
 v35f-phase2 — 2026-04-21 — Création NC via UI (modal 2 étapes) + modal marquer payée (traçabilité) + envoi email fonctionnel — OK
 
 v35h-phase1 — 2026-04-22 — Liaison front catalogue v35g (image_principale + galeries unifiées + filtres kebab-case + description marketing) — OK
+
+P2-REVERT — 2026-04-22 — Retour à l'état d'avant P2-A (annulation de tous les prompts maquettes P2-*). Tag de sauvegarde : safety-before-revert-20260422-161517 — OK

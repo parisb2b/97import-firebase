@@ -1,0 +1,103 @@
+=== MAJ P2-REVERT — Retour à l'état d'avant P2-A ===
+Date : 2026-04-22 16:17
+Branche : v2
+Action : git reset --hard + cleanup fichiers orphelins
+
+SAUVEGARDE DE SÉCURITÉ :
+  Tag créé : safety-before-revert-20260422-161517
+  Commande de restauration : git reset --hard safety-before-revert-20260422-161517
+  Tag pushé sur origin : ✅
+
+ÉTAT AVANT REVERT :
+  Commit : fa5eb61 P2-FIX2 Part E: Add global Toast notification system
+  Nombre de commits P2-* annulés : 36
+
+ÉTAT APRÈS REVERT :
+  Commit : 9eccb54 v35h Phase 1: rapport final
+
+PROMPTS ANNULÉS :
+  ❌ P2-A (Charte + Header + Footer)
+  ❌ P2-B (Home)
+  ❌ P2-C (Catalogue + ProductCard + SearchBar + page Recherche)
+  ❌ P2-D (Page Produit refaite)
+  ❌ P2-E1 (Header fixes UX)
+  ❌ P2-E2 (Panier + TunnelCommande + MonCompte unifié)
+  ❌ P2-FIX (première restauration)
+  ❌ P2-FIX2 (deuxième restauration + Toast + Footer)
+
+PROMPTS CONSERVÉS (pré-P2-A, tout ce qui était stable et validé) :
+  ✅ v35a à v35d (Devis, Listes achat, Conteneurs)
+  ✅ v35e (Excel bilingues FR/ZH)
+  ✅ v35g Phases 1-3 (Refonte admin produits)
+  ✅ v35f Phases 1-2 (Commissions partenaires)
+  ✅ v35h Phase 1 (Liaison front catalogue)
+
+FICHIERS ORPHELINS SUPPRIMÉS :
+  - src/front/styles/variables.css
+  - src/front/styles/animations.css
+  - src/lib/searchHelpers.ts
+  - src/front/pages/Recherche.tsx
+  - src/front/components/TunnelCommande.tsx
+  - src/front/hooks/useClientAuth.ts
+  - src/lib/useToast.ts
+  - src/components/ToastContainer.tsx
+  - public/images/hero, categories, partners
+  - MAJ-P2-*.TXT, AUDIT-FRONT-P2-*.md
+
+BUILD : ✅ OK (0 erreur TypeScript, built in 3.44s)
+
+FICHIERS FRONT RESTAURÉS (état pré-P2-A) :
+  ✅ src/front/components/Header.tsx
+  ✅ src/front/components/Footer.tsx
+  ✅ src/front/components/ProductCard.tsx
+  ✅ src/front/components/SearchBar.tsx
+  ✅ src/front/components/PriceDisplay.tsx
+  ✅ src/front/pages/Home.tsx
+  ✅ src/front/pages/Catalogue.tsx
+  ✅ src/front/pages/Produit.tsx
+  ✅ src/front/pages/Panier.tsx
+  ✅ src/front/pages/MonCompte.tsx
+  ✅ src/front/pages/EspaceClient.tsx
+  ✅ src/front/pages/EspacePartenaire.tsx
+  ✅ src/front/FrontApp.tsx
+
+TESTS À EFFECTUER PAR MICHEL :
+  [ ] 1. Site front charge correctement
+  [ ] 2. Panier affiche les prix correctement (fin du bug NaN)
+  [ ] 3. Workflow devis original (3 popups) fonctionne
+  [ ] 4. Espace client + Espace partenaire accessibles
+  [ ] 5. Back-office inchangé et fonctionnel
+  [ ] 6. Données Firestore intactes (produits, devis, partenaires)
+  [ ] 7. Catalogue affiche produits avec images principales
+  [ ] 8. Page Produit affiche médias unifiés (photos + vidéos)
+
+IMPACT SUR LES DONNÉES :
+  ✅ Aucun impact sur Firestore (produits/devis/partenaires intacts)
+  ✅ Aucun impact sur Firebase Storage (images/vidéos intactes)
+  ✅ Code source revenu à l'état validé pré-P2-A
+
+STATISTIQUES REVERT :
+  36 commits annulés
+  4546 insertions supprimées
+  1289 deletions annulées
+  32 fichiers modifiés
+  13 fichiers orphelins supprimés
+
+PROCHAINE ÉTAPE :
+  Nouveau prompt P2-MAQUETTES (strict) qui ne modifiera QUE les pages
+  mentionnées dans les 6 maquettes validées, sans toucher au reste.
+
+RAISON DU REVERT :
+  Les prompts successifs P2-A → P2-FIX2 ont introduit des bugs :
+  - Prix NaN dans le Panier
+  - Layouts cassés
+  - Workflows divergents des validations initiales
+  Décision : repartir d'un état stable validé (v35h Phase 1)
+
+══════════════════════════════════════════════
+  P2-REVERT TERMINÉ ✅
+  État : revenu au commit v35h Phase 1
+  Tag sauvegarde : safety-before-revert-20260422-161517
+  Build : OK (0 erreur)
+  Force push : origin/v2 mis à jour
+══════════════════════════════════════════════
