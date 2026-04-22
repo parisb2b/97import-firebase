@@ -1,0 +1,62 @@
+=== MAJ P2-OPTIONS-STRICT — Système d'options Type 1 ===
+Date : 2026-04-22
+Branche : v2
+Build : OK
+
+OBJECTIF :
+  Permettre la gestion des options produits via dropdowns qui pointent
+  vers des refs Firestore différentes (Type 1 uniquement).
+
+FICHIERS MODIFIÉS (4) :
+  ✅ src/front/pages/Catalogue.tsx (regroupement + hero bleus)
+  ✅ src/front/pages/Produit.tsx (dropdowns + accessoires)
+  ✅ src/front/FrontApp.tsx (route /catalogue/accessoires)
+  ✅ src/admin/pages/FicheProduit.tsx (intégration onglet)
+
+FICHIERS CRÉÉS (3) :
+  ✅ src/lib/productGroupHelpers.ts
+  ✅ src/front/components/ProductOptionSelector.tsx
+  ✅ src/admin/components/produit/OngletOptions.tsx
+
+FICHIERS INTERDITS (intacts) :
+  ✅ Home, Panier, EspaceClient, EspacePartenaire
+  ✅ Header, Footer, PriceDisplay, SearchBar
+  ✅ admin.css
+  ✅ Tous les hooks, lib existants (hors productGroupHelpers)
+
+FONCTIONNALITÉS LIVRÉES :
+  ✅ Regroupement des variantes dans le Catalogue (par groupe_produit)
+  ✅ Dropdowns d'options sur la fiche produit parente
+  ✅ Changement de ref + prix dynamique selon sélection
+  ✅ Injection de la ref sélectionnée dans le panier
+  ✅ Section "Accessoires compatibles" sur les fiches mini-pelles
+  ✅ Route /catalogue/accessoires?compatible=R22
+  ✅ Hero bleu uniforme sur toutes les catégories (#1565C0)
+  ✅ Onglet "Options" dans le back-office AdminProduits
+
+ACTION MICHEL APRÈS LIVRAISON :
+  1. Aller dans le back-office
+  2. Pour chaque groupe de variantes, éditer les produits :
+     - Variantes R22 (3 produits) : mettre groupe_produit = "R22"
+     - Sur le produit MP-R22-001 (parent) : cocher "fiche parente" + configurer dropdown "Chenilles"
+  3. Répéter pour R18, R32, R57, MS/MP maisons, kits solaires
+  4. Durée estimée : 45 min - 1h
+
+COMMITS :
+  3659b4e P2-OPT-A: helper productGroupHelpers
+  f2b303c P2-OPT-B: composant ProductOptionSelector
+  e1d5209 P2-OPT-C: Catalogue regroupement + hero bleus
+  3e8d191 P2-OPT-D: Produit dropdowns + accessoires
+  87386e1 P2-OPT-E: route /catalogue/accessoires
+  8c2995a P2-OPT-F: onglet Options admin
+  e06bac2 P2-OPT: fix TypeScript unused vars
+
+TESTS À EFFECTUER (8) :
+  [ ] Hero bleu uniforme sur /catalogue et /catalogue/:cat
+  [ ] Regroupement variantes (après saisie back-office)
+  [ ] Dropdown fonctionnel sur fiche parente
+  [ ] Prix change selon sélection option
+  [ ] Bonne ref injectée au panier
+  [ ] Section accessoires compatibles sur fiche mini-pelle
+  [ ] Route /catalogue/accessoires?compatible=X
+  [ ] Onglet "Options" dans back-office fonctionnel

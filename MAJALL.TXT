@@ -746,3 +746,5 @@ P2-REVERT — 2026-04-22 — Retour à l'état d'avant P2-A (annulation de tous 
 P2-MAQ — 2026-04-22 — Design des 6 maquettes appliqué sur Home + Catalogue uniquement (scope strict respecté) — OK
 
 FIX-P2MAQ — 2026-04-22 — Fix liens catégories Header (kebab-case) + icônes centrées au-dessus des labels — OK
+
+P2-OPTIONS-STRICT — 2026-04-22 — Système d'options Type 1 (dropdowns + regroupement variantes) + accessoires compatibles + hero bleus + onglet admin — OK
