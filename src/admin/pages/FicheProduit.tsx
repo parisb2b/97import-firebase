@@ -7,6 +7,7 @@ import FicheProduitTabs from '../components/produit/FicheProduitTabs';
 import OngletEssentiel from '../components/produit/OngletEssentiel';
 import OngletDetails from '../components/produit/OngletDetails';
 import OngletMedias from '../components/produit/OngletMedias';
+import OngletOptions from '../components/produit/OngletOptions';
 
 export default function FicheProduit() {
   const [, params] = useRoute('/admin/produits/:ref');
@@ -33,7 +34,7 @@ export default function FicheProduit() {
   const [loading, setLoading] = useState(!isCreation);
   const [saving, setSaving] = useState(false);
   const [dirty, setDirty] = useState(false);
-  const [activeTab, setActiveTab] = useState<'essentiel' | 'details' | 'medias'>('essentiel');
+  const [activeTab, setActiveTab] = useState<'essentiel' | 'details' | 'medias' | 'options'>('essentiel');
 
   const completude = useMemo(() => calculerCompletude(product), [product]);
 
@@ -65,6 +66,27 @@ export default function FicheProduit() {
   const handleChange = (field: string, value: any) => {
     setProduct((prev: any) => ({ ...prev, [field]: value }));
     setDirty(true);
+  };
+
+  const handleUpdateOptions = async (updates: { groupe_produit?: string; options_config?: any }) => {
+    if (isCreation || !product.reference) {
+      alert('❌ Veuillez d\'abord sauvegarder le produit avant de configurer les options.');
+      return;
+    }
+    try {
+      await setDoc(doc(db, 'products', product.reference), {
+        ...updates,
+        updated_at: serverTimestamp(),
+      }, { merge: true });
+
+      // Recharger le produit
+      const snap = await getDoc(doc(db, 'products', product.reference));
+      if (snap.exists()) {
+        setProduct({ id: snap.id, ...snap.data() });
+      }
+    } catch (err: any) {
+      alert('❌ Erreur lors de la sauvegarde : ' + err.message);
+    }
   };
 
   const handleSave = async () => {
@@ -250,9 +272,14 @@ export default function FicheProduit() {
         <OngletDetails product={product} onChange={handleChange} />
       )}
 
-      {/* Onglet Médias — Placeholder Phase 3 */}
+      {/* Onglet Médias */}
       {activeTab === 'medias' && !isCreation && (
         <OngletMedias product={product} onChange={handleChange} />
+      )}
+
+      {/* Onglet Options */}
+      {activeTab === 'options' && !isCreation && (
+        <OngletOptions product={product} onUpdate={handleUpdateOptions} />
       )}
 
       {/* Sticky Footer */}
