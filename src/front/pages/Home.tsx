@@ -2,10 +2,10 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'wouter';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import SearchBar from '@/front/components/SearchBar';
 
 export default function Home() {
   const [, navigate] = useLocation();
-  const [searchQuery, setSearchQuery] = useState('');
   const [productsCount, setProductsCount] = useState<Record<string, number>>({
     'mini-pelle': 0,
     'maison-modulaire': 0,
@@ -33,13 +33,6 @@ export default function Home() {
       }
     })();
   }, []);
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate(`/catalogue?search=${encodeURIComponent(searchQuery.trim())}`);
-    }
-  };
 
   const categories = [
     {
@@ -112,19 +105,9 @@ export default function Home() {
             </p>
 
             {/* Search bar */}
-            <form onSubmit={handleSearch} style={searchFormStyle}>
-              <span style={{ fontSize: 18, color: 'var(--text-3)' }}>🔍</span>
-              <input
-                type="text"
-                placeholder="Rechercher un produit (ex: mini-pelle R22, kit solaire 10kW...)"
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                style={searchInputStyle}
-              />
-              <button type="submit" style={searchButtonStyle}>
-                Rechercher
-              </button>
-            </form>
+            <div style={{ marginBottom: 32, maxWidth: 580 }}>
+              <SearchBar variant="hero" placeholder="Rechercher un produit (ex: mini-pelle R22, kit solaire 10kW...)" />
+            </div>
 
             {/* Stats compact */}
             <div style={heroStatsStyle} className="stats-hero">
@@ -376,43 +359,6 @@ const heroSubtitleStyle: React.CSSProperties = {
   opacity: 0.92,
   marginBottom: 32,
   maxWidth: 580,
-};
-
-const searchFormStyle: React.CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: 8,
-  padding: 8,
-  background: '#fff',
-  borderRadius: 'var(--radius-full)',
-  boxShadow: 'var(--shadow-xl)',
-  maxWidth: 580,
-  marginBottom: 32,
-};
-
-const searchInputStyle: React.CSSProperties = {
-  flex: 1,
-  padding: '10px 8px',
-  border: 'none',
-  outline: 'none',
-  fontSize: 14,
-  background: 'transparent',
-  color: 'var(--text)',
-  fontFamily: 'inherit',
-};
-
-const searchButtonStyle: React.CSSProperties = {
-  padding: '10px 24px',
-  background: 'var(--orange)',
-  color: '#fff',
-  border: 'none',
-  borderRadius: 'var(--radius-full)',
-  fontSize: 13,
-  fontWeight: 600,
-  cursor: 'pointer',
-  fontFamily: 'inherit',
-  transition: 'var(--transition-fast)',
-  whiteSpace: 'nowrap',
 };
 
 const heroStatsStyle: React.CSSProperties = {

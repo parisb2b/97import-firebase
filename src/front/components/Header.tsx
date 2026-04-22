@@ -4,6 +4,7 @@ import { onAuthStateChanged, User, signOut as firebaseSignOut } from 'firebase/a
 import { doc, getDoc } from 'firebase/firestore';
 import { clientAuth, db } from '../../lib/firebase';
 import { useI18n } from '../../i18n';
+import SearchBar from './SearchBar';
 
 export default function Header() {
   const [location] = useLocation();
@@ -121,6 +122,11 @@ export default function Header() {
             );
           })}
         </nav>
+
+        {/* ═══ SEARCH BAR (desktop only) ═══ */}
+        <div className="header-search" style={{ flex: '0 1 320px' }}>
+          <SearchBar variant="header" />
+        </div>
 
         {/* ═══ ZONE DROITE ═══ */}
         <div style={rightZoneStyle}>
@@ -251,6 +257,7 @@ export default function Header() {
       <style>{`
         @media (max-width: 1024px) {
           .nav-desktop { display: none !important; }
+          .header-search { display: none !important; }
           .burger-menu { display: flex !important; }
         }
         @media (min-width: 1025px) {
