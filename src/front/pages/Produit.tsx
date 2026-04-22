@@ -7,6 +7,12 @@ import { useI18n } from '../../i18n';
 import Breadcrumb from '../components/Breadcrumb';
 import PriceDisplay, { getProductPrice } from '../components/PriceDisplay';
 import { useToast } from '../components/Toast';
+import ProductOptionSelector from '../components/ProductOptionSelector';
+import {
+  getAccessoiresCompatibles,
+  extractGroupeCode,
+  OptionsConfig,
+} from '../../lib/productGroupHelpers';
 import {
   getImagePrincipale,
   getMediasOrdonnesPourSite,
@@ -28,6 +34,9 @@ export default function Produit() {
   const [userRole, setUserRole] = useState<string | null>(null);
   const [hasAccessoires, setHasAccessoires] = useState(false);
   const [accCount, setAccCount] = useState(0);
+  const [selectedRef, setSelectedRef] = useState<string | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
+  const [allProducts, setAllProducts] = useState<any[]>([]);
 
   useEffect(() => {
     const unsub = onAuthStateChanged(clientAuth, async (u) => {
@@ -43,6 +52,28 @@ export default function Produit() {
     });
     return () => unsub();
   }, []);
+
+  // Charger tous les produits pour accéder aux variantes + accessoires compatibles
+  useEffect(() => {
+    (async () => {
+      try {
+        const snap = await getDocs(collection(db, 'products'));
+        setAllProducts(snap.docs.map(d => ({ id: d.id, ...d.data() } as any)));
+      } catch (err) {
+        console.error('Erreur chargement produits:', err);
+      }
+    })();
+  }, []);
+
+  // Quand la ref sélectionnée change, charger le produit correspondant
+  useEffect(() => {
+    if (!selectedRef || allProducts.length === 0) {
+      setSelectedProduct(null);
+      return;
+    }
+    const found = allProducts.find(p => p.reference === selectedRef);
+    setSelectedProduct(found || null);
+  }, [selectedRef, allProducts]);
 
   useEffect(() => {
     const load = async () => {
@@ -71,6 +102,8 @@ export default function Produit() {
   if (loading) return <div style={{ padding: 60, textAlign: 'center', color: '#6B7280' }}>...</div>;
   if (!product) return <div style={{ padding: 60, textAlign: 'center', color: '#6B7280' }}>—</div>;
 
+  const displayedProduct = selectedProduct || product;
+
   const pName = (p: any) => {
     const raw = lang === 'zh' ? (p.nom_zh || p.nom_fr) : lang === 'en' ? (p.nom_en || p.nom_fr) : p.nom_fr;
     return (raw || p.nom || p.numero_interne || '').replace(/\s*--\s*/g, ' — ');
@@ -89,19 +122,22 @@ export default function Produit() {
   const nextMedia = () => setSelectedMediaIndex(i => i < medias.length - 1 ? i + 1 : 0);
 
   const handleAddToCart = () => {
+    const refFinale = selectedRef || product.reference || product.id;
+    const produitAAjouter = displayedProduct || product;
+
     const saved = localStorage.getItem('cart');
     const cart = saved ? JSON.parse(saved) : [];
-    const existing = cart.find((c: any) => c.id === product.id);
+    const existing = cart.find((c: any) => c.id === produitAAjouter.id);
     if (existing) {
       existing.qte += 1;
     } else {
       cart.push({
-        id: product.id,
-        ref: product.numero_interne || product.id,
-        nom_fr: product.nom_fr || product.nom || product.numero_interne,
-        prix: getProductPrice(product, userRole),
+        id: produitAAjouter.id,
+        ref: refFinale,
+        nom_fr: produitAAjouter.nom_fr || produitAAjouter.nom || produitAAjouter.numero_interne,
+        prix: getProductPrice(produitAAjouter, userRole),
         qte: 1,
-        image: getImagePrincipale(product) || '',
+        image: getImagePrincipale(produitAAjouter) || '',
       });
     }
     localStorage.setItem('cart', JSON.stringify(cart));
@@ -109,25 +145,25 @@ export default function Produit() {
     showToast(t('product.addToCart') + ' ✅');
   };
 
-  // Specs for badges (top 4)
+  // Specs for badges (top 4) - Use displayedProduct for specs
   const badges = [
-    product.moteur && { icon: '⚙️', label: product.moteur, sub: t('product.moteur') },
-    product.puissance_kw && { icon: '⚡', label: `${product.puissance_kw} kW`, sub: t('product.puissance') },
-    product.poids_net_kg && { icon: '⚖️', label: `${product.poids_net_kg} kg`, sub: t('product.poids') },
-    product.longueur_cm && product.largeur_cm && { icon: '📐', label: `${product.longueur_cm}×${product.largeur_cm} cm`, sub: 'Dimensions' },
+    displayedProduct.moteur && { icon: '⚙️', label: displayedProduct.moteur, sub: t('product.moteur') },
+    displayedProduct.puissance_kw && { icon: '⚡', label: `${displayedProduct.puissance_kw} kW`, sub: t('product.puissance') },
+    displayedProduct.poids_net_kg && { icon: '⚖️', label: `${displayedProduct.poids_net_kg} kg`, sub: t('product.poids') },
+    displayedProduct.longueur_cm && displayedProduct.largeur_cm && { icon: '📐', label: `${displayedProduct.longueur_cm}×${displayedProduct.largeur_cm} cm`, sub: 'Dimensions' },
   ].filter(Boolean) as { icon: string; label: string; sub: string }[];
 
-  // Full specs table
+  // Full specs table - Use displayedProduct for specs
   const specsTable = [
-    { k: t('product.poids'), v: product.poids_net_kg ? `${product.poids_net_kg} kg` : null },
-    { k: t('product.moteur'), v: product.moteur },
-    { k: t('product.puissance'), v: product.puissance_kw ? `${product.puissance_kw} kW` : null },
-    { k: t('product.longueur'), v: product.longueur_cm ? `${product.longueur_cm} cm` : null },
-    { k: t('product.largeur'), v: product.largeur_cm ? `${product.largeur_cm} cm` : null },
-    { k: t('product.hauteur'), v: product.hauteur_cm ? `${product.hauteur_cm} cm` : null },
-    { k: t('product.marque'), v: product.marque },
-    { k: t('product.matiere'), v: pMat(product) },
-    { k: t('product.codeHs'), v: product.code_hs },
+    { k: t('product.poids'), v: displayedProduct.poids_net_kg ? `${displayedProduct.poids_net_kg} kg` : null },
+    { k: t('product.moteur'), v: displayedProduct.moteur },
+    { k: t('product.puissance'), v: displayedProduct.puissance_kw ? `${displayedProduct.puissance_kw} kW` : null },
+    { k: t('product.longueur'), v: displayedProduct.longueur_cm ? `${displayedProduct.longueur_cm} cm` : null },
+    { k: t('product.largeur'), v: displayedProduct.largeur_cm ? `${displayedProduct.largeur_cm} cm` : null },
+    { k: t('product.hauteur'), v: displayedProduct.hauteur_cm ? `${displayedProduct.hauteur_cm} cm` : null },
+    { k: t('product.marque'), v: displayedProduct.marque },
+    { k: t('product.matiere'), v: pMat(displayedProduct) },
+    { k: t('product.codeHs'), v: displayedProduct.code_hs },
   ].filter(s => s.v);
 
   return (
@@ -288,8 +324,18 @@ export default function Produit() {
 
           {/* Price */}
           <div style={{ marginBottom: 22 }}>
-            <PriceDisplay product={product} userRole={userRole} size="lg" />
+            <PriceDisplay product={displayedProduct} userRole={userRole} size="lg" />
           </div>
+
+          {/* Product Options Selector */}
+          {product.options_config && (
+            <ProductOptionSelector
+              optionsConfig={product.options_config as OptionsConfig}
+              onSelectionChange={(ref, selection) => {
+                setSelectedRef(ref);
+              }}
+            />
+          )}
 
           {/* Action buttons */}
           {userRole && (
@@ -465,30 +511,89 @@ export default function Produit() {
         );
       })()}
 
-      {/* Accessoires banner */}
-      {hasAccessoires && (
-        <div style={{ maxWidth: 1280, margin: '0 auto', padding: '24px 20px 60px' }}>
-          <Link href={`/catalogue/${product.categorie}`}>
-            <div style={{
-              background: `linear-gradient(135deg, ${B}, #1E88E5)`, borderRadius: 16,
-              padding: 20, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            }}>
-              <div>
-                <div style={{ color: 'white', fontWeight: 700, fontSize: 15 }}>
-                  🔧 {t('product.accessories')} {product.gamme || pName(product)}
-                </div>
-                <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: 13, marginTop: 4 }}>
-                  {accCount} {t('product.accessoriesCount')}
+      {/* Accessoires compatibles section (mini-pelles uniquement) */}
+      {(product.categorie?.toLowerCase().includes('mini-pelle') || product.reference?.startsWith('MP-')) && (() => {
+        const groupeCode = extractGroupeCode(product.reference);
+        const accessoires = groupeCode ? getAccessoiresCompatibles(allProducts, groupeCode) : [];
+
+        if (accessoires.length === 0) return <div style={{ height: 60 }} />;
+
+        return (
+          <section style={{ padding: '48px 0', background: '#F9FAFB' }}>
+            <div style={{ maxWidth: 1400, margin: '0 auto', padding: '0 24px' }}>
+              <div style={{
+                background: '#fff', padding: 24, borderRadius: 16,
+                marginBottom: 20, display: 'flex', alignItems: 'center', gap: 16,
+                boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
+              }}>
+                <span style={{ fontSize: 32 }}>🔧</span>
+                <div>
+                  <div style={{ fontSize: 20, fontWeight: 700, color: '#0F172A' }}>
+                    Accessoires compatibles {groupeCode}
+                  </div>
+                  <div style={{ fontSize: 13, color: '#6B7280', marginTop: 4 }}>
+                    {accessoires.length} accessoire{accessoires.length > 1 ? 's' : ''} disponible{accessoires.length > 1 ? 's' : ''}
+                  </div>
                 </div>
               </div>
-              <span style={{ color: 'white', fontSize: 24 }}>→</span>
-            </div>
-          </Link>
-        </div>
-      )}
 
-      {/* Bottom padding if no accessories */}
-      {!hasAccessoires && <div style={{ height: 60 }} />}
+              {/* Preview 3 accessoires */}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+                gap: 16, marginBottom: 20,
+              }}>
+                {accessoires.slice(0, 3).map(a => (
+                  <Link
+                    key={a.id}
+                    href={`/produit/${a.reference || a.id}`}
+                  >
+                    <div style={{
+                      display: 'flex', flexDirection: 'column',
+                      background: '#fff', borderRadius: 12, overflow: 'hidden',
+                      textDecoration: 'none', color: '#0F172A',
+                      boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
+                      cursor: 'pointer',
+                    }}>
+                      <div style={{
+                        aspectRatio: '4/3', background: '#F3F4F6',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      }}>
+                        {a.image_principale ? (
+                          <img src={a.image_principale} alt={a.nom_fr} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        ) : (
+                          <span style={{ fontSize: 40 }}>🔧</span>
+                        )}
+                      </div>
+                      <div style={{ padding: 12 }}>
+                        <div style={{ fontSize: 13, fontWeight: 600 }}>{a.nom_fr || a.reference}</div>
+                        <div style={{ fontSize: 11, color: '#6B7280', marginTop: 4 }}>{a.reference}</div>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+
+              {/* Bouton voir tous */}
+              <div style={{ textAlign: 'center' }}>
+                <Link href={`/catalogue/accessoires?compatible=${groupeCode}`}>
+                  <a style={{
+                    display: 'inline-block', padding: '12px 32px',
+                    background: '#EA580C', color: '#fff',
+                    textDecoration: 'none', borderRadius: 10,
+                    fontSize: 14, fontWeight: 700,
+                  }}>
+                    Voir tous les accessoires compatibles →
+                  </a>
+                </Link>
+              </div>
+            </div>
+          </section>
+        );
+      })()}
+
+      {/* Bottom padding if not mini-pelle */}
+      {!(product.categorie?.toLowerCase().includes('mini-pelle') || product.reference?.startsWith('MP-')) && <div style={{ height: 60 }} />}
     </>
   );
 }
