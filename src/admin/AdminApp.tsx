@@ -36,6 +36,7 @@ import DetailCommission from './pages/DetailCommission';
 import DetailFraisLogistique from './pages/DetailFraisLogistique';
 import DetailClient from './pages/DetailClient';
 import DetailPartenaire from './pages/DetailPartenaire';
+import AcomptesEncaisser from './pages/AcomptesEncaisser';
 
 // Sidebar item type
 interface SidebarItem {
@@ -59,8 +60,9 @@ const SIDEBAR_SECTIONS: SidebarSection[] = [
     items: [
       { path: '/admin', label: 'Tableau de bord', icon: '📊' },
       { path: '/admin/devis', label: 'Devis', icon: '📋' },
+      { path: '/admin/acomptes', label: 'Acomptes à encaisser', icon: '💰' },
       { path: '/admin/factures', label: 'Factures', icon: '🧾' },
-      { path: '/admin/commissions', label: 'Notes de commission', icon: '💰' },
+      { path: '/admin/commissions', label: 'Notes de commission', icon: '💼' },
       { path: '/admin/frais', label: 'Factures logistiques', icon: '🛳' },
     ],
   },
@@ -296,6 +298,7 @@ export default function AdminApp() {
               <Route path="/admin/devis" component={ListeDevis} />
               <Route path="/admin/devis/nouveau" component={DetailDevis} />
               <Route path="/admin/devis/:id" component={DetailDevis} />
+              <Route path="/admin/acomptes" component={AcomptesEncaisser} />
               <Route path="/admin/factures/:id" component={DetailFacture} />
               <Route path="/admin/factures" component={Factures} />
               <Route path="/admin/commissions/:id" component={DetailCommission} />
