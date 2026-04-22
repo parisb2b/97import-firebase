@@ -4,12 +4,11 @@ import { Link } from 'wouter';
 import { db } from '../../lib/firebase';
 import { useI18n } from '../../i18n';
 import SearchBar from '../components/SearchBar';
-import { getImagePrincipale } from '@/lib/productMediaHelpers';
 
 export default function Home() {
-  const { t } = useI18n();
+  useI18n(); // Keep i18n initialized
   const [products, setProducts] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [_loading, setLoading] = useState(true);
 
   useEffect(() => {
     getDocs(collection(db, 'products')).then(snap => {
