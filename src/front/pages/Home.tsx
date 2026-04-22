@@ -6,7 +6,7 @@ import { db } from '@/lib/firebase';
 export default function Home() {
   const [, navigate] = useLocation();
   const [searchQuery, setSearchQuery] = useState('');
-  const [productsCount, setProductsCount] = useState({
+  const [productsCount, setProductsCount] = useState<Record<string, number>>({
     'mini-pelle': 0,
     'maison-modulaire': 0,
     'solaire': 0,
