@@ -8,6 +8,7 @@ import OngletEssentiel from '../components/produit/OngletEssentiel';
 import OngletDetails from '../components/produit/OngletDetails';
 import OngletMedias from '../components/produit/OngletMedias';
 import OngletOptions from '../components/produit/OngletOptions';
+import ModalDupliquerProduit from '../components/produit/ModalDupliquerProduit';
 
 export default function FicheProduit() {
   const [, params] = useRoute('/admin/produits/:ref');
@@ -35,6 +36,7 @@ export default function FicheProduit() {
   const [saving, setSaving] = useState(false);
   const [dirty, setDirty] = useState(false);
   const [activeTab, setActiveTab] = useState<'essentiel' | 'details' | 'medias' | 'options'>('essentiel');
+  const [modalDupliquerOpen, setModalDupliquerOpen] = useState(false);
 
   const completude = useMemo(() => calculerCompletude(product), [product]);
 
@@ -186,6 +188,13 @@ export default function FicheProduit() {
     }
   };
 
+  const handleDupliquerSuccess = (_newId: string, newRef: string) => {
+    setModalDupliquerOpen(false);
+    alert(`✅ Produit dupliqué avec la référence "${newRef}".\nVous êtes redirigé vers le nouveau produit.`);
+    // Redirection vers la fiche du nouveau produit
+    setLocation(`/admin/produits/${newRef}`);
+  };
+
   if (loading) {
     return (
       <div style={{ padding: 60, textAlign: 'center', color: '#9CA3AF' }}>
@@ -304,6 +313,26 @@ export default function FicheProduit() {
               Supprimer
             </button>
           )}
+          {!isCreation && product?.reference && (
+            <button
+              onClick={() => setModalDupliquerOpen(true)}
+              disabled={!product?.reference}
+              style={{
+                padding: '8px 16px',
+                background: '#F59E0B',
+                color: '#fff',
+                border: 'none',
+                borderRadius: 10,
+                fontSize: 13,
+                fontWeight: 600,
+                cursor: product?.reference ? 'pointer' : 'not-allowed',
+                opacity: product?.reference ? 1 : 0.5,
+                fontFamily: 'inherit',
+              }}
+            >
+              📋 Dupliquer
+            </button>
+          )}
           <button onClick={handleSave} disabled={saving}
             style={{
               padding: '10px 24px',
@@ -323,6 +352,15 @@ export default function FicheProduit() {
           </button>
         </div>
       </div>
+
+      {/* Modal Dupliquer */}
+      {modalDupliquerOpen && product && (
+        <ModalDupliquerProduit
+          produit={product}
+          onClose={() => setModalDupliquerOpen(false)}
+          onSuccess={handleDupliquerSuccess}
+        />
+      )}
     </div>
   );
 }
