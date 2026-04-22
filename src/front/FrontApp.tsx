@@ -6,6 +6,7 @@ import Footer from './components/Footer';
 import Home from './pages/Home';
 import Catalogue from './pages/Catalogue';
 import Produit from './pages/Produit';
+import Recherche from './pages/Recherche';
 import Connexion from './pages/Connexion';
 import Inscription from './pages/Inscription';
 import Panier from './pages/Panier';
@@ -32,6 +33,7 @@ export default function FrontApp() {
           <Route path="/catalogue/:categorie/:gamme" component={Catalogue} />
           <Route path="/catalogue/:categorie" component={Catalogue} />
           <Route path="/produit/:id" component={Produit} />
+          <Route path="/recherche" component={Recherche} />
           <Route path="/connexion" component={Connexion} />
           <Route path="/inscription" component={Inscription} />
           <Route path="/panier" component={Panier} />
