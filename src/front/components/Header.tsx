@@ -192,26 +192,31 @@ export default function Header() {
 
               {showUserMenu && (
                 <div style={userDropdownStyle}>
-                  <Link
-                    href={role === 'partner' ? '/espace-partenaire' : '/espace-client'}
-                    style={userOptionStyle}
-                    onClick={() => setShowUserMenu(false)}
-                  >
-                    {t('header.mySpace') || 'Mon espace'}
-                  </Link>
-                  <Link
-                    href="/mon-compte"
-                    style={userOptionStyle}
-                    onClick={() => setShowUserMenu(false)}
-                  >
-                    {t('header.myAccount') || 'Mon compte'}
-                  </Link>
+                  {role === 'partner' ? (
+                    <Link
+                      href="/espace-partenaire"
+                      style={userOptionStyle}
+                      onClick={() => setShowUserMenu(false)}
+                    >
+                      Mon espace partenaire
+                    </Link>
+                  ) : (
+                    <Link
+                      href="/espace-client"
+                      style={userOptionStyle}
+                      onClick={() => setShowUserMenu(false)}
+                    >
+                      Mon espace client
+                    </Link>
+                  )}
+
                   <hr style={{ margin: '6px 0', border: 'none', borderTop: '1px solid var(--border)' }} />
+
                   <button
                     onClick={handleSignOut}
-                    style={{ ...userOptionStyle, color: 'var(--danger)', textAlign: 'left', width: '100%' }}
+                    style={{ ...userOptionStyle, color: 'var(--danger)', textAlign: 'left', width: '100%', background: 'transparent', border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}
                   >
-                    {t('auth.deconnexion') || 'Déconnexion'}
+                    Déconnexion
                   </button>
                 </div>
               )}
