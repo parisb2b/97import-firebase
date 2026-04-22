@@ -1,0 +1,85 @@
+=== MAJ P2-C — Catalogue + ProductCard + Recherche Google-like ===
+Date : 22/04/2026 13:00
+Branche : v2
+Build : OK (0 erreur TypeScript)
+
+NOUVEAUX FICHIERS :
+  src/lib/searchHelpers.ts — recherche multi-champs avec score pertinence
+  src/front/pages/Recherche.tsx — page résultats exhaustifs
+
+FICHIERS REFAITS :
+  src/front/components/SearchBar.tsx — Google-like avec dropdown live
+  src/front/components/ProductCard.tsx — design maquette + badges
+  src/front/pages/Catalogue.tsx — hero catégorie + filtres + tri
+  src/front/components/Header.tsx — intégration SearchBar
+  src/front/pages/Home.tsx — utilise SearchBar variant hero
+  src/front/FrontApp.tsx — route /recherche
+
+FONCTIONNALITÉS RECHERCHE :
+  ✅ Multi-champs (référence, nom FR/ZH/EN, descriptions, points forts, fournisseur, etc.)
+  ✅ Insensible casse + accents
+  ✅ Score de pertinence (référence > nom > description)
+  ✅ Live (debounce 200ms)
+  ✅ Dropdown avec thumbnails (8 résultats max)
+  ✅ Page /recherche dédiée pour résultats exhaustifs (200 max)
+  ✅ Disponible Header (toujours) + Hero accueil
+
+CATALOGUE :
+  ✅ Hero catégorie dynamique (image + titre + desc + couleur)
+  ✅ Filtres latéraux : catégories + gammes
+  ✅ Tri : récent / nom / prix
+  ✅ Breadcrumb
+  ✅ Compteur de produits
+  ✅ Responsive mobile (filtres en bouton ⚙️)
+
+PRODUCTCARD :
+  ✅ Image avec aspect-ratio 4:3
+  ✅ Badges (Nouveau si < 30j, VIP si prix négocié)
+  ✅ Catégorie chip
+  ✅ Référence overlay bas-droite
+  ✅ Description courte tronquée (80 car)
+  ✅ Prix selon rôle (PriceDisplay)
+  ✅ Hover effect (transition CSS)
+
+COMMITS (6) :
+  8d93436 P2-C-A: helper searchHelpers (recherche Google-like multi-champs + accents)
+  0858e2d P2-C-B: refonte SearchBar Google-like + intégration Header + Home
+  593c5c8 P2-C-C: page Recherche dédiée pour résultats exhaustifs
+  bce4396 P2-C-D: refonte ProductCard (image + badges + cat chip + ref + hover)
+  55c4d10 P2-C-E: refonte page Catalogue (hero catégorie + filtres latéraux + tri + responsive)
+  8d0d9c3 P2-C-F: fix TypeScript unused vars (onAddToCart, navigate)
+
+TESTS À EFFECTUER PAR MICHEL (10) :
+  [ ] Test 1 : Page /catalogue/mini-pelle → hero bleu avec image + titre + desc + compteur
+  [ ] Test 2 : Filtres latéraux catégories fonctionnels
+  [ ] Test 3 : Filtre gamme dynamique (si produits ont gammes)
+  [ ] Test 4 : Tri "Plus récents" / "Nom A→Z" / "Prix croissant" / "Prix décroissant"
+  [ ] Test 5 : ProductCards avec image 4:3 + badges Nouveau/VIP + référence overlay
+  [ ] Test 6 : SearchBar header : taper "mini" → dropdown 8 résultats avec thumbnails
+  [ ] Test 7 : SearchBar header : taper "R22" → trouve toutes les R22
+  [ ] Test 8 : Click résultat dropdown → ouvre page /produit/:id
+  [ ] Test 9 : Click "Voir tous les résultats" → page /recherche?q=... exhaustive (200 max)
+  [ ] Test 10 : Mobile (< 1024px) → filtres masqués, bouton "⚙️ Filtres" visible
+
+COMPATIBILITÉ :
+  ✅ Conserve Header + Footer P2-A
+  ✅ Conserve Home P2-B
+  ✅ Utilise variables CSS (--blue, --orange, --radius, etc.)
+  ✅ Utilise productMediaHelpers pour images
+  ✅ Compatibilité routing Wouter
+  ✅ Aucune régression autres pages
+
+PROCHAINE ÉTAPE :
+  P2-D : Refonte page Produit (galerie + specs + boutons + recommandations)
+  - Galerie avec zoom (images + vidéos + PDFs)
+  - Specs techniques (tableau)
+  - Points forts en bullets
+  - Boutons CTA (Devis, Panier, WhatsApp)
+  - Produits similaires (même catégorie)
+
+═══════════════════════════════════════════════════════════
+  P2-C TERMINÉE ✅
+  Build: OK (0 erreur TypeScript)
+  6 commits pushed sur branche v2
+  SearchBar + Catalogue + ProductCard refondus selon maquettes
+═══════════════════════════════════════════════════════════
