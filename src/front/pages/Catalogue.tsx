@@ -6,7 +6,7 @@ import { db, clientAuth } from '../../lib/firebase';
 import { useI18n } from '../../i18n';
 import Breadcrumb from '../components/Breadcrumb';
 import ProductCard from '../components/ProductCard';
-import { regrouperProduitsParGroupe } from '../../lib/productGroupHelpers';
+import { regrouperProduitsParGroupe, getAccessoiresCompatibles } from '../../lib/productGroupHelpers';
 
 const CATEGORIES_INFO: Record<string, { label: string; desc: string; image: string | null; color: string; icon: string }> = {
   'mini-pelle': {
@@ -54,7 +54,14 @@ export default function Catalogue() {
   const [_user, setUser] = useState<User | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
   const [filterGamme, setFilterGamme] = useState('');
+  const [compatibleFilter, setCompatibleFilter] = useState<string | null>(null);
   const { t, lang } = useI18n();
+
+  // Lire query param "compatible" pour filtrer les accessoires
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    setCompatibleFilter(params.get('compatible'));
+  }, []);
 
   useEffect(() => {
     const unsub = onAuthStateChanged(clientAuth, async (u) => {
@@ -88,6 +95,14 @@ export default function Catalogue() {
         // Catégories à exclure du catalogue public (services internes)
         const CATEGORIES_EXCLUES = ['logistique'];
 
+        // Si route = /catalogue/accessoires avec ?compatible=R22
+        if (categorie === 'accessoires' && compatibleFilter) {
+          const accessories = getAccessoiresCompatibles(all, compatibleFilter);
+          setProducts(accessories);
+          setLoading(false);
+          return;
+        }
+
         const filtered = categorie
           ? all.filter(p => {
               const catNormalisee = normalizeCategorie(p.categorie);
@@ -114,7 +129,7 @@ export default function Catalogue() {
     };
     load();
     setFilterGamme('');
-  }, [categorie]);
+  }, [categorie, compatibleFilter]);
 
   // Get distinct gammes for filter chips
   const gammes = [...new Set(products.map(p => p.gamme).filter(Boolean))].sort();
