@@ -545,3 +545,80 @@ export async function notifyAcompteEncaisse(
     }
   }
 }
+
+// ═══════════════════════════════════════════════════════
+// P3-WF1: FACTURE ACOMPTE (NOUVEAU WORKFLOW)
+// ═══════════════════════════════════════════════════════
+
+/**
+ * Envoie l'email de confirmation de paiement acompte au client
+ * avec le PDF en pièce jointe (via URL Firebase Storage)
+ */
+export async function envoyerEmailFactureAcompte(params: {
+  clientEmail: string;
+  clientNom: string;
+  factureNumero: string;
+  devisNumero: string;
+  acompteNumero: number;
+  estSolde: boolean;
+  montantAcompte: number;
+  totalPaye: number;
+  totalDevis: number;
+  pdfUrl: string;
+  estEntierementPaye: boolean;
+}): Promise<void> {
+  const subject = params.estEntierementPaye
+    ? `✅ Facture payée intégralement — ${params.devisNumero}`
+    : params.estSolde
+      ? `Facture solde reçue — ${params.factureNumero}`
+      : `Facture acompte n°${params.acompteNumero}/3 reçue — ${params.factureNumero}`;
+
+  const restant = params.totalDevis - params.totalPaye;
+
+  const html = baseTemplate({
+    preheader: params.estEntierementPaye ? 'Votre devis est intégralement payé' : `Acompte n°${params.acompteNumero} reçu`,
+    title: params.estEntierementPaye ? '✅ Facture payée intégralement' : `Acompte n°${params.acompteNumero} reçu`,
+    intro: `Bonjour ${params.clientNom},<br><br>Nous avons bien reçu votre paiement. Vous trouverez ci-joint votre facture <strong>${params.factureNumero}</strong>.`,
+    body: `
+      <div style="background:#FBF0ED;padding:16px;border-radius:8px;margin:20px 0;">
+        <h3 style="margin:0 0 12px;color:#C87F6B;">Détail du paiement</h3>
+        <p style="margin:4px 0;"><strong>Devis d'origine :</strong> ${params.devisNumero}</p>
+        <p style="margin:4px 0;"><strong>Montant reçu :</strong> ${formatEur(params.montantAcompte)}</p>
+        <p style="margin:4px 0;"><strong>Total payé à ce jour :</strong> ${formatEur(params.totalPaye)}</p>
+        <p style="margin:4px 0;"><strong>Total devis :</strong> ${formatEur(params.totalDevis)}</p>
+        ${restant > 0.01 ? `<p style="margin:4px 0;color:#D97706;"><strong>Reste à payer :</strong> ${formatEur(restant)}</p>` : ''}
+      </div>
+
+      ${params.estEntierementPaye
+        ? `<p style="background:#D1FAE5;padding:12px;border-left:4px solid #10B981;border-radius:4px;">
+             🎉 Votre devis est intégralement payé. Nous allons procéder au lancement de la production.
+           </p>`
+        : `<p>Pour effectuer le paiement suivant, merci de vous référer aux coordonnées bancaires indiquées sur votre devis.</p>`
+      }
+    `,
+    ctaLabel: '📄 Télécharger la facture',
+    ctaUrl: params.pdfUrl,
+    footer: `
+      <p style="margin-top:32px;color:#6B7280;font-size:13px;">
+        Merci pour votre confiance.<br>
+        L'équipe 97import
+      </p>
+    `,
+  });
+
+  await sendEmail({
+    to: params.clientEmail,
+    message: {
+      subject,
+      html,
+      text: htmlToText(html),
+      attachments: [{ filename: `${params.factureNumero}.pdf`, path: params.pdfUrl }],
+    },
+    _metadata: {
+      event: 'facture_acompte',
+      devis_id: params.devisNumero,
+      created_at: null,
+    },
+  });
+}
+
