@@ -1,0 +1,78 @@
+=== MAJ P3-ADMIN-DUPLIQUER — Bouton Dupliquer produit ===
+Date : 2026-04-22
+Branche : v2
+Build : OK
+
+FICHIERS CRÉÉS (1) :
+  ✅ src/admin/components/produit/ModalDupliquerProduit.tsx
+
+FICHIERS MODIFIÉS (1) :
+  ✅ src/admin/pages/FicheProduit.tsx (ajout bouton + intégration modal)
+
+FONCTIONNALITÉS :
+  ✅ Bouton "📋 Dupliquer" dans la fiche produit admin
+  ✅ Modal avec saisie nouvelle ref + nom + catégorie
+  ✅ Vérification unicité de la ref (query Firestore)
+  ✅ Copie de TOUS les champs sauf : id, groupe_produit, options_config, image_principale
+  ✅ Traçabilité : duplique_de + duplique_le ajoutés
+  ✅ Checkbox "Créer en désactivé" (cochée par défaut)
+  ✅ Redirection automatique vers la nouvelle fiche
+  ✅ admin.css non modifié (styles inline uniquement)
+
+COMMITS :
+  668d743 - P3-DUP-A: composant ModalDupliquerProduit
+  5cedd37 - P3-DUP-B: bouton Dupliquer + modal intégrée dans FicheProduit
+
+TESTS À EFFECTUER :
+  [ ] Bouton visible à côté de Enregistrer (uniquement en édition, pas en création)
+  [ ] Modal affiche source + champs vides
+  [ ] Validation ref dupliquée → erreur affichée dans la modal
+  [ ] Duplication réussie → redirection nouvelle fiche
+  [ ] Produit créé avec actif=false (si checkbox cochée)
+  [ ] Champs dupliqués fidèlement (prix, specs, composition_kit, etc.)
+  [ ] Champs exclus bien absents (groupe_produit, options_config, image_principale)
+  [ ] Traçabilité visible en Firestore (duplique_de + duplique_le)
+
+NOTES TECHNIQUES :
+  - Le bouton est positionné entre "Supprimer" et "Enregistrer"
+  - Couleur orange (#F59E0B) pour le distinguer visuellement
+  - Modal avec overlay fixe (z-index 10000)
+  - Validation côté client ET Firestore (where reference == ...)
+  - Utilise addDoc() pour auto-génération ID Firestore
+  - Redirection vers /admin/produits/{newRef} (ref, pas ID)
+  - Alert navigateur pour confirmation visuelle
+
+COMPORTEMENT DÉTAILLÉ :
+  1. User clique "📋 Dupliquer" sur une fiche existante
+  2. Modal s'ouvre avec :
+     - Info produit source (ref + nom)
+     - Input nouvelle ref (vide, focus auto)
+     - Input nouveau nom (pré-rempli "COPIE DE ...")
+     - Input catégorie (pré-rempli avec catégorie actuelle)
+     - Checkbox "Créer en désactivé" (cochée)
+  3. User saisit nouvelle ref + ajuste le nom
+  4. Click "Dupliquer" :
+     a. Validation formulaire (ref non vide, différente, nom non vide)
+     b. Query Firestore where('reference', '==', nouvelleRef)
+     c. Si existe → erreur affichée en rouge dans modal
+     d. Sinon :
+        - Copie tous les champs du produit
+        - Supprime : id, groupe_produit, options_config, image_principale
+        - Remplace : reference, nom_fr, categorie, actif
+        - Ajoute : duplique_de, duplique_le, created_at, updated_at
+        - addDoc(collection(db, 'products'), nouveauProduit)
+        - Ferme modal
+        - Alert "✅ Produit dupliqué..."
+        - Redirection vers /admin/produits/{newRef}
+  5. User arrive sur la fiche du nouveau produit (vierge de groupe/options/image)
+
+FICHIERS NON TOUCHÉS (conformité stricte) :
+  ✅ admin.css (styles inline uniquement)
+  ✅ Aucun autre composant modifié
+  ✅ Aucune route ajoutée
+  ✅ Firestore Rules non modifiées
+
+PÉRIMÈTRE RESPECTÉ : 100%
+  - 1 fichier créé (autorisé)
+  - 1 fichier modifié (autorisé)
+  - 0 fichier hors périmètre touché
