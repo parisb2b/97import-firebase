@@ -4,6 +4,7 @@ import { Link } from 'wouter';
 import { db } from '../../lib/firebase';
 import { useI18n } from '../../i18n';
 import SearchBar from '../components/SearchBar';
+import { getImagePrincipale } from '@/lib/productMediaHelpers';
 
 const CAT_ICONS: Record<string, string> = {
   'Mini-Pelle': '🏗️', 'Maisons': '🏠', 'Solaire': '☀️',
@@ -37,7 +38,7 @@ export default function Home() {
       if (!cats.has(cat)) cats.set(cat, { nom: cat, count: 0, image: null });
       const c = cats.get(cat)!;
       c.count++;
-      if (!c.image && p.images_urls?.length) c.image = p.images_urls[0];
+      if (!c.image) c.image = getImagePrincipale(p);
     });
     return Array.from(cats.values()).sort((a, b) => b.count - a.count);
   }, [products]);

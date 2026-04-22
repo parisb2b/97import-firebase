@@ -3,6 +3,7 @@ import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { useLocation } from 'wouter';
 import { useI18n } from '../../i18n';
+import { getImagePrincipale } from '@/lib/productMediaHelpers';
 export default function SearchBar() {
   const { t, lang } = useI18n();
   const [q, setQ] = useState('');
@@ -82,11 +83,14 @@ export default function SearchBar() {
             onMouseEnter={e => (e.currentTarget.style.background = '#F5F7FA')}
             onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
             >
-              {p.images_urls?.[0] ? (
-                <img src={p.images_urls[0]} alt="" style={{ width: 40, height: 40, borderRadius: 8, objectFit: 'cover' }} />
-              ) : (
-                <div style={{ width: 40, height: 40, borderRadius: 8, background: '#E2E8F0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>📦</div>
-              )}
+              {(() => {
+                const img = getImagePrincipale(p);
+                return img ? (
+                  <img src={img} alt="" style={{ width: 40, height: 40, borderRadius: 8, objectFit: 'cover' }} />
+                ) : (
+                  <div style={{ width: 40, height: 40, borderRadius: 8, background: '#E2E8F0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>📦</div>
+                );
+              })()}
               <div>
                 <div style={{ fontSize: 13, fontWeight: 600, color: '#1565C0' }}>{lang === 'zh' ? (p.nom_zh || p.nom_fr) : lang === 'en' ? (p.nom_en || p.nom_fr) : p.nom_fr || p.nom}</div>
                 <div style={{ fontSize: 11, color: '#94A3B8' }}>{p.categorie}{p.gamme ? ` · ${p.gamme}` : ''}{p.reference ? ` · ${p.reference}` : ''}</div>
