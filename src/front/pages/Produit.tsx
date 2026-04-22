@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useRoute, Link } from 'wouter';
-import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
+import { doc, getDoc, collection, getDocs } from 'firebase/firestore';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { db, clientAuth } from '../../lib/firebase';
 import { useI18n } from '../../i18n';
@@ -32,8 +32,6 @@ export default function Produit() {
   const [selectedMediaIndex, setSelectedMediaIndex] = useState(0);
   const [_user, setUser] = useState<User | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
-  const [hasAccessoires, setHasAccessoires] = useState(false);
-  const [accCount, setAccCount] = useState(0);
   const [selectedRef, setSelectedRef] = useState<string | null>(null);
   const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
   const [allProducts, setAllProducts] = useState<any[]>([]);
@@ -84,10 +82,6 @@ export default function Produit() {
         if (snap.exists()) {
           const p: any = { id: snap.id, ...snap.data() };
           setProduct(p);
-          const accQ = query(collection(db, 'products'), where('machine_compatible', '==', p.gamme || p.id));
-          const accSnap = await getDocs(accQ);
-          setHasAccessoires(accSnap.size > 0);
-          setAccCount(accSnap.size);
         }
       } catch (err) {
         console.error('Error:', err);
@@ -331,7 +325,7 @@ export default function Produit() {
           {product.options_config && (
             <ProductOptionSelector
               optionsConfig={product.options_config as OptionsConfig}
-              onSelectionChange={(ref, selection) => {
+              onSelectionChange={(ref) => {
                 setSelectedRef(ref);
               }}
             />

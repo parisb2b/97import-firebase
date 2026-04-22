@@ -4,7 +4,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import {
   OptionsConfig,
-  OptionDropdown,
   getRefFromSelection,
   dropdownEstVisible,
   filtrerChoixSelonConditions,
