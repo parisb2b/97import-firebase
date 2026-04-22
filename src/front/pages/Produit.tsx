@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useParams, useLocation, Link } from 'wouter';
+import { useParams, Link } from 'wouter';
 import { collection, doc, getDoc, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import {
@@ -17,7 +17,6 @@ type Tab = 'description' | 'specs' | 'forts' | 'documents';
 export default function Produit() {
   const params = useParams<{ id: string }>();
   const productId = params?.id;
-  const [, navigate] = useLocation();
 
   const [product, setProduct] = useState<any>(null);
   const [loading, setLoading] = useState(true);
