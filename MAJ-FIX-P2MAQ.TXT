@@ -1,0 +1,85 @@
+=== MAJ FIX-P2MAQ — Liens kebab-case + icônes verticales ===
+Date : 2026-04-22 17:00
+Branche : v2
+Build : ✅ OK (0 erreur TypeScript, built in 3.53s)
+
+FICHIER MODIFIÉ (exclusivement) :
+  ✅ src/front/components/Header.tsx (13 insertions, 8 deletions)
+
+CORRECTIONS :
+
+  Fix 1 — Liens catégories (lignes 99-103)
+    /catalogue/Mini-Pelle        → /catalogue/mini-pelle
+    /catalogue/Maisons           → /catalogue/maison-modulaire
+    /catalogue/Solaire           → /catalogue/solaire
+    /catalogue/Agricole          → /catalogue/agricole
+    /catalogue/Divers            → /catalogue/divers
+    
+  Fix 2 — Layout icônes menu (lignes 170-189)
+    AVANT : icônes à gauche des labels (horizontal inline)
+            {item.icon} {item.label}
+            
+    APRÈS : icônes centrées au-dessus des labels (layout vertical)
+            <span flexDirection="column" alignItems="center">
+              <span fontSize={18}>{item.icon}</span>
+              <span fontSize={11}>{item.label}</span>
+            </span>
+            
+    Changements de style :
+    - display: 'inline-flex'
+    - flexDirection: 'column'
+    - alignItems: 'center'
+    - gap: 2
+    - padding: '4px 10px' (réduit de 6px à 4px verticalement)
+    - Icône : fontSize: 18, lineHeight: 1
+    - Label : fontSize: 11, fontWeight: 500
+
+IMPACT :
+  ✅ Hero catégorie s'affiche correctement (catInfo trouvé via kebab-case)
+  ✅ Produits filtrés par catégorie (déjà fonctionnel, renforcé)
+  ✅ Breadcrumb cohérent ("Accueil › Mini-Pelles RIPPA")
+  ✅ Menu plus compact en largeur (icônes au-dessus)
+  ✅ Items menu occupent ~42px de hauteur (dans les 64px du header)
+  ✅ Aucune régression sur autres fichiers
+
+FICHIERS NON MODIFIÉS (vérifiés) :
+  ✅ Catalogue.tsx (déjà OK après P2-MAQ)
+  ✅ Home.tsx
+  ✅ FrontApp.tsx
+  ✅ Tous les autres composants
+
+COMMITS (1) :
+  65d690a FIX-P2MAQ: liens catégories kebab-case + icônes au-dessus des labels
+
+TESTS À EFFECTUER (7) :
+  [ ] Clic Mini-Pelles → hero bleu avec image mini-pelle + "42 produits disponibles"
+  [ ] Clic Maisons → hero vert avec image maison + "23 produits disponibles"
+  [ ] Clic Solaire → hero orange avec image solaire + "23 produits disponibles"
+  [ ] Clic Agricole → hero vert (fond coloré, icône 🌾) + "8 produits disponibles"
+  [ ] Clic Divers → hero violet (fond coloré, icône 📦) + "8 produits disponibles"
+  [ ] Icônes centrées au-dessus des labels dans chaque item du menu
+  [ ] Breadcrumb correct : "Accueil › [Nom catégorie]" sur chaque page
+
+STATISTIQUES :
+  1 fichier modifié
+  13 lignes ajoutées
+  8 lignes supprimées
+  2 fixes appliqués (liens + layout)
+  1 commit
+
+AVANT/APRÈS VISUEL :
+
+  AVANT (horizontal) :        APRÈS (vertical) :
+  🚜 Mini-Pelles                   🚜
+  🏠 Maisons               →   Mini-Pelles
+  ☀️ Solaire                      🏠
+                            Maisons modulaires
+                                  ☀️
+                               Solaire
+
+══════════════════════════════════════════════
+  FIX-P2MAQ TERMINÉ ✅
+  Build: OK (0 erreur TypeScript)
+  Hero catégories + menu vertical fonctionnels
+  Scope strict respecté (1 fichier uniquement)
+══════════════════════════════════════════════

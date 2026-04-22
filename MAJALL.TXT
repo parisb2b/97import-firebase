@@ -744,3 +744,5 @@ v35h-phase1 — 2026-04-22 — Liaison front catalogue v35g (image_principale + 
 P2-REVERT — 2026-04-22 — Retour à l'état d'avant P2-A (annulation de tous les prompts maquettes P2-*). Tag de sauvegarde : safety-before-revert-20260422-161517 — OK
 
 P2-MAQ — 2026-04-22 — Design des 6 maquettes appliqué sur Home + Catalogue uniquement (scope strict respecté) — OK
+
+FIX-P2MAQ — 2026-04-22 — Fix liens catégories Header (kebab-case) + icônes centrées au-dessus des labels — OK
