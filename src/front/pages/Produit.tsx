@@ -172,7 +172,7 @@ export default function Produit() {
     const message = encodeURIComponent(
       `Bonjour, je suis intéressé par le produit ${product.nom_fr} (réf ${ref}). Pouvez-vous m'envoyer plus d'informations ?`
     );
-    window.open(`https://wa.me/33XXXXXXXXX?text=${message}`, '_blank');
+    window.open(`https://wa.me/33620607448?text=${message}`, '_blank');
   };
 
   return (
