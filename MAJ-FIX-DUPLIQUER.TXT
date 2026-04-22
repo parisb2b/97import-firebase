@@ -1,0 +1,92 @@
+=== MAJ FIX-DUPLIQUER — Redirection après duplication ===
+Date : 2026-04-22
+Build : OK
+
+PROBLÈME :
+  Après duplication réussie, la fiche du nouveau produit affichait
+  "produit introuvable". Le produit était bien créé en Firestore
+  mais la redirection ne pointait pas vers le bon identifiant.
+
+DIAGNOSTIC (Partie A) :
+
+  1. Route admin produit :
+     - Définie dans AdminApp.tsx ligne 318 : <Route path="/admin/produits/:ref" />
+     - Le paramètre de route est :ref (la référence), pas :id
+
+  2. Chargement dans FicheProduit.tsx :
+     - useRoute('/admin/produits/:ref') → params.ref
+     - getDoc(doc(db, 'products', params.ref))
+     - Le document Firestore est chargé en utilisant params.ref comme ID
+
+  3. Convention du projet :
+     - L'ID du document Firestore = la référence du produit
+     - Exemples : MS-30-001, MP-R18-001, KS-10K-001
+     - Cette convention permet de charger les produits sans query
+
+CAUSE IDENTIFIÉE :
+
+  Dans ModalDupliquerProduit.tsx :
+  - addDoc(collection(db, 'products'), nouveauProduit) générait un ID aléatoire
+  - Exemple : ID Firestore = "xYz123abC", reference = "MS-20-001"
+  - La redirection pointait vers /admin/produits/MS-20-001
+  - Mais le document avec l'ID "MS-20-001" n'existait pas !
+  - FicheProduit cherchait doc(db, 'products', 'MS-20-001') → 404
+
+CORRECTION :
+
+  Remplacer addDoc() par setDoc() avec la référence comme ID :
+
+  AVANT :
+    const docRef = await addDoc(collection(db, 'products'), nouveauProduit);
+    onSuccess(docRef.id, nouvelleRef.trim());
+
+  APRÈS :
+    await setDoc(doc(db, 'products', nouvelleRef.trim()), nouveauProduit);
+    onSuccess(nouvelleRef.trim(), nouvelleRef.trim());
+
+  Résultat :
+  - Le document Firestore a l'ID "MS-20-001"
+  - La redirection pointe vers /admin/produits/MS-20-001
+  - FicheProduit charge doc(db, 'products', 'MS-20-001') → ✅ trouvé
+
+FICHIERS MODIFIÉS :
+  - src/admin/components/produit/ModalDupliquerProduit.tsx
+    * Import : collection, query, where, getDocs, doc, setDoc, serverTimestamp
+    * Ligne 75 : setDoc() au lieu de addDoc()
+    * Ligne 77 : onSuccess(ref, ref) au lieu de onSuccess(docRef.id, ref)
+
+COMMIT :
+  eaa002a - FIX-DUPLIQUER: corriger redirection après duplication
+
+TESTS À EFFECTUER :
+  [ ] Ouvrir /admin/produits (liste catalogue)
+  [ ] Cliquer sur un produit existant (ex: MS-30-001)
+  [ ] Cliquer "📋 Dupliquer"
+  [ ] Saisir nouvelle ref : MS-20-001
+  [ ] Saisir nouveau nom : Maison Standard 20 Pieds
+  [ ] Valider la duplication
+  [ ] Vérifier :
+      - Alert "✅ Produit dupliqué..."
+      - Redirection automatique vers la fiche MS-20-001
+      - Fiche s'affiche correctement (pas d'erreur "produit introuvable")
+      - Tous les champs dupliqués fidèlement
+      - Champs exclus (groupe_produit, options_config, image_principale) absents
+      - Traçabilité (duplique_de, duplique_le) présents
+  [ ] Vérifier dans Firestore :
+      - Document ID = MS-20-001 (pas un ID aléatoire)
+      - Champ reference = "MS-20-001"
+      - Champ nom_fr = "Maison Standard 20 Pieds"
+      - Champ actif = false (si checkbox cochée)
+
+IMPACT :
+  Cette correction permet de créer MS-20-001 pour compléter le seed V2.
+  Les 4 produits MS-20-OPT-XCH peuvent ensuite être créés par duplication.
+
+COMPATIBILITÉ :
+  ✅ Produits existants non affectés (ils ont déjà ID = référence)
+  ✅ Nouvelle convention appliquée uniquement aux duplications futures
+  ✅ Pas de migration nécessaire
+
+BUILD :
+  ✅ TypeScript : 0 erreur
+  ⚠️  Chunk size warnings (non-bloquant)
