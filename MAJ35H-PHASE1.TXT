@@ -1,0 +1,98 @@
+=== MAJ35H PHASE 1 — Liaison Front Catalogue (alignement v35g) ===
+Date : 22/04/2026 11:30
+Branche : v2
+Build : OK (0 erreur TypeScript)
+
+OBJECTIF :
+  Aligner le front public sur la nouvelle structure v35g pour que les modifications
+  back-office se reflètent sur le site public.
+
+PROBLÈMES RÉSOLUS :
+
+1. Image principale ignorée
+   Front lisait images_urls[0], maintenant utilise image_principale en priorité
+   Fichiers : ProductCard.tsx, Home.tsx, SearchBar.tsx, Produit.tsx
+
+2. Galerie photos format objets non géré
+   Helper getGaleriePhotos() gère ancien format (string[]) ET nouveau ({url, visible_site})
+   Filtre automatique selon visible_site
+
+3. Filtres catégories désynchronisés
+   Normalisation kebab-case dans Catalogue.tsx (tolérant majuscule/minuscule)
+   Évite que les LOG-* apparaissent dans le catalogue public
+
+4. Vidéos MP4 jamais affichées
+   Page Produit affiche la galerie unifiée (vidéos d'abord, puis photos)
+   Player HTML5 avec contrôles + miniatures cliquables
+
+5. Description marketing / points forts / PDF jamais affichés
+   Sections dédiées sur la page Produit
+   Helpers dédiés avec fallback intelligent
+
+NOUVEAU FICHIER :
+
+src/lib/productMediaHelpers.ts (~176 lignes)
+  - getImagePrincipale(product)
+  - getGaleriePhotos(product) → URLs visibles
+  - getGalerieVideos(product) → objets vidéos visibles
+  - getMediasOrdonnesPourSite(product) → vidéos puis photos
+  - getDocumentsPdf(product)
+  - getDescriptionMarketing(product, langue)
+  - getPointsForts(product)
+
+FICHIERS MODIFIÉS :
+
+src/front/components/ProductCard.tsx
+  - Utilise getImagePrincipale (compat ancien/nouveau)
+
+src/front/pages/Catalogue.tsx
+  - Normalisation catégories kebab-case
+  - Liste CATEGORIES_EXCLUES centralisée
+  - Helper local normalizeCategorie()
+
+src/front/pages/Produit.tsx
+  - Galerie unifiée vidéos+photos avec player HTML5
+  - Section Description marketing
+  - Section Points forts
+  - Section Documents techniques PDF
+  - selectedMediaIndex pour navigation miniatures
+
+src/front/pages/Home.tsx
+  - getImagePrincipale pour produits vedettes
+
+src/front/components/SearchBar.tsx
+  - getImagePrincipale dans résultats recherche
+
+COMMITS (5) :
+  b692018 v35h-P1-A: helper unifié médias produits (compat ancienne/nouvelle structure)
+  ada260c v35h-P1-B: ProductCard utilise image_principale en priorité (compat ancien)
+  40dec2a v35h-P1-C: filtres catégories kebab-case + normalisation tolérante (post nettoyage)
+  5eadbe7 v35h-P1-D: page Produit affiche médias unifiés (vidéos+photos) + description marketing + points forts + PDF
+  30a4686 v35h-P1-E: Home + SearchBar utilisent getImagePrincipale (compat structure v35g)
+
+COMPATIBILITÉ ASCENDANTE :
+  ✅ Produits avec ancienne structure (images_urls) → fonctionnent toujours
+  ✅ Produits avec nouvelle structure (image_principale + galeries) → priorité
+  ✅ Produits mixtes → cascade intelligente
+
+TESTS MANUELS À EFFECTUER :
+  [ ] Test 1 : Image principale s'affiche après upload
+  [ ] Test 2 : Galerie photos avec toggle visible_site respecté
+  [ ] Test 3 : Vidéos MP4 affichées avec player HTML5
+  [ ] Test 4 : Description marketing affichée
+  [ ] Test 5 : Points forts en bullet points
+  [ ] Test 6 : Documents PDF téléchargeables
+  [ ] Test 7 : Filtres catégories kebab-case OK
+  [ ] Test 8 : Pas de régression produits ancien format
+
+BACKLOG V35H-P2 :
+  - Fix Storage admin auth (utiliser adminAuth au lieu de clientAuth)
+  - Optimisation Firestore (where côté serveur)
+  - Cache léger des produits (éviter re-fetch à chaque navigation)
+  - Lazy loading images
+
+═══════════════════════════════════════════════════════════
+  v35h PHASE 1 TERMINÉE ✅
+  Build: OK (0 erreur TypeScript)
+  5 commits pushed sur branche v2
+═══════════════════════════════════════════════════════════

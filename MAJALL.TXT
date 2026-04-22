@@ -738,3 +738,5 @@ nettoyage-catalogue — 2026-04-21 — Nettoyage Firestore : 13 suppressions + 9
 v35f-phase1 — 2026-04-21 — Correctifs commission + coefficients configurables + fix bugs admin — OK
 
 v35f-phase2 — 2026-04-21 — Création NC via UI (modal 2 étapes) + modal marquer payée (traçabilité) + envoi email fonctionnel — OK
+
+v35h-phase1 — 2026-04-22 — Liaison front catalogue v35g (image_principale + galeries unifiées + filtres kebab-case + description marketing) — OK
