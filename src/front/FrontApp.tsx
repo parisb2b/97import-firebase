@@ -10,10 +10,7 @@ import Recherche from './pages/Recherche';
 import Connexion from './pages/Connexion';
 import Inscription from './pages/Inscription';
 import Panier from './pages/Panier';
-import Profil from './pages/Profil';
-import { Redirect } from 'wouter';
-import EspaceClient from './pages/EspaceClient';
-import EspacePartenaire from './pages/EspacePartenaire';
+import MonCompte from './pages/MonCompte';
 import Services from './pages/Services';
 import Contact from './pages/Contact';
 
@@ -37,12 +34,9 @@ export default function FrontApp() {
           <Route path="/connexion" component={Connexion} />
           <Route path="/inscription" component={Inscription} />
           <Route path="/panier" component={Panier} />
-          <Route path="/mon-compte/:tab?">{() => <Redirect to="/espace-client" />}</Route>
+          <Route path="/mon-compte" component={MonCompte} />
           <Route path="/services" component={Services} />
           <Route path="/contact" component={Contact} />
-          <Route path="/espace-client" component={EspaceClient} />
-          <Route path="/espace-partenaire" component={EspacePartenaire} />
-          <Route path="/profil" component={Profil} />
           <Route path="/mentions-legales">{() => <Placeholder name="Mentions légales" />}</Route>
           <Route path="/cgv">{() => <Placeholder name="CGV" />}</Route>
           <Route path="/rgpd">{() => <Placeholder name="RGPD" />}</Route>
