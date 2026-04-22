@@ -131,43 +131,118 @@ export default function OngletOptions({ product, onUpdate }: Props) {
               <div style={{ paddingLeft: 20, borderLeft: '3px solid #D1D5DB' }}>
                 <div style={{ fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 8 }}>Choix</div>
                 {dd.choices.map((c, choiceIdx) => (
-                  <div key={choiceIdx} style={{ display: 'flex', gap: 6, marginBottom: 6, alignItems: 'center' }}>
-                    <input
-                      type="text"
-                      value={c.label}
-                      onChange={e => updateChoice(ddIdx, choiceIdx, { label: e.target.value })}
-                      placeholder="Label choix"
-                      style={{ ...inputStyle, flex: 1 }}
-                    />
-                    <input
-                      type="text"
-                      value={c.ref}
-                      onChange={e => updateChoice(ddIdx, choiceIdx, { ref: e.target.value })}
-                      placeholder="Ref Firestore (ex: MP-R22-001)"
-                      style={{ ...inputStyle, flex: 1 }}
-                    />
-                    <input
-                      type="text"
-                      value={c.description || ''}
-                      onChange={e => updateChoice(ddIdx, choiceIdx, { description: e.target.value })}
-                      placeholder="Description (optionnel)"
-                      style={{ ...inputStyle, flex: 1 }}
-                    />
-                    <button onClick={() => removeChoice(ddIdx, choiceIdx)} style={btnDangerStyle}>×</button>
+                  <div key={choiceIdx} style={{ marginBottom: 12 }}>
+                    <div style={{ display: 'flex', gap: 6, marginBottom: 6, alignItems: 'center' }}>
+                      <input
+                        type="text"
+                        value={c.label}
+                        onChange={e => updateChoice(ddIdx, choiceIdx, { label: e.target.value })}
+                        placeholder="Label choix"
+                        style={{ ...inputStyle, flex: 1 }}
+                      />
+                      <input
+                        type="text"
+                        value={c.ref}
+                        onChange={e => updateChoice(ddIdx, choiceIdx, { ref: e.target.value })}
+                        placeholder="Ref Firestore (ex: MP-R22-001)"
+                        style={{ ...inputStyle, flex: 1 }}
+                      />
+                      <input
+                        type="text"
+                        value={c.description || ''}
+                        onChange={e => updateChoice(ddIdx, choiceIdx, { description: e.target.value })}
+                        placeholder="Description (optionnel)"
+                        style={{ ...inputStyle, flex: 1 }}
+                      />
+                      <button onClick={() => removeChoice(ddIdx, choiceIdx)} style={btnDangerStyle}>×</button>
+                    </div>
+
+                    {/* Condition UI */}
+                    <div style={conditionWrapStyle}>
+                      <label style={{ fontSize: 11, color: '#6B7280', display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}>
+                        <input
+                          type="checkbox"
+                          checked={!!c.condition}
+                          onChange={e => {
+                            if (e.target.checked) {
+                              // Activer la condition avec des valeurs par défaut
+                              const otherDropdowns = config.dropdowns.filter((_, i) => i !== ddIdx);
+                              const firstOther = otherDropdowns[0];
+                              if (!firstOther) {
+                                alert('Ajoutez d\'abord un autre dropdown pour créer une condition');
+                                return;
+                              }
+                              const firstOtherChoice = firstOther.choices[0];
+                              updateChoice(ddIdx, choiceIdx, {
+                                condition: {
+                                  dropdown_label: firstOther.label,
+                                  value: firstOtherChoice?.label || '',
+                                },
+                              });
+                            } else {
+                              // Désactiver la condition
+                              updateChoice(ddIdx, choiceIdx, { condition: undefined });
+                            }
+                          }}
+                        />
+                        Ce choix est visible uniquement si un autre dropdown vaut une certaine valeur
+                      </label>
+
+                      {c.condition && (
+                        <div style={conditionFieldsStyle}>
+                          <span style={{ fontSize: 12, color: '#374151' }}>Visible si</span>
+
+                          {/* Sélecteur dropdown de référence */}
+                          <select
+                            value={c.condition.dropdown_label}
+                            onChange={e => {
+                              const newDropdown = e.target.value;
+                              const targetDropdown = config.dropdowns.find(d => d.label === newDropdown);
+                              const firstChoice = targetDropdown?.choices[0];
+                              updateChoice(ddIdx, choiceIdx, {
+                                condition: {
+                                  dropdown_label: newDropdown,
+                                  value: firstChoice?.label || '',
+                                },
+                              });
+                            }}
+                            style={conditionSelectStyle}
+                          >
+                            {config.dropdowns
+                              .filter((_, i) => i !== ddIdx)
+                              .map(d => (
+                                <option key={d.label} value={d.label}>{d.label}</option>
+                              ))}
+                          </select>
+
+                          <span style={{ fontSize: 12, color: '#374151' }}>=</span>
+
+                          {/* Sélecteur valeur */}
+                          <select
+                            value={c.condition.value}
+                            onChange={e => {
+                              updateChoice(ddIdx, choiceIdx, {
+                                condition: {
+                                  ...c.condition!,
+                                  value: e.target.value,
+                                },
+                              });
+                            }}
+                            style={conditionSelectStyle}
+                          >
+                            {config.dropdowns
+                              .find(d => d.label === c.condition?.dropdown_label)
+                              ?.choices.map(choice => (
+                                <option key={choice.label} value={choice.label}>{choice.label}</option>
+                              ))}
+                          </select>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 ))}
 
                 <button onClick={() => addChoice(ddIdx)} style={btnSmallStyle}>+ Ajouter un choix</button>
-
-                {/* Condition (pour dropdown conditionnel comme "Taille panneaux" visible si "Pose = Toit") */}
-                <div style={{ marginTop: 14, paddingTop: 14, borderTop: '1px dashed #D1D5DB' }}>
-                  <div style={{ fontSize: 11, color: '#6B7280', marginBottom: 6 }}>
-                    Pour rendre les choix conditionnels à un autre dropdown, modifier manuellement le JSON pour ajouter :<br/>
-                    <code style={{ background: '#fff', padding: '2px 6px', borderRadius: 4 }}>
-                      {`{"condition": {"dropdown_label": "Type de fixation", "value": "Toit"}}`}
-                    </code>
-                  </div>
-                </div>
               </div>
             </div>
           ))}
@@ -227,4 +302,30 @@ const btnDangerStyle: React.CSSProperties = {
   padding: '6px 10px', background: '#FEE2E2',
   color: '#991B1B', border: 'none', borderRadius: 6,
   fontSize: 12, cursor: 'pointer', fontFamily: 'inherit',
+};
+
+const conditionWrapStyle: React.CSSProperties = {
+  marginTop: 6,
+  marginLeft: 20,
+  padding: 8,
+  background: '#FEF3C7',
+  borderLeft: '3px solid #F59E0B',
+  borderRadius: 4,
+};
+
+const conditionFieldsStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: 8,
+  marginTop: 6,
+};
+
+const conditionSelectStyle: React.CSSProperties = {
+  padding: '4px 8px',
+  border: '1px solid #D1D5DB',
+  borderRadius: 4,
+  fontSize: 12,
+  fontFamily: 'inherit',
+  background: '#fff',
+  cursor: 'pointer',
 };
