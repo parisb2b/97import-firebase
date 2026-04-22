@@ -1,0 +1,34 @@
+=== MAJ P2-OPT-FIX-CONDITIONS — UI saisie conditions ===
+Date : 2026-04-22
+Branche : v2
+Build : OK
+
+FICHIER MODIFIÉ (exclusivement) :
+  ✅ src/admin/components/produit/OngletOptions.tsx
+
+AMÉLIORATION :
+  Avant : saisie conditions = éditer JSON brut (impraticable)
+  Après : checkbox + 2 selects (dropdown cible + valeur cible)
+
+UX :
+  ☑️ Case à cocher "Ce choix est visible uniquement si..."
+  Si cochée :
+    Dropdown "dropdown de référence" (liste des autres dropdowns)
+    Dropdown "valeur attendue" (liste des choix du dropdown cible)
+  
+EXEMPLE D'USAGE :
+  Kit solaire 10kW
+  Dropdown 1 "Type de fixation" : Au sol / Sur toit
+  Dropdown 2 "Taille panneaux" :
+    - Grands panneaux (visible si Type de fixation = Sur toit) ✓
+    - Petits panneaux (visible si Type de fixation = Sur toit) ✓
+    - (optionnel) autres choix sans condition
+
+COMMIT :
+  9266b59 P2-OPT-FIX-CONDITIONS: UI saisie visuelle des conditions
+
+TESTS À EFFECTUER :
+  [ ] Onglet Options : cocher la checkbox "visible si..."
+  [ ] Sélectionner un dropdown de référence + une valeur
+  [ ] Sauvegarder
+  [ ] Vérifier côté front que le dropdown conditionnel se masque/affiche correctement

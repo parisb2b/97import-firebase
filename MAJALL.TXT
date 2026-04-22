@@ -748,3 +748,5 @@ P2-MAQ — 2026-04-22 — Design des 6 maquettes appliqué sur Home + Catalogue 
 FIX-P2MAQ — 2026-04-22 — Fix liens catégories Header (kebab-case) + icônes centrées au-dessus des labels — OK
 
 P2-OPTIONS-STRICT — 2026-04-22 — Système d'options Type 1 (dropdowns + regroupement variantes) + accessoires compatibles + hero bleus + onglet admin — OK
+
+P2-OPT-FIX-CONDITIONS — 2026-04-22 — UI saisie visuelle des conditions dropdowns (onglet Options admin) — OK
