@@ -750,3 +750,5 @@ P2-C — 2026-04-22 12:31 — Catalogue refondu (hero catégorie + filtres + tri
 P2-D — 2026-04-22 12:58 — Page Produit refondue (galerie unifiée + onglets + composition kit + produits similaires + CTA panier/WhatsApp) — OK
 
 P2-E2 — 2026-04-22 — FIX bug prix visiteur + Panier + tunnel 4 étapes + espace unifié — PHASE 2 COMPLÈTE
+
+P2-FIX — 2026-04-22 — Restauration Panier + EspaceClient + EspacePartenaire + fix dropdown user + retrait 'dédouanement inclus' + retrait bouton 'Demander un devis' des fiches produits — OK

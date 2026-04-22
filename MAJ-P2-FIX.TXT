@@ -1,0 +1,74 @@
+=== MAJ P2-FIX — Restauration + Corrections ciblées ===
+Date : 2026-04-22 17:20
+Branche : v2
+Build : OK (0 erreur TypeScript)
+
+OBJECTIF :
+  Revenir aux maquettes validées en corrigeant les écarts introduits en P2-E2.
+
+RESTAURÉ (via Git) :
+  ✅ src/front/pages/Panier.tsx — version précédente (avec ajout produit custom)
+  ✅ src/front/pages/EspaceClient.tsx
+  ✅ src/front/pages/EspacePartenaire.tsx
+  ✅ Routes /espace-client et /espace-partenaire dans FrontApp.tsx
+
+CORRIGÉ :
+  ✅ Header dropdown user : textes i18n cassés remplacés par FR en dur
+  ✅ Dropdown user : "Mon profil" supprimé (redirigeait vers accueil)
+  ✅ Dropdown user : redirect dynamique selon rôle (client / partenaire)
+  ✅ "Dédouanement inclus" retiré partout (mention trompeuse)
+  ✅ "Demander un devis" retiré des fiches produits (remplacé par WhatsApp pleine largeur)
+
+ADAPTÉ :
+  ✅ Panier intègre TunnelCommande (lance le tunnel au clic sur "Demander un devis")
+  ✅ EspaceClient + EspacePartenaire utilisent useClientAuth hook
+  ✅ EspacePartenaire vérifie role='partner' et redirige vers /espace-client sinon
+
+CONSERVÉ (rien changé) :
+  ✅ Header refait P2-A
+  ✅ Footer P2-A
+  ✅ Variables CSS P2-A
+  ✅ Home P2-B
+  ✅ Catalogue + ProductCard + SearchBar P2-C
+  ✅ Page Produit galerie + onglets P2-D (juste 2 suppressions ciblées)
+  ✅ Hook useClientAuth + fix prix real-time P2-E2
+  ✅ TunnelCommande component P2-E2
+
+COMMITS (5) :
+  41eaaf9 P2-FIX-A: restaure Panier + intègre TunnelCommande
+  96a8389 P2-FIX-B: restaure EspaceClient + EspacePartenaire + routes
+  d6cd085 P2-FIX-C: fix dropdown user header
+  588620e P2-FIX-D: retirer 'dédouanement inclus' partout
+  e2fd001 P2-FIX-E: retirer bouton 'Demander un devis' fiches produits
+
+TESTS À EFFECTUER (7) :
+  [ ] Panier avec ajout produit catalogue + produit custom
+  [ ] Bouton "Demander un devis" du panier → tunnel 4 étapes
+  [ ] Soumission tunnel → redirection /espace-client
+  [ ] Dropdown user client : 2 items (Mon espace client + Déconnexion)
+  [ ] Dropdown user partenaire : 2 items (Mon espace partenaire + Déconnexion)
+  [ ] Fiches produits : pas de "Dédouanement inclus" + pas de bouton devis
+  [ ] Fix prix real-time toujours fonctionnel
+
+FICHIERS MODIFIÉS :
+  src/front/pages/Panier.tsx (restauré bf7d901 + intégré TunnelCommande)
+  src/front/pages/EspaceClient.tsx (adapté useClientAuth)
+  src/front/pages/EspacePartenaire.tsx (adapté useClientAuth)
+  src/front/FrontApp.tsx (routes restaurées)
+  src/front/components/Header.tsx (dropdown user fixé)
+  src/front/pages/Home.tsx (avantages 3→2)
+  src/front/pages/Produit.tsx (avantages 3→2, bouton devis supprimé)
+
+À DISCUTER ENSUITE :
+  Système d'options produits (maisons modulaires, mini-pelles, kits solaires)
+  → Prompt P2-OPTIONS dédié
+  → 1 page produit parent avec dropdowns d'options
+  → Options = références internes Firestore (invisibles client)
+  → Injection référence selon config au moment du devis
+
+═══════════════════════════════════════════════════════════
+  P2-FIX TERMINÉE ✅
+  Site conforme aux maquettes validées
+  Build: OK (0 erreur TypeScript)
+  5 commits pushed sur branche v2
+═══════════════════════════════════════════════════════════
