@@ -72,10 +72,14 @@ echo ""
 echo "ÉTAPE 2/5 : Affichage des données du document..."
 echo ""
 
-echo "$RESPONSE" | python3 << 'PYEOF'
-import json, sys
+# Sauvegarder la réponse dans un fichier temporaire
+echo "$RESPONSE" > /tmp/ms-20-001-data.json
 
-data = json.load(sys.stdin)
+python3 << 'PYEOF'
+import json
+
+with open('/tmp/ms-20-001-data.json') as f:
+    data = json.load(f)
 fields = data.get('fields', {})
 
 def extract(key):
@@ -165,14 +169,18 @@ sleep 1
 
 VERIFY_RESPONSE=$(curl -s "https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default)/documents/products/${DOC_ID}?key=${API_KEY}")
 
-if echo "$VERIFY_RESPONSE" | grep -q '"code": 5'; then
+# Vérifier si le document n'existe plus (code 5 ou 404 = NOT_FOUND)
+if echo "$VERIFY_RESPONSE" | grep -qE '"code":\s*(5|404)'; then
+  echo "✅ CONFIRMÉ : Document ${DOC_ID} supprimé avec succès"
+  echo ""
+elif echo "$VERIFY_RESPONSE" | grep -q '"NOT_FOUND"'; then
   echo "✅ CONFIRMÉ : Document ${DOC_ID} supprimé avec succès"
   echo ""
 else
   echo "⚠️  AVERTISSEMENT : Le document semble toujours exister"
   echo ""
   echo "Réponse Firestore :"
-  echo "$VERIFY_RESPONSE" | python3 -c "import json,sys; print(json.dumps(json.load(sys.stdin), indent=2))" | head -20
+  echo "$VERIFY_RESPONSE" | python3 -c "import json,sys; print(json.dumps(json.load(sys.stdin), indent=2))" 2>/dev/null | head -20
   echo ""
   echo "Possible délai de propagation. Attendez 10 secondes et revérifiez."
   exit 1
