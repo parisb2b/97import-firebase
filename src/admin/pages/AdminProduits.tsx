@@ -4,6 +4,7 @@ import { collection, getDocs, orderBy, query } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { calculerCompletude, CATEGORIES, StatutCompletude, manqueCodeHs, CHAMPS_ESSENTIEL } from '../../lib/productHelpers';
 import { loadFilters, saveFilters, resetFilters, hasActiveFilters } from '../../lib/filterPersistence';
+import ModalDupliquerProduit from '../components/produit/ModalDupliquerProduit';
 
 interface Product {
   id: string;
@@ -43,6 +44,9 @@ export default function AdminProduits() {
   const [sortCol, setSortCol] = useState<SortColumn>('reference');
   const [sortDir, setSortDir] = useState<SortDir>('asc');
 
+  const [produitADupliquer, setProduitADupliquer] = useState<any | null>(null);
+  const [toastDuplication, setToastDuplication] = useState<string | null>(null);
+
   useEffect(() => { loadProducts(); }, []);
 
   // Sauvegarder les filtres dans localStorage à chaque changement
@@ -66,6 +70,16 @@ export default function AdminProduits() {
       setLoading(false);
     }
   };
+
+  function handleDupliquerSuccess(_newId: string, newRef: string) {
+    setProduitADupliquer(null);
+    setToastDuplication(`Produit dupliqué avec la référence ${newRef}`);
+    // Auto-dismiss après 3 secondes
+    setTimeout(() => setToastDuplication(null), 3000);
+    // Note : si un listener Firestore onSnapshot est actif, la liste se mettra à jour auto
+    // Ici on recharge manuellement pour être sûr
+    loadProducts();
+  }
 
   const productsAvecCompletude = useMemo(() =>
     products.map(p => ({ ...p, _completude: calculerCompletude(p) })), [products]);
@@ -215,6 +229,7 @@ export default function AdminProduits() {
                 <th style={{ ...thStyle, textAlign: 'right' }} onClick={() => toggleSort('prix_achat')}>Prix achat {sortIcon('prix_achat')}</th>
                 <th style={{ ...thStyle, textAlign: 'center' }} onClick={() => toggleSort('completude_statut')}>Complétude {sortIcon('completude_statut')}</th>
                 <th style={{ ...thStyle, textAlign: 'center' }}>Site</th>
+                <th style={{ ...thStyle, width: 120 }}>Actions</th>
                 <th style={thStyle}></th>
               </tr>
             </thead>
@@ -272,6 +287,28 @@ export default function AdminProduits() {
                     <td style={{ ...tdStyle, textAlign: 'center' }}>
                       {p.actif ? <span style={{ color: '#059669' }}>✓ Actif</span> : <span style={{ color: '#9CA3AF' }}>— Masqué</span>}
                     </td>
+                    <td style={{ whiteSpace: 'nowrap', padding: '8px 12px' }}>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setProduitADupliquer(p);
+                        }}
+                        title="Dupliquer ce produit"
+                        style={{
+                          padding: '4px 10px',
+                          background: '#F59E0B',
+                          color: '#fff',
+                          border: 'none',
+                          borderRadius: 4,
+                          fontSize: 11,
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                          fontFamily: 'inherit',
+                        }}
+                      >
+                        📋 Dupliquer
+                      </button>
+                    </td>
                     <td style={{ ...tdStyle, textAlign: 'right', color: '#6B7280' }}>→</td>
                   </tr>
                 );
@@ -283,6 +320,41 @@ export default function AdminProduits() {
       <div style={{ fontSize: 12, color: '#9CA3AF', marginTop: 12 }}>
         {sorted.length} / {stats.total} produit{sorted.length > 1 ? 's' : ''} affiché{sorted.length > 1 ? 's' : ''}
       </div>
+
+      {/* Modal de duplication */}
+      {produitADupliquer && (
+        <ModalDupliquerProduit
+          produit={produitADupliquer}
+          onClose={() => setProduitADupliquer(null)}
+          onSuccess={handleDupliquerSuccess}
+        />
+      )}
+
+      {/* Toast de confirmation */}
+      {toastDuplication && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 20,
+            right: 20,
+            zIndex: 9999,
+            background: '#10B981',
+            color: '#fff',
+            padding: '12px 20px',
+            borderRadius: 8,
+            boxShadow: '0 10px 25px rgba(0,0,0,0.2)',
+            fontSize: 14,
+            fontWeight: 600,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            maxWidth: 400,
+          }}
+        >
+          <span style={{ fontSize: 18 }}>✅</span>
+          <span>{toastDuplication}</span>
+        </div>
+      )}
     </div>
   );
 }
