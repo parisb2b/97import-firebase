@@ -16,15 +16,15 @@ function getAchatCNY(product: any): number {
 }
 
 function getPublic(product: any): number {
-  return product.prix_public_eur || product.prix_public || Math.round(getAchat(product) * 2) || 0;
+  return product.prix_public_eur || product.prix_public || Math.ceil(getAchat(product) * 2) || 0;
 }
 
 export function getProductPrice(product: any, role: string | null | undefined): number {
   const achat = getAchat(product);
   const pub = getPublic(product);
   if (!achat && !pub) return 0;
-  if (role === 'partner') return Math.round(achat * 1.2) || Math.round(pub * 0.6);
-  return pub || Math.round(achat * 2);
+  if (role === 'partner') return Math.ceil(achat * 1.2) || Math.ceil(pub * 0.6);
+  return pub || Math.ceil(achat * 2);
 }
 
 export default function PriceDisplay({ product, userRole, size = 'md' }: PriceDisplayProps) {
@@ -32,7 +32,7 @@ export default function PriceDisplay({ product, userRole, size = 'md' }: PriceDi
   const achat = getAchat(product);
   const achatCNY = getAchatCNY(product);
   const pub = getPublic(product);
-  const partner = Math.round(achat * 1.2) || Math.round(pub * 0.6);
+  const partner = Math.ceil(achat * 1.2) || Math.ceil(pub * 0.6);
 
   // Visitor — locked
   if (!userRole) {
