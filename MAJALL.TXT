@@ -1,3 +1,5 @@
+P3-WF1-A — 2026-04-23 — Panier nettoyé (popups acompte/RIB extraits) + 3 nouveaux statuts (en_negociation_partenaire, devis_vip_envoye, signe) — OK
+
 FIX-PRIX-ARRONDI-VIP — 2026-04-23 — Math.ceil prix Public/Partenaire + suppression carte VIP back-office — OK
 
 [2026-04-17 13:30] v35a-fix3 — Affichage uniforme + Calcul cumulé FA

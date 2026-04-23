@@ -1,0 +1,78 @@
+=== MAJ P3-WF1-A-STRICT — Nettoyage Panier + statuts + extraction popups ===
+Date : 2026-04-23
+Branche : v2
+Build : OK
+
+OBJECTIFS RÉALISÉS :
+  ✅ 3 nouveaux statuts ajoutés : en_negociation_partenaire, devis_vip_envoye, signe
+  ✅ Statut annule ajouté pour complétude
+  ✅ Popup Acompte (step 1) extrait du Panier dans composant réutilisable
+  ✅ Popup RIB (step 2) extrait du Panier dans composant réutilisable
+  ✅ Panier nettoyé : garde UNIQUEMENT popup Partenaire (step 0)
+  ✅ Création devis : statut initial changé de 'nouveau' à 'en_negociation_partenaire'
+  ✅ Création devis : plus d'acomptes dans le Panier (acomptes: [])
+
+NOUVEAU FLUX PANIER :
+  Panier → Popup Partenaire → création devis statut 'en_negociation_partenaire'
+  (fin du workflow panier — le reste se passe côté partenaire puis client)
+
+FICHIERS MODIFIÉS (2) :
+  ✅ src/lib/quoteStatusHelpers.ts (+36 insertions, -10 suppressions)
+     - Type QuoteStatus : ajout en_negociation_partenaire, devis_vip_envoye, signe, annule
+     - libelleStatut : ajout libellés pour nouveaux statuts
+     - couleurStatut : ajout couleurs (violet, magenta, vert, rouge)
+     - calculerStatut : nouveau param statutActuel optionnel pour préserver statuts amont
+
+  ✅ src/front/pages/Panier.tsx (+7 insertions, -245 suppressions)
+     - Supprimé states : typeCompte, montantAcompte, quoteNumero
+     - Supprimé fonctions : handleConfirmVirement, handleSansAcompte
+     - Supprimé composant Steps
+     - Supprimé popups JSX : step 1 (acompte) et step 2 (RIB)
+     - Nouvelle fonction handleCreateQuote : crée devis directement après choix partenaire
+     - Devis créé avec statut 'en_negociation_partenaire' et acomptes: []
+
+FICHIERS CRÉÉS (2) :
+  ✅ src/front/components/PopupVerserAcompte.tsx (235 lignes)
+     - Composant réutilisable pour versement acompte
+     - Props : isOpen, onClose, onSubmit, totalDevis, restant, title, minAcomptePct
+     - Features : choix type compte (perso/pro), mode saisie (% ou montant exact), 
+       slider pourcentage, validation montant, calcul automatique
+     - Prêt pour usage futur dans espace client après signature
+
+  ✅ src/front/components/PopupSaisieRIB.tsx (200 lignes)
+     - Composant réutilisable pour saisie RIB client
+     - Props : isOpen, onClose, onSubmit, initial values, title, description
+     - Features : choix "j'ai un RIB" / "plus tard", validation IBAN/BIC, 
+       champs IBAN, BIC, nom banque
+     - Prêt pour usage futur dans espace client après signature
+
+FICHIERS INTERDITS (intacts) :
+  ✅ Tous les admin (FicheProduit, AdminProduits, DetailDevis, etc.)
+  ✅ Tout le front non concerné (Home, Catalogue, Produit, etc.)
+  ✅ Services (emailService, pdf-generator, generateInvoiceAcompte)
+  ✅ admin.css
+  ✅ EspaceClient et EspacePartenaire (seront modifiés dans P3-WF1-B et P3-WF1-C)
+
+COMMITS (4) :
+  2225ff8 P3-WF1-A-A: nouveaux statuts devis
+  c8995ee P3-WF1-A-B: composant PopupSaisieRIB
+  2358ac2 P3-WF1-A-C: composant PopupVerserAcompte
+  bcf63c2 P3-WF1-A-D: nettoyer Panier
+
+STATISTIQUES :
+  Fichiers modifiés : 2
+  Fichiers créés    : 2
+  Insertions        : +478
+  Suppressions      : -255
+  Net               : +223 lignes
+
+TESTS À EFFECTUER (5) :
+  [ ] Panier : seul le popup Partenaire apparaît (plus d'acompte ni RIB)
+  [ ] Après choix partenaire : devis créé avec statut 'en_negociation_partenaire'
+  [ ] Dans Firestore : champs acompte_pct, type_compte, iban, bic ABSENTS du nouveau devis
+  [ ] Admin : voir le devis dans liste avec statut 'En négociation partenaire' (violet)
+  [ ] Build OK sans erreurs TypeScript
+
+À SUIVRE (PROCHAINS PROMPTS) :
+  P3-WF1-B : Workflow partenaire → client (renvoi devis VIP négocié)
+  P3-WF1-C : Signature client + déclenchement acompte + alertes + commission auto
