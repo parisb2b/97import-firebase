@@ -187,11 +187,21 @@ export default function FicheProduit() {
     setSaving(true);
     try {
       await deleteDoc(doc(db, 'products', product.reference));
-      alert('✓ Produit supprimé');
-      setLocation('/admin/produits');
+      setToast({
+        message: `Produit ${product.reference} supprimé ✓`,
+        type: 'success',
+      });
+      // Attendre un peu avant de naviguer pour que le toast soit visible
+      setTimeout(() => {
+        setLocation('/admin/produits');
+      }, 1200);
     } catch (err: any) {
       console.error('Erreur delete:', err);
-      alert('Erreur lors de la suppression: ' + err.message);
+      setToast({
+        message: 'Erreur lors de la suppression',
+        type: 'error',
+        details: [err.message],
+      });
     } finally {
       setSaving(false);
     }
