@@ -9,6 +9,7 @@ import OngletDetails from '../components/produit/OngletDetails';
 import OngletMedias from '../components/produit/OngletMedias';
 import OngletOptions from '../components/produit/OngletOptions';
 import ModalDupliquerProduit from '../components/produit/ModalDupliquerProduit';
+import Toast, { ToastType } from '../components/Toast';
 
 export default function FicheProduit() {
   const [, params] = useRoute('/admin/produits/:ref');
@@ -37,6 +38,7 @@ export default function FicheProduit() {
   const [dirty, setDirty] = useState(false);
   const [activeTab, setActiveTab] = useState<'essentiel' | 'details' | 'medias' | 'options'>('essentiel');
   const [modalDupliquerOpen, setModalDupliquerOpen] = useState(false);
+  const [toast, setToast] = useState<{ message: string; type: ToastType; details?: string[] } | null>(null);
 
   const completude = useMemo(() => calculerCompletude(product), [product]);
 
@@ -143,17 +145,20 @@ export default function FicheProduit() {
       const nbManquants = CHAMPS_ESSENTIEL.length - completudeActuelle.essentiel;
       if (nbManquants === 0) {
         // Tout OK
-        alert(isCreation
-          ? '✅ Produit créé avec succès'
-          : '✅ Produit enregistré avec succès');
+        setToast({
+          message: isCreation ? 'Produit créé avec succès ✓' : 'Modifications enregistrées ✓',
+          type: 'success',
+        });
       } else {
         // Sauvegarde partielle : info non bloquante
-        const message = `✅ ${isCreation ? 'Produit créé' : 'Produit enregistré'} avec succès\n\n`
-          + `ℹ️ ${nbManquants} champ(s) essentiel(s) reste(nt) à remplir :\n`
-          + completudeActuelle.champs_manquants_essentiel.map(c => `  • ${c}`).join('\n')
-          + '\n\nLe produit reste en statut "Bloquant" jusqu\'à ce qu\'ils soient tous remplis.'
-          + '\nVous pouvez revenir quand vous voulez pour les compléter.';
-        alert(message);
+        setToast({
+          message: isCreation ? 'Produit créé avec succès' : 'Modifications enregistrées',
+          type: 'warning',
+          details: [
+            `${nbManquants} champ(s) essentiel(s) manquant(s) :`,
+            ...completudeActuelle.champs_manquants_essentiel,
+          ],
+        });
       }
 
       // Redirection ou rechargement
@@ -167,7 +172,11 @@ export default function FicheProduit() {
         }
       }
     } catch (err: any) {
-      alert('❌ Erreur lors de la sauvegarde : ' + err.message);
+      setToast({
+        message: 'Erreur lors de la sauvegarde',
+        type: 'error',
+        details: [err.message],
+      });
     } finally {
       setSaving(false);
     }
@@ -359,6 +368,16 @@ export default function FicheProduit() {
           produit={product}
           onClose={() => setModalDupliquerOpen(false)}
           onSuccess={handleDupliquerSuccess}
+        />
+      )}
+
+      {/* Toast notifications */}
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          details={toast.details}
+          onClose={() => setToast(null)}
         />
       )}
     </div>
