@@ -2,10 +2,14 @@
 // Helpers pour la gestion des statuts devis + calculs paiements
 
 export type QuoteStatus =
-  | 'nouveau'
+  | 'nouveau'                          // ancien, rétrocompatibilité
+  | 'en_negociation_partenaire'        // NOUVEAU : devis créé, attend négociation partenaire
+  | 'devis_vip_envoye'                 // NOUVEAU : partenaire a renvoyé devis VIP au client
+  | 'signe'                            // NOUVEAU : client a signé, peut verser 1er acompte
   | 'acompte_1' | 'acompte_2' | 'acompte_3'
   | 'solde_paye'
-  | 'en_production';
+  | 'en_production'
+  | 'annule';                          // ajouté pour complétude (référencé dans AcomptesEncaisser)
   // Statuts P3-WF3 à venir : expédié, arrivé_port, livré
 
 export interface Acompte {
@@ -64,16 +68,30 @@ export function estEntierementPaye(total_ht: number, acomptes: Acompte[] = []): 
 }
 
 /**
- * Calcule le statut du devis en fonction des acomptes
+ * Calcule le statut du devis en fonction des acomptes ET du statut actuel.
+ * Les nouveaux statuts amont (en_negociation_partenaire, devis_vip_envoye, signe)
+ * sont préservés tant qu'il n'y a pas d'acompte.
  */
-export function calculerStatut(total_ht: number, acomptes: Acompte[] = []): QuoteStatus {
+export function calculerStatut(
+  total_ht: number,
+  acomptes: Acompte[] = [],
+  statutActuel?: QuoteStatus  // nouveau param optionnel
+): QuoteStatus {
   const nbPartiels = getNbAcomptes(acomptes);
   const paye = estEntierementPaye(total_ht, acomptes);
 
+  // Si paiements en cours : utiliser la logique paiement
   if (paye) return 'solde_paye';
   if (nbPartiels >= 3) return 'acompte_3';
   if (nbPartiels === 2) return 'acompte_2';
   if (nbPartiels === 1) return 'acompte_1';
+
+  // Aucun paiement : préserver les statuts amont
+  if (statutActuel === 'en_negociation_partenaire') return 'en_negociation_partenaire';
+  if (statutActuel === 'devis_vip_envoye') return 'devis_vip_envoye';
+  if (statutActuel === 'signe') return 'signe';
+  if (statutActuel === 'annule') return 'annule';
+
   return 'nouveau';
 }
 
@@ -83,11 +101,15 @@ export function calculerStatut(total_ht: number, acomptes: Acompte[] = []): Quot
 export function libelleStatut(statut: QuoteStatus): string {
   const labels: Record<QuoteStatus, string> = {
     nouveau: 'Nouveau — En attente d\'acompte',
+    en_negociation_partenaire: 'En négociation partenaire',
+    devis_vip_envoye: 'Devis VIP envoyé au client',
+    signe: 'Signé — En attente 1er acompte',
     acompte_1: 'Acompte 1 reçu',
     acompte_2: 'Acompte 2 reçu',
     acompte_3: 'Acompte 3 reçu — Solde attendu',
     solde_paye: 'Intégralement payé',
     en_production: 'En production',
+    annule: 'Annulé',
   };
   return labels[statut] || statut;
 }
@@ -97,12 +119,16 @@ export function libelleStatut(statut: QuoteStatus): string {
  */
 export function couleurStatut(statut: QuoteStatus): string {
   const colors: Record<QuoteStatus, string> = {
-    nouveau: '#6B7280',       // gris
-    acompte_1: '#F59E0B',     // orange clair
-    acompte_2: '#F59E0B',     // orange
-    acompte_3: '#D97706',     // orange foncé
-    solde_paye: '#10B981',    // vert
-    en_production: '#1565C0', // bleu
+    nouveau: '#6B7280',                       // gris
+    en_negociation_partenaire: '#8B5CF6',     // violet (négociation)
+    devis_vip_envoye: '#EC4899',              // rose/magenta (envoyé)
+    signe: '#10B981',                         // vert (signé)
+    acompte_1: '#F59E0B',                     // orange clair
+    acompte_2: '#F59E0B',
+    acompte_3: '#D97706',                     // orange foncé
+    solde_paye: '#10B981',                    // vert
+    en_production: '#1565C0',                 // bleu
+    annule: '#DC2626',                        // rouge
   };
   return colors[statut] || '#6B7280';
 }
