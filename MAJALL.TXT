@@ -754,3 +754,5 @@ P2-OPT-FIX-CONDITIONS — 2026-04-22 — UI saisie visuelle des conditions dropd
 P3-DUP — 2026-04-22 — Bouton Dupliquer produit dans back-office + modal ciblée — OK
 
 FIX-DROPDOWNS — 2026-04-23 — Fix getRefFromSelection (conditions avant label) + suppression ref statique sous titre produit — OK
+
+P3-QOL-A — 2026-04-23 — Toast auto-dismiss livré (parties B/C/D à suivre) — OK

@@ -1,0 +1,55 @@
+=== MAJ P3-QOL-PART-A — Toast auto-dismiss ===
+Date : 2026-04-23
+Branche : v2
+Statut : LIVRÉ (parties B/C/D à suivre)
+
+FONCTIONNALITÉ LIVRÉE :
+  ✅ Toast auto-dismiss (remplace alert() bloquant après save)
+
+DÉTAILS TECHNIQUES :
+  • Créé : src/admin/components/Toast.tsx
+    - Composant Toast avec animation entrée/sortie
+    - Auto-dismiss après 3.5 secondes
+    - Support 4 types : success, warning, error, info
+    - Support liste de détails (ex: champs manquants)
+    - Bouton fermeture manuelle (×)
+  
+  • Modifié : src/admin/pages/FicheProduit.tsx
+    - Import du composant Toast
+    - Ajout state toast
+    - Remplacé 3 alert() dans handleSave par setToast():
+      * Success (tous champs OK) → toast vert
+      * Warning (champs manquants) → toast orange avec liste des champs
+      * Error (erreur sauvegarde) → toast rouge avec message d'erreur
+    - Toast rendu à la fin du JSX (après ModalDupliquer)
+
+FICHIERS MODIFIÉS (2) :
+  ✅ src/admin/components/Toast.tsx (créé)
+  ✅ src/admin/pages/FicheProduit.tsx (modifié)
+
+COMMIT :
+  49cae88 P3-QOL-A: toast auto-dismiss (remplace alert après save)
+
+TESTS À EFFECTUER (2) :
+  1. TEST SUCCÈS COMPLET :
+     - Ouvrir une fiche produit existante avec tous les champs remplis
+     - Modifier un champ quelconque
+     - Cliquer "Enregistrer"
+     - Vérifier : un toast VERT apparaît en haut à droite
+     - Vérifier : "Modifications enregistrées ✓"
+     - Vérifier : disparaît tout seul après ~3-4 secondes
+     - Vérifier : pas de popup alert() bloquant
+  
+  2. TEST WARNING CHAMPS MANQUANTS :
+     - Ouvrir une fiche produit incomplète (ex: prix_achat vide)
+     - Modifier un champ
+     - Cliquer "Enregistrer"
+     - Vérifier : un toast ORANGE apparaît
+     - Vérifier : "Modifications enregistrées" + liste des champs manquants
+     - Vérifier : disparaît tout seul après ~3-4 secondes
+
+PROCHAINES ÉTAPES :
+  À livrer dans 3 prompts séparés :
+  - Partie B : Filtres catalogue persistants (localStorage)
+  - Partie C : Bouton Dupliquer en ligne dans liste
+  - Partie D : Multi-devises EUR/USD/CNY + prix partenaire
