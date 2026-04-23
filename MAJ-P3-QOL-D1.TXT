@@ -1,0 +1,41 @@
+=== MAJ P3-QOL-D1-STRICT — Toast suppression produit ===
+Date : 2026-04-23
+Branche : v2
+Build : OK
+
+PROBLÈME RÉSOLU :
+  Lors de la suppression d'un produit, un popup "Produit supprimé. OK"
+  bloquait Michel qui devait cliquer pour continuer.
+
+SOLUTION :
+  - GARDÉ : confirm() de sécurité AVANT suppression
+  - REMPLACÉ : alert() de succès APRÈS suppression → toast auto-dismiss
+  - Délai de 1,2 sec avant redirection pour laisser voir le toast
+
+FICHIERS MODIFIÉS (1) :
+  ✅ src/admin/pages/FicheProduit.tsx
+
+FICHIERS INTERDITS (intacts) :
+  ✅ admin.css
+  ✅ Toast.tsx (réutilisation)
+  ✅ Front public
+  ✅ Autres composants
+
+FONCTIONNALITÉS :
+  - Popup confirm() de sécurité conservé
+  - Toast vert "Produit XXX supprimé ✓" après suppression
+  - Toast d'erreur en cas d'échec (avec détails)
+  - Délai de 1200ms avant redirection vers la liste
+  - Réutilisation du composant Toast existant
+
+COMMITS :
+  1dc940c P3-QOL-D1-A: toast auto-dismiss après suppression (FicheProduit)
+
+TESTS À EFFECTUER (3) :
+  [ ] Depuis FicheProduit, clic "Supprimer" → confirm "Êtes-vous sûr ?" apparaît
+  [ ] Clic OK → produit supprimé + toast vert "Produit XXX supprimé ✓" pendant 3-4 sec
+  [ ] Redirection vers liste après le toast (si depuis FicheProduit)
+
+NOTE :
+  AdminProduits.tsx ne permet pas la suppression depuis la liste,
+  donc aucune modification nécessaire sur ce fichier.
