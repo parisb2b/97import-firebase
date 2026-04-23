@@ -3,6 +3,7 @@ import { Link, useLocation } from 'wouter';
 import { collection, getDocs, orderBy, query } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { calculerCompletude, CATEGORIES, StatutCompletude, manqueCodeHs, CHAMPS_ESSENTIEL } from '../../lib/productHelpers';
+import { loadFilters, saveFilters, resetFilters, hasActiveFilters } from '../../lib/filterPersistence';
 
 interface Product {
   id: string;
@@ -31,14 +32,28 @@ export default function AdminProduits() {
   const [, setLocation] = useLocation();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState('TOUS');
-  const [statutFilter, setStatutFilter] = useState('TOUS');
-  const [actifFilter, setActifFilter] = useState('TOUS');
+
+  // Charger les filtres sauvegardés depuis localStorage
+  const savedFilters = loadFilters();
+  const [searchTerm, setSearchTerm] = useState(savedFilters.recherche || '');
+  const [categoryFilter, setCategoryFilter] = useState(savedFilters.categorie || 'TOUS');
+  const [statutFilter, setStatutFilter] = useState(savedFilters.statut || 'TOUS');
+  const [actifFilter, setActifFilter] = useState(savedFilters.actif || 'TOUS');
+
   const [sortCol, setSortCol] = useState<SortColumn>('reference');
   const [sortDir, setSortDir] = useState<SortDir>('asc');
 
   useEffect(() => { loadProducts(); }, []);
+
+  // Sauvegarder les filtres dans localStorage à chaque changement
+  useEffect(() => {
+    saveFilters({
+      recherche: searchTerm,
+      categorie: categoryFilter,
+      statut: statutFilter,
+      actif: actifFilter,
+    });
+  }, [searchTerm, categoryFilter, statutFilter, actifFilter]);
 
   const loadProducts = async () => {
     setLoading(true);
@@ -152,6 +167,34 @@ export default function AdminProduits() {
           <option value="ACTIF">Actifs sur le site</option>
           <option value="MASQUE">Masqués</option>
         </select>
+
+        {/* Bouton Réinitialiser - visible uniquement si au moins un filtre actif */}
+        {hasActiveFilters({ recherche: searchTerm, categorie: categoryFilter, statut: statutFilter, actif: actifFilter }) && (
+          <button
+            onClick={() => {
+              setSearchTerm('');
+              setCategoryFilter('TOUS');
+              setStatutFilter('TOUS');
+              setActifFilter('TOUS');
+              resetFilters();
+            }}
+            style={{
+              padding: '6px 12px',
+              background: '#E5E7EB',
+              color: '#374151',
+              border: 'none',
+              borderRadius: 6,
+              fontSize: 12,
+              fontWeight: 600,
+              cursor: 'pointer',
+              fontFamily: 'inherit',
+              whiteSpace: 'nowrap',
+            }}
+            title="Effacer tous les filtres"
+          >
+            🔄 Réinitialiser filtres
+          </button>
+        )}
       </div>
 
       {/* Table */}

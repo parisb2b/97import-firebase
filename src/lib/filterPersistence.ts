@@ -4,9 +4,10 @@
 const STORAGE_KEY = 'admin_catalogue_filters_v1';
 
 export interface CatalogueFilters {
-  categorie?: string;          // 'mini-pelle', 'maison-modulaire', etc. ou '' pour "Tous"
+  categorie?: string;          // 'mini-pelle', 'maison-modulaire', etc. ou 'TOUS' pour "Tous"
   recherche?: string;          // texte de recherche
-  statut?: 'actif' | 'inactif' | 'tous';
+  statut?: string;             // 'TOUS', 'complet', 'pret_site', etc.
+  actif?: string;              // 'TOUS', 'ACTIF', 'MASQUE'
   // Ajouter d'autres filtres si nécessaire selon le code existant
   [key: string]: any;
 }
