@@ -762,3 +762,5 @@ P3-QOL-B — 2026-04-23 — Filtres catalogue admin persistants (localStorage + 
 P3-QOL-C — 2026-04-23 — Bouton Dupliquer en ligne dans liste catalogue admin — OK
 
 P3-QOL-D1 — 2026-04-23 — Toast auto-dismiss après suppression produit (remplace popup OK) — OK
+
+P3-QOL-D2 — 2026-04-23 — Enrichissement section Prix & fournisseur (multi-devises USD/CNY/EUR + prix de vente calculés) — OK

@@ -1,0 +1,51 @@
+=== MAJ P3-QOL-D2-STRICT — Multi-devises + prix de vente (v2) ===
+Date : 2026-04-23
+Branche : v2
+Build : OK
+
+OBJECTIF RÉALISÉ :
+  Dans la section "Prix & Fournisseur" EXISTANTE de l'onglet Essentiel :
+  - Intégration de 3 champs prix d'achat synchronisés (USD → CNY → EUR)
+  - Intégration d'un bloc "Prix de vente calculés" (Public, Partenaire, VIP)
+  - Le champ fournisseur existant est INCHANGÉ
+
+FICHIERS CRÉÉS (1) :
+  ✅ src/lib/currencyHelpers.ts (Frankfurter API, cache 1h, fallback)
+
+FICHIERS MODIFIÉS (1) :
+  ✅ src/admin/components/produit/OngletEssentiel.tsx (enrichissement section Prix & fournisseur)
+
+FICHIERS INTERDITS (intacts) :
+  ✅ admin.css
+  ✅ Tout front public
+  ✅ FicheProduit.tsx (parent non modifié, logique dans OngletEssentiel)
+  ✅ AdminProduits, Toast, ModalDupliquer, filterPersistence
+  ✅ Autres onglets (Détails, Médias, Options)
+
+CHAMPS FIRESTORE :
+  - prix_achat (EUR, source de vérité - inchangé)
+  - prix_achat_usd (NOUVEAU - synchronisé)
+  - prix_achat_cny (NOUVEAU - synchronisé)
+
+FONCTIONNALITÉS :
+  - 3 champs prix d'achat : USD $, CNY ¥, EUR € (source verte)
+  - Synchronisation bidirectionnelle : saisir dans n'importe quelle devise → les 2 autres se calculent
+  - Affichage taux du jour : "1 EUR = X.XXXX USD = Y.YYYY CNY"
+  - Bloc prix de vente calculés (lecture seule) :
+    * Public (User) : × 2 du prix d'achat EUR
+    * Partenaire : × 1.2 du prix d'achat EUR
+    * VIP : affiche prix négocié si défini, sinon "—"
+  - Cache Frankfurter API : 1h (évite appels répétés)
+  - Fallback automatique : USD=1.08, CNY=7.80 si API indisponible
+
+COMMITS :
+  b601b19 P3-QOL-D2-A: helper currencyHelpers
+  eb0258a P3-QOL-D2-B: enrichir section Prix & fournisseur
+
+TESTS À EFFECTUER (6) :
+  [ ] Ouvrir fiche produit → onglet Essentiel
+  [ ] Dans la section Prix & Fournisseur, voir les 3 champs USD/CNY/EUR + bloc prix de vente
+  [ ] Le champ fournisseur est toujours là et fonctionnel
+  [ ] Saisir 1000 USD → CNY et EUR se calculent auto
+  [ ] Saisir 1000 EUR → USD et CNY se calculent auto
+  [ ] Prix Public/Partenaire/VIP affichés correctement (2000€ / 1200€ / VIP)
