@@ -297,13 +297,6 @@ export default function Produit() {
             {pName(product)}
           </h1>
 
-          {/* Reference */}
-          {(product.reference || product.numero_interne) && (
-            <span style={{ fontSize: 13, color: '#94A3B8', fontWeight: 500 }}>
-              {t('product.ref')} : {product.reference || product.numero_interne}
-            </span>
-          )}
-
           {/* Gamme */}
           <p style={{ color: '#6B7280', fontSize: 14, marginBottom: 22, marginTop: 4 }}>
             {product.gamme ? `${t('product.gamme')} ${product.gamme}` : ''}{product.gamme && product.categorie ? ' · ' : ''}{product.categorie || ''}
