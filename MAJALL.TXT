@@ -756,3 +756,5 @@ P3-DUP — 2026-04-22 — Bouton Dupliquer produit dans back-office + modal cibl
 FIX-DROPDOWNS — 2026-04-23 — Fix getRefFromSelection (conditions avant label) + suppression ref statique sous titre produit — OK
 
 P3-QOL-A — 2026-04-23 — Toast auto-dismiss livré (parties B/C/D à suivre) — OK
+
+P3-QOL-B — 2026-04-23 — Filtres catalogue admin persistants (localStorage + bouton Reset) — OK

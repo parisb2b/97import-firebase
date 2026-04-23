@@ -1,0 +1,51 @@
+=== MAJ P3-QOL-B-FILTRES-STRICT — Filtres catalogue persistants ===
+Date : 2026-04-23
+Branche : v2
+Build : OK
+
+PROBLÈME RÉSOLU :
+  Les filtres catalogue admin (catégorie, recherche, statut) étaient
+  perdus à chaque fois que Michel ouvrait une fiche produit puis
+  revenait à la liste.
+
+SOLUTION :
+  Sauvegarde dans localStorage à chaque changement de filtre.
+  Restauration automatique au chargement de la page.
+  Bouton "🔄 Réinitialiser filtres" qui apparaît uniquement
+  quand au moins un filtre est actif.
+
+FICHIERS CRÉÉS (1) :
+  ✅ src/lib/filterPersistence.ts
+     - Interface CatalogueFilters (catégorie, recherche, statut, actif)
+     - saveFilters() : sauvegarde dans localStorage
+     - loadFilters() : charge depuis localStorage
+     - resetFilters() : efface localStorage
+     - hasActiveFilters() : vérifie si au moins un filtre actif
+
+FICHIERS MODIFIÉS (1) :
+  ✅ src/admin/pages/AdminProduits.tsx
+     - Import du helper filterPersistence
+     - États filtres initialisés depuis loadFilters()
+     - useEffect qui sauvegarde à chaque changement
+     - Bouton "Réinitialiser" conditionnel (visible si filtres actifs)
+
+FICHIERS INTERDITS (intacts) :
+  ✅ admin.css
+  ✅ Front public
+  ✅ FicheProduit, Toast, ModalDupliquer
+
+FONCTIONNALITÉS :
+  - Filtres sauvegardés automatiquement (clé: admin_catalogue_filters_v1)
+  - Restauration auto au chargement
+  - Bouton "Réinitialiser" visible uniquement si filtres actifs
+  - Compatible avec tous les filtres existants (catégorie, recherche, statut, actif)
+
+COMMITS :
+  c54c07f P3-QOL-B-A: helper filterPersistence
+  cddc675 P3-QOL-B-B: filtres catalogue admin persistants + bouton Réinitialiser
+
+TESTS À EFFECTUER (4) :
+  [ ] Filtrer par catégorie "mini-pelle" dans AdminProduits
+  [ ] Ouvrir une fiche produit, la modifier, revenir à la liste → filtre conservé
+  [ ] Recharger la page (F5) → filtres toujours actifs
+  [ ] Cliquer "🔄 Réinitialiser filtres" → tous les filtres reset
