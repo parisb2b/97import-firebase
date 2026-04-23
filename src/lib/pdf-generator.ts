@@ -446,7 +446,7 @@ function drawTotalsVIP(doc: jsPDF, totalPublic: number, totalNegocie: number, y:
 // ============ DRAW: ACOMPTE BLOCK ============
 
 // ============ DRAW: CONDITIONS + SIGNATURE ============
-function drawConditionsSignature(doc: jsPDF, y: number, color: readonly [number, number, number]) {
+function drawConditionsSignature(doc: jsPDF, y: number, color: readonly [number, number, number], signe_le?: any) {
   doc.setDrawColor(...C.grayLine);
   doc.line(20, y, 190, y);
   y += 6;
@@ -462,12 +462,34 @@ function drawConditionsSignature(doc: jsPDF, y: number, color: readonly [number,
   doc.setFontSize(8);
   doc.setTextColor(...C.grayText);
   doc.text('Règlement : À réception', 20, y);
-  doc.text('À _______, le __/__/____', 120, y);
+
+  // Si signé, afficher la date de signature
+  if (signe_le) {
+    const dateSignature = signe_le?.toDate ? signe_le.toDate() : new Date(signe_le);
+    const dateStr = dateSignature.toLocaleDateString('fr-FR');
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...color);
+    doc.text(`Signé le ${dateStr}`, 120, y);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(...C.grayText);
+  } else {
+    doc.text('À _______, le __/__/____', 120, y);
+  }
+
   y += 4;
   doc.text('Mode : Virement bancaire', 20, y);
-  doc.text('Signature :', 120, y);
-  y += 4;
-  doc.text('Nom et qualité :', 120, y);
+
+  if (signe_le) {
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...color);
+    doc.text('✓ Devis signé électroniquement', 120, y);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(...C.grayText);
+  } else {
+    doc.text('Signature :', 120, y);
+    y += 4;
+    doc.text('Nom et qualité :', 120, y);
+  }
 }
 
 // ============ DRAW: FOOTER ============
@@ -519,7 +541,7 @@ export function generateDevis(quote: any, emetteur?: any): jsPDF {
     y = drawTotals(doc, quote.total_ht || 0, y, color);
   }
 
-  drawConditionsSignature(doc, y + 5, color);
+  drawConditionsSignature(doc, y + 5, color, quote.signe_le);
   drawFooter(doc, 'Devis', numero, color);
 
   return doc;

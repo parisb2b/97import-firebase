@@ -1,9 +1,13 @@
 import { useState } from 'react';
 import PopupAcompte from './PopupAcompte';
+import PopupSaisieRIB from '../../components/PopupSaisieRIB';
+import PopupVerserAcompte from '../../components/PopupVerserAcompte';
 import { peutVerserAcompte } from '../../../lib/devisHelpers';
 import { db } from '../../../lib/firebase';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { generateDevis, downloadPDF } from '../../../lib/pdf-generator';
+import { notifyAcompteDeclare, notifySignatureClient } from '../../../lib/emailService';
+import { useToast } from '../../components/Toast';
 
 interface DevisCardProps {
   devis: any;
@@ -13,8 +17,11 @@ interface DevisCardProps {
 }
 
 export default function DevisCard({ devis, profile, onRefresh, forceOpen = false }: DevisCardProps) {
+  const { showToast } = useToast();
   const [open, setOpen] = useState(forceOpen);
   const [showPopupAcompte, setShowPopupAcompte] = useState(false);
+  const [showPopupRIB, setShowPopupRIB] = useState(false);
+  const [showPopupVerserAcompte, setShowPopupVerserAcompte] = useState(false);
 
   // Calculs
   const acomptes = Array.isArray(devis.acomptes) ? devis.acomptes : [];
@@ -55,6 +62,106 @@ export default function DevisCard({ devis, profile, onRefresh, forceOpen = false
     } catch (err) {
       console.error('Erreur PDF:', err);
       alert('Erreur lors du téléchargement du PDF');
+    }
+  };
+
+  // Signature du devis
+  const handleSigner = async () => {
+    try {
+      await updateDoc(doc(db, 'quotes', devis.id), {
+        signe_le: serverTimestamp(),
+        statut: 'signe',
+        updatedAt: serverTimestamp(),
+      });
+
+      // Notification email
+      try {
+        const devisSnap = await getDoc(doc(db, 'quotes', devis.id));
+        const devisData = devisSnap.data();
+        if (devisData) {
+          const devisAJour: any = { id: devis.id, numero: devis.numero, ...devisData };
+
+          // Récupérer le nom du partenaire si existe
+          let partenaireName: string | undefined;
+          if (devisAJour.partenaire_code) {
+            const partenaireSnap = await getDoc(doc(db, 'partners', devisAJour.partenaire_code as string));
+            if (partenaireSnap.exists()) {
+              partenaireName = `${partenaireSnap.data().prenom || ''} ${partenaireSnap.data().nom || ''}`.trim() || undefined;
+            }
+          }
+
+          await notifySignatureClient(devisAJour, partenaireName);
+        }
+      } catch (err) {
+        console.error('[DevisCard] Erreur notification signature:', err);
+      }
+
+      showToast('✅ Devis signé avec succès !');
+
+      // Passer à l'étape RIB
+      setShowPopupRIB(true);
+      onRefresh();
+    } catch (err) {
+      console.error('[DevisCard] Erreur signature:', err);
+      showToast('Erreur lors de la signature', 'error');
+    }
+  };
+
+  // RIB submit
+  const handleRIBSubmit = async (data: { hasRib: boolean; iban?: string; bic?: string; nom_banque?: string }) => {
+    try {
+      if (data.hasRib) {
+        await updateDoc(doc(db, 'quotes', devis.id), {
+          iban: data.iban,
+          bic: data.bic,
+          nom_banque: data.nom_banque,
+          updatedAt: serverTimestamp(),
+        });
+      }
+
+      setShowPopupRIB(false);
+
+      // Passer à l'étape acompte
+      setShowPopupVerserAcompte(true);
+    } catch (err) {
+      console.error('[DevisCard] Erreur RIB:', err);
+      showToast('Erreur lors de l\'enregistrement du RIB', 'error');
+    }
+  };
+
+  // Acompte submit (après signature)
+  const handleAcompteSignatureSubmit = async (data: { montantAcompte: number; typeCompte: 'perso' | 'pro' }) => {
+    try {
+      const newAcompte = {
+        montant: data.montantAcompte,
+        type_compte: data.typeCompte,
+        date: new Date().toISOString(),
+        statut: 'declare',
+        ref_fa: '',
+      };
+
+      const updatedAcomptes = [...(devis.acomptes || []), newAcompte];
+
+      await updateDoc(doc(db, 'quotes', devis.id), {
+        acomptes: updatedAcomptes,
+        updatedAt: serverTimestamp(),
+      });
+
+      // Notification email
+      try {
+        const devisSnap = await getDoc(doc(db, 'quotes', devis.id));
+        const devisAJour = { id: devis.id, numero: devis.numero, ...devisSnap.data() };
+        await notifyAcompteDeclare(devisAJour, newAcompte);
+      } catch (err) {
+        console.error('[DevisCard] Erreur notification:', err);
+      }
+
+      showToast('✅ Acompte déclaré avec succès !');
+      setShowPopupVerserAcompte(false);
+      onRefresh();
+    } catch (err) {
+      console.error('[DevisCard] Erreur acompte:', err);
+      showToast('Erreur lors de la déclaration de l\'acompte', 'error');
     }
   };
 
@@ -322,6 +429,63 @@ export default function DevisCard({ devis, profile, onRefresh, forceOpen = false
             </div>
           )}
 
+          {/* Bouton Signer (si devis_vip_envoye et non signé) */}
+          {devis.statut === 'devis_vip_envoye' && !devis.signe_le && (
+            <div style={{ marginBottom: 16 }}>
+              <div style={{
+                background: '#FEF3C7',
+                borderRadius: 12,
+                padding: 16,
+                marginBottom: 12,
+                textAlign: 'center',
+              }}>
+                <p style={{ margin: 0, color: '#92400E', fontSize: 14, lineHeight: 1.6 }}>
+                  🎁 Votre partenaire vous a envoyé une offre VIP avec des prix négociés. Pour accepter cette offre et lancer votre commande, signez le devis ci-dessous.
+                </p>
+              </div>
+              <button
+                onClick={handleSigner}
+                style={{
+                  width: '100%',
+                  padding: 14,
+                  background: 'linear-gradient(135deg, #7C3AED, #4C1D95)',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: 12,
+                  fontSize: 14,
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 8,
+                }}
+              >
+                ✍️ Je signe ce devis
+              </button>
+            </div>
+          )}
+
+          {/* Message si signé récemment */}
+          {devis.statut === 'signe' && devis.signe_le && acomptes.length === 0 && (
+            <div style={{
+              background: '#D1FAE5',
+              borderRadius: 12,
+              padding: 16,
+              marginBottom: 16,
+              textAlign: 'center',
+              border: '2px solid #059669',
+            }}>
+              <div style={{ fontSize: 32, marginBottom: 8 }}>✅</div>
+              <p style={{ margin: '0 0 8px 0', color: '#065F46', fontSize: 14, fontWeight: 600 }}>
+                Devis signé le {devis.signe_le?.toDate?.()?.toLocaleDateString('fr-FR') || '—'}
+              </p>
+              <p style={{ margin: 0, color: '#059669', fontSize: 13 }}>
+                Vous pouvez maintenant verser un acompte pour lancer la production.
+              </p>
+            </div>
+          )}
+
           {/* Bouton Verser un acompte */}
           {peutVerserAcompte(devis) && (
             <button
@@ -358,6 +522,30 @@ export default function DevisCard({ devis, profile, onRefresh, forceOpen = false
             setShowPopupAcompte(false);
             onRefresh();
           }}
+        />
+      )}
+
+      {showPopupRIB && (
+        <PopupSaisieRIB
+          isOpen={showPopupRIB}
+          onClose={() => setShowPopupRIB(false)}
+          onSubmit={handleRIBSubmit}
+          initialIban={devis.iban}
+          initialBic={devis.bic}
+          initialNomBanque={devis.nom_banque}
+          title="Coordonnées bancaires"
+          description="Pour faciliter le virement de votre acompte, merci de nous communiquer votre IBAN."
+        />
+      )}
+
+      {showPopupVerserAcompte && (
+        <PopupVerserAcompte
+          isOpen={showPopupVerserAcompte}
+          onClose={() => setShowPopupVerserAcompte(false)}
+          onSubmit={handleAcompteSignatureSubmit}
+          totalDevis={devis.total_ht}
+          title="Déclarer votre acompte"
+          minAcomptePct={30}
         />
       )}
     </div>

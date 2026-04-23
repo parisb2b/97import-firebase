@@ -291,6 +291,12 @@ export async function notifyDevisVipEnvoye(devis: any, partenaireName?: string):
   const totalHtNegocie = devis.total_ht || 0;
   const economie = totalHtPublic - totalHtNegocie;
 
+  // ─── URL signature avec token ───
+  const signatureToken = devis.signature_token || '';
+  const signatureUrl = signatureToken
+    ? `${SITE_URL}/signature/${signatureToken}`
+    : ESPACE_CLIENT_URL;
+
   // ─── Email au CLIENT ───
   const htmlClient = baseTemplate({
     preheader: `Votre partenaire ${devis.partenaire_code || ''} vous a envoyé une offre VIP`,
@@ -304,10 +310,18 @@ export async function notifyDevisVipEnvoye(devis: any, partenaireName?: string):
         <p style="margin:0;color:#C87F6B;font-size:24px;font-weight:700;">${formatEur(totalHtNegocie)}</p>
         ${economie > 0 ? `<p style="margin:12px 0 0 0;color:#059669;font-size:14px;font-weight:600;">Vous économisez ${formatEur(economie)}</p>` : ''}
       </div>
-      <p style="margin-top:20px;">Pour accepter cette offre, versez un acompte depuis votre espace client.</p>
+      <p style="margin-top:20px;">Pour accepter cette offre, cliquez sur le bouton ci-dessous pour signer votre devis en un clic :</p>
+      ${signatureToken ? `
+      <div style="background:#E0F2FE;border-radius:12px;padding:16px;margin-top:16px;text-align:center;">
+        <p style="margin:0;color:#0369A1;font-size:13px;">
+          🔒 Lien de signature sécurisé (valable 30 jours)<br>
+          <a href="${signatureUrl}" style="color:#0369A1;text-decoration:underline;word-break:break-all;font-size:11px;">${signatureUrl}</a>
+        </p>
+      </div>
+      ` : ''}
     `,
-    ctaLabel: 'Voir mon offre VIP',
-    ctaUrl: ESPACE_CLIENT_URL,
+    ctaLabel: signatureToken ? '✍️ Signer mon devis' : 'Voir mon offre VIP',
+    ctaUrl: signatureUrl,
   });
 
   await sendEmail({
@@ -620,5 +634,111 @@ export async function envoyerEmailFactureAcompte(params: {
       created_at: null,
     },
   });
+}
+
+// ═══════════════════════════════════════════════════════
+// ÉVÉNEMENT 5 : SIGNATURE DEVIS
+// ═══════════════════════════════════════════════════════
+
+export async function notifySignatureClient(devis: any, partenaireName?: string): Promise<void> {
+  const clientEmail = devis.client_email || devis.email;
+  const clientNom = `${devis.client_prenom || ''} ${devis.client_nom || ''}`.trim() || 'Cher client';
+  const totalHt = devis.total_ht || 0;
+
+  // ─── Email au CLIENT ───
+  if (clientEmail) {
+    const htmlClient = baseTemplate({
+      preheader: `Votre devis ${devis.numero} a été signé avec succès`,
+      title: `✅ Devis signé`,
+      intro: `Bonjour ${clientNom},<br><br>Vous venez de signer votre devis <strong>${devis.numero}</strong>. Merci de votre confiance !`,
+      body: `
+        <div style="background:#D1FAE5;border-radius:12px;padding:20px;text-align:center;border-left:4px solid #059669;">
+          <p style="margin:0 0 8px 0;color:#065F46;font-size:16px;font-weight:600;">Devis signé avec succès</p>
+          <p style="margin:0 0 16px 0;color:#059669;font-size:14px;">Votre commande pour <strong>${formatEur(totalHt)}</strong> est maintenant confirmée.</p>
+        </div>
+        <p style="margin-top:20px;">Pour lancer la production, merci de verser un acompte minimum de 30% depuis votre espace client.</p>
+        <p style="margin-top:12px;color:#6B7280;font-size:13px;">
+          Dès réception de votre virement, nous vous enverrons votre facture d'acompte et lancerons la fabrication de vos produits.
+        </p>
+      `,
+      ctaLabel: 'Accéder à mon espace client',
+      ctaUrl: ESPACE_CLIENT_URL,
+    });
+
+    await sendEmail({
+      to: clientEmail,
+      message: {
+        subject: `✅ Devis signé — ${devis.numero}`,
+        html: htmlClient,
+        text: htmlToText(htmlClient),
+      },
+      _metadata: { event: 'signature_client', devis_id: devis.numero, created_at: null },
+    });
+  }
+
+  // ─── Email à l'ADMIN ───
+  const htmlAdmin = baseTemplate({
+    preheader: `Devis ${devis.numero} signé par ${clientNom}`,
+    title: `✍️ Devis signé`,
+    intro: `Le client <strong>${clientNom}</strong> vient de signer le devis <strong>${devis.numero}</strong>.`,
+    body: `
+      <div style="background:#D1FAE5;border-radius:12px;padding:20px;border-left:4px solid #059669;">
+        <p style="margin:0 0 8px 0;"><strong>Client :</strong> ${clientNom} (${clientEmail || '—'})</p>
+        <p style="margin:0 0 8px 0;"><strong>Devis :</strong> ${devis.numero}</p>
+        <p style="margin:0 0 8px 0;"><strong>Montant HT :</strong> ${formatEur(totalHt)}</p>
+        <p style="margin:0;"><strong>Partenaire :</strong> ${partenaireName || devis.partenaire_code || 'aucun'}</p>
+      </div>
+      <p style="margin-top:20px;color:#92400E;">
+        → En attente du premier acompte pour lancer la production.
+      </p>
+    `,
+    ctaLabel: 'Voir le devis',
+    ctaUrl: `${SITE_URL}/admin/devis/${devis.numero}`,
+  });
+
+  await sendEmail({
+    to: ADMIN_EMAIL,
+    message: {
+      subject: `[97import] Devis signé — ${devis.numero} — ${formatEur(totalHt)}`,
+      html: htmlAdmin,
+      text: htmlToText(htmlAdmin),
+    },
+    _metadata: { event: 'signature_admin', devis_id: devis.numero, created_at: null },
+  });
+
+  // ─── Email au PARTENAIRE (si attribué) ───
+  if (devis.partenaire_code) {
+    const partenaireSnap = await getDoc(doc(db, 'partners', devis.partenaire_code));
+    if (partenaireSnap.exists()) {
+      const partEmail = partenaireSnap.data().email;
+      if (partEmail) {
+        const htmlPart = baseTemplate({
+          preheader: `Votre client ${clientNom} a signé son devis ${devis.numero}`,
+          title: `✍️ Votre client a signé son devis`,
+          intro: `<strong>${clientNom}</strong> vient de signer le devis <strong>${devis.numero}</strong> que vous avez négocié.`,
+          body: `
+            <div style="background:#D1FAE5;border-radius:12px;padding:20px;">
+              <p style="margin:0 0 8px 0;color:#065F46;font-weight:600;">Félicitations ! 🎉</p>
+              <p style="margin:0;color:#059669;font-size:14px;">
+                Votre client a accepté votre offre VIP. Dès qu'il versera un acompte, votre commission sera calculée et visible dans votre espace partenaire.
+              </p>
+            </div>
+          `,
+          ctaLabel: 'Voir dans mon espace partenaire',
+          ctaUrl: ESPACE_PARTENAIRE_URL,
+        });
+
+        await sendEmail({
+          to: partEmail,
+          message: {
+            subject: `[97import partenaire] Devis signé — ${devis.numero}`,
+            html: htmlPart,
+            text: htmlToText(htmlPart),
+          },
+          _metadata: { event: 'signature_partenaire', devis_id: devis.numero, created_at: null },
+        });
+      }
+    }
+  }
 }
 

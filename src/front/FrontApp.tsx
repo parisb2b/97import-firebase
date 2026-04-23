@@ -13,6 +13,7 @@ import Profil from './pages/Profil';
 import { Redirect } from 'wouter';
 import EspaceClient from './pages/EspaceClient';
 import EspacePartenaire from './pages/EspacePartenaire';
+import SignatureDevis from './pages/SignatureDevis';
 import Services from './pages/Services';
 import Contact from './pages/Contact';
 
@@ -41,6 +42,7 @@ export default function FrontApp() {
           <Route path="/contact" component={Contact} />
           <Route path="/espace-client" component={EspaceClient} />
           <Route path="/espace-partenaire" component={EspacePartenaire} />
+          <Route path="/signature/:token" component={SignatureDevis} />
           <Route path="/profil" component={Profil} />
           <Route path="/mentions-legales">{() => <Placeholder name="Mentions légales" />}</Route>
           <Route path="/cgv">{() => <Placeholder name="CGV" />}</Route>

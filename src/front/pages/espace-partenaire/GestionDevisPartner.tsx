@@ -123,13 +123,21 @@ export default function GestionDevisPartner({ partnerCode }: { partnerCode: stri
       totalHtNegocie += prixNeg * (ligne.qte || 1);
     });
 
+    // Générer token de signature (30 jours de validité)
+    const signatureToken = crypto.randomUUID().replace(/-/g, '');
+    const tokenExpiry = new Date();
+    tokenExpiry.setDate(tokenExpiry.getDate() + 30);
+
     try {
       await updateDoc(doc(db, 'quotes', d.id), {
         is_vip: true,
         prix_negocies: prixNegociesMap,
         total_ht_public: d.total_ht,
         total_ht: totalHtNegocie,
-        statut: 'vip_envoye',
+        statut: 'devis_vip_envoye',
+        signature_token: signatureToken,
+        signature_token_expiry: tokenExpiry.toISOString(),
+        signature_token_used: false,
         updatedAt: new Date(),
       });
 
