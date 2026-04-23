@@ -752,3 +752,5 @@ P2-OPTIONS-STRICT — 2026-04-22 — Système d'options Type 1 (dropdowns + regr
 P2-OPT-FIX-CONDITIONS — 2026-04-22 — UI saisie visuelle des conditions dropdowns (onglet Options admin) — OK
 
 P3-DUP — 2026-04-22 — Bouton Dupliquer produit dans back-office + modal ciblée — OK
+
+FIX-DROPDOWNS — 2026-04-23 — Fix getRefFromSelection (conditions avant label) + suppression ref statique sous titre produit — OK

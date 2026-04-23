@@ -1,0 +1,42 @@
+=== MAJ FIX-DROPDOWNS-STRICT ===
+Date : 2026-04-23 12:35
+Branche : v2
+Build : OK
+
+PROBLÈMES CORRIGÉS :
+  ✅ Bug dropdowns Maisons (MS-20/30/40) : prix ne changeait pas selon la Taille
+  ✅ Bug dropdowns Kits solaires (KS-10K/12K/20K) : prix ne changeait pas selon la combinaison
+  ✅ Référence statique sous le titre : supprimée (redondante avec ProductOptionSelector)
+
+CAUSE RACINE :
+  La fonction getRefFromSelection() du fichier productGroupHelpers.ts
+  cherchait le choix dans le dernier dropdown via .find(c => c.label === ...)
+  SANS filtrer d'abord les choix selon leurs conditions.
+  Résultat : quand plusieurs choix avaient le même label (ex: "2 chambres")
+  avec des conditions différentes (Taille 20/30/40), find() retournait
+  toujours le premier, ignorant la condition active.
+
+FIX :
+  Ajout d'un appel à filtrerChoixSelonConditions() AVANT le .find()
+  pour ne chercher que dans les choix dont les conditions sont satisfaites.
+
+FICHIERS MODIFIÉS (2) :
+  ✅ src/lib/productGroupHelpers.ts (fonction getRefFromSelection)
+  ✅ src/front/pages/Produit.tsx (suppression ref statique sous titre)
+
+COMMITS :
+  b892642 FIX-DROPDOWNS-B: supprimer référence statique sous titre produit
+  465d1bf FIX-DROPDOWNS-A: getRefFromSelection filtre conditions avant lookup
+
+TESTS À EFFECTUER PAR MICHEL (6) :
+  [ ] Maison MS-20-001 : changer Taille 20→30→40 → prix change 2000→3000→4000
+  [ ] Maison MS-20-001 : choisir Taille 20, puis Chambres 3/4/5 → ref MS-20-OPT-1/2/3CH
+  [ ] Kit solaire KS-10K : Sur toit + Petits = KS-10K-001 (55552 €)
+  [ ] Kit solaire KS-10K : Au sol + Petits = KS-10K-003 (66665 €)
+  [ ] Mini-pelle R22 : fonctionne toujours (non-régression)
+  [ ] La ref n'apparaît plus sous le titre h1 du produit
+
+IMPACT :
+  - Bug bloquant pour 6 groupes (MS, MP, KS-10K/12K/20K) ✅ résolu
+  - Mini-pelles (1 dropdown, pas de conditions) non impactées ✅
+  - Pas de modification de admin.css ni de front non lié ✅
