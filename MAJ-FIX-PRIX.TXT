@@ -1,0 +1,113 @@
+═══════════════════════════════════════════════════════════════════════════════
+  FIX-PRIX-ARRONDI-VIP — Rapport de mise à jour
+═══════════════════════════════════════════════════════════════════════════════
+Date        : 2026-04-23
+Projet      : 97import-firebase
+Objectif    : Remplacer Math.round par Math.ceil pour tous les prix de vente
+              (Public et Partenaire) + Supprimer la carte VIP du back-office
+Statut      : ✅ TERMINÉ
+───────────────────────────────────────────────────────────────────────────────
+
+RÉSUMÉ DES MODIFICATIONS
+───────────────────────────────────────────────────────────────────────────────
+Fichiers modifiés : 2
+Insertions        : +7
+Suppressions      : -22
+Bilan net         : -15 lignes
+
+SCOPE PRÉCIS
+───────────────────────────────────────────────────────────────────────────────
+✅ Math.round → Math.ceil (tous les prix calculés Public et Partenaire)
+✅ Suppression carte VIP du back-office (OngletEssentiel.tsx)
+✅ Vérification PDF (aucune modification nécessaire)
+
+DÉTAIL DES FICHIERS MODIFIÉS
+───────────────────────────────────────────────────────────────────────────────
+
+1. src/front/components/PriceDisplay.tsx
+   ──────────────────────────────────────────────────────────────────────────
+   Commit  : ca3474a
+   Changes : 4 occurrences Math.round → Math.ceil
+
+   Ligne 19 — getPublic():
+     - Avant : Math.round(getAchat(product) * 2)
+     + Après : Math.ceil(getAchat(product) * 2)
+
+   Ligne 26 — getProductPrice() pour partner:
+     - Avant : Math.round(achat * 1.2) || Math.round(pub * 0.6)
+     + Après : Math.ceil(achat * 1.2) || Math.ceil(pub * 0.6)
+
+   Ligne 27 — getProductPrice() pour user/visitor:
+     - Avant : pub || Math.round(achat * 2)
+     + Après : pub || Math.ceil(achat * 2)
+
+   Ligne 35 — partner constant:
+     - Avant : Math.round(achat * 1.2) || Math.round(pub * 0.6)
+     + Après : Math.ceil(achat * 1.2) || Math.ceil(pub * 0.6)
+
+   Impact  : Tous les prix affichés côté front-end (User/Partner) sont arrondis
+             au centime supérieur au lieu du centime le plus proche.
+
+2. src/admin/components/produit/OngletEssentiel.tsx
+   ──────────────────────────────────────────────────────────────────────────
+   Commit  : 69fd880
+   Changes : 2 Math.ceil ajoutés + 1 carte VIP supprimée + grid 3→2 colonnes
+
+   Ligne 333 — gridTemplateColumns:
+     - Avant : 'repeat(3, 1fr)'
+     + Après : 'repeat(2, 1fr)'
+
+   Lignes 340, 352 — Prix calculés Public et Partenaire:
+     + Math.ceil((product.prix_achat || 0) * 2)      // Public
+     + Math.ceil((product.prix_achat || 0) * 1.2)    // Partenaire
+
+   Lignes 340, 352 — toLocaleString options nettoyées:
+     - Supprimé minimumFractionDigits: 2, maximumFractionDigits: 2
+       (les entiers n'ont pas besoin de décimales forcées)
+
+   Lignes 359-372 — Carte VIP supprimée complètement:
+     - 15 lignes de JSX supprimées (div VIP avec prix × 1.5)
+
+   Impact  : Back-office affiche 2 cartes au lieu de 3, avec Math.ceil au lieu
+             de Math.round pour les prix calculés.
+
+VÉRIFICATIONS EFFECTUÉES
+───────────────────────────────────────────────────────────────────────────────
+✅ src/lib/pdf-generator.ts           → Aucun Math.round trouvé (prix)
+✅ src/lib/generateInvoiceAcompte.ts  → Aucun Math.round trouvé
+✅ npm run build                      → Succès (0 erreurs TS)
+
+COMMITS GIT
+───────────────────────────────────────────────────────────────────────────────
+ca3474a  FIX-PRIX-B: PriceDisplay Math.ceil au lieu de Math.round (prix Public/Partenaire)
+69fd880  FIX-PRIX-C: OngletEssentiel Math.ceil + suppression carte VIP (grid 2 colonnes)
+
+IMPACT UTILISATEUR
+───────────────────────────────────────────────────────────────────────────────
+Avant (Math.round):
+  Prix achat = 12.40 € → Public = 25 € (24.80 arrondi)
+  Prix achat = 12.60 € → Public = 25 € (25.20 arrondi)
+
+Après (Math.ceil):
+  Prix achat = 12.40 € → Public = 25 € (24.80 → 25)
+  Prix achat = 12.60 € → Public = 26 € (25.20 → 26)
+
+Résultat : Toujours arrondi au centime supérieur = jamais de perte pour l'admin.
+
+VALIDATION FINALE
+───────────────────────────────────────────────────────────────────────────────
+✅ Tous les Math.round → Math.ceil (prix calculés Public/Partenaire)
+✅ Carte VIP supprimée du back-office
+✅ Grid 3 colonnes → 2 colonnes
+✅ Build TypeScript : 0 erreur
+✅ Commits : 2 commits atomiques et explicites
+
+PROCHAINE ÉTAPE
+───────────────────────────────────────────────────────────────────────────────
+→ Tester manuellement l'affichage des prix côté front et back-office
+→ Vérifier que les prix sont bien arrondis au centime supérieur
+→ P3-WF1 : Workflow paiement selon AUDIT-GLOBAL-REPORT.md (5 étapes)
+
+═══════════════════════════════════════════════════════════════════════════════
+Fin du rapport FIX-PRIX-ARRONDI-VIP
+═══════════════════════════════════════════════════════════════════════════════

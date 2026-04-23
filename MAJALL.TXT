@@ -1,3 +1,5 @@
+FIX-PRIX-ARRONDI-VIP — 2026-04-23 — Math.ceil prix Public/Partenaire + suppression carte VIP back-office — OK
+
 [2026-04-17 13:30] v35a-fix3 — Affichage uniforme + Calcul cumulé FA
 ======================================================================================
 PROBLÈME #1 : Affichage incohérent entre les 4 onglets client (Mes devis / Mes commandes / Mes virements / Mes factures)
