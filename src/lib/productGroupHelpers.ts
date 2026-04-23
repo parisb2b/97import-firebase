@@ -68,6 +68,11 @@ export function regrouperProduitsParGroupe(products: any[]): any[] {
 /**
  * Trouve la ref interne correspondant à une combinaison de choix dans les dropdowns.
  * Ex: {Chenilles: "Caoutchouc"} → "MP-R22-001"
+ *
+ * IMPORTANT : pour les dropdowns multiples, filtre d'abord les choix du dernier
+ * dropdown selon leurs conditions, PUIS cherche par label.
+ * Nécessaire quand plusieurs choix ont le même label avec conditions différentes
+ * (ex: "2 chambres" × 3 tailles de maison).
  */
 export function getRefFromSelection(
   optionsConfig: OptionsConfig,
@@ -81,9 +86,11 @@ export function getRefFromSelection(
   }
 
   // Pour plusieurs dropdowns : la ref est dans le DERNIER dropdown (le plus spécifique)
-  // car les dropdowns précédents filtrent les choix via "condition"
+  // MAIS il faut d'abord filtrer ses choix selon les conditions (sinon plusieurs choix
+  // peuvent avoir le même label avec des conditions différentes → find() retourne le mauvais)
   const lastDropdown = optionsConfig.dropdowns[optionsConfig.dropdowns.length - 1];
-  const lastChoice = lastDropdown.choices.find(c => c.label === selection[lastDropdown.label]);
+  const choixValides = filtrerChoixSelonConditions(lastDropdown.choices, selection);
+  const lastChoice = choixValides.find(c => c.label === selection[lastDropdown.label]);
   return lastChoice?.ref || null;
 }
 
