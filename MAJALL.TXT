@@ -758,3 +758,5 @@ FIX-DROPDOWNS — 2026-04-23 — Fix getRefFromSelection (conditions avant label
 P3-QOL-A — 2026-04-23 — Toast auto-dismiss livré (parties B/C/D à suivre) — OK
 
 P3-QOL-B — 2026-04-23 — Filtres catalogue admin persistants (localStorage + bouton Reset) — OK
+
+P3-QOL-C — 2026-04-23 — Bouton Dupliquer en ligne dans liste catalogue admin — OK

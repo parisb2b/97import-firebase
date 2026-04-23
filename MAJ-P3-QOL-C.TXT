@@ -1,0 +1,40 @@
+=== MAJ P3-QOL-C-DUPLIQUER-LISTE-STRICT ===
+Date : 2026-04-23
+Branche : v2
+Build : OK
+
+PROBLÈME RÉSOLU :
+  Pour dupliquer un produit, Michel devait ouvrir la fiche puis
+  cliquer sur le bouton Dupliquer. Fastidieux pour plusieurs
+  duplications à la suite.
+
+SOLUTION :
+  Bouton "📋 Dupliquer" ajouté en fin de ligne dans la liste
+  catalogue admin. Clic direct → modal ouverte sans passer
+  par la fiche.
+
+FICHIERS MODIFIÉS (1) :
+  ✅ src/admin/pages/AdminProduits.tsx
+
+FICHIERS CRÉÉS :
+  Aucun (réutilisation de ModalDupliquerProduit existant)
+
+FICHIERS INTERDITS (intacts) :
+  ✅ admin.css
+  ✅ Front public
+  ✅ FicheProduit, Toast, ModalDupliquer, filterPersistence
+
+FONCTIONNALITÉS :
+  - Bouton "📋 Dupliquer" sur chaque ligne de la liste
+  - Clic → modal de duplication (réutilise ModalDupliquerProduit)
+  - e.stopPropagation() empêche la nav vers la fiche
+  - Toast de confirmation après duplication réussie
+  - Liste Firestore se met à jour auto (rechargement manuel)
+
+COMMIT :
+  e1b06ae P3-QOL-C: bouton Dupliquer en ligne dans liste catalogue admin
+
+TESTS À EFFECTUER (3) :
+  [ ] Sur chaque ligne de la liste : bouton "📋 Dupliquer" visible
+  [ ] Clic sur le bouton → modal s'ouvre avec le bon produit source
+  [ ] Duplication OK → nouveau produit visible dans la liste + toast de confirmation
