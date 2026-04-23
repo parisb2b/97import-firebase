@@ -331,13 +331,13 @@ export default function OngletEssentiel({ product, onChange, isCreation }: Props
             🏷️ Prix de vente calculés (lecture seule)
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10 }}>
             <div style={{ background: '#fff', padding: 10, borderRadius: 4, textAlign: 'center' }}>
               <div style={{ fontSize: 10, color: '#6B7280', textTransform: 'uppercase', letterSpacing: 0.3 }}>
                 Public (User)
               </div>
               <div style={{ fontSize: 18, fontWeight: 700, color: '#1565C0', marginTop: 2 }}>
-                {((product.prix_achat || 0) * 2).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €
+                {Math.ceil((product.prix_achat || 0) * 2).toLocaleString('fr-FR')} €
               </div>
               <div style={{ fontSize: 9, color: '#9CA3AF', fontStyle: 'italic' }}>
                 × 2 du prix d'achat
@@ -349,25 +349,10 @@ export default function OngletEssentiel({ product, onChange, isCreation }: Props
                 Partenaire
               </div>
               <div style={{ fontSize: 18, fontWeight: 700, color: '#EA580C', marginTop: 2 }}>
-                {((product.prix_achat || 0) * 1.2).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €
+                {Math.ceil((product.prix_achat || 0) * 1.2).toLocaleString('fr-FR')} €
               </div>
               <div style={{ fontSize: 9, color: '#9CA3AF', fontStyle: 'italic' }}>
                 × 1.2 du prix d'achat
-              </div>
-            </div>
-
-            <div style={{ background: '#fff', padding: 10, borderRadius: 4, textAlign: 'center' }}>
-              <div style={{ fontSize: 10, color: '#6B7280', textTransform: 'uppercase', letterSpacing: 0.3 }}>
-                VIP
-              </div>
-              <div style={{ fontSize: 18, fontWeight: 700, color: '#7c3aed', marginTop: 2 }}>
-                {product.prix_vip_negocie
-                  ? `${Number(product.prix_vip_negocie).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €`
-                  : '—'
-                }
-              </div>
-              <div style={{ fontSize: 9, color: '#9CA3AF', fontStyle: 'italic' }}>
-                {product.prix_vip_negocie ? 'Négocié' : 'Non défini'}
               </div>
             </div>
           </div>
