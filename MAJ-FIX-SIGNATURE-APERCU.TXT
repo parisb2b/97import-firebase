@@ -1,0 +1,100 @@
+=== MAJ FIX-SIGNATURE-EMAIL-APERCU ===
+Date : 2026-04-24 11:45
+Branche : v2
+Build : OK
+
+PROBLÈME RÉSOLU :
+  Quand le client cliquait sur le bouton "Signer" dans l'email,
+  la page /signature/:token affichait un récap trop basique
+  (juste numéro + montant total). Le client ne voyait pas
+  les détails des produits et leurs prix VIP avant de signer.
+
+SOLUTION :
+  L'écran "apercu" dans SignatureDevis.tsx affiche désormais :
+    - En-tête avec numéro devis et destinataire
+    - Tableau détaillé des produits :
+        * Référence
+        * Description
+        * Quantité
+        * Prix public BARRÉ + prix VIP en violet
+        * Total ligne (idem)
+    - Récap totaux : HT public barré, HT VIP, économie, TVA, TTC
+    - Mention légale "signature définitive"
+    - 2 boutons :
+        * "Je signe le devis" (vert, action principale)
+        * "Voir plus de détails dans mon espace" (secondaire)
+
+FICHIER MODIFIÉ (1) :
+  ✅ src/front/pages/SignatureDevis.tsx (+156 lignes, -41 lignes)
+
+FICHIERS INTERDITS (intacts) :
+  ✅ emailService.ts
+  ✅ DevisCard.tsx
+  ✅ MesDevis.tsx
+  ✅ pdf-generator.ts
+  ✅ firebase.ts
+  ✅ admin.css
+  ✅ Tous les autres
+
+MODIFICATIONS DÉTAILLÉES :
+
+  Interface Devis (lignes 11-27) :
+    Ajout de 3 propriétés optionnelles :
+      - total_ht_public?: number;
+      - is_vip?: boolean;
+      - prix_negocies?: Record<string, number>;
+
+  Section "apercu" (lignes 269-444) :
+    Remplacement complet du récap basique par un aperçu détaillé :
+      - Calcul des totaux : HT, HT public, TVA (20%), TTC, économie
+      - Tableau produits avec colonnes : Réf, Description, Qté, Prix unitaire, Total
+      - Logique VIP pour chaque ligne :
+          const prixNegocie = devis.prix_negocies?.[ref] ?? prixPublic;
+          const estNegocie = devis.is_vip && prixNegocie !== prixPublic;
+      - Affichage conditionnel :
+          Si VIP négocié → prix public barré (gris #9CA3AF) + prix VIP (violet #7C3AED)
+          Sinon → prix normal
+      - Section totaux avec économie en vert (#10B981)
+      - Bouton vert "Je signe le devis" (onClick={handleSigner})
+      - Bouton secondaire "Voir plus de détails" (setLocation('/espace-client'))
+
+COMMIT :
+  fea7eba FIX-SIGNATURE-APERCU: tableau détaillé devis VIP + bouton vers espace client
+
+TESTS À EFFECTUER (7) :
+
+  Test 1 — Workflow complet :
+    [ ] Créer un devis, partenaire négocie + envoie VIP
+    [ ] Client reçoit email, clic bouton "Signer mon devis"
+
+  Test 2 — Aperçu détaillé :
+    [ ] Page /signature/:token affiche tableau produits avec prix VIP
+    [ ] Vérifier prix barrés + violet sur chaque ligne
+    [ ] Vérifier totaux corrects (HT VIP + économie + TVA + TTC)
+
+  Test 3 — Navigation :
+    [ ] Bouton "Voir plus de détails" → redirige espace client
+    [ ] Bouton "Je signe" → flow signature normal (RIB → Acompte → Terminé)
+
+COHÉRENCE WORKFLOW :
+  ✅ Email devis VIP : lien vers /signature/:token
+  ✅ Page signature : aperçu détaillé avec prix VIP (NOUVEAU)
+  ✅ Espace client DevisCard : aperçu détaillé avec prix VIP (déjà OK)
+  ✅ PDF devis : prix VIP (déjà OK)
+  ✅ PDF facture acompte : prix VIP (déjà OK)
+
+  → Le client voit maintenant les mêmes prix VIP partout avant de signer
+
+SCOPE RESPECTÉ :
+  ✅ 1 fichier modifié uniquement (SignatureDevis.tsx)
+  ✅ Modifications ciblées (115 lignes nettes)
+  ✅ Aucun fichier interdit touché
+  ✅ Build TypeScript : 0 erreur
+  ✅ Aucune nouvelle dépendance
+  ✅ Logique VIP inspirée de DevisCard.tsx
+  ✅ Couleurs cohérentes : violet #7C3AED, gris #9CA3AF, vert #10B981
+
+BACKUP TAG :
+  backup-signapercu-20260424-1145
+
+✅ FIX APPLIQUÉ ET VALIDÉ

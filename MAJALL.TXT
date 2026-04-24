@@ -772,3 +772,5 @@ P3-QOL-D2 — 2026-04-23 — Enrichissement section Prix & fournisseur (multi-de
 FIX-URLS-EMAILS-VERCEL — 2026-04-24 — URLs emails pointent vers Vercel preview — OK
 
 FIX-AFFICHAGE-PRIX-VIP — 2026-04-24 — PDF facture acompte + back-office DetailDevis affichent prix VIP négociés (testé sur DVS-2604024)
+
+FIX-SIGNATURE-EMAIL-APERCU — 2026-04-24 — Page /signature/:token affiche tableau détaillé du devis VIP avant signature
