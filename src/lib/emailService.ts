@@ -6,9 +6,15 @@ import { db } from './firebase';
 const FROM_ADDRESS = '97import <notifications@97import.com>';
 const REPLY_TO = 'parisb2b@gmail.com';
 const ADMIN_EMAIL = 'parisb2b@gmail.com';
-const SITE_URL = 'https://97import.com';
-const ESPACE_CLIENT_URL = 'https://97import.com/espace-client';
-const ESPACE_PARTENAIRE_URL = 'https://97import.com/espace-partenaire';
+
+// ═══════════════════════════════════════════════════
+// URL du site — à modifier quand on passera en prod
+// ═══════════════════════════════════════════════════
+// En test : URL Vercel preview
+// En prod : remplacer par 'https://97import.com'
+const SITE_URL = 'https://97import-firebase-git-v2-parisb2bs-projects.vercel.app';
+const ESPACE_CLIENT_URL = `${SITE_URL}/espace-client`;
+const ESPACE_PARTENAIRE_URL = `${SITE_URL}/espace-partenaire`;
 
 // ═══ Types ═══
 interface EmailAttachment {
