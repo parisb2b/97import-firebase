@@ -1,5 +1,5 @@
 // src/lib/emailService.ts
-import { collection, addDoc, serverTimestamp, doc, getDoc } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, query, where, getDocs } from 'firebase/firestore';
 import { db } from './firebase';
 
 // ═══ Constantes de config ═══
@@ -55,6 +55,44 @@ async function sendEmail(mail: MailDoc): Promise<void> {
   } catch (err) {
     console.error('[emailService] Erreur écriture doc mail:', err);
     // Ne pas throw : une erreur email ne doit pas bloquer l'action principale
+  }
+}
+
+/**
+ * Helper : récupère les infos du partenaire lié à un devis.
+ * Cherche dans la collection `partners/` via le champ `code`.
+ * Retourne null si aucun partenaire associé ou introuvable.
+ */
+async function getPartnerFromDevis(devis: any): Promise<{ email: string; nom: string; code: string } | null> {
+  if (!devis.partenaire_code) return null;
+
+  try {
+    const partnerQuery = query(
+      collection(db, 'partners'),
+      where('code', '==', devis.partenaire_code),
+      where('actif', '==', true)
+    );
+    const partnerSnap = await getDocs(partnerQuery);
+
+    if (partnerSnap.empty) {
+      console.warn(`[getPartnerFromDevis] Partenaire ${devis.partenaire_code} non trouvé dans partners/`);
+      return null;
+    }
+
+    const data = partnerSnap.docs[0].data();
+    if (!data.email) {
+      console.warn(`[getPartnerFromDevis] Partenaire ${devis.partenaire_code} trouvé mais sans email`);
+      return null;
+    }
+
+    return {
+      email: data.email,
+      nom: data.nom || 'Partenaire',
+      code: devis.partenaire_code,
+    };
+  } catch (err) {
+    console.error('[getPartnerFromDevis] Erreur:', err);
+    return null;
   }
 }
 
@@ -243,38 +281,37 @@ export async function notifyDevisCree(devis: any): Promise<void> {
   });
 
   // ─── Email au PARTENAIRE (si attribué) ───
-  if (devis.partenaire_code) {
-    const partenaireSnap = await getDoc(doc(db, 'partners', devis.partenaire_code));
-    if (partenaireSnap.exists()) {
-      const partEmail = partenaireSnap.data().email;
-      if (partEmail) {
-        const htmlPart = baseTemplate({
-          preheader: `Nouveau devis client ${devis.numero} attribué à votre code ${devis.partenaire_code}`,
-          title: `Un nouveau client vous a choisi comme partenaire`,
-          intro: `<strong>${clientNom}</strong> vient de créer un devis en vous sélectionnant comme partenaire.`,
-          body: `
-            <div style="background:#F9FAFB;border-radius:12px;padding:20px;">
-              <p style="margin:0 0 8px 0;"><strong>Devis :</strong> ${devis.numero}</p>
-              <p style="margin:0 0 8px 0;"><strong>Client :</strong> ${clientNom}</p>
-              <p style="margin:0;color:#1565C0;font-weight:700;">Total public HT : ${formatEur(totalHt)}</p>
-            </div>
-            <p style="margin-top:20px;">Vous pouvez accéder au devis depuis votre espace partenaire pour négocier un prix VIP si souhaité.</p>
-          `,
-          ctaLabel: 'Gérer ce devis',
-          ctaUrl: `${ESPACE_PARTENAIRE_URL}`,
-        });
+  try {
+    const partner = await getPartnerFromDevis(devis);
+    if (partner) {
+      const htmlPart = baseTemplate({
+        preheader: `Nouveau devis client ${devis.numero} attribué à votre code ${partner.code}`,
+        title: `Un nouveau client vous a choisi comme partenaire`,
+        intro: `<strong>${clientNom}</strong> vient de créer un devis en vous sélectionnant comme partenaire.`,
+        body: `
+          <div style="background:#F9FAFB;border-radius:12px;padding:20px;">
+            <p style="margin:0 0 8px 0;"><strong>Devis :</strong> ${devis.numero}</p>
+            <p style="margin:0 0 8px 0;"><strong>Client :</strong> ${clientNom}</p>
+            <p style="margin:0;color:#1565C0;font-weight:700;">Total public HT : ${formatEur(totalHt)}</p>
+          </div>
+          <p style="margin-top:20px;">Vous pouvez accéder au devis depuis votre espace partenaire pour négocier un prix VIP si souhaité.</p>
+        `,
+        ctaLabel: 'Gérer ce devis',
+        ctaUrl: `${ESPACE_PARTENAIRE_URL}`,
+      });
 
-        await sendEmail({
-          to: partEmail,
-          message: {
-            subject: `[97import partenaire] Nouveau devis ${devis.numero}`,
-            html: htmlPart,
-            text: htmlToText(htmlPart),
-          },
-          _metadata: { event: 'devis_cree_partenaire', devis_id: devis.numero, created_at: null },
-        });
-      }
+      await sendEmail({
+        to: partner.email,
+        message: {
+          subject: `[97import partenaire] Nouveau devis ${devis.numero}`,
+          html: htmlPart,
+          text: htmlToText(htmlPart),
+        },
+        _metadata: { event: 'devis_cree_partenaire', devis_id: devis.numero, created_at: null },
+      });
     }
+  } catch (err) {
+    console.error('[notifyDevisCree] Erreur email partenaire:', err);
   }
 }
 
@@ -282,83 +319,169 @@ export async function notifyDevisCree(devis: any): Promise<void> {
 // ÉVÉNEMENT 2 : DEVIS VIP ENVOYÉ
 // ═══════════════════════════════════════════════════════
 
+/**
+ * Étape 9 : Partenaire a renvoyé le devis VIP au client.
+ * Envoie 3 emails : client (avec lien signature), admin (info), partenaire (confirmation).
+ */
 export async function notifyDevisVipEnvoye(devis: any, partenaireName?: string): Promise<void> {
-  const clientEmail = devis.client_email || devis.email;
-  if (!clientEmail) return;
-
-  const clientNom = `${devis.client_prenom || ''} ${devis.client_nom || ''}`.trim() || 'Cher client';
-  const totalHtPublic = devis.total_ht_public || devis.total_ht || 0;
-  const totalHtNegocie = devis.total_ht || 0;
-  const economie = totalHtPublic - totalHtNegocie;
-
-  // ─── URL signature avec token ───
   const signatureToken = devis.signature_token || '';
   const signatureUrl = signatureToken
     ? `${SITE_URL}/signature/${signatureToken}`
     : ESPACE_CLIENT_URL;
 
-  // ─── Email au CLIENT ───
-  const htmlClient = baseTemplate({
-    preheader: `Votre partenaire ${devis.partenaire_code || ''} vous a envoyé une offre VIP`,
-    title: `Votre offre VIP est disponible`,
-    intro: `Bonjour ${clientNom},<br><br>${partenaireName ? `<strong>${partenaireName}</strong>, ` : 'Votre partenaire, '}vient de négocier un tarif préférentiel sur votre devis <strong>${devis.numero}</strong>.`,
-    body: `
-      <div style="background:#FEF3C7;border-radius:12px;padding:20px;text-align:center;">
-        <p style="margin:0 0 8px 0;color:#92400E;font-size:13px;">Prix public</p>
-        <p style="margin:0 0 16px 0;color:#6B7280;font-size:16px;text-decoration:line-through;">${formatEur(totalHtPublic)}</p>
-        <p style="margin:0 0 8px 0;color:#C87F6B;font-size:13px;font-weight:600;">Votre prix VIP</p>
-        <p style="margin:0;color:#C87F6B;font-size:24px;font-weight:700;">${formatEur(totalHtNegocie)}</p>
-        ${economie > 0 ? `<p style="margin:12px 0 0 0;color:#059669;font-size:14px;font-weight:600;">Vous économisez ${formatEur(economie)}</p>` : ''}
-      </div>
-      <p style="margin-top:20px;">Pour accepter cette offre, cliquez sur le bouton ci-dessous pour signer votre devis en un clic :</p>
-      ${signatureToken ? `
-      <div style="background:#E0F2FE;border-radius:12px;padding:16px;margin-top:16px;text-align:center;">
-        <p style="margin:0;color:#0369A1;font-size:13px;">
-          🔒 Lien de signature sécurisé (valable 30 jours)<br>
-          <a href="${signatureUrl}" style="color:#0369A1;text-decoration:underline;word-break:break-all;font-size:11px;">${signatureUrl}</a>
-        </p>
-      </div>
-      ` : ''}
-    `,
-    ctaLabel: signatureToken ? '✍️ Signer mon devis' : 'Voir mon offre VIP',
-    ctaUrl: signatureUrl,
-  });
+  const montantVip = Math.ceil(devis.total_ht || 0).toLocaleString('fr-FR');
+  const montantPublic = Math.ceil(devis.total_ht_public || devis.total_ht || 0).toLocaleString('fr-FR');
 
-  await sendEmail({
-    to: clientEmail,
-    message: {
-      subject: `🎁 Offre VIP — Devis ${devis.numero}`,
-      html: htmlClient,
-      text: htmlToText(htmlClient),
-    },
-    _metadata: { event: 'devis_vip_envoye', devis_id: devis.numero, created_at: null },
-  });
+  // ═══ Email 1 : CLIENT (avec lien signature) ═══
+  if (devis.client_email) {
+    try {
+      await addDoc(collection(db, 'mail'), {
+        to: devis.client_email,
+        from: FROM_ADDRESS,
+        replyTo: REPLY_TO,
+        message: {
+          subject: `🎁 Votre devis VIP est prêt — ${devis.numero}`,
+          html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+              <h2 style="color: #1565C0;">Votre devis VIP est prêt !</h2>
+              <p>Bonjour ${devis.client_nom || 'cher client'},</p>
+              <p>Votre partenaire ${partenaireName || ''} a négocié des tarifs préférentiels pour votre devis.</p>
 
-  // ─── Email à l'ADMIN (visibilité) ───
-  const htmlAdmin = baseTemplate({
-    preheader: `Devis VIP ${devis.numero} envoyé au client`,
-    title: `Devis VIP envoyé`,
-    intro: `Le partenaire <strong>${partenaireName || devis.partenaire_code}</strong> a envoyé une version VIP du devis <strong>${devis.numero}</strong>.`,
-    body: `
-      <div style="background:#F9FAFB;border-radius:12px;padding:20px;">
-        <p style="margin:0 0 8px 0;"><strong>Client :</strong> ${clientNom} (${clientEmail})</p>
-        <p style="margin:0 0 8px 0;"><strong>Prix public :</strong> ${formatEur(totalHtPublic)}</p>
-        <p style="margin:0;"><strong>Prix VIP négocié :</strong> ${formatEur(totalHtNegocie)}</p>
-      </div>
-    `,
-    ctaLabel: 'Voir le devis',
-    ctaUrl: `${SITE_URL}/admin/devis/${devis.numero}`,
-  });
+              <div style="padding: 16px; background: #EEF2FF; border-radius: 8px; margin: 20px 0;">
+                <div><strong>📋 Numéro :</strong> ${devis.numero}</div>
+                <div><strong>💰 Montant VIP :</strong> <span style="color: #10B981; font-weight: 700;">${montantVip} €</span></div>
+                ${montantPublic !== montantVip ? `<div style="color: #6B7280; text-decoration: line-through;">Prix public initial : ${montantPublic} €</div>` : ''}
+              </div>
 
-  await sendEmail({
-    to: ADMIN_EMAIL,
-    message: {
-      subject: `[97import] Devis VIP envoyé — ${devis.numero}`,
-      html: htmlAdmin,
-      text: htmlToText(htmlAdmin),
-    },
-    _metadata: { event: 'devis_vip_envoye_admin', devis_id: devis.numero, created_at: null },
-  });
+              ${signatureToken ? `
+              <div style="text-align: center; margin: 30px 0;">
+                <a href="${signatureUrl}"
+                   style="display: inline-block; padding: 16px 32px; background: #10B981; color: #fff;
+                          text-decoration: none; border-radius: 8px; font-weight: 700; font-size: 16px;">
+                  ✍️ Signer directement mon devis
+                </a>
+                <div style="font-size: 11px; color: #6B7280; margin-top: 8px;">
+                  Lien unique, valable 30 jours
+                </div>
+              </div>
+              <p style="text-align: center; color: #6B7280; font-size: 13px;">— ou —</p>
+              ` : ''}
+
+              <div style="text-align: center; margin: 20px 0;">
+                <a href="${ESPACE_CLIENT_URL}"
+                   style="display: inline-block; padding: 10px 20px; border: 2px solid #1565C0;
+                          color: #1565C0; text-decoration: none; border-radius: 6px; font-weight: 600;">
+                  Accéder à mon espace client
+                </a>
+              </div>
+
+              <p style="color: #6B7280; font-size: 13px; margin-top: 30px;">
+                Cordialement,<br>L'équipe 97import
+              </p>
+            </div>
+          `,
+          text: `Votre devis VIP est prêt - ${devis.numero}\n\nBonjour ${devis.client_nom || 'cher client'},\n\nVotre partenaire ${partenaireName || ''} a négocié des tarifs préférentiels pour votre devis.\n\nMontant VIP : ${montantVip} €\n\n${signatureToken ? `Signer directement : ${signatureUrl}\n\n` : ''}Accéder à mon espace client : ${ESPACE_CLIENT_URL}`,
+        },
+        _metadata: {
+          event: 'devis_vip_envoye_client',
+          devis_id: devis.id || devis.numero,
+          created_at: serverTimestamp(),
+        },
+      });
+    } catch (err) {
+      console.error('[notifyDevisVipEnvoye] Erreur email client:', err);
+    }
+  }
+
+  // ═══ Email 2 : ADMIN ═══
+  try {
+    await addDoc(collection(db, 'mail'), {
+      to: ADMIN_EMAIL,
+      from: FROM_ADDRESS,
+      replyTo: REPLY_TO,
+      message: {
+        subject: `[97import] Devis VIP envoyé au client — ${devis.numero}`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #1E3A5F;">Devis VIP envoyé au client</h2>
+            <p>Le partenaire ${partenaireName || '—'} a négocié et envoyé le devis VIP.</p>
+
+            <div style="padding: 16px; background: #F3F4F6; border-radius: 8px; margin: 20px 0;">
+              <div><strong>📋 Devis :</strong> ${devis.numero}</div>
+              <div><strong>👤 Client :</strong> ${devis.client_nom || '—'} (${devis.client_email || '—'})</div>
+              <div><strong>🤝 Partenaire :</strong> ${partenaireName || '—'} (code ${devis.partenaire_code || '—'})</div>
+              <div><strong>💰 Montant VIP :</strong> ${montantVip} € (public: ${montantPublic} €)</div>
+            </div>
+
+            <p style="color: #EA580C;"><strong>⏳ En attente signature client</strong></p>
+
+            <div style="text-align: center; margin: 20px 0;">
+              <a href="${SITE_URL}/admin/devis/${devis.id || devis.numero}"
+                 style="display: inline-block; padding: 10px 20px; background: #1565C0; color: #fff;
+                        text-decoration: none; border-radius: 6px; font-weight: 600;">
+                Voir le devis
+              </a>
+            </div>
+          </div>
+        `,
+        text: `Devis VIP envoyé au client - ${devis.numero}\n\nLe partenaire ${partenaireName || '—'} a négocié et envoyé le devis VIP.\n\nClient : ${devis.client_nom || '—'} (${devis.client_email || '—'})\nMontant VIP : ${montantVip} €\n\nVoir : ${SITE_URL}/admin/devis/${devis.id || devis.numero}`,
+      },
+      _metadata: {
+        event: 'devis_vip_envoye_admin',
+        devis_id: devis.id || devis.numero,
+        created_at: serverTimestamp(),
+      },
+    });
+  } catch (err) {
+    console.error('[notifyDevisVipEnvoye] Erreur email admin:', err);
+  }
+
+  // ═══ Email 3 : PARTENAIRE (confirmation) ═══
+  try {
+    const partner = await getPartnerFromDevis(devis);
+    if (partner) {
+      await addDoc(collection(db, 'mail'), {
+        to: partner.email,
+        from: FROM_ADDRESS,
+        replyTo: REPLY_TO,
+        message: {
+          subject: `✅ Devis VIP envoyé au client — ${devis.numero}`,
+          html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+              <h2 style="color: #10B981;">Devis VIP bien envoyé ✓</h2>
+              <p>Bonjour ${partner.nom},</p>
+              <p>Votre devis VIP négocié a été envoyé au client avec succès.</p>
+
+              <div style="padding: 16px; background: #F0FDF4; border-radius: 8px; margin: 20px 0;">
+                <div><strong>📋 Devis :</strong> ${devis.numero}</div>
+                <div><strong>👤 Client :</strong> ${devis.client_nom || '—'}</div>
+                <div><strong>💰 Montant VIP :</strong> ${montantVip} €</div>
+              </div>
+
+              <p>Vous serez notifié quand le client signera le devis.</p>
+
+              <div style="text-align: center; margin: 20px 0;">
+                <a href="${ESPACE_PARTENAIRE_URL}"
+                   style="display: inline-block; padding: 10px 20px; background: #1565C0; color: #fff;
+                          text-decoration: none; border-radius: 6px; font-weight: 600;">
+                  Mon espace partenaire
+                </a>
+              </div>
+            </div>
+          `,
+          text: `Devis VIP bien envoyé - ${devis.numero}\n\nBonjour ${partner.nom},\n\nVotre devis VIP négocié a été envoyé au client avec succès.\n\nClient : ${devis.client_nom || '—'}\nMontant VIP : ${montantVip} €\n\nVous serez notifié quand le client signera le devis.\n\nMon espace partenaire : ${ESPACE_PARTENAIRE_URL}`,
+        },
+        _metadata: {
+          event: 'devis_vip_envoye_partenaire',
+          devis_id: devis.id || devis.numero,
+          partenaire_code: partner.code,
+          created_at: serverTimestamp(),
+        },
+      });
+    }
+  } catch (err) {
+    console.error('[notifyDevisVipEnvoye] Erreur email partenaire:', err);
+  }
 }
 
 // ═══════════════════════════════════════════════════════
@@ -430,33 +553,32 @@ export async function notifyAcompteDeclare(devis: any, acompte: any): Promise<vo
   });
 
   // ─── Email au PARTENAIRE (si attribué) ───
-  if (devis.partenaire_code) {
-    const partenaireSnap = await getDoc(doc(db, 'partners', devis.partenaire_code));
-    if (partenaireSnap.exists()) {
-      const partEmail = partenaireSnap.data().email;
-      if (partEmail) {
-        const htmlPart = baseTemplate({
-          preheader: `Votre client ${clientNom} a déclaré un acompte sur ${devis.numero}`,
-          title: `Votre client a versé un acompte`,
-          intro: `<strong>${clientNom}</strong> vient de déclarer un virement de <strong>${formatEur(montant)}</strong> sur le devis ${devis.numero}.`,
-          body: `
-            <p>Dès que l'acompte sera encaissé, votre commission sera calculée et visible dans votre espace partenaire.</p>
-          `,
-          ctaLabel: 'Voir dans mon espace partenaire',
-          ctaUrl: ESPACE_PARTENAIRE_URL,
-        });
+  try {
+    const partner = await getPartnerFromDevis(devis);
+    if (partner) {
+      const htmlPart = baseTemplate({
+        preheader: `Votre client ${clientNom} a déclaré un acompte sur ${devis.numero}`,
+        title: `Votre client a versé un acompte`,
+        intro: `<strong>${clientNom}</strong> vient de déclarer un virement de <strong>${formatEur(montant)}</strong> sur le devis ${devis.numero}.`,
+        body: `
+          <p>Dès que l'acompte sera encaissé, votre commission sera calculée et visible dans votre espace partenaire.</p>
+        `,
+        ctaLabel: 'Voir dans mon espace partenaire',
+        ctaUrl: ESPACE_PARTENAIRE_URL,
+      });
 
-        await sendEmail({
-          to: partEmail,
-          message: {
-            subject: `[97import partenaire] Acompte déclaré sur ${devis.numero}`,
-            html: htmlPart,
-            text: htmlToText(htmlPart),
-          },
-          _metadata: { event: 'acompte_declare_partenaire', devis_id: devis.numero, created_at: null },
-        });
-      }
+      await sendEmail({
+        to: partner.email,
+        message: {
+          subject: `[97import partenaire] Acompte déclaré sur ${devis.numero}`,
+          html: htmlPart,
+          text: htmlToText(htmlPart),
+        },
+        _metadata: { event: 'acompte_declare_partenaire', devis_id: devis.numero, created_at: null },
+      });
     }
+  } catch (err) {
+    console.error('[notifyAcompteDeclare] Erreur email partenaire:', err);
   }
 }
 
@@ -524,39 +646,75 @@ export async function notifyAcompteEncaisse(
     });
   }
 
-  // ─── Email au PARTENAIRE (commission due) ───
-  if (devis.partenaire_code) {
-    const partenaireSnap = await getDoc(doc(db, 'partners', devis.partenaire_code));
-    if (partenaireSnap.exists()) {
-      const partEmail = partenaireSnap.data().email;
-      if (partEmail) {
-        const htmlPart = baseTemplate({
-          preheader: `L'acompte de ${formatEur(montant)} a été encaissé — votre commission est due`,
-          title: `Acompte encaissé — Commission confirmée`,
-          intro: `L'acompte de <strong>${formatEur(montant)}</strong> sur le devis <strong>${devis.numero}</strong> a été encaissé.`,
-          body: `
-            <p>Votre commission correspondante est désormais confirmée. Vous pouvez la consulter dans votre espace partenaire.</p>
-            <div style="background:#F9FAFB;border-radius:12px;padding:20px;margin-top:16px;">
-              <p style="margin:0 0 8px 0;"><strong>Client :</strong> ${clientNom}</p>
-              <p style="margin:0 0 8px 0;"><strong>Acompte encaissé :</strong> ${formatEur(montant)}</p>
-              <p style="margin:0;"><strong>Facture :</strong> ${refFa}</p>
-            </div>
-          `,
-          ctaLabel: 'Voir mes commissions',
-          ctaUrl: `${ESPACE_PARTENAIRE_URL}`,
-        });
-
-        await sendEmail({
-          to: partEmail,
-          message: {
-            subject: `[97import partenaire] Commission confirmée — ${devis.numero}`,
-            html: htmlPart,
-            text: htmlToText(htmlPart),
-          },
-          _metadata: { event: 'acompte_encaisse_partenaire', devis_id: devis.numero, created_at: null },
-        });
+  // ─── Email à l'ADMIN (confirmation encaissement) ───
+  const htmlAdmin = baseTemplate({
+    preheader: `Acompte de ${formatEur(montant)} encaissé pour ${devis.numero}`,
+    title: `✅ Acompte encaissé`,
+    intro: `L'acompte de <strong>${formatEur(montant)}</strong> a été encaissé pour le devis <strong>${devis.numero}</strong>.`,
+    body: `
+      <div style="background:#D1FAE5;border-radius:12px;padding:20px;border-left:4px solid #059669;">
+        <p style="margin:0 0 8px 0;"><strong>Client :</strong> ${clientNom} (${clientEmail || '—'})</p>
+        <p style="margin:0 0 8px 0;"><strong>Devis :</strong> ${devis.numero}</p>
+        <p style="margin:0 0 8px 0;"><strong>Acompte encaissé :</strong> ${formatEur(montant)}</p>
+        <p style="margin:0 0 8px 0;"><strong>Facture :</strong> ${refFa}</p>
+        <p style="margin:0;"><strong>Partenaire :</strong> ${devis.partenaire_code || 'aucun'}</p>
+      </div>
+      <div style="background:#F9FAFB;border-radius:12px;padding:20px;margin-top:16px;">
+        <p style="margin:0 0 8px 0;"><strong>Total devis HT :</strong> ${formatEur(totalHt)}</p>
+        <p style="margin:0 0 8px 0;color:#059669;"><strong>Total encaissé :</strong> ${formatEur(totalEncaisse)}</p>
+        <p style="margin:0;${soldeRestant > 0 ? 'color:#EA580C;' : 'color:#059669;'}"><strong>Solde restant :</strong> ${formatEur(soldeRestant)}</p>
+      </div>
+      ${soldeRestant > 0
+        ? `<p style="margin-top:20px;color:#EA580C;">→ En attente des prochains acomptes.</p>`
+        : `<p style="margin-top:20px;color:#059669;font-weight:600;">✓ Commande intégralement payée — Préparer l'expédition.</p>`
       }
+    `,
+    ctaLabel: 'Voir le devis',
+    ctaUrl: `${SITE_URL}/admin/devis/${devis.numero}`,
+  });
+
+  await sendEmail({
+    to: ADMIN_EMAIL,
+    message: {
+      subject: `[97import] Acompte encaissé ${formatEur(montant)} — ${devis.numero}`,
+      html: htmlAdmin,
+      text: htmlToText(htmlAdmin),
+    },
+    _metadata: { event: 'acompte_encaisse_admin', devis_id: devis.numero, created_at: null },
+  });
+
+  // ─── Email au PARTENAIRE (commission due) ───
+  try {
+    const partner = await getPartnerFromDevis(devis);
+    if (partner) {
+      const htmlPart = baseTemplate({
+        preheader: `L'acompte de ${formatEur(montant)} a été encaissé — votre commission est due`,
+        title: `Acompte encaissé — Commission confirmée`,
+        intro: `L'acompte de <strong>${formatEur(montant)}</strong> sur le devis <strong>${devis.numero}</strong> a été encaissé.`,
+        body: `
+          <p>Votre commission correspondante est désormais confirmée. Vous pouvez la consulter dans votre espace partenaire.</p>
+          <div style="background:#F9FAFB;border-radius:12px;padding:20px;margin-top:16px;">
+            <p style="margin:0 0 8px 0;"><strong>Client :</strong> ${clientNom}</p>
+            <p style="margin:0 0 8px 0;"><strong>Acompte encaissé :</strong> ${formatEur(montant)}</p>
+            <p style="margin:0;"><strong>Facture :</strong> ${refFa}</p>
+          </div>
+        `,
+        ctaLabel: 'Voir mes commissions',
+        ctaUrl: `${ESPACE_PARTENAIRE_URL}`,
+      });
+
+      await sendEmail({
+        to: partner.email,
+        message: {
+          subject: `[97import partenaire] Commission confirmée — ${devis.numero}`,
+          html: htmlPart,
+          text: htmlToText(htmlPart),
+        },
+        _metadata: { event: 'acompte_encaisse_partenaire', devis_id: devis.numero, created_at: null },
+      });
     }
+  } catch (err) {
+    console.error('[notifyAcompteEncaisse] Erreur email partenaire:', err);
   }
 }
 
@@ -707,38 +865,37 @@ export async function notifySignatureClient(devis: any, partenaireName?: string)
   });
 
   // ─── Email au PARTENAIRE (si attribué) ───
-  if (devis.partenaire_code) {
-    const partenaireSnap = await getDoc(doc(db, 'partners', devis.partenaire_code));
-    if (partenaireSnap.exists()) {
-      const partEmail = partenaireSnap.data().email;
-      if (partEmail) {
-        const htmlPart = baseTemplate({
-          preheader: `Votre client ${clientNom} a signé son devis ${devis.numero}`,
-          title: `✍️ Votre client a signé son devis`,
-          intro: `<strong>${clientNom}</strong> vient de signer le devis <strong>${devis.numero}</strong> que vous avez négocié.`,
-          body: `
-            <div style="background:#D1FAE5;border-radius:12px;padding:20px;">
-              <p style="margin:0 0 8px 0;color:#065F46;font-weight:600;">Félicitations ! 🎉</p>
-              <p style="margin:0;color:#059669;font-size:14px;">
-                Votre client a accepté votre offre VIP. Dès qu'il versera un acompte, votre commission sera calculée et visible dans votre espace partenaire.
-              </p>
-            </div>
-          `,
-          ctaLabel: 'Voir dans mon espace partenaire',
-          ctaUrl: ESPACE_PARTENAIRE_URL,
-        });
+  try {
+    const partner = await getPartnerFromDevis(devis);
+    if (partner) {
+      const htmlPart = baseTemplate({
+        preheader: `Votre client ${clientNom} a signé son devis ${devis.numero}`,
+        title: `✍️ Votre client a signé son devis`,
+        intro: `<strong>${clientNom}</strong> vient de signer le devis <strong>${devis.numero}</strong> que vous avez négocié.`,
+        body: `
+          <div style="background:#D1FAE5;border-radius:12px;padding:20px;">
+            <p style="margin:0 0 8px 0;color:#065F46;font-weight:600;">Félicitations ! 🎉</p>
+            <p style="margin:0;color:#059669;font-size:14px;">
+              Votre client a accepté votre offre VIP. Dès qu'il versera un acompte, votre commission sera calculée et visible dans votre espace partenaire.
+            </p>
+          </div>
+        `,
+        ctaLabel: 'Voir dans mon espace partenaire',
+        ctaUrl: ESPACE_PARTENAIRE_URL,
+      });
 
-        await sendEmail({
-          to: partEmail,
-          message: {
-            subject: `[97import partenaire] Devis signé — ${devis.numero}`,
-            html: htmlPart,
-            text: htmlToText(htmlPart),
-          },
-          _metadata: { event: 'signature_partenaire', devis_id: devis.numero, created_at: null },
-        });
-      }
+      await sendEmail({
+        to: partner.email,
+        message: {
+          subject: `[97import partenaire] Devis signé — ${devis.numero}`,
+          html: htmlPart,
+          text: htmlToText(htmlPart),
+        },
+        _metadata: { event: 'signature_partenaire', devis_id: devis.numero, created_at: null },
+      });
     }
+  } catch (err) {
+    console.error('[notifySignatureClient] Erreur email partenaire:', err);
   }
 }
 
