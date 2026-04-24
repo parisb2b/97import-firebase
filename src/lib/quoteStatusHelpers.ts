@@ -1,98 +1,142 @@
 // src/lib/quoteStatusHelpers.ts
-// Helpers pour la gestion des statuts devis + calculs paiements
+// Helpers pour la gestion des statuts devis + calculs paiements (13 statuts complets)
 
 export type QuoteStatus =
-  | 'nouveau'                          // ancien, rétrocompatibilité
-  | 'en_negociation_partenaire'        // NOUVEAU : devis créé, attend négociation partenaire
-  | 'devis_vip_envoye'                 // NOUVEAU : partenaire a renvoyé devis VIP au client
-  | 'signe'                            // NOUVEAU : client a signé, peut verser 1er acompte
+  | 'nouveau'
+  | 'en_negociation_partenaire'
+  | 'devis_vip_envoye'
+  | 'signe'
   | 'acompte_1' | 'acompte_2' | 'acompte_3'
   | 'solde_paye'
+  | 'commande_ferme'
   | 'en_production'
-  | 'annule';                          // ajouté pour complétude (référencé dans AcomptesEncaisser)
-  // Statuts P3-WF3 à venir : expédié, arrivé_port, livré
+  | 'embarque_chine'
+  | 'arrive_port_domtom'
+  | 'livre'
+  | 'termine'
+  | 'annule';
 
 export interface Acompte {
-  numero: number;              // 1, 2, 3 ou 0 = solde
+  numero: number;              // 1, 2, 3 ou 0 pour solde
   montant: number;
   date_reception: string;      // ISO string
   reference_virement?: string;
   facture_acompte_numero?: string; // FA-AC-AAMM-NNN
   facture_acompte_pdf_url?: string;
-  is_solde?: boolean;          // true si c'est le solde final
-  created_at: string;          // ISO
-  created_by: string;          // UID admin
+  is_solde?: boolean;
+  encaisse: boolean;           // true si validé par admin
+  created_at: string;
+  created_by: string;          // UID admin qui a validé
+}
+
+export interface FactureFinale {
+  numero: string;              // FA-AAMM-NNN
+  pdf_url?: string;
+  date_emission: string;
+  total: number;
+  generee_auto: boolean;
+}
+
+export interface QuoteLine {
+  reference: string;
+  nom: string;
+  quantite: number;
+  prix_achat?: number;
+  prix_partenaire?: number;    // prix de référence pour commission
+  prix_vip_negocie?: number;   // prix final négocié par le partenaire
+  prix_unitaire_final: number; // prix qui sera facturé
+  total_ligne: number;
 }
 
 /**
- * Retourne le montant total payé (somme de tous les acomptes + solde éventuel)
+ * Montant total ENCAISSÉ (acomptes où encaisse=true)
  */
-export function getTotalPaye(acomptes: Acompte[] = []): number {
-  return acomptes.reduce((sum, a) => sum + (a.montant || 0), 0);
+export function getTotalEncaisse(acomptes: Acompte[] = []): number {
+  return acomptes
+    .filter(a => a.encaisse === true)
+    .reduce((sum, a) => sum + (a.montant || 0), 0);
 }
 
 /**
- * Retourne le montant restant à payer
+ * Montant restant à payer (basé sur l'encaissé réel)
  */
-export function getRestantAPayer(total_ht: number, acomptes: Acompte[] = []): number {
-  return Math.max(0, total_ht - getTotalPaye(acomptes));
+export function getSoldeRestant(total_ht: number, acomptes: Acompte[] = []): number {
+  return Math.max(0, total_ht - getTotalEncaisse(acomptes));
 }
 
 /**
- * Compte le nombre d'acomptes PARTIELS (hors solde)
+ * Nombre d'acomptes PARTIELS encaissés (hors solde)
  */
-export function getNbAcomptes(acomptes: Acompte[] = []): number {
-  return acomptes.filter(a => !a.is_solde).length;
+export function getNbAcomptesEncaisses(acomptes: Acompte[] = []): number {
+  return acomptes.filter(a => a.encaisse === true && !a.is_solde).length;
 }
 
 /**
  * Peut-on encore ajouter un acompte partiel ? (max 3)
  */
-export function peutAjouterAcompte(acomptes: Acompte[] = []): boolean {
-  return getNbAcomptes(acomptes) < 3;
+export function peutAjouterAcompte(acomptes: Acompte[] = [], soldeRestant: number): boolean {
+  return getNbAcomptesEncaisses(acomptes) < 3 && soldeRestant > 0.01;
 }
 
 /**
  * Le prochain paiement doit-il être le solde forcé ?
- * Oui si on a déjà 3 acomptes partiels.
  */
 export function prochainPaiementEstSolde(acomptes: Acompte[] = []): boolean {
-  return getNbAcomptes(acomptes) >= 3;
+  return getNbAcomptesEncaisses(acomptes) >= 3;
 }
 
 /**
  * Le devis est-il entièrement payé ?
  */
 export function estEntierementPaye(total_ht: number, acomptes: Acompte[] = []): boolean {
-  return getRestantAPayer(total_ht, acomptes) <= 0.01; // tolérance arrondis
+  return getSoldeRestant(total_ht, acomptes) <= 0.01;
 }
 
 /**
- * Calcule le statut du devis en fonction des acomptes ET du statut actuel.
- * Les nouveaux statuts amont (en_negociation_partenaire, devis_vip_envoye, signe)
- * sont préservés tant qu'il n'y a pas d'acompte.
+ * Valide un nouveau paiement avant enregistrement
  */
-export function calculerStatut(
+export function validerNouveauPaiement(
   total_ht: number,
   acomptes: Acompte[] = [],
-  statutActuel?: QuoteStatus  // nouveau param optionnel
+  montant: number
+): { ok: boolean; erreur?: string } {
+  if (montant < 50) {
+    return { ok: false, erreur: 'Montant minimum : 50€ par paiement' };
+  }
+  const restant = getSoldeRestant(total_ht, acomptes);
+  if (montant > restant + 0.01) {
+    return { ok: false, erreur: `Montant supérieur au solde restant (${restant.toFixed(2)}€)` };
+  }
+  if (prochainPaiementEstSolde(acomptes) && Math.abs(montant - restant) > 0.01) {
+    return { ok: false, erreur: `4e paiement = solde forcé (${restant.toFixed(2)}€ obligatoire)` };
+  }
+  return { ok: true };
+}
+
+/**
+ * Calcule le statut du devis en fonction des acomptes (sans toucher au statut si non-paiement)
+ * Retourne le statut MÊME si déjà avancé (ex: reste commande_ferme si déjà commandé).
+ * Ne pas downgrader : si statut > solde_paye, on garde.
+ */
+export function calculerStatutPaiement(
+  statutActuel: QuoteStatus,
+  total_ht: number,
+  acomptes: Acompte[] = []
 ): QuoteStatus {
-  const nbPartiels = getNbAcomptes(acomptes);
+  // Si statut avancé (commande_ferme et +), on garde
+  const statutsAvances: QuoteStatus[] = ['commande_ferme', 'en_production', 'embarque_chine', 'arrive_port_domtom', 'livre', 'termine', 'annule'];
+  if (statutsAvances.includes(statutActuel)) return statutActuel;
+
+  const nbPartiels = getNbAcomptesEncaisses(acomptes);
   const paye = estEntierementPaye(total_ht, acomptes);
 
-  // Si paiements en cours : utiliser la logique paiement
   if (paye) return 'solde_paye';
   if (nbPartiels >= 3) return 'acompte_3';
   if (nbPartiels === 2) return 'acompte_2';
   if (nbPartiels === 1) return 'acompte_1';
 
-  // Aucun paiement : préserver les statuts amont
-  if (statutActuel === 'en_negociation_partenaire') return 'en_negociation_partenaire';
-  if (statutActuel === 'devis_vip_envoye') return 'devis_vip_envoye';
-  if (statutActuel === 'signe') return 'signe';
-  if (statutActuel === 'annule') return 'annule';
-
-  return 'nouveau';
+  // Si statut amont (nouveau, négociation, signe), on garde (ne downgrade pas)
+  return statutActuel;
 }
 
 /**
@@ -100,50 +144,120 @@ export function calculerStatut(
  */
 export function libelleStatut(statut: QuoteStatus): string {
   const labels: Record<QuoteStatus, string> = {
-    nouveau: 'Nouveau — En attente d\'acompte',
-    en_negociation_partenaire: 'En négociation partenaire',
-    devis_vip_envoye: 'Devis VIP envoyé au client',
-    signe: 'Signé — En attente 1er acompte',
+    nouveau: 'Nouveau — En attente',
+    en_negociation_partenaire: 'Négociation partenaire',
+    devis_vip_envoye: 'Devis VIP envoyé',
+    signe: 'Signé — En attente paiement',
     acompte_1: 'Acompte 1 reçu',
     acompte_2: 'Acompte 2 reçu',
     acompte_3: 'Acompte 3 reçu — Solde attendu',
-    solde_paye: 'Intégralement payé',
+    solde_paye: 'Facture payée',
+    commande_ferme: 'Commande ferme',
     en_production: 'En production',
+    embarque_chine: 'Embarqué — Conteneur parti',
+    arrive_port_domtom: 'Arrivé au port',
+    livre: 'Livré',
+    termine: 'Clôturé',
     annule: 'Annulé',
   };
   return labels[statut] || statut;
 }
 
 /**
- * Couleur du badge statut pour l'UI admin
+ * Couleur du badge statut
  */
 export function couleurStatut(statut: QuoteStatus): string {
   const colors: Record<QuoteStatus, string> = {
-    nouveau: '#6B7280',                       // gris
-    en_negociation_partenaire: '#8B5CF6',     // violet (négociation)
-    devis_vip_envoye: '#EC4899',              // rose/magenta (envoyé)
-    signe: '#10B981',                         // vert (signé)
-    acompte_1: '#F59E0B',                     // orange clair
+    nouveau: '#6B7280',
+    en_negociation_partenaire: '#8B5CF6',
+    devis_vip_envoye: '#A855F7',
+    signe: '#3B82F6',
+    acompte_1: '#F59E0B',
     acompte_2: '#F59E0B',
-    acompte_3: '#D97706',                     // orange foncé
-    solde_paye: '#10B981',                    // vert
-    en_production: '#1565C0',                 // bleu
-    annule: '#DC2626',                        // rouge
+    acompte_3: '#D97706',
+    solde_paye: '#10B981',
+    commande_ferme: '#059669',
+    en_production: '#1565C0',
+    embarque_chine: '#0891B2',
+    arrive_port_domtom: '#0E7490',
+    livre: '#047857',
+    termine: '#374151',
+    annule: '#DC2626',
   };
   return colors[statut] || '#6B7280';
 }
 
 /**
- * Génère le prochain numéro de facture d'acompte FA-AC-AAMM-NNN.
- * Utilise un compteur atomique Firestore dans counters/facture_acompte_AAMM
+ * Footer text pour PDF selon statut + contexte
  */
-export async function generateFactureAcompteNumero(): Promise<string> {
+export function footerTextPDF(
+  statut: QuoteStatus,
+  contexte: {
+    partenaire_code?: string;
+    date_signature?: string;
+    date_acompte?: string;
+    numero_acompte?: number;
+    date_solde?: string;
+    date_commande?: string;
+    date_embarquement?: string;
+    date_arrivee?: string;
+    date_livraison?: string;
+  }
+): string {
+  const fmt = (iso?: string) => iso ? new Date(iso).toLocaleDateString('fr-FR') : '';
+
+  switch (statut) {
+    case 'nouveau':
+      return "DEVIS — En attente d'acceptation";
+    case 'en_negociation_partenaire':
+      return `DEVIS EN NÉGOCIATION — Partenaire ${contexte.partenaire_code || 'N/A'}`;
+    case 'devis_vip_envoye':
+      return `DEVIS VIP — Prix négocié partenaire ${contexte.partenaire_code || 'N/A'}`;
+    case 'signe':
+      return `DEVIS SIGNÉ — En attente de paiement${contexte.date_signature ? ` (le ${fmt(contexte.date_signature)})` : ''}`;
+    case 'acompte_1':
+    case 'acompte_2':
+    case 'acompte_3':
+      return `FACTURE ACOMPTE N°${contexte.numero_acompte || 1}/3 — Reçue le ${fmt(contexte.date_acompte)}`;
+    case 'solde_paye':
+      return `FACTURE PAYÉE — Solde reçu le ${fmt(contexte.date_solde)}`;
+    case 'commande_ferme':
+      return `COMMANDE FERME — Commandée le ${fmt(contexte.date_commande)}`;
+    case 'embarque_chine':
+      return `EMBARQUÉ — Conteneur parti le ${fmt(contexte.date_embarquement)}`;
+    case 'arrive_port_domtom':
+      return `ARRIVÉ AU PORT — Le ${fmt(contexte.date_arrivee)}`;
+    case 'livre':
+      return `LIVRÉE — Le ${fmt(contexte.date_livraison)}`;
+    case 'termine':
+      return 'CLÔTURÉ';
+    case 'annule':
+      return 'ANNULÉ';
+    default:
+      return '';
+  }
+}
+
+/**
+ * Génère le prochain numéro via compteur atomique Firestore
+ * Types : 'facture_acompte' (FA-AC), 'facture_finale' (FA), 'note_commission' (NC)
+ */
+export async function generateNumeroDocument(
+  type: 'facture_acompte' | 'facture_finale' | 'note_commission'
+): Promise<string> {
   const { db } = await import('./firebase');
   const { doc, runTransaction, serverTimestamp } = await import('firebase/firestore');
 
   const now = new Date();
   const aamm = `${String(now.getFullYear()).slice(-2)}${String(now.getMonth() + 1).padStart(2, '0')}`;
-  const counterId = `facture_acompte_${aamm}`;
+
+  const prefixMap = {
+    facture_acompte: 'FA-AC',
+    facture_finale: 'FA',
+    note_commission: 'NC',
+  };
+  const prefix = prefixMap[type];
+  const counterId = `${type}_${aamm}`;
   const counterRef = doc(db, 'counters', counterId);
 
   const numero = await runTransaction(db, async (transaction) => {
@@ -152,12 +266,12 @@ export async function generateFactureAcompteNumero(): Promise<string> {
     const next = current + 1;
     transaction.set(counterRef, {
       value: next,
-      prefix: 'FA-AC',
+      prefix,
       period: aamm,
       updated_at: serverTimestamp(),
     }, { merge: true });
     return next;
   });
 
-  return `FA-AC-${aamm}-${String(numero).padStart(3, '0')}`;
+  return `${prefix}-${aamm}-${String(numero).padStart(3, '0')}`;
 }

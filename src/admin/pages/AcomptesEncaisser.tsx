@@ -8,7 +8,7 @@ import { db } from '../../lib/firebase';
 import {
   QuoteStatus,
   libelleStatut, couleurStatut,
-  getTotalPaye, getRestantAPayer, getNbAcomptes,
+  getTotalEncaisse, getSoldeRestant, getNbAcomptesEncaisses,
   Acompte,
 } from '../../lib/quoteStatusHelpers';
 
@@ -104,9 +104,9 @@ export default function AcomptesEncaisser() {
             ) : (
               quotesFiltered.map(q => {
                 const acomptes = (q.acomptes || []) as Acompte[];
-                const paye = getTotalPaye(acomptes);
-                const restant = getRestantAPayer(q.total_ht || 0, acomptes);
-                const nbPartiels = getNbAcomptes(acomptes);
+                const paye = getTotalEncaisse(acomptes);
+                const restant = getSoldeRestant(q.total_ht || 0, acomptes);
+                const nbPartiels = getNbAcomptesEncaisses(acomptes);
                 const statut = (q.statut || 'nouveau') as QuoteStatus;
 
                 return (

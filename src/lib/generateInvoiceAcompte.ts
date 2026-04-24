@@ -2,7 +2,7 @@
 // Génère un PDF de facture d'acompte conforme à la charte Luxent Limited
 
 import jsPDF from 'jspdf';
-import { Acompte, getTotalPaye, getRestantAPayer, estEntierementPaye } from './quoteStatusHelpers';
+import { Acompte, getTotalEncaisse, getSoldeRestant, estEntierementPaye } from './quoteStatusHelpers';
 
 // Charte graphique
 const COLORS = {
@@ -189,8 +189,8 @@ export async function generateFactureAcomptePDF(data: FactureAcompteData): Promi
   }
 
   // Total payé
-  const totalPaye = getTotalPaye(data.historique_acomptes);
-  const restant = getRestantAPayer(data.total_devis, data.historique_acomptes);
+  const totalPaye = getTotalEncaisse(data.historique_acomptes);
+  const restant = getSoldeRestant(data.total_devis, data.historique_acomptes);
 
   y += 3;
   doc.setDrawColor(COLORS.border);
