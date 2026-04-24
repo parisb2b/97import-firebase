@@ -42,6 +42,8 @@ interface Devis {
   total_encaisse: number;
   solde_restant: number;
   destination: string;
+  is_vip?: boolean;
+  prix_negocies?: Record<string, number>;
 }
 
 const emptyDevis: Devis = {
@@ -394,13 +396,66 @@ export default function DetailDevis() {
                       style={{ textAlign: 'right' }}
                       onChange={(e) => handleLigneChange(index, 'qte', Number(e.target.value))} />
                   </td>
-                  <td>
-                    <input className="fi" type="number" value={ligne.prix_unitaire} min={0}
-                      style={{ textAlign: 'right' }}
-                      onChange={(e) => handleLigneChange(index, 'prix_unitaire', Number(e.target.value))} />
+                  <td style={{ textAlign: 'right', verticalAlign: 'middle', paddingRight: 8 }}>
+                    {(() => {
+                      const ref = ligne.ref || '';
+                      const prixPublic = ligne.prix_unitaire || 0;
+                      const prixNegocie = devis.prix_negocies?.[ref] ?? prixPublic;
+                      const estNegocie = devis.is_vip && prixNegocie !== prixPublic;
+                      const estLectureSeule = devis.statut === 'signe' || devis.statut === 'acompte_1'
+                        || devis.statut === 'acompte_2' || devis.statut === 'acompte_3'
+                        || devis.statut === 'solde_paye';
+
+                      // Mode lecture seule (devis signé ou en cours de paiement) avec affichage VIP
+                      if (estLectureSeule) {
+                        return (
+                          <div>
+                            {estNegocie && (
+                              <div style={{ textDecoration: 'line-through', color: '#9CA3AF', fontSize: 12 }}>
+                                {prixPublic.toLocaleString('fr-FR')} €
+                              </div>
+                            )}
+                            <div style={{
+                              color: estNegocie ? '#7c3aed' : '#111827',
+                              fontWeight: estNegocie ? 600 : 400
+                            }}>
+                              {prixNegocie.toLocaleString('fr-FR')} €
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      // Mode édition (devis brouillon, en négociation, etc.)
+                      return (
+                        <input className="fi" type="number" value={ligne.prix_unitaire} min={0}
+                          style={{ textAlign: 'right' }}
+                          onChange={(e) => handleLigneChange(index, 'prix_unitaire', Number(e.target.value))} />
+                      );
+                    })()}
                   </td>
-                  <td style={{ textAlign: 'right', fontWeight: 600 }}>
-                    {ligne.total.toLocaleString('fr-FR')} €
+                  <td style={{ textAlign: 'right', fontWeight: 600, paddingRight: 8 }}>
+                    {(() => {
+                      const ref = ligne.ref || '';
+                      const prixPublic = ligne.prix_unitaire || 0;
+                      const prixNegocie = devis.prix_negocies?.[ref] ?? prixPublic;
+                      const estNegocie = devis.is_vip && prixNegocie !== prixPublic;
+                      const totalLigne = prixNegocie * (ligne.qte || 1);
+                      const totalPublic = prixPublic * (ligne.qte || 1);
+
+                      if (estNegocie) {
+                        return (
+                          <div>
+                            <div style={{ textDecoration: 'line-through', color: '#9CA3AF', fontSize: 12, fontWeight: 400 }}>
+                              {totalPublic.toLocaleString('fr-FR')} €
+                            </div>
+                            <div style={{ color: '#7c3aed', fontWeight: 600 }}>
+                              {totalLigne.toLocaleString('fr-FR')} €
+                            </div>
+                          </div>
+                        );
+                      }
+                      return <span>{totalLigne.toLocaleString('fr-FR')} €</span>;
+                    })()}
                   </td>
                   <td>
                     <button onClick={() => handleRemoveLigne(index)}
