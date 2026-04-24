@@ -1,8 +1,9 @@
-// src/lib/generateInvoiceAcompte.ts
-// Génère un PDF de facture d'acompte conforme charte Luxent + footer dynamique
+// src/lib/generateInvoiceFinale.ts
+// Facture finale GLOBALE générée auto quand solde_paye atteint
+// Reprend TOUTES les lignes du devis + historique paiements
 
 import jsPDF from 'jspdf';
-import { Acompte, getTotalEncaisse, getSoldeRestant, estEntierementPaye, footerTextPDF, QuoteStatus } from './quoteStatusHelpers';
+import { Acompte, getTotalEncaisse, QuoteLine } from './quoteStatusHelpers';
 
 const COLORS = {
   salmon: '#C87F6B',
@@ -17,20 +18,12 @@ const EMETTEUR = {
   ligne1: '2ND FLOOR COLLEGE HOUSE',
   ligne2: '17 KING EDWARDS ROAD',
   ligne3: 'RUISLIP HA4 7AE LONDON',
-  iban: 'DE76 2022 0800 0059 5688 30',
-  swift: 'SXPYDEMMXXX',
-  banque: 'Banking Circle S.A.',
 };
 
-export interface FactureAcompteData {
-  numero: string;
+export interface FactureFinaleData {
+  numero: string;                 // FA-AAMM-NNN
   devis_numero: string;
-  statut_devis: QuoteStatus;
   date_emission: string;
-  acompte_numero: number;
-  acompte_est_solde: boolean;
-  montant: number;
-  total_devis: number;
   client: {
     nom: string;
     email: string;
@@ -39,31 +32,32 @@ export interface FactureAcompteData {
     cp?: string;
     pays?: string;
   };
-  historique_acomptes: Acompte[];
-  reference_virement?: string;
+  lignes: QuoteLine[];
+  total_ht: number;
+  acomptes: Acompte[];
+  date_solde_paye: string;
 }
 
-export async function generateFactureAcomptePDF(data: FactureAcompteData): Promise<Blob> {
+export async function generateFactureFinalePDF(data: FactureFinaleData): Promise<Blob> {
   const doc = new jsPDF({ unit: 'mm', format: 'a4' });
   const pageW = doc.internal.pageSize.getWidth();
   const pageH = doc.internal.pageSize.getHeight();
   const margin = 15;
   let y = margin;
 
-  // ═══ HEADER ═══
+  // HEADER
   doc.setFontSize(18);
   doc.setTextColor(COLORS.salmon);
   doc.setFont('helvetica', 'bold');
-  doc.text(data.acompte_est_solde ? 'FACTURE SOLDE' : `FACTURE ACOMPTE N°${data.acompte_numero}/3`, margin, y + 6);
+  doc.text('FACTURE', margin, y + 6);
 
   doc.setFontSize(10);
   doc.setTextColor(COLORS.textMuted);
   doc.setFont('helvetica', 'normal');
   doc.text(`N° ${data.numero}`, margin, y + 12);
   doc.text(`Émise le ${formatDate(data.date_emission)}`, margin, y + 17);
-  doc.text(`Concerne devis : ${data.devis_numero}`, margin, y + 22);
+  doc.text(`Devis d'origine : ${data.devis_numero}`, margin, y + 22);
 
-  // Logo LUXENT (texte)
   doc.setFontSize(14);
   doc.setTextColor(COLORS.salmon);
   doc.setFont('helvetica', 'bold');
@@ -71,10 +65,9 @@ export async function generateFactureAcomptePDF(data: FactureAcompteData): Promi
 
   y += 35;
 
-  // ═══ BLOCS ÉMETTEUR / CLIENT ═══
+  // BLOCS ÉMETTEUR / CLIENT
   const blocW = (pageW - 2 * margin - 10) / 2;
 
-  // Émetteur
   doc.setFontSize(9);
   doc.setTextColor(COLORS.textMuted);
   doc.setFont('helvetica', 'bold');
@@ -86,7 +79,6 @@ export async function generateFactureAcomptePDF(data: FactureAcompteData): Promi
   doc.text(EMETTEUR.ligne2, margin, y + 15);
   doc.text(EMETTEUR.ligne3, margin, y + 20);
 
-  // Client
   const clientX = margin + blocW + 10;
   doc.setTextColor(COLORS.textMuted);
   doc.setFont('helvetica', 'bold');
@@ -95,42 +87,47 @@ export async function generateFactureAcomptePDF(data: FactureAcompteData): Promi
   doc.setFont('helvetica', 'normal');
   doc.text(data.client.nom || '—', clientX, y + 5);
   if (data.client.adresse) doc.text(data.client.adresse, clientX, y + 10);
-  if (data.client.cp || data.client.ville) {
-    doc.text(`${data.client.cp || ''} ${data.client.ville || ''}`, clientX, y + 15);
-  }
+  if (data.client.cp || data.client.ville) doc.text(`${data.client.cp || ''} ${data.client.ville || ''}`, clientX, y + 15);
   doc.text(data.client.email, clientX, y + 20);
 
   y += 40;
 
-  // ═══ TABLEAU ACOMPTE ═══
+  // TABLEAU LIGNES (toutes les lignes du devis)
   doc.setFillColor(COLORS.salmon);
   doc.rect(margin, y, pageW - 2 * margin, 8, 'F');
   doc.setTextColor('#FFFFFF');
   doc.setFontSize(9);
   doc.setFont('helvetica', 'bold');
-  doc.text('DÉSIGNATION', margin + 2, y + 5.5);
-  doc.text('MONTANT HT', pageW - margin - 35, y + 5.5);
+  doc.text('RÉF.', margin + 2, y + 5.5);
+  doc.text('DÉSIGNATION', margin + 35, y + 5.5);
+  doc.text('PU HT', pageW - margin - 70, y + 5.5);
+  doc.text('QTÉ', pageW - margin - 45, y + 5.5);
+  doc.text('TOTAL HT', pageW - margin - 25, y + 5.5);
   y += 8;
 
-  doc.setDrawColor(COLORS.border);
-  doc.rect(margin, y, pageW - 2 * margin, 12, 'S');
   doc.setTextColor(COLORS.text);
-  doc.setFontSize(10);
+  doc.setFontSize(9);
   doc.setFont('helvetica', 'normal');
+  for (const l of data.lignes) {
+    doc.setDrawColor(COLORS.border);
+    doc.rect(margin, y, pageW - 2 * margin, 8, 'S');
+    doc.text(l.reference.substring(0, 15), margin + 2, y + 5);
+    doc.text((l.nom || '').substring(0, 40), margin + 35, y + 5);
+    doc.text(formatMontant(l.prix_unitaire_final), pageW - margin - 70, y + 5);
+    doc.text(String(l.quantite), pageW - margin - 45, y + 5);
+    doc.text(formatMontant(l.total_ligne), pageW - margin - 25, y + 5);
+    y += 8;
+    if (y > pageH - 80) { doc.addPage(); y = margin; }
+  }
 
-  const designation = data.acompte_est_solde
-    ? `Solde sur devis ${data.devis_numero}`
-    : `Acompte n°${data.acompte_numero} sur devis ${data.devis_numero}`;
-  doc.text(designation, margin + 2, y + 7);
-  doc.text(formatMontant(data.montant) + ' €', pageW - margin - 35, y + 7);
-  y += 15;
+  y += 5;
 
-  // ═══ TOTAUX ═══
+  // TOTAUX
   doc.setFontSize(10);
   doc.setTextColor(COLORS.textMuted);
   doc.text('Total HT :', pageW - margin - 70, y);
   doc.setTextColor(COLORS.text);
-  doc.text(formatMontant(data.montant) + ' €', pageW - margin - 35, y);
+  doc.text(formatMontant(data.total_ht) + ' €', pageW - margin - 35, y);
   y += 5;
   doc.setTextColor(COLORS.textMuted);
   doc.text('TVA (0%) :', pageW - margin - 70, y);
@@ -144,10 +141,12 @@ export async function generateFactureAcomptePDF(data: FactureAcompteData): Promi
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(COLORS.salmon);
   doc.text('TOTAL TTC :', pageW - margin - 70, y + 4);
-  doc.text(formatMontant(data.montant) + ' €', pageW - margin - 35, y + 4);
+  doc.text(formatMontant(data.total_ht) + ' €', pageW - margin - 35, y + 4);
   y += 20;
 
-  // ═══ HISTORIQUE PAIEMENTS ═══
+  // HISTORIQUE PAIEMENTS (détail)
+  if (y > pageH - 60) { doc.addPage(); y = margin; }
+
   doc.setFillColor(COLORS.palePink);
   doc.rect(margin, y, pageW - 2 * margin, 8, 'F');
   doc.setTextColor(COLORS.salmon);
@@ -160,46 +159,21 @@ export async function generateFactureAcomptePDF(data: FactureAcompteData): Promi
   doc.setTextColor(COLORS.text);
   doc.setFont('helvetica', 'normal');
 
-  for (const a of data.historique_acomptes.filter(a => a.encaisse)) {
+  for (const a of data.acomptes.filter(a => a.encaisse)) {
     const label = a.is_solde ? 'Solde' : `Acompte n°${a.numero}`;
     const refStr = a.reference_virement ? ` (${a.reference_virement})` : '';
-    const ligne = `${label.padEnd(15)} : ${formatMontant(a.montant).padStart(10)}€ reçu le ${formatDate(a.date_reception)}${refStr}`;
-    doc.text(ligne, margin + 2, y);
+    doc.text(`${label.padEnd(15)} : ${formatMontant(a.montant).padStart(10)}€ reçu le ${formatDate(a.date_reception)}${refStr}`, margin + 2, y);
     y += 5;
   }
-
-  const totalPaye = getTotalEncaisse(data.historique_acomptes);
-  const restant = getSoldeRestant(data.total_devis, data.historique_acomptes);
 
   y += 3;
   doc.setDrawColor(COLORS.border);
   doc.line(margin + 2, y, pageW - margin - 2, y);
   y += 5;
-
   doc.setFont('helvetica', 'bold');
-  doc.text(`Total payé  : ${formatMontant(totalPaye)} €`, margin + 2, y);
-  y += 5;
-  doc.text(`Reste à payer : ${formatMontant(restant)} €`, margin + 2, y);
-  y += 5;
-  doc.text(`Total devis   : ${formatMontant(data.total_devis)} €`, margin + 2, y);
-  y += 15;
+  doc.text(`Total payé : ${formatMontant(getTotalEncaisse(data.acomptes))} €`, margin + 2, y);
 
-  // Infos bancaires si reste à payer
-  if (restant > 0.01) {
-    doc.setFontSize(9);
-    doc.setTextColor(COLORS.textMuted);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Coordonnées bancaires pour le paiement restant :', margin, y);
-    y += 5;
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(COLORS.text);
-    doc.text(`Bénéficiaire : ${EMETTEUR.nom}`, margin, y); y += 4;
-    doc.text(`IBAN : ${EMETTEUR.iban}`, margin, y); y += 4;
-    doc.text(`SWIFT : ${EMETTEUR.swift}`, margin, y); y += 4;
-    doc.text(`Banque : ${EMETTEUR.banque}`, margin, y);
-  }
-
-  // ═══ FOOTER DYNAMIQUE ═══
+  // FOOTER — FACTURE PAYÉE
   const footerY = pageH - 20;
   doc.setDrawColor(COLORS.salmon);
   doc.setLineWidth(0.5);
@@ -208,16 +182,7 @@ export async function generateFactureAcomptePDF(data: FactureAcompteData): Promi
   doc.setFontSize(11);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(COLORS.salmon);
-
-  const entierementPaye = estEntierementPaye(data.total_devis, data.historique_acomptes);
-  const footer = entierementPaye
-    ? `FACTURE PAYÉE — Solde reçu le ${formatDate(data.date_emission)}`
-    : footerTextPDF(data.statut_devis, {
-        date_acompte: data.date_emission,
-        numero_acompte: data.acompte_numero,
-      });
-
-  doc.text(footer, pageW / 2, footerY, { align: 'center' });
+  doc.text(`FACTURE PAYÉE — Solde reçu le ${formatDate(data.date_solde_paye)}`, pageW / 2, footerY, { align: 'center' });
 
   doc.setFontSize(7);
   doc.setFont('helvetica', 'normal');
