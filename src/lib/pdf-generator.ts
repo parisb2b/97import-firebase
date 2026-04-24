@@ -557,6 +557,9 @@ export function generateFactureAcompte(quote: any, acompteCible: any, emetteur?:
   const numero = acompteCible?.ref_fa || quote?.numero_fa || 'FA-' + (quote.numero || '').replace('DVS-', '');
   const date = formatDate(acompteCible?.date_encaissement || acompteCible?.createdAt || quote.createdAt);
 
+  // Détecter si devis VIP pour afficher prix négociés
+  const isVip = quote.is_vip === true;
+
   drawLogo(doc, cfg.showLogo);
   drawHeader(doc, "Facture d'Acompte", numero, date, C.salmon);
 
@@ -577,7 +580,11 @@ export function generateFactureAcompte(quote: any, acompteCible: any, emetteur?:
   y += 6;
 
   // Tableau produits
-  y = drawProductTable(doc, quote.lignes || [], y + 2);
+  y = drawProductTable(doc, quote.lignes || [], y + 2, {
+    headerColor: C.salmon,  // Garder couleur saumon pour l'en-tête (couleur du document facture)
+    isVip,
+    prixNegocies: quote.prix_negocies || {}
+  });
 
   // TVA
   doc.setFontSize(8);
