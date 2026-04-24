@@ -1,0 +1,83 @@
+=== MAJ CREATE-PARTNER-TEST ===
+Date : 2026-04-24 10:42
+
+COMPTE PARTENAIRE CRÉÉ :
+  Email         : uberdeco77@gmail.com
+  Password      : 20262026
+  UID           : ES6pQ0NYLKfwA0qxMVSXheVWZbq2
+  Role          : partner
+  Code          : UD
+  Nom           : Uber Deco
+  Société       : Uber Deco Sarl
+  Actif         : true
+  Commission    : 10%
+
+ÉTAPES RÉALISÉES :
+  ✅ Utilisateur existait déjà dans Firebase Authentication
+  ✅ Document créé dans Firestore users/ES6pQ0NYLKfwA0qxMVSXheVWZbq2
+  ✅ Champ partenaire_code = "UD" ajouté dans users/
+  ✅ Document créé dans Firestore partners/ES6pQ0NYLKfwA0qxMVSXheVWZbq2
+  ✅ Champs code="UD", nom="Uber Deco", actif=true dans partners/
+  ✅ Tous les champs requis renseignés
+
+MÉTHODE UTILISÉE :
+  - Firebase Auth REST API (sign-in pour récupérer UID)
+  - Firestore REST API (PATCH pour créer/mettre à jour les documents)
+
+COLLECTIONS FIRESTORE MISES À JOUR :
+  1. users/ES6pQ0NYLKfwA0qxMVSXheVWZbq2
+     - email: uberdeco77@gmail.com
+     - role: partner
+     - partenaire_code: UD
+     - firstName: Uber
+     - lastName: Deco
+     - nom_societe: Uber Deco Sarl
+     - Adresse complète (Paris 75015)
+
+  2. partners/ES6pQ0NYLKfwA0qxMVSXheVWZbq2
+     - code: UD
+     - nom: Uber Deco
+     - email: uberdeco77@gmail.com
+     - userId: ES6pQ0NYLKfwA0qxMVSXheVWZbq2
+     - actif: true
+     - commission_taux: 10
+
+PARTENAIRES ACTIFS DANS LE POPUP PANIER :
+  Total : 7 partenaires
+
+  [JM] Jean-Marc Delacroix       | jm@partner.com
+  [MC] Michel Chen                | mc@partner.com
+  [MM] MICHEL CHEN MC87           | mc@sasfr.com
+  [PB] Pierre Bernard             | partenaire@97import.com
+  [TD] Thomas Dupont              | td@partner.com
+  [TT] dubourg                    | tt@sasfr.com
+  [UD] ⭐ Uber Deco               | uberdeco77@gmail.com ✅ NOUVEAU
+
+✅ CONFIRMATION : Le partenaire "UD" APPARAÎTRA dans le popup du panier !
+
+PROCHAINES ÉTAPES (pour Michel) :
+  1. Déconnexion de tout compte existant
+  2. Connexion sur le site 97import.com avec :
+     - Email : uberdeco77@gmail.com
+     - Password : 20262026
+  3. Vérifier accès à l'espace partenaire
+  4. Dans un autre navigateur (privé), créer un devis client :
+     a. Ajouter des produits au panier
+     b. Cliquer sur "Créer mon devis"
+     c. Dans le popup "Choix partenaire", VÉRIFIER la pastille "UD"
+     d. Sélectionner UD et créer le devis
+  5. Vérifier que :
+     - Email arrive sur uberdeco77@gmail.com (partenaire)
+     - Email arrive sur parisb2b@gmail.com (admin)
+     - Email arrive sur le compte client
+  6. Se connecter avec uberdeco77@gmail.com dans l'espace partenaire
+  7. Vérifier que le devis apparaît dans "Gestion devis"
+  8. Négocier un prix VIP et l'envoyer au client
+  9. Vérifier email reçu avec lien signature
+
+NOTE TECHNIQUE :
+  Le code Panier.tsx charge les partenaires depuis la collection
+  partners/ (pas users/), c'est pourquoi il a fallu créer
+  un document dans les DEUX collections :
+  - users/ : pour la connexion et les droits
+  - partners/ : pour l'affichage dans le popup panier

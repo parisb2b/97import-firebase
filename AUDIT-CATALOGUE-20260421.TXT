@@ -1,0 +1,303 @@
+═══════════════════════════════════════════════════════════
+  AUDIT CATALOGUE PRODUITS — 21/04/2026 16:43:29
+  Firestore : importok-6ef77
+═══════════════════════════════════════════════════════════
+
+┌────────────────────────────────────────────┐
+│  1. VUE D'ENSEMBLE                          │
+└────────────────────────────────────────────┘
+
+Total produits Firestore : 112
+  ✅ Actifs  : 107
+  ⏸️  Masqués : 5
+  ❓ Statut non défini : 0
+
+┌────────────────────────────────────────────┐
+│  2. RÉPARTITION PAR CATÉGORIE               │
+└────────────────────────────────────────────┘
+
+  mini-pelle                : 42 produit(s)
+  solaire                   : 23 produit(s)
+  maison-modulaire          : 23 produit(s)
+  divers                    : 8 produit(s)
+  logistique                : 8 produit(s)
+  agricole                  : 8 produit(s)
+
+┌────────────────────────────────────────────┐
+│  3. RÉPARTITION PAR PRÉFIXE DE RÉFÉRENCE    │
+└────────────────────────────────────────────┘
+
+  MP         :  28 produit(s)
+  ACC        :  26 produit(s)
+  KS         :  23 produit(s)
+  MS         :  11 produit(s)
+  LOG        :   8 produit(s)
+  MA         :   8 produit(s)
+  DVS        :   4 produit(s)
+  DIV        :   3 produit(s)
+  CC         :   1 produit(s)
+
+┌────────────────────────────────────────────┐
+│  4. TAUX DE REMPLISSAGE — ESSENTIEL (11)    │
+└────────────────────────────────────────────┘
+
+  reference              ████████████████████  112/112 (100%)
+  categorie              ████████████████████  112/112 (100%)
+  nom_fr                 ████████████████████  112/112 (100%)
+  prix_achat             █░░░░░░░░░░░░░░░░░░░  9/112 (8%)
+  fournisseur            ███████░░░░░░░░░░░░░  40/112 (36%)
+  poids_brut_kg          ░░░░░░░░░░░░░░░░░░░░  5/112 (4%)
+  volume_m3              █░░░░░░░░░░░░░░░░░░░  10/112 (9%)
+  est_kit                █████████████████░░░  100/112 (89%)
+  composition_kit        ██░░░░░░░░░░░░░░░░░░  12/112 (11%)
+  actif                  ████████████████████  112/112 (100%)
+  image_principale       ░░░░░░░░░░░░░░░░░░░░  1/112 (1%)
+
+┌────────────────────────────────────────────┐
+│  5. TAUX DE REMPLISSAGE — DÉTAILS (20)      │
+└────────────────────────────────────────────┘
+
+  code_hs                █████░░░░░░░░░░░░░░░  31/112 (28%)
+  nom_zh                 █████████░░░░░░░░░░░  54/112 (48%)
+  nom_en                 ███░░░░░░░░░░░░░░░░░  21/112 (19%)
+  description_courte_fr  ░░░░░░░░░░░░░░░░░░░░  0/112 (0%)
+  description_courte_zh  ░░░░░░░░░░░░░░░░░░░░  0/112 (0%)
+  description_courte_en  ░░░░░░░░░░░░░░░░░░░░  0/112 (0%)
+  usage_fr               ░░░░░░░░░░░░░░░░░░░░  0/112 (0%)
+  usage_zh               ░░░░░░░░░░░░░░░░░░░░  0/112 (0%)
+  usage_en               ░░░░░░░░░░░░░░░░░░░░  0/112 (0%)
+  longueur_cm            █░░░░░░░░░░░░░░░░░░░  9/112 (8%)
+  largeur_cm             █░░░░░░░░░░░░░░░░░░░  9/112 (8%)
+  hauteur_cm             █░░░░░░░░░░░░░░░░░░░  9/112 (8%)
+  poids_net_kg           ░░░░░░░░░░░░░░░░░░░░  4/112 (4%)
+  matiere_fr             ███░░░░░░░░░░░░░░░░░  18/112 (16%)
+  matiere_zh             █░░░░░░░░░░░░░░░░░░░  10/112 (9%)
+  matiere_en             █░░░░░░░░░░░░░░░░░░░  8/112 (7%)
+  reference_usine        ░░░░░░░░░░░░░░░░░░░░  0/112 (0%)
+  ville_origine_cn       ░░░░░░░░░░░░░░░░░░░░  0/112 (0%)
+  pays_origine           ░░░░░░░░░░░░░░░░░░░░  0/112 (0%)
+  ce_certification       ░░░░░░░░░░░░░░░░░░░░  0/112 (0%)
+
+┌────────────────────────────────────────────┐
+│  6. TAUX DE REMPLISSAGE — MÉDIAS (11)       │
+└────────────────────────────────────────────┘
+
+  images_galerie         ░░░░░░░░░░░░░░░░░░░░  0/112 (0%)
+  videos_galerie         ░░░░░░░░░░░░░░░░░░░░  0/112 (0%)
+  video_url              ░░░░░░░░░░░░░░░░░░░░  0/112 (0%)
+  description_marketing_fr ░░░░░░░░░░░░░░░░░░░░  0/112 (0%)
+  description_marketing_zh ░░░░░░░░░░░░░░░░░░░░  0/112 (0%)
+  description_marketing_en ░░░░░░░░░░░░░░░░░░░░  0/112 (0%)
+  points_forts           ░░░░░░░░░░░░░░░░░░░░  0/112 (0%)
+  documents_pdf          ░░░░░░░░░░░░░░░░░░░░  0/112 (0%)
+  slug_url               ░░░░░░░░░░░░░░░░░░░░  0/112 (0%)
+  meta_title             ░░░░░░░░░░░░░░░░░░░░  0/112 (0%)
+  meta_description       ░░░░░░░░░░░░░░░░░░░░  0/112 (0%)
+
+┌────────────────────────────────────────────┐
+│  7. STATUT DE COMPLÉTUDE (calculé)          │
+└────────────────────────────────────────────┘
+
+  ● Complet     :   0 / 112
+  ● Prêt site   :   0 / 112
+  ● À enrichir  :   0 / 112
+  ● Bloquant    : 112 / 112
+
+┌────────────────────────────────────────────┐
+│  8. ANALYSE DES KITS                        │
+└────────────────────────────────────────────┘
+
+Kits trouvés : 12
+  KS-10K-001         → ✅ format nouveau (5 composants)
+  KS-10K-002         → ✅ format nouveau (5 composants)
+  KS-10K-003         → ✅ format nouveau (5 composants)
+  KS-10K-004         → ✅ format nouveau (5 composants)
+  KS-12K-001         → ✅ format nouveau (5 composants)
+  KS-12K-002         → ✅ format nouveau (5 composants)
+  KS-12K-003         → ✅ format nouveau (5 composants)
+  KS-12K-004         → ✅ format nouveau (5 composants)
+  KS-20K-001         → ✅ format nouveau (5 composants)
+  KS-20K-002         → ✅ format nouveau (5 composants)
+  KS-20K-003         → ✅ format nouveau (5 composants)
+  KS-20K-004         → ✅ format nouveau (5 composants)
+
+┌────────────────────────────────────────────┐
+│  9. ANOMALIES DÉTECTÉES                     │
+└────────────────────────────────────────────┘
+
+  ⚠️  76 produit(s) actif(s) sans code HS (bloquant pour Excel BE-EXPORT)
+  ⚠️  99 produit(s) actif(s) sans prix_achat
+  ⚠️  106 produit(s) actif(s) sans image_principale
+
+┌────────────────────────────────────────────┐
+│  10. TOP PRODUITS                           │
+└────────────────────────────────────────────┘
+
+  TOP 10 — PRODUITS LES MIEUX REMPLIS :
+     1. MP-R22-001         — Mini-pelle R22 PRO — Chenilles 18/42  (E:8 D:10 M:0)
+     2. MP-R22-002         — Mini-pelle R22 PRO — Chenilles 17/42  (E:8 D:9 M:0)
+     3. MP-R22-003         — Mini-pelle R22 PRO — Double ch 14/42  (E:8 D:6 M:0)
+     4. KS-BAT-10K-001     — Batterie 10 kW                 12/42  (E:6 D:6 M:0)
+     5. KS-OND-10K-001     — Onduleur 10 kW                 12/42  (E:6 D:6 M:0)
+     6. KS-PAN-S-001       — Panneau solaire petit format   12/42  (E:6 D:6 M:0)
+     7. MP-20-001          — Maison Premium 20 Pieds        12/42  (E:6 D:6 M:0)
+     8. MP-R18-001         — Mini-pelle R18 PRO — Chenilles 12/42  (E:6 D:6 M:0)
+     9. MP-R22-004         — Mini-pelle R22 PRO -- Avec cab 12/42  (E:8 D:4 M:0)
+    10. MS-30-001          — Maison Standard 30 Pieds       12/42  (E:6 D:6 M:0)
+
+  TOP 10 — PRODUITS LES PLUS À ENRICHIR :
+     1. ACC-GC-004         — Godet curage R32 -- 60cm       5/42  (E:5 D:0 M:0)
+     2. ACC-GC-005         — Godet curage R32 -- 80cm       5/42  (E:5 D:0 M:0)
+     3. ACC-GD-007         — Godet a dents R32 -- 60cm      5/42  (E:5 D:0 M:0)
+     4. ACC-GD-008         — Godet a dents R32 -- 80cm      5/42  (E:5 D:0 M:0)
+     5. ACC-GD-009         — Godet a dents R57 -- 60cm      5/42  (E:5 D:0 M:0)
+     6. ACC-GD-010         — Godet a dents R57 -- 80cm      5/42  (E:5 D:0 M:0)
+     7. ACC-GD-011         — Godet a dents R57 -- 100cm     5/42  (E:5 D:0 M:0)
+     8. ACC-GI-001         — Godet inclinable R22 -- 60cm   5/42  (E:5 D:0 M:0)
+     9. ACC-GI-002         — Godet inclinable R22 -- 80cm   5/42  (E:5 D:0 M:0)
+    10. DIV-GEN-001        — Groupe électrogène 5kVA        5/42  (E:4 D:1 M:0)
+
+┌────────────────────────────────────────────┐
+│  11. RECOMMANDATIONS PRIORITAIRES           │
+└────────────────────────────────────────────┘
+
+Pour que TES EXCEL soient complets (BC-CHINE, BE-EXPORT, etc.), les champs
+suivants sont critiques. Priorise-les dans ton enrichissement :
+
+  PRIORITÉ 1 (essentiels douane chinoise BE-EXPORT) :
+    code_hs           : 31/112 remplis
+    nom_zh            : 54/112 remplis
+    usage_zh          : 0/112 remplis
+    ville_origine_cn  : 0/112 remplis
+
+  PRIORITÉ 2 (Packing List et logistique) :
+    longueur_cm       : 9/112 remplis
+    largeur_cm        : 9/112 remplis
+    hauteur_cm        : 9/112 remplis
+    poids_net_kg      : 4/112 remplis
+
+  PRIORITÉ 3 (marketing site public) :
+    description_marketing_fr : 0/112 remplis
+    images_galerie    : 0/112 remplis
+    videos_galerie    : 0/112 remplis
+
+┌────────────────────────────────────────────┐
+│  12. LISTE COMPLÈTE DES RÉFÉRENCES          │
+└────────────────────────────────────────────┘
+
+  🔴 ACTIF        ACC-GC-001           — Godet curage R22 -- 30cm
+  🔴 ACTIF        ACC-GC-002           — Godet curage R22 -- 60cm
+  🔴 ACTIF        ACC-GC-003           — Godet curage R22 -- 80cm
+  🔴 ACTIF        ACC-GC-004           — Godet curage R32 -- 60cm
+  🔴 ACTIF        ACC-GC-005           — Godet curage R32 -- 80cm
+  🔴 ACTIF        ACC-GD-001           — Godet a dents R22 -- 20cm
+  🔴 ACTIF        ACC-GD-002           — Godet a dents R22 -- 30cm
+  🔴 ACTIF        ACC-GD-003           — Godet a dents R22 -- 40cm
+  🔴 ACTIF        ACC-GD-004           — Godet a dents R22 -- 60cm
+  🔴 ACTIF        ACC-GD-005           — Godet a dents R22 -- 80cm
+  🔴 ACTIF        ACC-GD-006           — Godet a dents R32 -- 30cm
+  🔴 ACTIF        ACC-GD-007           — Godet a dents R32 -- 60cm
+  🔴 ACTIF        ACC-GD-008           — Godet a dents R32 -- 80cm
+  🔴 ACTIF        ACC-GD-009           — Godet a dents R57 -- 60cm
+  🔴 ACTIF        ACC-GD-010           — Godet a dents R57 -- 80cm
+  🔴 ACTIF        ACC-GD-011           — Godet a dents R57 -- 100cm
+  🔴 ACTIF        ACC-GI-001           — Godet inclinable R22 -- 60cm
+  🔴 ACTIF        ACC-GI-002           — Godet inclinable R22 -- 80cm
+  🔴 ACTIF        ACC-GP-001           — Grappin R22
+  🔴 ACTIF        ACC-GP-002           — Grappin R32
+  🔴 ACTIF        ACC-GP-003           — Grappin R57
+  🔴 ACTIF        ACC-MH-001           — Marteau hydraulique R22
+  🔴 ACTIF        ACC-MH-002           — Marteau hydraulique R32
+  🔴 ACTIF        ACC-MH-003           — Marteau hydraulique R57
+  🔴 ACTIF        ACC-TA-001           — Tariere R22
+  🔴 ACTIF        ACC-TA-002           — Tariere R32
+  🔴 ACTIF        CC-BYD-001           — Camping Car Deluxe Hybride BYD T5DM
+  🔴 ACTIF        DIV-0077             — Onduleur hybride monophasé Deye 12K 3 MPPT po
+  🔴 ACTIF        DIV-GEN-001          — Groupe électrogène 5kVA
+  🔴 ACTIF        DIV-GEN-002          — Groupe électrogène 10 kVA
+  🔴 ACTIF        DVS-CLIM-001         — Climatisation -- Maison modulaire
+  🔴 ACTIF        DVS-CLIM-002         — Climatisation 9000 BTU
+  🔴 ACTIF        DVS-CLIM-003         — Climatisation 12000 BTU
+  🔴 ACTIF        DVS-MEUB-001         — Pack Meuble sur mesure
+  🔴 ACTIF  [KIT] KS-10K-001           — Kit Solaire 10kW — Toiture + Petits panneaux
+  🔴 ACTIF  [KIT] KS-10K-002           — Kit Solaire 10kW — Toiture + Grands panneaux
+  🔴 ACTIF  [KIT] KS-10K-003           — Kit Solaire 10kW — Sol + Petits panneaux
+  🔴 ACTIF  [KIT] KS-10K-004           — Kit Solaire 10kW — Sol + Grands panneaux
+  🔴 ACTIF  [KIT] KS-12K-001           — Kit Solaire 12kW — Toiture + Petits panneaux
+  🔴 ACTIF  [KIT] KS-12K-002           — Kit Solaire 12kW — Toiture + Grands panneaux
+  🔴 ACTIF  [KIT] KS-12K-003           — Kit Solaire 12kW — Sol + Petits panneaux
+  🔴 ACTIF  [KIT] KS-12K-004           — Kit Solaire 12kW — Sol + Grands panneaux
+  🔴 ACTIF  [KIT] KS-20K-001           — Kit Solaire 20kW — Toiture + Petits panneaux
+  🔴 ACTIF  [KIT] KS-20K-002           — Kit Solaire 20kW — Toiture + Grands panneaux
+  🔴 ACTIF  [KIT] KS-20K-003           — Kit Solaire 20kW — Sol + Petits panneaux
+  🔴 ACTIF  [KIT] KS-20K-004           — Kit Solaire 20kW — Sol + Grands panneaux
+  🔴 ACTIF        KS-BAT-10K-001       — Batterie 10 kW
+  🔴 ACTIF        KS-BAT-12K-001       — Batterie 12 kW
+  🔴 ACTIF        KS-BAT-20K-001       — Batterie 20 kW
+  🔴 ACTIF        KS-CAB-001           — Cablage et connectique
+  🔴 ACTIF        KS-FIX-SOL-001       — Kit fixation sol (structures au sol)
+  🔴 ACTIF        KS-FIX-TOIT-001      — Kit fixation toiture (rails alu + crochets + 
+  🔴 ACTIF        KS-OND-10K-001       — Onduleur 10 kW
+  🔴 ACTIF        KS-OND-12K-001       — Onduleur 12 kW
+  🔴 ACTIF        KS-OND-20K-001       — Onduleur 20 kW
+  🔴 ACTIF        KS-PAN-L-001         — Panneau solaire grand format
+  🔴 ACTIF        KS-PAN-S-001         — Panneau solaire petit format
+  🔴 ACTIF        LOG-DEDU-FR-001      — Dedouanement -- France Metro.
+  🔴 ACTIF        LOG-DEDU-GP-001      — Dedouanement -- Guadeloupe
+  🔴 ACTIF        LOG-DEDU-MQ-001      — Dedouanement -- Martinique
+  🔴 ACTIF        LOG-FRET-FR-001      — Frais maritimes -- France Metro.
+  🔴 ACTIF        LOG-FRET-GP-001      — Frais maritimes -- Guadeloupe
+  🔴 ACTIF        LOG-FRET-MQ-001      — Frais maritimes -- Martinique T1 2026 20P
+  🔴              LOG-FRET-MQ-002      — Frais maritimes -- MartiniqueT1 2026 40P
+  🔴 ACTIF        LOG-SVC-001          — Services 97import
+  🔴 ACTIF        MA-ACC-001           — Remorque agricole 1T
+  🔴 ACTIF        MA-ACC-002           — Charrue 2 socs
+  🔴 ACTIF        MA-ACC-003           — Rogneuse de talus
+  🔴 ACTIF        MA-MOT-001           — Motoculteur 12CV
+  🔴 ACTIF        MA-MOT-002           — Motoculteur 7CV
+  🔴 ACTIF        MA-TRA-001           — Tracteur Compact 25CV
+  🔴 ACTIF        MA-TRA-002           — Tracteur 45CV
+  🔴 ACTIF        MA-TRA-003           — Tracteur 65CV
+  🔴 ACTIF        MP-20-001            — Maison Premium 20 Pieds
+  🔴 ACTIF        MP-20-OPT-1CH        — Option +1 chambre -- MP-20
+  🔴 ACTIF        MP-20-OPT-2CH        — Option +2 chambres -- MP-20
+  🔴 ACTIF        MP-20-OPT-3CH        — Option +3 chambres -- MP-20
+  🔴 ACTIF        MP-30-001            — Maison Premium 30 Pieds
+  🔴 ACTIF        MP-30-OPT-1CH        — Option +1 chambre -- MP-30
+  🔴 ACTIF        MP-30-OPT-2CH        — Option +2 chambres -- MP-30
+  🔴 ACTIF        MP-30-OPT-3CH        — Option +3 chambres -- MP-30
+  🔴 ACTIF        MP-40-001            — Maison Premium 40 Pieds
+  🔴 ACTIF        MP-40-OPT-1CH        — Option +1 chambre -- MP-40
+  🔴 ACTIF        MP-40-OPT-2CH        — Option +2 chambres -- MP-40
+  🔴 ACTIF        MP-40-OPT-3CH        — Option +3 chambres -- MP-40
+  🔴 ACTIF        MP-R18-001           — Mini-pelle R18 PRO — Chenilles caoutchouc
+  🔴 ACTIF        MP-R18-002           — Mini-pelle R18 PRO — Chenilles métal
+  🔴 ACTIF        MP-R18-003           — Mini-pelle R18 PRO — Double chenilles
+  🔴              MP-R18-004           — Mini-pelle R18 PRO -- Avec cabine
+  🔴 ACTIF        MP-R22-001           — Mini-pelle R22 PRO — Chenilles caoutchouc
+  🔴 ACTIF        MP-R22-002           — Mini-pelle R22 PRO — Chenilles métal
+  🔴 ACTIF        MP-R22-003           — Mini-pelle R22 PRO — Double chenilles
+  🔴              MP-R22-004           — Mini-pelle R22 PRO -- Avec cabine
+  🔴 ACTIF        MP-R32-001           — Mini-pelle R32 PRO — Chenilles caoutchouc
+  🔴 ACTIF        MP-R32-002           — Mini-pelle R32 PRO — Chenilles métal
+  🔴 ACTIF        MP-R32-003           — Mini-pelle R32 PRO — Double chenilles
+  🔴              MP-R32-004           — Mini-pelle R32 PRO -- Avec cabine
+  🔴 ACTIF        MP-R57-001           — Mini-pelle R57 PRO — Chenilles caoutchouc
+  🔴 ACTIF        MP-R57-002           — Mini-pelle R57 PRO — Chenilles métal
+  🔴 ACTIF        MP-R57-003           — Mini-pelle R57 PRO — Double chenilles
+  🔴              MP-R57-004           — Mini-pelle R57 PRO -- Avec cabine
+  🔴 ACTIF        MS-20-OPT-1CH        — Option +1 chambre -- MS-20
+  🔴 ACTIF        MS-20-OPT-2CH        — Option +2 chambres -- MS-20
+  🔴 ACTIF        MS-20-OPT-3CH        — Option +3 chambres -- MS-20
+  🔴 ACTIF        MS-30-001            — Maison Standard 30 Pieds
+  🔴 ACTIF        MS-30-OPT-1CH        — Option +1 chambre -- MS-30
+  🔴 ACTIF        MS-30-OPT-2CH        — Option +2 chambres -- MS-30
+  🔴 ACTIF        MS-30-OPT-3CH        — Option +3 chambres -- MS-30
+  🔴 ACTIF        MS-40-001            — Maison Standard 40 Pieds
+  🔴 ACTIF        MS-40-OPT-1CH        — Option +1 chambre -- MS-40
+  🔴 ACTIF        MS-40-OPT-2CH        — Option +2 chambres -- MS-40
+  🔴 ACTIF        MS-40-OPT-3CH        — Option +3 chambres -- MS-40
+
+═══════════════════════════════════════════════════════════
+  FIN DE L'AUDIT
+═══════════════════════════════════════════════════════════

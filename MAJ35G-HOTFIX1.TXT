@@ -1,0 +1,411 @@
+=== MAJ35G HOTFIX 1 — Sauvegarde partielle + Drag&Drop image principale ===
+Date : 2026-04-20
+Branche : v2
+Build : ✓ OK (0 erreur TypeScript)
+
+OBJECTIF :
+  Corriger 2 frustrations UX Phase 1/2 :
+  1. Sauvegarde bloquée si essentiel incomplet → libérée (seuls ref+catégorie strictement obligatoires)
+  2. Image principale = URL seulement → ajout drag&drop avec compression auto
+
+================================================================================
+ MODIFICATIONS PARTIE A — FicheProduit.tsx
+================================================================================
+
+✅ handleSave() : validation stricte limitée à reference + categorie
+   - Avant: 11 champs essentiels tous bloquants
+   - Après: seuls reference + categorie strictement obligatoires
+   - Autres champs: sauvegarde autorisée même si manquants
+
+✅ Sauvegarde toujours effectuée même si essentiel incomplet
+   - Calcul complétude en temps réel via calculerCompletude()
+   - Enregistrement complétude dans Firestore (champs essentiel/details/medias/statut)
+   - Timestamps: serverTimestamp() au lieu de Date.now().toISOString()
+
+✅ Popup feedback : succès + liste des champs manquants (info, pas blocage)
+   Format message:
+   "✅ Produit créé/enregistré avec succès
+
+   ℹ️ X champ(s) essentiel(s) reste(nt) à remplir :
+     • nom_fr
+     • prix_achat
+     • fournisseur
+     [...]
+
+   Le produit reste en statut 'Bloquant' jusqu'à ce qu'ils soient tous remplis.
+   Vous pouvez revenir quand vous voulez pour les compléter."
+
+✅ Bouton footer : "Enregistrer (incomplet)" si essentiel < 11
+   - Feedback visuel clair pour l'admin
+   - Background gris (#D1D5DB) si saving
+
+✅ Indicateur footer amélioré selon état (dirty / manquants / OK)
+   - Création: "⚠️ Référence et catégorie obligatoires. Les autres champs peuvent être complétés plus tard."
+   - Dirty: "● Modifications non enregistrées" (orange #EA580C)
+   - Manquants: "⚠️ X champ(s) essentiel(s) manquant(s) — produit non utilisable en devis" (ambre #92400E)
+   - OK: "Aucune modification en attente"
+
+✅ Vérification unicité référence si création
+   - Vérifie que la référence n'existe pas déjà dans Firestore
+   - Alert bloquante si doublon: "⚠️ La référence XXX existe déjà. Choisissez une autre référence."
+
+✅ Rechargement après save (édition)
+   - getDoc pour récupérer les données fraîches depuis Firestore
+   - Synchronisation product state avec données serveur
+
+================================================================================
+ AJOUTS PARTIE B — storageHelpers.ts
+================================================================================
+
+✅ Fonction compresserImage(file): Promise<File>
+   - Redimensionnement max 1920px largeur (conserve ratio)
+   - Canvas HTML5 pour manipulation côté client
+   - Conversion JPEG qualité 80%
+   - Gestion erreurs: image non chargeable, canvas non supporté
+   - Promise-based avec FileReader + Image
+
+✅ Fonction uploadImagePrincipale(ref, file): Promise<string>
+   - Validation type: file.type.startsWith('image/')
+   - Compression automatique via compresserImage()
+   - Path Firebase Storage: products/{ref}/principale/main_{timestamp}.jpg
+   - Upload via uploadBytes + getDownloadURL
+   - Retourne URL signée Firebase Storage
+
+================================================================================
+ MODIFICATIONS PARTIE B — OngletEssentiel.tsx
+================================================================================
+
+✅ Imports ajoutés
+   - useRef depuis React
+   - uploadImagePrincipale, supprimerFichierStorage depuis storageHelpers
+
+✅ États locaux
+   - uploadingImage: boolean (spinner pendant upload)
+   - dragOver: boolean (bordure orange au survol)
+   - fileInputRef: React.RefObject<HTMLInputElement> (input caché)
+
+✅ Handlers
+   - handleUploadImagePrincipale(file): validation référence, suppression ancien, upload nouveau
+   - handleFileSelect: déclencheur depuis input file
+   - handleDrop: déclencheur depuis drag & drop
+   - handleDragOver: activation dragOver state
+   - handleDragLeave: désactivation dragOver state
+   - handleRemoveImage: confirmation + suppression
+
+✅ Zone drag & drop (si aucune image)
+   - Dimensions: width 100%, padding 40px
+   - Bordure: 2px dashed #E5E7EB (grise) ou #EA580C (orange si dragOver)
+   - Background: #F9FAFB (gris clair) ou #FFF7ED (orange clair si dragOver)
+   - Cursor: pointer (ou wait si uploading)
+   - Transition CSS: all 0.15s
+   - Contenu:
+     * Uploading: spinner ⏳ + "Upload en cours..." + "Compression et envoi vers Firebase Storage"
+     * Idle: icône ⬆ + "Glissez-déposez une image ici" + "ou cliquez pour parcourir — JPG, PNG, WebP (compression auto)"
+
+✅ Séparateur "— ou —"
+   - Entre zone drag&drop et input URL externe
+   - Style: texte centré, gris clair #9CA3AF, 12px
+
+✅ Input URL externe (si aucune image)
+   - Label: "URL externe de l'image"
+   - Placeholder: "https://..."
+   - Hint: "Pour coller une URL d'image hébergée ailleurs (optionnel)"
+   - Permet toujours de saisir une URL manuellement
+
+✅ Preview après upload (si image existe)
+   - FormGrid2 avec 2 colonnes:
+     * Gauche: preview image 1:1 ratio, border-radius 12px, overflow hidden
+     * Droite: boutons + URL lecture seule
+
+   - Boutons:
+     * "🔄 Remplacer" (orange #EA580C, flex 1)
+       → Réouvre l'input file pour sélectionner nouvelle image
+     * "🗑 Supprimer" (rouge #DC2626, bordure #FECACA)
+       → Confirmation + suppression image + suppression Firebase si URL firebasestorage
+
+   - URL lecture seule:
+     * Label: "URL (lecture seule)"
+     * Input disabled, background gris #F9FAFB, fontSize 11px
+     * Hint: "URL Firebase Storage (ou externe)"
+
+✅ Input file caché
+   - ref={fileInputRef}
+   - type="file"
+   - accept="image/*"
+   - display: none
+   - onChange={handleFileSelect}
+
+✅ Suppression auto ancienne image Firebase lors remplacement
+   - Vérifie si URL contient 'firebasestorage'
+   - Appelle supprimerFichierStorage avant upload nouveau
+   - Évite accumulation fichiers orphelins dans Storage
+
+✅ Validation: référence requise avant upload
+   - Si édition (!isCreation) et pas de reference: alert "⚠️ Enregistrez d'abord le produit"
+   - Si création (isCreation) et reference vide: alert "⚠️ Saisissez d'abord une référence produit"
+   - Empêche upload sans référence (pas de path Firebase valide sans ref)
+
+✅ Suppression imagePreviewStyle non utilisé
+   - Style déplacé inline dans le nouveau code drag&drop
+   - Fix TypeScript warning TS6133
+
+================================================================================
+ COMMITS (3)
+================================================================================
+
+1. e88fa9e — v35g-hotfix1-A: sauvegarde partielle autorisée (seules ref+catégorie bloquantes)
+   - FicheProduit.tsx: validation stricte, feedback adapté, footer amélioré
+
+2. e03db3b — v35g-hotfix1-B: drag&drop image principale + compression auto côté client
+   - storageHelpers.ts: compresserImage + uploadImagePrincipale
+   - OngletEssentiel.tsx: zone drag&drop, preview, boutons
+
+3. 652e1e1 — v35g-hotfix1-B fix: suppression imagePreviewStyle non utilisé
+   - OngletEssentiel.tsx: fix TypeScript warning
+
+================================================================================
+ BUILD
+================================================================================
+
+✅ npm run build
+   → 0 erreur TypeScript
+   → Warning chunk size (non bloquant, optimisation future)
+   → Build succeeded in 3.47s
+   → dist/ généré sans erreur
+
+================================================================================
+ TESTS MANUELS (5)
+================================================================================
+
+[ ] Test 1 — Sauvegarde partielle
+    1. Créer nouveau produit
+    2. Saisir uniquement: référence "TEST-HOTFIX1", catégorie "Solaire", nom "Test partial save"
+    3. NE PAS remplir: prix, fournisseur, poids, volume, image
+    4. Cliquer "Créer le produit"
+    5. ✓ Vérifier popup: "✅ Produit créé avec succès... ℹ️ 8 champ(s) essentiel(s) reste(nt) à remplir..."
+    6. ✓ Vérifier redirection vers fiche édition
+    7. ✓ Vérifier badge "● Champs essentiels manquants" (rouge)
+    8. ✓ Vérifier liste produits: TEST-HOTFIX1 apparaît avec statut Bloquant
+    9. Retourner fiche, remplir prix_achat + fournisseur
+    10. ✓ Bouton affiche "Enregistrer (incomplet)"
+    11. Cliquer Enregistrer
+    12. ✓ Vérifier popup: "✅ Produit enregistré... ℹ️ 6 champ(s)..." (nombre diminué)
+
+[ ] Test 2 — Drag & drop image principale
+    1. Ouvrir produit existant sans image
+    2. ✓ Voir zone "Glissez-déposez une image ici" (fond gris, bordure pointillée)
+    3. Glisser image JPG depuis Finder/Explorer vers la zone
+    4. ✓ Au survol: bordure devient orange (#EA580C), fond orange clair (#FFF7ED)
+    5. Déposer l'image
+    6. ✓ Upload démarre: spinner ⏳ + "Upload en cours..."
+    7. ✓ Après upload (2-5 secondes):
+       - Preview image apparaît (carré 1:1)
+       - Boutons "🔄 Remplacer" (orange) + "🗑 Supprimer" (rouge)
+       - URL lecture seule affichée
+    8. ✓ URL commence par "https://firebasestorage.googleapis.com/..."
+    9. Firebase Console → Storage → products/{ref}/principale/
+    10. ✓ Fichier main_{timestamp}.jpg existe
+
+[ ] Test 3 — Compression image
+    1. Uploader image lourde (> 2 Mo, résolution > 3000px)
+    2. Attendre fin upload
+    3. Firebase Console → Storage → products/{ref}/principale/main_{timestamp}.jpg
+    4. ✓ Taille fichier < 500 Ko (compression 80%)
+    5. Télécharger image depuis Storage
+    6. ✓ Largeur max = 1920px (ou moins si image source plus petite)
+    7. ✓ Format = JPEG (même si source PNG/WebP)
+
+[ ] Test 4 — Remplacement et suppression image
+    1. Produit avec image existante
+    2. Cliquer bouton "🔄 Remplacer"
+    3. ✓ Input file s'ouvre
+    4. Sélectionner nouvelle image
+    5. ✓ Upload nouveau + suppression ancien fichier Firebase
+    6. ✓ Preview mis à jour avec nouvelle image
+    7. Cliquer "🗑 Supprimer"
+    8. ✓ Confirmation: "Supprimer l'image principale ?"
+    9. Confirmer
+    10. ✓ Image disparaît, retour à zone drag&drop
+    11. ✓ Fichier supprimé dans Firebase Storage
+
+[ ] Test 5 — URL externe alternative
+    1. Nouveau produit sans image
+    2. Ignorer la zone drag&drop
+    3. Scroller vers bas → champ "URL externe de l'image"
+    4. Coller URL externe (ex: https://picsum.photos/400)
+    5. ✓ Preview s'affiche
+    6. ✓ Boutons Remplacer/Supprimer apparaissent
+    7. ✓ URL externe conservée (pas uploadée vers Firebase)
+    8. Cliquer Supprimer
+    9. ✓ Confirmation + suppression (pas de suppression Storage car externe)
+
+[ ] Test 6 — Validation référence avant upload
+    1. Créer nouveau produit
+    2. NE PAS saisir de référence
+    3. Essayer uploader image via drag&drop
+    4. ✓ Alert: "⚠️ Saisissez d'abord une référence produit..."
+    5. Saisir référence
+    6. Essayer à nouveau uploader
+    7. ✓ Upload fonctionne
+
+[ ] Test 7 — Indicateur footer
+    1. Nouveau produit (création)
+    2. ✓ Footer: "⚠️ Référence et catégorie obligatoires. Les autres champs peuvent être complétés plus tard."
+    3. Créer produit (ref + cat uniquement)
+    4. Mode édition, produit incomplet (manque 8 champs)
+    5. ✓ Footer: "⚠️ 8 champ(s) essentiel(s) manquant(s) — produit non utilisable en devis" (ambre)
+    6. Modifier un champ
+    7. ✓ Footer: "● Modifications non enregistrées" (orange)
+    8. Enregistrer
+    9. Compléter tous champs essentiels
+    10. ✓ Footer: "Aucune modification en attente"
+
+[ ] Test 8 — Blocage doublon référence
+    1. Créer produit référence "DUPLI-001"
+    2. Enregistrer
+    3. Créer nouveau produit
+    4. Saisir référence "DUPLI-001" (doublon)
+    5. Cliquer Créer
+    6. ✓ Alert: "⚠️ La référence DUPLI-001 existe déjà. Choisissez une autre référence."
+    7. ✓ Produit non créé
+    8. Changer référence "DUPLI-002"
+    9. ✓ Création OK
+
+================================================================================
+ FICHIERS MODIFIÉS/CRÉÉS
+================================================================================
+
+Modifiés (3):
+  ✓ src/admin/pages/FicheProduit.tsx (+84 -29 lignes)
+  ✓ src/lib/storageHelpers.ts (+91 lignes)
+  ✓ src/admin/components/produit/OngletEssentiel.tsx (+285 -16 lignes)
+
+Créés (1):
+  ✓ MAJ35G-HOTFIX1.TXT (ce fichier)
+
+================================================================================
+ IMPACT UTILISATEUR
+================================================================================
+
+✅ AMÉLIORATION 1 — Sauvegarde partielle
+   AVANT: Michel remplit 5 champs sur 11 → clic Enregistrer → alert blocante
+          → perd ses 5 champs s'il quitte par erreur
+
+   APRÈS: Michel remplit 5 champs (dont ref + cat obligatoires) → clic Enregistrer
+          → sauvegarde OK + popup info liste des 6 manquants
+          → peut revenir plus tard compléter → travail jamais perdu
+
+✅ AMÉLIORATION 2 — Drag & drop image
+   AVANT: Michel doit:
+          1. Aller Firebase Console
+          2. Storage → products → créer dossiers manuellement
+          3. Upload image
+          4. Copier URL
+          5. Retour admin → coller URL
+
+   APRÈS: Michel drag & drop image depuis Finder
+          → compression auto
+          → upload auto
+          → URL auto-remplie
+          → 1 action au lieu de 5
+
+✅ BONUS — Compression auto
+   - Images lourdes (5-10 Mo) → compressées ~300-500 Ko
+   - Économie bande passante
+   - Chargement plus rapide site public
+   - Storage Firebase moins consommé
+
+================================================================================
+ BACKLOG RESTANT
+================================================================================
+
+⏳ HOTFIX 2 : DeepL via Vercel Serverless Function
+   - Problème: clé DeepL exposée côté client (VITE_DEEPL_API_KEY)
+   - Solution: API route Vercel /api/translate pour masquer clé
+   - Sécurité: clé stockée côté serveur uniquement
+
+⏳ Phase 3 : Onglet Médias complet
+   - Galerie photos (upload multiple + drag&drop réorganisation @dnd-kit)
+   - Upload PDF manuel + fiche technique
+   - Vidéo YouTube embed
+   - Traductions marketing FR→ZH/EN
+   - Métadonnées SEO (slug, meta_title)
+
+⏳ v35f : Commissions partenaires
+   - Système calcul commissions automatiques
+   - Profils partenaires avec taux personnalisés
+
+⏳ v35b-enhance : CTA emails signés
+   - Boutons d'action dans emails
+   - Signature cryptographique
+
+================================================================================
+ NOTES TECHNIQUES
+================================================================================
+
+COMPRESSION IMAGE:
+  - Canvas HTML5 côté client (pas de serveur Node/Sharp)
+  - Max width: 1920px (responsive pour écrans Retina)
+  - Quality: 0.8 (80%) pour JPEG
+  - Format sortie: toujours JPEG (même si PNG/WebP en entrée)
+  - Avantages:
+    * Pas de quota serveur consommé
+    * Upload plus rapide (fichier déjà compressé)
+    * Feedback immédiat dans le browser
+
+FIREBASE STORAGE PATH:
+  - Image principale: products/{ref}/principale/main_{timestamp}.jpg
+  - Galerie (Phase 3): products/{ref}/galerie/{timestamp}_{filename}
+  - Documents PDF: products/{ref}/documents/{timestamp}_{filename}
+  - Certificat CE: products/{ref}/certifications/CE_{timestamp}.pdf
+
+  Avantages structure:
+    * 1 dossier par produit (facile à retrouver)
+    * Timestamp évite conflits noms
+    * Suppression produit → peut supprimer tout le dossier
+
+SAUVEGARDE PARTIELLE FIRESTORE:
+  Structure document product:
+  {
+    reference: "TEST-001",
+    categorie: "solaire",
+    nom_fr: "Test",
+    // ... autres champs (peuvent être undefined)
+    completude: {
+      essentiel: 3,        // sur 11
+      details: 0,          // sur 20
+      medias: 0,           // sur 9
+      statut: "bloquant"   // complet | pret_site | a_enrichir | bloquant
+    },
+    created_at: Timestamp,
+    updated_at: Timestamp
+  }
+
+VALIDATION RÉFÉRENCE:
+  - Seule validation strictement bloquante (avec catégorie)
+  - Raison: référence = document ID Firestore
+  - Vérification unicité via getDoc() avant création
+  - Pas de renommage possible après création (immutable ID)
+
+================================================================================
+ CONCLUSION
+================================================================================
+
+✅ HOTFIX 1 LIVRÉ AVEC SUCCÈS
+
+Deux améliorations UX majeures implémentées:
+1. Sauvegarde partielle → travail jamais perdu, workflow plus fluide
+2. Drag & drop image → UX moderne, 5 étapes réduites à 1
+
+Build compile sans erreur TypeScript.
+3 commits documentent la progression.
+8 tests manuels définis pour validation.
+
+👉 PRÊT POUR VALIDATION MICHEL
+
+Après validation + tests → Hotfix 2 (DeepL serverless) ou Phase 3 (Médias).
+
+================================================================================
+Rapport généré le 2026-04-20 par Claude Code (Opus 4.6)
+Hotfix 1 v35g — Durée totale: ~25 minutes
+================================================================================

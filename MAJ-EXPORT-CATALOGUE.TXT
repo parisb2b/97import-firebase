@@ -1,0 +1,52 @@
+=== MAJ EXPORT-CATALOGUE-EXCEL ===
+Date : 2026-04-23
+Mode : lecture seule Firestore + génération Excel
+
+FICHIERS CRÉÉS (2) :
+  ✅ catalogue-97import-20260423.xlsx (racine projet, 18KB)
+  ✅ GUIDE-REMPLISSAGE-EXCEL.md
+
+CONTENU EXCEL :
+  Onglet 1 "Catalogue 97import" :
+    - 113 produits Firestore récupérés et pré-remplis
+    - Séparation visuelle par catégorie (bandes jaunes)
+    - Colonnes verrouillées (référence, catégorie, groupe) en gris
+    - Colonnes à remplir en blanc
+    - 18 colonnes : reference, categorie, nom (FR/EN/ZH), description (FR/EN/ZH),
+      sous_categorie, prix_achat (USD/CNY/EUR), fournisseur, image_principale,
+      actif, groupe_produit, duplique_de
+
+  Onglet 2 "📘 Instructions" :
+    - Guide complet de remplissage
+    - Conventions nommage photos (<REFERENCE>-principal.jpg)
+    - Règles langues (traduction auto DeepL)
+    - Règles prix (1 devise remplie → 2 autres auto)
+    - Processus d'import complet
+
+  Onglet 3 "📊 Stats" :
+    - Nombre de produits par catégorie
+    - Taux de complétude de chaque champ (alertes couleur)
+      • Rouge (<50%), Orange (50-80%), Vert (>80%)
+
+STATISTIQUES PRODUITS :
+  Total produits exportés : 113
+  Catégories : 7 (agricole, divers, logistique, maison-modulaire, mini-pelle, solaire, mini-pelle-accessories)
+
+STRATÉGIE DE REMPLISSAGE :
+  - Colonnes pré-remplies : si donnée existe en Firestore
+  - Colonnes vides : à compléter par Michel
+  - Langues EN/ZH : auto-traduction lors de l'import (DeepL)
+  - Prix USD/CNY/EUR : 1 seule devise à remplir (Frankfurter API)
+  - Photos : dépôt dans ~/97import-OK/photos-catalogue/
+
+PROCHAINE ÉTAPE :
+  Michel remplit l'Excel + place photos dans ~/97import-OK/photos-catalogue/
+  Puis demande le prompt IMPORT-CATALOGUE-EXCEL pour mise à jour Firestore
+
+VALIDATION :
+  ✅ 113 produits récupérés depuis Firestore
+  ✅ Fichier Excel 18KB créé avec succès
+  ✅ 3 onglets : Catalogue, Instructions, Stats
+  ✅ Guide GUIDE-REMPLISSAGE-EXCEL.md créé
+  ✅ Aucune modification Firestore (mode lecture seule)
+  ✅ Aucune modification code
