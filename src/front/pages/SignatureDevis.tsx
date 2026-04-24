@@ -166,11 +166,17 @@ export default function SignatureDevis() {
 
     try {
       const newAcompte = {
+        numero: 1,
         montant: data.montantAcompte,
+        date_reception: new Date().toISOString(),
+        reference_virement: undefined,
+        facture_acompte_numero: undefined,
+        facture_acompte_pdf_url: undefined,
+        is_solde: false,
+        encaisse: false,
+        created_at: new Date().toISOString(),
+        created_by: 'client',
         type_compte: data.typeCompte,
-        date: new Date().toISOString(),
-        statut: 'declare',
-        ref_fa: '',
       };
 
       const updatedAcomptes = [...(devis.acomptes || []), newAcompte];

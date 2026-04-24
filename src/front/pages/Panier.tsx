@@ -127,13 +127,27 @@ export default function Panier() {
     try {
       const numero = await getNextNumber('DVS');
       const devisId = numero.replace(/[^a-zA-Z0-9]/g, '-');
-      const lignes = cart.map(item => ({
-        ref: item.ref, nom_fr: item.nom_fr, qte: item.qte,
-        prix_unitaire: item.prix, total: item.prix * item.qte,
-        type: item.type || 'product',
-        ...(item.description ? { description: item.description } : {}),
-        ...(item.lien ? { lien: item.lien } : {}),
-      }));
+      const lignes = cart.map(item => {
+        const prix_partenaire = item.prix * 0.7;
+        return {
+          reference: item.ref,
+          ref: item.ref,
+          nom: item.nom_fr,
+          nom_fr: item.nom_fr,
+          quantite: item.qte,
+          qte: item.qte,
+          prix_achat: undefined,
+          prix_partenaire: prix_partenaire,
+          prix_vip_negocie: undefined,
+          prix_unitaire_final: item.prix,
+          prix_unitaire: item.prix,
+          total_ligne: item.prix * item.qte,
+          total: item.prix * item.qte,
+          type: item.type || 'product',
+          ...(item.description ? { description: item.description } : {}),
+          ...(item.lien ? { lien: item.lien } : {}),
+        };
+      });
 
       // Charger le profil client pour inclure toutes les infos
       let userProfile: any = {};
@@ -157,7 +171,7 @@ export default function Panier() {
         is_vip: false,
         lignes,
         total_ht: total,
-        partenaire_code: selectedPartner || null,
+        partenaire_code: selectedPartner || 'ADMIN',
         acomptes: [],
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),

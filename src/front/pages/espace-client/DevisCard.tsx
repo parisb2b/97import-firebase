@@ -25,8 +25,8 @@ export default function DevisCard({ devis, profile, onRefresh, forceOpen = false
 
   // Calculs
   const acomptes = Array.isArray(devis.acomptes) ? devis.acomptes : [];
-  const acomptesEncaisses = acomptes.filter((a: any) => a.statut === 'encaisse');
-  const acomptesDeclares = acomptes.filter((a: any) => a.statut === 'declare');
+  const acomptesEncaisses = acomptes.filter((a: any) => a.encaisse === true);
+  const acomptesDeclares = acomptes.filter((a: any) => a.encaisse === false);
 
   const totalEncaisse = acomptesEncaisses.reduce((s: number, a: any) => s + (a.montant || 0), 0);
   const totalDeclare = acomptesDeclares.reduce((s: number, a: any) => s + (a.montant || 0), 0);
@@ -133,11 +133,17 @@ export default function DevisCard({ devis, profile, onRefresh, forceOpen = false
   const handleAcompteSignatureSubmit = async (data: { montantAcompte: number; typeCompte: 'perso' | 'pro' }) => {
     try {
       const newAcompte = {
+        numero: 1,
         montant: data.montantAcompte,
+        date_reception: new Date().toISOString(),
+        reference_virement: undefined,
+        facture_acompte_numero: undefined,
+        facture_acompte_pdf_url: undefined,
+        is_solde: false,
+        encaisse: false,
+        created_at: new Date().toISOString(),
+        created_by: 'client',
         type_compte: data.typeCompte,
-        date: new Date().toISOString(),
-        statut: 'declare',
-        ref_fa: '',
       };
 
       const updatedAcomptes = [...(devis.acomptes || []), newAcompte];
@@ -399,7 +405,7 @@ export default function DevisCard({ devis, profile, onRefresh, forceOpen = false
                     const dateA = a.date
                       ? new Date(a.date).toLocaleDateString('fr-FR')
                       : '—';
-                    const statutBadge = a.statut === 'encaisse'
+                    const statutBadge = a.encaisse === true
                       ? { label: 'Encaissé', bg: '#D1FAE5', color: '#065F46' }
                       : { label: 'Déclaré', bg: '#FEF3C7', color: '#92400E' };
 

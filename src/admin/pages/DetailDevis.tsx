@@ -241,7 +241,7 @@ export default function DetailDevis() {
   };
 
   const handleEncaisser = async () => {
-    const acomptesDeclares = (devis.acomptes || []).filter((a: any) => a.statut === 'declare');
+    const acomptesDeclares = (devis.acomptes || []).filter((a: any) => a.encaisse === false);
     if (acomptesDeclares.length === 0) {
       setErrorMsg('Aucun acompte déclaré en attente'); setTimeout(() => setErrorMsg(''), 5000);
       return;
@@ -278,7 +278,7 @@ export default function DetailDevis() {
           {isNew ? 'Nouveau devis' : devis.numero}
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
-          {!isNew && (devis.acomptes || []).some((a: any) => a.statut === 'declare') && (
+          {!isNew && (devis.acomptes || []).some((a: any) => a.encaisse === false) && (
             <Button variant="s" onClick={handleEncaisser}>
               {t('btn.encaisser')}
             </Button>

@@ -50,7 +50,7 @@ export default function MesVirements({ userId, profile }: MesVirementsProps) {
         montant: a.montant || 0,
         type_compte: a.type_compte || 'pro',
         iban_utilise: a.iban_utilise,
-        statut: a.statut || 'declare',
+        statut: a.statut,
         ref_fa: a.ref_fa,
         acompte_index: idx,
       });

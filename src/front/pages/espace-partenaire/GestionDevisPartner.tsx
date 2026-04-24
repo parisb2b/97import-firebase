@@ -128,10 +128,26 @@ export default function GestionDevisPartner({ partnerCode }: { partnerCode: stri
     const tokenExpiry = new Date();
     tokenExpiry.setDate(tokenExpiry.getDate() + 30);
 
+    // Mise à jour des lignes avec prix_vip_negocie
+    const lignesUpdated = (d.lignes || []).map((l: any) => {
+      const prixNegocie = prixNegociesMap[l.reference || l.ref];
+      if (prixNegocie !== undefined) {
+        return {
+          ...l,
+          prix_vip_negocie: prixNegocie,
+          prix_unitaire_final: prixNegocie,
+          total_ligne: prixNegocie * (l.quantite || l.qte || 1),
+          total: prixNegocie * (l.quantite || l.qte || 1),
+        };
+      }
+      return l;
+    });
+
     try {
       await updateDoc(doc(db, 'quotes', d.id), {
         is_vip: true,
-        prix_negocies: prixNegociesMap,
+        lignes: lignesUpdated,
+        prix_negocies: null,
         total_ht_public: d.total_ht,
         total_ht: totalHtNegocie,
         statut: 'devis_vip_envoye',

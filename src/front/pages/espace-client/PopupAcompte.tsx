@@ -65,10 +65,17 @@ export default function PopupAcompte({ devisId, devisNumero, clientNom, onClose,
       const currentAcomptes = currentData?.acomptes || [];
 
       const nouvelAcompte = {
+        numero: 1,
         montant,
-        date: new Date().toISOString(),
+        date_reception: new Date().toISOString(),
+        reference_virement: undefined,
+        facture_acompte_numero: undefined,
+        facture_acompte_pdf_url: undefined,
+        is_solde: false,
+        encaisse: false,
+        created_at: new Date().toISOString(),
+        created_by: 'client',
         type_compte: typeCompte,
-        statut: 'declare',
         iban_utilise: rib.iban,
       };
 
