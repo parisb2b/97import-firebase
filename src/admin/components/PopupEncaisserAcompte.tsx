@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { doc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db, storage } from '../../lib/firebase';
-import { generateFactureAcompte } from '../../lib/pdf-generator';
-import { getNextNumber } from '../../lib/counters';
+import { generateFactureAcomptePDF } from '../../lib/generateInvoiceAcompte';
+import { validerNouveauPaiement, prochainPaiementEstSolde, getNbAcomptesEncaisses, generateNumeroDocument } from '../../lib/quoteStatusHelpers';
 import { notifyAcompteEncaisse } from '../../lib/emailService';
 
 interface Props {
@@ -19,7 +19,7 @@ export default function PopupEncaisserAcompte({ devis, onClose, onSuccess }: Pro
 
   const acomptesDeclares = (devis.acomptes || [])
     .map((a: any, idx: number) => ({ a, idx }))
-    .filter(({ a }: any) => a.statut === 'declare');
+    .filter(({ a }: any) => a.encaisse === false);
 
   if (acomptesDeclares.length === 0) {
     return (
@@ -43,71 +43,94 @@ export default function PopupEncaisserAcompte({ devis, onClose, onSuccess }: Pro
     setError(null);
 
     try {
-      const numeroFA = await getNextNumber('FA');
       const acomptesActuels = [...(devis.acomptes || [])];
       const acompteCible = acomptesActuels[selectedIndex];
 
-      if (!acompteCible || acompteCible.statut !== 'declare') {
+      if (!acompteCible || acompteCible.encaisse !== false) {
         throw new Error('Acompte invalide');
       }
 
-      // MODIFIER (pas ajouter)
-      acomptesActuels[selectedIndex] = {
-        ...acompteCible,
-        statut: 'encaisse',
-        ref_fa: numeroFA,
-        date_encaissement: new Date().toISOString(),
-      };
-
-      // Recalculs
-      const totalEncaisse = acomptesActuels
-        .filter((a: any) => a.statut === 'encaisse')
-        .reduce((sum: number, a: any) => sum + (a.montant || 0), 0);
-      const totalHt = devis.total_ht || 0;
-      const soldeRestant = totalHt - totalEncaisse;
-
-      let nouveauStatut = devis.statut;
-      if (nouveauStatut === 'nouveau' || nouveauStatut === 'brouillon' || nouveauStatut === 'vip_envoye') {
-        nouveauStatut = 'en_cours';
+      // VALIDATION du montant
+      const validation = validerNouveauPaiement(
+        devis.total_ht || devis.total || 0,
+        acomptesActuels.filter((a: any) => a.encaisse === true),
+        acompteCible.montant
+      );
+      if (!validation.ok) {
+        setError(validation.erreur || 'Montant invalide');
+        setLoading(false);
+        return;
       }
 
-      let statutPaiement = 'non_paye';
-      if (totalEncaisse >= totalHt && totalHt > 0) statutPaiement = 'paye_complet';
-      else if (totalEncaisse > 0) statutPaiement = 'paye_partiel';
+      // Calculs
+      const nbPartiels = getNbAcomptesEncaisses(acomptesActuels);
+      const estSolde = prochainPaiementEstSolde(acomptesActuels);
+      const numeroFA = await generateNumeroDocument('facture_acompte');
 
-      // Générer et uploader PDF FA
-      const emetteurSnap = await getDoc(doc(db, 'admin_params', 'emetteur'));
-      const emetteur = emetteurSnap.exists() ? emetteurSnap.data() : undefined;
+      // Mettre à jour l'acompte avec la nouvelle structure P3-COMPLET
+      acomptesActuels[selectedIndex] = {
+        numero: estSolde ? 0 : (nbPartiels + 1),
+        montant: acompteCible.montant,
+        date_reception: acompteCible.date || new Date().toISOString(),
+        reference_virement: acompteCible.reference_virement || undefined,
+        facture_acompte_numero: numeroFA,
+        facture_acompte_pdf_url: '',  // sera rempli après upload
+        is_solde: estSolde,
+        encaisse: true,
+        created_at: acompteCible.created_at || new Date().toISOString(),
+        created_by: acompteCible.created_by || 'admin',
+      };
 
-      const pdfDoc = generateFactureAcompte(
-        {
-          ...devis,
-          acomptes: acomptesActuels,  // ← IMPORTANT : le nouveau tableau
+      // Générer PDF avec nouveau générateur
+      const pdfBlob = await generateFactureAcomptePDF({
+        numero: numeroFA,
+        devis_numero: devis.numero,
+        statut_devis: devis.statut || 'nouveau',
+        date_emission: new Date().toISOString(),
+        acompte_numero: estSolde ? 0 : (nbPartiels + 1),
+        acompte_est_solde: estSolde,
+        montant: acompteCible.montant,
+        total_devis: devis.total_ht || devis.total || 0,
+        client: {
+          nom: devis.client_nom || '',
+          email: devis.client_email || '',
+          adresse: devis.client_adresse,
+          ville: devis.client_ville,
+          cp: devis.client_cp,
         },
-        acomptesActuels[selectedIndex],   // ← acompte cible (modifié)
-        emetteur
-      );
-      const pdfBlob = pdfDoc.output('blob');
+        historique_acomptes: acomptesActuels,
+        reference_virement: acompteCible.reference_virement,
+      });
       const fileRef = storageRef(storage, `factures_acompte/${numeroFA}.pdf`);
       await uploadBytes(fileRef, pdfBlob, { contentType: 'application/pdf' });
       const pdfUrl = await getDownloadURL(fileRef);
 
-      const facturesAcompteUrls = Array.isArray(devis.factures_acompte_urls)
-        ? [...devis.factures_acompte_urls] : [];
-      facturesAcompteUrls.push({
-        ref_fa: numeroFA,
-        url: pdfUrl,
-        date: new Date().toISOString(),
-      });
+      // Mettre à jour l'URL dans l'acompte
+      acomptesActuels[selectedIndex].facture_acompte_pdf_url = pdfUrl;
 
-      await updateDoc(doc(db, 'quotes', devis.numero || devis.id), {
+      // Recalculs
+      const totalEncaisse = acomptesActuels
+        .filter((a: any) => a.encaisse === true)
+        .reduce((sum: number, a: any) => sum + (a.montant || 0), 0);
+      const totalHt = devis.total_ht || devis.total || 0;
+      const soldeRestant = totalHt - totalEncaisse;
+
+      // Déterminer le nouveau statut du devis
+      let nouveauStatut = devis.statut;
+      if (Math.abs(soldeRestant) < 0.01) {
+        nouveauStatut = 'solde_paye';
+      } else if (nouveauStatut === 'nouveau' || nouveauStatut === 'brouillon') {
+        const nbEncaisses = acomptesActuels.filter((a: any) => a.encaisse).length;
+        if (nbEncaisses === 1) nouveauStatut = 'acompte_1';
+        else if (nbEncaisses === 2) nouveauStatut = 'acompte_2';
+        else if (nbEncaisses === 3) nouveauStatut = 'acompte_3';
+      }
+
+      await updateDoc(doc(db, 'quotes', devis.id || devis.numero), {
         acomptes: acomptesActuels,
         total_encaisse: totalEncaisse,
         solde_restant: soldeRestant,
         statut: nouveauStatut,
-        statut_paiement: statutPaiement,
-        factures_acompte_urls: facturesAcompteUrls,
-        facture_acompte_url: pdfUrl,
         updated_at: serverTimestamp(),
       });
 
@@ -115,19 +138,25 @@ export default function PopupEncaisserAcompte({ devis, onClose, onSuccess }: Pro
       try {
         const devisAJour = {
           ...devis,
-          acomptes: acomptesActuels,  // avec l'acompte modifié
+          acomptes: acomptesActuels,
+          statut: nouveauStatut,
         };
         await notifyAcompteEncaisse(
           devisAJour,
           acomptesActuels[selectedIndex],
-          pdfUrl  // l'URL Storage de la FA générée
+          pdfUrl
         );
       } catch (err) {
         console.error('Erreur notification acompte encaissé:', err);
       }
 
       // Download local pour admin
-      pdfDoc.save(`${numeroFA}.pdf`);
+      const url = URL.createObjectURL(pdfBlob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${numeroFA}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
 
       onSuccess();
     } catch (err: any) {
@@ -167,12 +196,16 @@ export default function PopupEncaisserAcompte({ devis, onClose, onSuccess }: Pro
             <strong style={{ color: '#1565C0' }}>{a.montant} €</strong>
             {' · '}
             <span style={{ fontSize: 13, color: '#374151' }}>
-              Déclaré le {new Date(a.date).toLocaleDateString('fr-FR')}
+              Déclaré le {new Date(a.date_reception || a.date || a.created_at).toLocaleDateString('fr-FR')}
             </span>
-            {' · '}
-            <span style={{ fontSize: 12, color: '#6B7280' }}>
-              Compte {a.type_compte === 'perso' ? 'personnel' : 'professionnel'}
-            </span>
+            {a.reference_virement && (
+              <>
+                {' · '}
+                <span style={{ fontSize: 12, color: '#6B7280' }}>
+                  Réf: {a.reference_virement}
+                </span>
+              </>
+            )}
           </label>
         ))}
 

@@ -3,7 +3,8 @@ import { collection, query, orderBy, getDocs, doc, getDoc, updateDoc } from 'fir
 import { useLocation } from 'wouter';
 import { db } from '../../lib/firebase';
 import { Card, Pill, IconButton, Kpi, FileIcon, CardIcon, DollarIcon, DownloadIcon, EuroIcon, EyeIcon } from '../components/Icons';
-import { generateDevis, generateFactureAcompte, generateFactureFinale, generateNoteCommission, downloadPDF } from '../../lib/pdf-generator';
+import { generateDevis, generateFactureFinale, generateNoteCommission, downloadPDF } from '../../lib/pdf-generator';
+import { generateFactureAcomptePDF } from '../../lib/generateInvoiceAcompte';
 
 interface Invoice {
   id: string;
@@ -72,10 +73,48 @@ export default function Factures() {
       const snap = await getDoc(doc(db, 'quotes', inv.quote_id));
       if (!snap.exists()) { alert('Devis associé introuvable'); return; }
       const quoteData = snap.data();
-      const pdfDoc = inv.type === 'acompte'
-        ? generateFactureAcompte(quoteData, { montant: inv.montant, numero: inv.numero, createdAt: inv.createdAt }, emetteurData)
-        : generateFactureFinale(quoteData, inv.numero, emetteurData);
-      downloadPDF(pdfDoc, `${inv.numero}.pdf`);
+
+      if (inv.type === 'acompte') {
+        // Trouver l'acompte correspondant dans le devis
+        const acompte = (quoteData.acomptes || []).find((a: any) =>
+          a.facture_acompte_numero === inv.numero || a.montant === inv.montant
+        );
+
+        if (!acompte) {
+          alert('Acompte introuvable dans le devis');
+          return;
+        }
+
+        const pdfBlob = await generateFactureAcomptePDF({
+          numero: inv.numero,
+          devis_numero: quoteData.numero,
+          statut_devis: quoteData.statut || 'nouveau',
+          date_emission: acompte.date_reception || acompte.created_at,
+          acompte_numero: acompte.numero || 1,
+          acompte_est_solde: acompte.is_solde || false,
+          montant: acompte.montant,
+          total_devis: quoteData.total_ht || quoteData.total || 0,
+          client: {
+            nom: quoteData.client_nom || '',
+            email: quoteData.client_email || '',
+            adresse: quoteData.client_adresse,
+            ville: quoteData.client_ville,
+            cp: quoteData.client_cp,
+          },
+          historique_acomptes: quoteData.acomptes || [],
+          reference_virement: acompte.reference_virement,
+        });
+
+        const url = URL.createObjectURL(pdfBlob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${inv.numero}.pdf`;
+        a.click();
+        URL.revokeObjectURL(url);
+      } else {
+        const pdfDoc = generateFactureFinale(quoteData, inv.numero, emetteurData);
+        downloadPDF(pdfDoc, `${inv.numero}.pdf`);
+      }
     } catch (err) {
       console.error('Erreur PDF facture:', err);
     }
