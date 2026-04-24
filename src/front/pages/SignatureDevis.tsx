@@ -14,6 +14,9 @@ interface Devis {
   client_nom: string;
   client_email: string;
   total_ht: number;
+  total_ht_public?: number;
+  is_vip?: boolean;
+  prix_negocies?: Record<string, number>;
   lignes: any[];
   statut: string;
   signature_token?: string;
@@ -264,66 +267,178 @@ export default function SignatureDevis() {
   }
 
   if (step === 'apercu' && devis) {
+    // Calculer les totaux
     const totalHt = devis.total_ht || 0;
-    const lignes = devis.lignes || [];
+    const totalHtPublic = devis.total_ht_public || totalHt;
+    const tva = totalHt * 0.20;  // 20% TVA
+    const totalTtc = totalHt + tva;
+    const economie = totalHtPublic > totalHt ? totalHtPublic - totalHt : 0;
 
     return (
       <div style={{ minHeight: '100vh', background: '#F3F4F6', padding: 20 }}>
-        <div style={{ maxWidth: 700, margin: '0 auto' }}>
-          {/* Header */}
-          <div style={{ background: '#fff', borderRadius: 16, padding: 32, marginBottom: 20, textAlign: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
-            <h1 style={{ fontSize: 24, fontWeight: 800, color: '#1565C0', marginBottom: 8 }}>Signature de devis</h1>
-            <p style={{ fontSize: 14, color: '#6B7280' }}>Devis {devis.numero}</p>
+        <div style={{ maxWidth: 720, margin: '0 auto', background: '#fff', borderRadius: 16, padding: 32, boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
+          {/* En-tête */}
+          <div style={{ borderBottom: '2px solid #1565C0', paddingBottom: 16, marginBottom: 24 }}>
+            <h1 style={{ color: '#1565C0', fontSize: 24, margin: 0 }}>
+              ✍️ Signature de votre devis VIP
+            </h1>
+            <p style={{ color: '#6B7280', fontSize: 14, margin: '8px 0 0' }}>
+              Veuillez vérifier les détails ci-dessous avant de signer.
+            </p>
           </div>
 
-          {/* Devis */}
-          <div style={{ background: '#fff', borderRadius: 16, padding: 32, marginBottom: 20, boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
-            <h2 style={{ fontSize: 18, fontWeight: 700, color: '#1E3A5F', marginBottom: 20 }}>Récapitulatif</h2>
-
-            {lignes.map((l: any, i: number) => {
-              const prixUnit = l.prix_negocie || l.prix_unitaire || 0;
-              const qte = l.qte || 1;
-              const total = prixUnit * qte;
-
-              return (
-                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 0', borderBottom: '1px solid #F3F4F6' }}>
-                  <div style={{ flex: 1 }}>
-                    <p style={{ fontSize: 14, fontWeight: 600, color: '#1565C0', marginBottom: 4 }}>{l.nom_fr || l.ref}</p>
-                    <p style={{ fontSize: 12, color: '#9CA3AF' }}>
-                      {qte}× {prixUnit.toLocaleString('fr-FR')} €
-                    </p>
-                  </div>
-                  <p style={{ fontSize: 14, fontWeight: 700, color: '#374151' }}>{total.toLocaleString('fr-FR')} €</p>
-                </div>
-              );
-            })}
-
-            <div style={{ marginTop: 20, paddingTop: 20, borderTop: '2px solid #1565C0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <p style={{ fontSize: 16, fontWeight: 700, color: '#1E3A5F' }}>Total HT</p>
-              <p style={{ fontSize: 24, fontWeight: 800, color: '#1565C0' }}>{totalHt.toLocaleString('fr-FR')} €</p>
+          {/* Infos devis */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 20 }}>
+            <div>
+              <div style={{ color: '#6B7280', fontSize: 12 }}>📋 Numéro de devis</div>
+              <div style={{ fontSize: 18, fontWeight: 700, color: '#111827' }}>{devis.numero}</div>
+            </div>
+            <div style={{ textAlign: 'right' }}>
+              <div style={{ color: '#6B7280', fontSize: 12 }}>👤 Destinataire</div>
+              <div style={{ fontSize: 14, fontWeight: 600 }}>{devis.client_nom || '—'}</div>
+              <div style={{ fontSize: 12, color: '#6B7280' }}>{devis.client_email || ''}</div>
             </div>
           </div>
 
-          {/* CTA */}
-          <div style={{ background: '#fff', borderRadius: 16, padding: 32, textAlign: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
-            <p style={{ fontSize: 14, color: '#6B7280', marginBottom: 20, lineHeight: 1.6 }}>
-              En signant ce devis, vous acceptez les conditions générales de vente et vous vous engagez à verser un acompte pour lancer la commande.
-            </p>
+          {/* Tableau détaillé des produits */}
+          <div style={{ overflow: 'auto', marginBottom: 20 }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
+              <thead>
+                <tr style={{ background: '#1565C0', color: '#fff' }}>
+                  <th style={{ padding: 10, textAlign: 'left' }}>Référence</th>
+                  <th style={{ padding: 10, textAlign: 'left' }}>Description</th>
+                  <th style={{ padding: 10, textAlign: 'center' }}>Qté</th>
+                  <th style={{ padding: 10, textAlign: 'right' }}>Prix unitaire</th>
+                  <th style={{ padding: 10, textAlign: 'right' }}>Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(devis.lignes || []).map((ligne: any, idx: number) => {
+                  const ref = ligne.ref || ligne.reference || '';
+                  const prixPublic = ligne.prix_unitaire || 0;
+                  const prixNegocie = devis.prix_negocies?.[ref] ?? prixPublic;
+                  const estNegocie = devis.is_vip && prixNegocie !== prixPublic;
+                  const qte = ligne.qte || 1;
+                  const totalLigne = prixNegocie * qte;
+                  const totalPublic = prixPublic * qte;
+
+                  return (
+                    <tr key={idx} style={{ borderBottom: '1px solid #E5E7EB' }}>
+                      <td style={{ padding: 10, color: '#374151', fontSize: 12 }}>{ref}</td>
+                      <td style={{ padding: 10, color: '#374151' }}>
+                        {ligne.libelle || ligne.nom || ligne.nom_fr || ligne.designation || '—'}
+                      </td>
+                      <td style={{ padding: 10, textAlign: 'center' }}>{qte}</td>
+                      <td style={{ padding: 10, textAlign: 'right' }}>
+                        {estNegocie && (
+                          <div style={{ textDecoration: 'line-through', color: '#9CA3AF', fontSize: 11 }}>
+                            {prixPublic.toLocaleString('fr-FR')} €
+                          </div>
+                        )}
+                        <div style={{
+                          color: estNegocie ? '#7C3AED' : '#111827',
+                          fontWeight: estNegocie ? 700 : 400
+                        }}>
+                          {prixNegocie.toLocaleString('fr-FR')} €
+                        </div>
+                      </td>
+                      <td style={{ padding: 10, textAlign: 'right' }}>
+                        {estNegocie && (
+                          <div style={{ textDecoration: 'line-through', color: '#9CA3AF', fontSize: 11 }}>
+                            {totalPublic.toLocaleString('fr-FR')} €
+                          </div>
+                        )}
+                        <div style={{
+                          color: estNegocie ? '#7C3AED' : '#111827',
+                          fontWeight: estNegocie ? 700 : 400
+                        }}>
+                          {totalLigne.toLocaleString('fr-FR')} €
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Totaux */}
+          <div style={{ background: '#F9FAFB', padding: 16, borderRadius: 8, marginBottom: 20 }}>
+            {economie > 0 && (
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                <span style={{ color: '#6B7280' }}>Total prix public</span>
+                <span style={{ textDecoration: 'line-through', color: '#9CA3AF' }}>
+                  {totalHtPublic.toLocaleString('fr-FR')} €
+                </span>
+              </div>
+            )}
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+              <span style={{ color: '#6B7280' }}>Total HT VIP</span>
+              <span style={{ fontWeight: 600, color: '#7C3AED' }}>
+                {totalHt.toLocaleString('fr-FR')} €
+              </span>
+            </div>
+            {economie > 0 && (
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                <span style={{ color: '#10B981', fontWeight: 600 }}>💰 Économie réalisée</span>
+                <span style={{ color: '#10B981', fontWeight: 700 }}>
+                  -{economie.toLocaleString('fr-FR')} €
+                </span>
+              </div>
+            )}
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+              <span style={{ color: '#6B7280' }}>TVA (20%)</span>
+              <span>{tva.toLocaleString('fr-FR', { maximumFractionDigits: 2 })} €</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between',
+                          borderTop: '1px solid #E5E7EB', paddingTop: 10, marginTop: 6 }}>
+              <span style={{ fontWeight: 700, fontSize: 16 }}>Total TTC</span>
+              <span style={{ fontWeight: 700, fontSize: 18, color: '#1565C0' }}>
+                {totalTtc.toLocaleString('fr-FR', { maximumFractionDigits: 2 })} €
+              </span>
+            </div>
+          </div>
+
+          {/* Mention légale */}
+          <p style={{ color: '#9CA3AF', fontSize: 11, fontStyle: 'italic', textAlign: 'center', marginBottom: 20 }}>
+            En signant, vous acceptez les conditions commerciales de votre devis.
+            Cette signature est définitive.
+          </p>
+
+          {/* Boutons d'action */}
+          <div style={{ display: 'flex', gap: 12, flexDirection: 'column' }}>
             <button
               onClick={handleSigner}
               style={{
-                width: '100%',
-                padding: '16px 0',
-                background: 'linear-gradient(135deg, #1565C0, #0D47A1)',
+                padding: '16px 24px',
+                background: '#10B981',
                 color: '#fff',
                 border: 'none',
-                borderRadius: 12,
+                borderRadius: 8,
                 fontSize: 16,
                 fontWeight: 700,
                 cursor: 'pointer',
+                fontFamily: 'inherit',
               }}
             >
-              ✍️ Je signe ce devis
+              ✍️ Je signe le devis
+            </button>
+
+            <button
+              onClick={() => setLocation('/espace-client')}
+              style={{
+                padding: '12px 20px',
+                background: 'transparent',
+                color: '#1565C0',
+                border: '2px solid #1565C0',
+                borderRadius: 8,
+                fontSize: 14,
+                fontWeight: 600,
+                cursor: 'pointer',
+                fontFamily: 'inherit',
+              }}
+            >
+              📄 Voir plus de détails dans mon espace
             </button>
           </div>
         </div>
