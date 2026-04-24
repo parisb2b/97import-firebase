@@ -905,3 +905,97 @@ export async function notifySignatureClient(devis: any, partenaireName?: string)
   }
 }
 
+// ═══ NOUVEAU : EMAILS P3 (PARTIE E) ═══
+
+/**
+ * Email au client quand la facture FINALE globale est générée
+ */
+export async function envoyerEmailFactureFinale(params: {
+  clientEmail: string;
+  clientNom: string;
+  factureFinaleNumero: string;
+  devisNumero: string;
+  total: number;
+  pdfUrl: string;
+}): Promise<void> {
+  const { db } = await import('./firebase');
+  const { collection, addDoc, serverTimestamp } = await import('firebase/firestore');
+  
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <div style="background: linear-gradient(135deg, #10B981 0%, #059669 100%); padding: 32px; text-align: center; color: #fff;">
+        <div style="font-size: 48px;">✅</div>
+        <h1 style="margin: 8px 0 0; font-size: 24px;">FACTURE PAYÉE — SOLDÉE</h1>
+      </div>
+      <div style="padding: 24px;">
+        <p>Bonjour ${params.clientNom},</p>
+        <p>Votre commande est intégralement payée. Voici votre <strong>facture globale</strong> ${params.factureFinaleNumero} récapitulative.</p>
+        <p><strong>Total payé :</strong> ${formatEur(params.total)}</p>
+        <p><strong>Devis :</strong> ${params.devisNumero}</p>
+        <p><a href="${params.pdfUrl}" style="display: inline-block; padding: 12px 24px; background: #10B981; color: #fff; text-decoration: none; border-radius: 6px; font-weight: 700;">📄 Télécharger la facture finale</a></p>
+        <p style="margin-top: 24px; color: #6B7280;">Nous allons procéder à la commande auprès de notre fournisseur. Vous serez tenu informé à chaque étape.</p>
+      </div>
+      <div style="background: #F9FAFB; padding: 16px; text-align: center; font-size: 11px; color: #6B7280;">
+        Luxent Limited / 97import.com<br/>
+        TVA non applicable — Art. 293B du CGI
+      </div>
+    </div>
+  `;
+  
+  await addDoc(collection(db, 'mail'), {
+    to: params.clientEmail,
+    message: { subject: `✅ Facture payée — ${params.devisNumero}`, html },
+    created_at: serverTimestamp(),
+  });
+}
+
+/**
+ * Email au partenaire quand commission versable
+ */
+export async function envoyerEmailCommissionPartenaire(params: {
+  partenaireEmail: string;
+  partenaireNom: string;
+  devisNumero: string;
+  clientNom: string;
+  montantCommission: number;
+  noteCommissionNumero?: string;
+  whatsappLink?: string;
+}): Promise<void> {
+  const { db } = await import('./firebase');
+  const { collection, addDoc, serverTimestamp } = await import('firebase/firestore');
+  
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <div style="background: linear-gradient(135deg, #1E3A5F 0%, #3B82F6 100%); padding: 32px; text-align: center; color: #fff;">
+        <div style="font-size: 48px;">💰</div>
+        <h1 style="margin: 8px 0 0;">Nouvelle commission</h1>
+      </div>
+      <div style="padding: 24px;">
+        <p>Bonjour ${params.partenaireNom},</p>
+        <p>Le client <strong>${params.clientNom}</strong> a soldé le devis <strong>${params.devisNumero}</strong>. Votre commission est prête à être versée.</p>
+        
+        <div style="background: #F0FDF4; border-left: 4px solid #10B981; padding: 20px; margin: 20px 0;">
+          <div style="font-size: 12px; color: #059669; font-weight: 700;">COMMISSION À VERSER</div>
+          <div style="font-size: 32px; font-weight: 800; color: #10B981; margin-top: 8px;">${formatEur(params.montantCommission)}</div>
+          ${params.noteCommissionNumero ? `<div style="font-size: 11px; color: #6B7280; margin-top: 4px;">Note de commission : ${params.noteCommissionNumero}</div>` : ''}
+        </div>
+        
+        <p>Merci de nous faire parvenir votre RIB pour que nous procédions au virement.</p>
+        
+        ${params.whatsappLink ? `<p><a href="${params.whatsappLink}" style="display: inline-block; padding: 10px 20px; background: #25D366; color: #fff; text-decoration: none; border-radius: 6px; font-weight: 700;">💬 Répondre sur WhatsApp</a></p>` : ''}
+      </div>
+      <div style="background: #F9FAFB; padding: 16px; text-align: center; font-size: 11px; color: #6B7280;">
+        97import.com / Luxent Limited
+      </div>
+    </div>
+  `;
+  
+  await addDoc(collection(db, 'mail'), {
+    to: params.partenaireEmail,
+    message: {
+      subject: `💰 Commission à verser — ${params.devisNumero}`,
+      html,
+    },
+    created_at: serverTimestamp(),
+  });
+}
