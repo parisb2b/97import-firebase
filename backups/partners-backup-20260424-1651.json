@@ -1,0 +1,246 @@
+{
+  "documents": [
+    {
+      "name": "projects/importok-6ef77/databases/(default)/documents/partners/EAlzNFTuB8dKOhbRzBJJ7ks6yXt2",
+      "fields": {
+        "createdAt": {
+          "timestampValue": "2026-04-14T13:42:29.479Z"
+        },
+        "userId": {
+          "stringValue": "EAlzNFTuB8dKOhbRzBJJ7ks6yXt2"
+        },
+        "email": {
+          "stringValue": "partenaire@97import.com"
+        },
+        "actif": {
+          "booleanValue": true
+        },
+        "nom": {
+          "stringValue": "Pierre Bernard"
+        },
+        "code": {
+          "stringValue": "PB"
+        }
+      },
+      "createTime": "2026-04-14T13:42:29.519650Z",
+      "updateTime": "2026-04-17T13:30:04.496858Z"
+    },
+    {
+      "name": "projects/importok-6ef77/databases/(default)/documents/partners/ES6pQ0NYLKfwA0qxMVSXheVWZbq2",
+      "fields": {
+        "createdAt": {
+          "timestampValue": "2026-04-24T08:42:22Z"
+        },
+        "actif": {
+          "booleanValue": true
+        },
+        "email": {
+          "stringValue": "uberdeco77@gmail.com"
+        },
+        "userId": {
+          "stringValue": "ES6pQ0NYLKfwA0qxMVSXheVWZbq2"
+        },
+        "code": {
+          "stringValue": "UD"
+        },
+        "nom": {
+          "stringValue": "Uber Deco"
+        },
+        "tel": {
+          "stringValue": "+33 6 98 76 54 32"
+        },
+        "commission_taux": {
+          "integerValue": "10"
+        }
+      },
+      "createTime": "2026-04-24T08:42:22.803608Z",
+      "updateTime": "2026-04-24T08:42:22.803608Z"
+    },
+    {
+      "name": "projects/importok-6ef77/databases/(default)/documents/partners/JYc73fIWj45cJMLjhFtf",
+      "fields": {
+        "createdAt": {
+          "timestampValue": "2026-04-23T20:35:31.200Z"
+        },
+        "nom": {
+          "stringValue": "dubourg"
+        },
+        "tel": {
+          "stringValue": "\u202a+596696947367"
+        },
+        "code": {
+          "stringValue": "TT"
+        },
+        "commission_taux": {
+          "integerValue": "0"
+        },
+        "email": {
+          "stringValue": "tt@sasfr.com"
+        },
+        "userId": {
+          "stringValue": "tt01"
+        },
+        "actif": {
+          "booleanValue": true
+        }
+      },
+      "createTime": "2026-04-23T20:35:31.304142Z",
+      "updateTime": "2026-04-23T20:35:31.304142Z"
+    },
+    {
+      "name": "projects/importok-6ef77/databases/(default)/documents/partners/NFmeGvmdwa9uXMs58lrF",
+      "fields": {
+        "createdAt": {
+          "timestampValue": "2026-04-24T05:35:53.534Z"
+        },
+        "nom": {
+          "stringValue": "MICHEL CHEN MC87"
+        },
+        "tel": {
+          "stringValue": "0620607448"
+        },
+        "code": {
+          "stringValue": "MM"
+        },
+        "commission_taux": {
+          "integerValue": "0"
+        },
+        "email": {
+          "stringValue": "mc@sasfr.com"
+        },
+        "userId": {
+          "stringValue": "mm"
+        },
+        "actif": {
+          "booleanValue": true
+        }
+      },
+      "createTime": "2026-04-24T05:35:54.908154Z",
+      "updateTime": "2026-04-24T05:35:54.908154Z"
+    },
+    {
+      "name": "projects/importok-6ef77/databases/(default)/documents/partners/PART-JM",
+      "fields": {
+        "email": {
+          "stringValue": "jm@partner.com"
+        },
+        "actif": {
+          "booleanValue": true
+        },
+        "id": {
+          "stringValue": "PART-JM"
+        },
+        "commission_taux": {
+          "integerValue": "15"
+        },
+        "code": {
+          "stringValue": "JM"
+        },
+        "nom": {
+          "stringValue": "Jean-Marc Delacroix"
+        },
+        "tel": {
+          "stringValue": "+596 696 100 001"
+        },
+        "createdAt": {
+          "timestampValue": "2026-04-12T09:03:12.848Z"
+        }
+      },
+      "createTime": "2026-04-12T09:03:13.559110Z",
+      "updateTime": "2026-04-12T09:03:13.559110Z"
+    },
+    {
+      "name": "projects/importok-6ef77/databases/(default)/documents/partners/PART-MC",
+      "fields": {
+        "createdAt": {
+          "timestampValue": "2026-04-12T09:03:12.848Z"
+        },
+        "email": {
+          "stringValue": "mc@partner.com"
+        },
+        "actif": {
+          "booleanValue": true
+        },
+        "id": {
+          "stringValue": "PART-MC"
+        },
+        "commission_taux": {
+          "integerValue": "10"
+        },
+        "nom": {
+          "stringValue": "Michel Chen"
+        },
+        "tel": {
+          "stringValue": "+86 135 001 0001"
+        },
+        "code": {
+          "stringValue": "MC"
+        }
+      },
+      "createTime": "2026-04-12T09:03:13.670189Z",
+      "updateTime": "2026-04-12T09:03:13.670189Z"
+    },
+    {
+      "name": "projects/importok-6ef77/databases/(default)/documents/partners/PART-TD",
+      "fields": {
+        "createdAt": {
+          "timestampValue": "2026-04-12T09:03:12.848Z"
+        },
+        "commission_taux": {
+          "integerValue": "12"
+        },
+        "tel": {
+          "stringValue": "+596 696 100 002"
+        },
+        "nom": {
+          "stringValue": "Thomas Dupont"
+        },
+        "code": {
+          "stringValue": "TD"
+        },
+        "email": {
+          "stringValue": "td@partner.com"
+        },
+        "actif": {
+          "booleanValue": true
+        },
+        "id": {
+          "stringValue": "PART-TD"
+        }
+      },
+      "createTime": "2026-04-12T09:03:13.604635Z",
+      "updateTime": "2026-04-12T09:03:13.604635Z"
+    },
+    {
+      "name": "projects/importok-6ef77/databases/(default)/documents/partners/cnMqbFQQlH8GX2bgbSvQ",
+      "fields": {
+        "createdAt": {
+          "timestampValue": "2026-04-24T07:17:51.534Z"
+        },
+        "actif": {
+          "booleanValue": false
+        },
+        "userId": {
+          "stringValue": "cc"
+        },
+        "email": {
+          "stringValue": "cc@sasfr.com"
+        },
+        "nom": {
+          "stringValue": "CHRISTELLE CHEN"
+        },
+        "code": {
+          "stringValue": "CC"
+        },
+        "tel": {
+          "stringValue": "0620607448"
+        },
+        "commission_taux": {
+          "integerValue": "0"
+        }
+      },
+      "createTime": "2026-04-24T07:17:51.800240Z",
+      "updateTime": "2026-04-24T07:18:59.623146Z"
+    }
+  ]
+}

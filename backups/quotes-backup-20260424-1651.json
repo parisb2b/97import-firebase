@@ -1,0 +1,4277 @@
+{
+  "documents": [
+    {
+      "name": "projects/importok-6ef77/databases/(default)/documents/quotes/DVS-2604001",
+      "fields": {
+        "client_tel": {
+          "stringValue": "+596 6 96 12 34 56"
+        },
+        "total_encaisse": {
+          "integerValue": "0"
+        },
+        "acomptes": {
+          "arrayValue": {
+            "values": [
+              {
+                "mapValue": {
+                  "fields": {
+                    "montant": {
+                      "integerValue": "500"
+                    },
+                    "date": {
+                      "stringValue": "2026-04-14T19:25:37.380Z"
+                    },
+                    "type_compte": {
+                      "stringValue": "professionnel"
+                    },
+                    "statut": {
+                      "stringValue": "declare"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "client_id": {
+          "stringValue": "d4FH6o9ZukOZZBKRAidreFJUEji2"
+        },
+        "client_email": {
+          "stringValue": "client@97import.com"
+        },
+        "total_ht": {
+          "integerValue": "121500"
+        },
+        "statut_paiement": {
+          "stringValue": "non_paye"
+        },
+        "acompte_pct": {
+          "integerValue": "30"
+        },
+        "destination": {
+          "stringValue": "MQ"
+        },
+        "partenaire_code": {
+          "stringValue": "TD"
+        },
+        "client_siret": {
+          "stringValue": ""
+        },
+        "client_nom": {
+          "stringValue": "Jean Dupont"
+        },
+        "statut": {
+          "stringValue": "nouveau"
+        },
+        "solde_restant": {
+          "integerValue": "121500"
+        },
+        "client_adresse": {
+          "stringValue": "12 Rue des Palmiers, 97200, Fort-de-France, MQ"
+        },
+        "partenaire_id": {
+          "nullValue": null
+        },
+        "id": {
+          "stringValue": "DVS-2604001"
+        },
+        "numero": {
+          "stringValue": "DVS-2604001"
+        },
+        "updatedAt": {
+          "timestampValue": "2026-04-14T19:26:26.650Z"
+        },
+        "lignes": {
+          "arrayValue": {
+            "values": [
+              {
+                "mapValue": {
+                  "fields": {
+                    "ref": {
+                      "stringValue": "TEST-MP-R22"
+                    },
+                    "prix_unitaire": {
+                      "integerValue": "24300"
+                    },
+                    "type": {
+                      "stringValue": "product"
+                    },
+                    "nom_fr": {
+                      "stringValue": "Mini-pelle R22 PRO"
+                    },
+                    "qte": {
+                      "integerValue": "5"
+                    },
+                    "total": {
+                      "integerValue": "121500"
+                    }
+                  }
+                }
+              },
+              {
+                "mapValue": {
+                  "fields": {
+                    "type": {
+                      "stringValue": "custom"
+                    },
+                    "prix_unitaire": {
+                      "integerValue": "0"
+                    },
+                    "lien": {
+                      "stringValue": "www,test,com"
+                    },
+                    "ref": {
+                      "stringValue": "SUR-MESURE"
+                    },
+                    "qte": {
+                      "integerValue": "2"
+                    },
+                    "description": {
+                      "stringValue": "fsd"
+                    },
+                    "total": {
+                      "integerValue": "0"
+                    },
+                    "nom_fr": {
+                      "stringValue": "ds"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "createdAt": {
+          "timestampValue": "2026-04-14T19:25:37.468Z"
+        }
+      },
+      "createTime": "2026-04-14T19:25:37.512970Z",
+      "updateTime": "2026-04-17T09:55:34.463575Z"
+    },
+    {
+      "name": "projects/importok-6ef77/databases/(default)/documents/quotes/DVS-2604002",
+      "fields": {
+        "statut_paiement": {
+          "stringValue": "non_paye"
+        },
+        "acomptes": {
+          "arrayValue": {
+            "values": [
+              {
+                "mapValue": {
+                  "fields": {
+                    "montant": {
+                      "integerValue": "500"
+                    },
+                    "statut": {
+                      "stringValue": "declare"
+                    },
+                    "type_compte": {
+                      "stringValue": "personnel"
+                    },
+                    "date": {
+                      "stringValue": "2026-04-14T20:27:15.321Z"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "client_id": {
+          "stringValue": "d4FH6o9ZukOZZBKRAidreFJUEji2"
+        },
+        "client_email": {
+          "stringValue": "client@97import.com"
+        },
+        "total_ht": {
+          "integerValue": "29680"
+        },
+        "total_encaisse": {
+          "integerValue": "0"
+        },
+        "client_tel": {
+          "stringValue": "+596 6 96 12 34 56"
+        },
+        "lignes": {
+          "arrayValue": {
+            "values": [
+              {
+                "mapValue": {
+                  "fields": {
+                    "prix_unitaire": {
+                      "integerValue": "14840"
+                    },
+                    "type": {
+                      "stringValue": "product"
+                    },
+                    "ref": {
+                      "stringValue": "TEST-MS-20"
+                    },
+                    "qte": {
+                      "integerValue": "2"
+                    },
+                    "total": {
+                      "integerValue": "29680"
+                    },
+                    "nom_fr": {
+                      "stringValue": "Maison Modulaire Standard 20 pieds"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "createdAt": {
+          "timestampValue": "2026-04-14T20:27:15.369Z"
+        },
+        "updatedAt": {
+          "timestampValue": "2026-04-14T20:27:15.369Z"
+        },
+        "numero": {
+          "stringValue": "DVS-2604002"
+        },
+        "client_nom": {
+          "stringValue": "Jean Dupont"
+        },
+        "client_adresse": {
+          "stringValue": "12 Rue des Palmiers, 97200, Fort-de-France, MQ"
+        },
+        "solde_restant": {
+          "integerValue": "29680"
+        },
+        "statut": {
+          "stringValue": "nouveau"
+        },
+        "partenaire_code": {
+          "stringValue": "PB"
+        }
+      },
+      "createTime": "2026-04-14T20:27:15.434057Z",
+      "updateTime": "2026-04-17T09:55:34.522261Z"
+    },
+    {
+      "name": "projects/importok-6ef77/databases/(default)/documents/quotes/DVS-2604003",
+      "fields": {
+        "statut_paiement": {
+          "stringValue": "non_paye"
+        },
+        "acomptes": {
+          "arrayValue": {
+            "values": [
+              {
+                "mapValue": {
+                  "fields": {
+                    "montant": {
+                      "integerValue": "500"
+                    },
+                    "type_compte": {
+                      "stringValue": "personnel"
+                    },
+                    "statut": {
+                      "stringValue": "declare"
+                    },
+                    "date": {
+                      "stringValue": "2026-04-14T20:27:43.431Z"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "client_id": {
+          "stringValue": "d4FH6o9ZukOZZBKRAidreFJUEji2"
+        },
+        "total_ht": {
+          "integerValue": "21480"
+        },
+        "client_email": {
+          "stringValue": "client@97import.com"
+        },
+        "total_encaisse": {
+          "integerValue": "0"
+        },
+        "client_tel": {
+          "stringValue": "+596 6 96 12 34 56"
+        },
+        "updatedAt": {
+          "timestampValue": "2026-04-14T20:27:43.480Z"
+        },
+        "createdAt": {
+          "timestampValue": "2026-04-14T20:27:43.480Z"
+        },
+        "lignes": {
+          "arrayValue": {
+            "values": [
+              {
+                "mapValue": {
+                  "fields": {
+                    "ref": {
+                      "stringValue": "TEST-SOL-10"
+                    },
+                    "prix_unitaire": {
+                      "integerValue": "10740"
+                    },
+                    "type": {
+                      "stringValue": "product"
+                    },
+                    "nom_fr": {
+                      "stringValue": "Kit Solaire Complet 10kW"
+                    },
+                    "total": {
+                      "integerValue": "21480"
+                    },
+                    "qte": {
+                      "integerValue": "2"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "numero": {
+          "stringValue": "DVS-2604003"
+        },
+        "client_nom": {
+          "stringValue": "Jean Dupont"
+        },
+        "statut": {
+          "stringValue": "nouveau"
+        },
+        "client_adresse": {
+          "stringValue": "12 Rue des Palmiers, 97200, Fort-de-France, MQ"
+        },
+        "solde_restant": {
+          "integerValue": "21480"
+        },
+        "partenaire_code": {
+          "stringValue": "JM"
+        }
+      },
+      "createTime": "2026-04-14T20:27:43.529905Z",
+      "updateTime": "2026-04-17T09:55:34.595047Z"
+    },
+    {
+      "name": "projects/importok-6ef77/databases/(default)/documents/quotes/DVS-2604004",
+      "fields": {
+        "acompte_pct": {
+          "integerValue": "30"
+        },
+        "destination": {
+          "stringValue": "Martinique"
+        },
+        "statut_paiement": {
+          "stringValue": "non_paye"
+        },
+        "client_id": {
+          "stringValue": "d4FH6o9ZukOZZBKRAidreFJUEji2"
+        },
+        "total_ht": {
+          "integerValue": "14840"
+        },
+        "client_email": {
+          "stringValue": "client@97import.com"
+        },
+        "acomptes": {
+          "arrayValue": {
+            "values": [
+              {
+                "mapValue": {
+                  "fields": {
+                    "montant": {
+                      "integerValue": "840"
+                    },
+                    "date": {
+                      "stringValue": "2026-04-14T21:31:59.425Z"
+                    },
+                    "type_compte": {
+                      "stringValue": "personnel"
+                    },
+                    "statut": {
+                      "stringValue": "declare"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "total_encaisse": {
+          "integerValue": "0"
+        },
+        "client_tel": {
+          "stringValue": "+596 6 96 12 34 56"
+        },
+        "updatedAt": {
+          "timestampValue": "2026-04-14T21:32:17.005Z"
+        },
+        "lignes": {
+          "arrayValue": {
+            "values": [
+              {
+                "mapValue": {
+                  "fields": {
+                    "qte": {
+                      "integerValue": "1"
+                    },
+                    "total": {
+                      "integerValue": "14840"
+                    },
+                    "nom_fr": {
+                      "stringValue": "Maison Modulaire Standard 20 pieds"
+                    },
+                    "type": {
+                      "stringValue": "product"
+                    },
+                    "prix_unitaire": {
+                      "integerValue": "14840"
+                    },
+                    "ref": {
+                      "stringValue": "TEST-MS-20"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "createdAt": {
+          "timestampValue": "2026-04-14T21:31:59.445Z"
+        },
+        "numero": {
+          "stringValue": "DVS-2604004"
+        },
+        "partenaire_id": {
+          "nullValue": null
+        },
+        "id": {
+          "stringValue": "DVS-2604004"
+        },
+        "statut": {
+          "stringValue": "nouveau"
+        },
+        "solde_restant": {
+          "integerValue": "14840"
+        },
+        "client_adresse": {
+          "stringValue": "12 Rue des Palmiers, 97200, Fort-de-France, MQ"
+        },
+        "client_siret": {
+          "stringValue": ""
+        },
+        "is_vip": {
+          "booleanValue": false
+        },
+        "client_nom": {
+          "stringValue": "Jean Dupont"
+        },
+        "partenaire_code": {
+          "nullValue": null
+        }
+      },
+      "createTime": "2026-04-14T21:31:59.485506Z",
+      "updateTime": "2026-04-17T09:55:34.633053Z"
+    },
+    {
+      "name": "projects/importok-6ef77/databases/(default)/documents/quotes/DVS-2604005",
+      "fields": {
+        "total_encaisse": {
+          "integerValue": "0"
+        },
+        "client_tel": {
+          "stringValue": "+596 6 96 12 34 56"
+        },
+        "statut_paiement": {
+          "stringValue": "non_paye"
+        },
+        "destination": {
+          "stringValue": "Martinique"
+        },
+        "acomptes": {
+          "arrayValue": {
+            "values": [
+              {
+                "mapValue": {
+                  "fields": {
+                    "date": {
+                      "stringValue": "2026-04-14T22:16:30.713Z"
+                    },
+                    "statut": {
+                      "stringValue": "declare"
+                    },
+                    "type_compte": {
+                      "stringValue": "personnel"
+                    },
+                    "montant": {
+                      "integerValue": "1111"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "client_id": {
+          "stringValue": "d4FH6o9ZukOZZBKRAidreFJUEji2"
+        },
+        "total_ht": {
+          "integerValue": "0"
+        },
+        "client_email": {
+          "stringValue": "client@97import.com"
+        },
+        "is_vip": {
+          "booleanValue": false
+        },
+        "client_nom": {
+          "stringValue": "Jean Dupont"
+        },
+        "solde_restant": {
+          "integerValue": "0"
+        },
+        "client_adresse": {
+          "stringValue": "12 Rue des Palmiers, 97200, Fort-de-France, MQ"
+        },
+        "statut": {
+          "stringValue": "nouveau"
+        },
+        "partenaire_code": {
+          "stringValue": "PB"
+        },
+        "lignes": {
+          "arrayValue": {
+            "values": [
+              {
+                "mapValue": {
+                  "fields": {
+                    "ref": {
+                      "stringValue": "MP-20-001"
+                    },
+                    "prix_unitaire": {
+                      "integerValue": "0"
+                    },
+                    "type": {
+                      "stringValue": "product"
+                    },
+                    "nom_fr": {
+                      "stringValue": "Maison Premium 20 Pieds"
+                    },
+                    "qte": {
+                      "integerValue": "2"
+                    },
+                    "total": {
+                      "integerValue": "0"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "createdAt": {
+          "timestampValue": "2026-04-14T22:16:30.763Z"
+        },
+        "updatedAt": {
+          "timestampValue": "2026-04-14T22:16:30.763Z"
+        },
+        "numero": {
+          "stringValue": "DVS-2604005"
+        }
+      },
+      "createTime": "2026-04-14T22:16:30.797486Z",
+      "updateTime": "2026-04-17T09:55:34.685543Z"
+    },
+    {
+      "name": "projects/importok-6ef77/databases/(default)/documents/quotes/DVS-2604006",
+      "fields": {
+        "client_id": {
+          "stringValue": "d4FH6o9ZukOZZBKRAidreFJUEji2"
+        },
+        "client_email": {
+          "stringValue": "client@97import.com"
+        },
+        "total_ht": {
+          "integerValue": "48600"
+        },
+        "acomptes": {
+          "arrayValue": {
+            "values": [
+              {
+                "mapValue": {
+                  "fields": {
+                    "date": {
+                      "stringValue": "2026-04-14T22:17:52.703Z"
+                    },
+                    "statut": {
+                      "stringValue": "declare"
+                    },
+                    "type_compte": {
+                      "stringValue": "personnel"
+                    },
+                    "montant": {
+                      "integerValue": "500"
+                    }
+                  }
+                }
+              },
+              {
+                "mapValue": {
+                  "fields": {
+                    "type_compte": {
+                      "stringValue": "perso"
+                    },
+                    "statut": {
+                      "stringValue": "declare"
+                    },
+                    "date": {
+                      "stringValue": "2026-04-14T22:22:48.426Z"
+                    },
+                    "montant": {
+                      "integerValue": "500"
+                    }
+                  }
+                }
+              },
+              {
+                "mapValue": {
+                  "fields": {
+                    "type_compte": {
+                      "stringValue": "perso"
+                    },
+                    "statut": {
+                      "stringValue": "declare"
+                    },
+                    "date": {
+                      "stringValue": "2026-04-14T22:24:18.171Z"
+                    },
+                    "montant": {
+                      "integerValue": "500"
+                    }
+                  }
+                }
+              },
+              {
+                "mapValue": {
+                  "fields": {
+                    "type_compte": {
+                      "stringValue": "perso"
+                    },
+                    "statut": {
+                      "stringValue": "declare"
+                    },
+                    "date": {
+                      "stringValue": "2026-04-14T22:29:54.066Z"
+                    },
+                    "montant": {
+                      "integerValue": "1"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "destination": {
+          "stringValue": "Martinique"
+        },
+        "statut_paiement": {
+          "stringValue": "non_paye"
+        },
+        "client_tel": {
+          "stringValue": "+596 6 96 12 34 56"
+        },
+        "total_encaisse": {
+          "integerValue": "0"
+        },
+        "numero": {
+          "stringValue": "DVS-2604006"
+        },
+        "lignes": {
+          "arrayValue": {
+            "values": [
+              {
+                "mapValue": {
+                  "fields": {
+                    "nom_fr": {
+                      "stringValue": "Mini-pelle R22 PRO"
+                    },
+                    "total": {
+                      "integerValue": "48600"
+                    },
+                    "qte": {
+                      "integerValue": "2"
+                    },
+                    "ref": {
+                      "stringValue": "TEST-MP-R22"
+                    },
+                    "prix_unitaire": {
+                      "integerValue": "24300"
+                    },
+                    "type": {
+                      "stringValue": "product"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "createdAt": {
+          "timestampValue": "2026-04-14T22:17:52.762Z"
+        },
+        "updatedAt": {
+          "timestampValue": "2026-04-14T22:29:54.066Z"
+        },
+        "partenaire_code": {
+          "stringValue": "JM"
+        },
+        "client_adresse": {
+          "stringValue": "12 Rue des Palmiers, 97200, Fort-de-France, MQ"
+        },
+        "solde_restant": {
+          "integerValue": "48600"
+        },
+        "statut": {
+          "stringValue": "nouveau"
+        },
+        "is_vip": {
+          "booleanValue": false
+        },
+        "client_nom": {
+          "stringValue": "Jean Dupont"
+        }
+      },
+      "createTime": "2026-04-14T22:17:52.777512Z",
+      "updateTime": "2026-04-17T09:55:34.742743Z"
+    },
+    {
+      "name": "projects/importok-6ef77/databases/(default)/documents/quotes/DVS-2604007",
+      "fields": {
+        "total_encaisse": {
+          "integerValue": "0"
+        },
+        "client_tel": {
+          "stringValue": "+596 6 96 12 34 56"
+        },
+        "statut_paiement": {
+          "stringValue": "non_paye"
+        },
+        "destination": {
+          "stringValue": "Martinique"
+        },
+        "acomptes": {
+          "arrayValue": {
+            "values": [
+              {
+                "mapValue": {
+                  "fields": {
+                    "montant": {
+                      "integerValue": "700"
+                    },
+                    "type_compte": {
+                      "stringValue": "professionnel"
+                    },
+                    "statut": {
+                      "stringValue": "declare"
+                    },
+                    "date": {
+                      "stringValue": "2026-04-14T22:34:05.701Z"
+                    }
+                  }
+                }
+              },
+              {
+                "mapValue": {
+                  "fields": {
+                    "date": {
+                      "stringValue": "2026-04-15T06:33:28.416Z"
+                    },
+                    "type_compte": {
+                      "stringValue": "pro"
+                    },
+                    "statut": {
+                      "stringValue": "declare"
+                    },
+                    "montant": {
+                      "integerValue": "498"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "client_id": {
+          "stringValue": "d4FH6o9ZukOZZBKRAidreFJUEji2"
+        },
+        "client_email": {
+          "stringValue": "client@97import.com"
+        },
+        "total_ht": {
+          "integerValue": "218700"
+        },
+        "client_nom": {
+          "stringValue": "Jean Dupont"
+        },
+        "is_vip": {
+          "booleanValue": false
+        },
+        "statut": {
+          "stringValue": "nouveau"
+        },
+        "client_adresse": {
+          "stringValue": "12 Rue des Palmiers, 97200, Fort-de-France, MQ"
+        },
+        "solde_restant": {
+          "integerValue": "218700"
+        },
+        "partenaire_code": {
+          "stringValue": "TD"
+        },
+        "updatedAt": {
+          "timestampValue": "2026-04-15T06:33:28.416Z"
+        },
+        "createdAt": {
+          "timestampValue": "2026-04-14T22:34:05.752Z"
+        },
+        "lignes": {
+          "arrayValue": {
+            "values": [
+              {
+                "mapValue": {
+                  "fields": {
+                    "prix_unitaire": {
+                      "integerValue": "24300"
+                    },
+                    "type": {
+                      "stringValue": "product"
+                    },
+                    "ref": {
+                      "stringValue": "TEST-MP-R22"
+                    },
+                    "total": {
+                      "integerValue": "218700"
+                    },
+                    "qte": {
+                      "integerValue": "9"
+                    },
+                    "nom_fr": {
+                      "stringValue": "Mini-pelle R22 PRO"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "numero": {
+          "stringValue": "DVS-2604007"
+        }
+      },
+      "createTime": "2026-04-14T22:34:05.786280Z",
+      "updateTime": "2026-04-17T09:55:34.829970Z"
+    },
+    {
+      "name": "projects/importok-6ef77/databases/(default)/documents/quotes/DVS-2604008",
+      "fields": {
+        "total_encaisse": {
+          "integerValue": "0"
+        },
+        "client_tel": {
+          "stringValue": "+596 6 96 12 34 56"
+        },
+        "destination": {
+          "stringValue": "Martinique"
+        },
+        "acompte_pct": {
+          "integerValue": "30"
+        },
+        "statut_paiement": {
+          "stringValue": "non_paye"
+        },
+        "client_id": {
+          "stringValue": "d4FH6o9ZukOZZBKRAidreFJUEji2"
+        },
+        "client_email": {
+          "stringValue": "client@97import.com"
+        },
+        "total_ht": {
+          "integerValue": "10740"
+        },
+        "acomptes": {
+          "arrayValue": {
+            "values": [
+              {
+                "mapValue": {
+                  "fields": {
+                    "date": {
+                      "stringValue": "2026-04-15T09:49:30.688Z"
+                    },
+                    "type_compte": {
+                      "stringValue": "professionnel"
+                    },
+                    "statut": {
+                      "stringValue": "declare"
+                    },
+                    "montant": {
+                      "integerValue": "5000"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "solde_restant": {
+          "integerValue": "10740"
+        },
+        "client_adresse": {
+          "stringValue": "12 Rue des Palmiers, 97200, Fort-de-France, MQ"
+        },
+        "statut": {
+          "stringValue": "nouveau"
+        },
+        "is_vip": {
+          "booleanValue": false
+        },
+        "client_nom": {
+          "stringValue": "Jean Dupont"
+        },
+        "client_siret": {
+          "stringValue": ""
+        },
+        "partenaire_code": {
+          "stringValue": "MC"
+        },
+        "lignes": {
+          "arrayValue": {
+            "values": [
+              {
+                "mapValue": {
+                  "fields": {
+                    "total": {
+                      "integerValue": "10740"
+                    },
+                    "qte": {
+                      "integerValue": "1"
+                    },
+                    "nom_fr": {
+                      "stringValue": "Kit Solaire Complet 10kW"
+                    },
+                    "prix_unitaire": {
+                      "integerValue": "10740"
+                    },
+                    "type": {
+                      "stringValue": "product"
+                    },
+                    "ref": {
+                      "stringValue": "TEST-SOL-10"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "createdAt": {
+          "timestampValue": "2026-04-15T09:49:30.738Z"
+        },
+        "updatedAt": {
+          "timestampValue": "2026-04-16T11:48:15.276Z"
+        },
+        "numero": {
+          "stringValue": "DVS-2604008"
+        },
+        "id": {
+          "stringValue": "DVS-2604008"
+        },
+        "partenaire_id": {
+          "nullValue": null
+        }
+      },
+      "createTime": "2026-04-15T09:49:30.792125Z",
+      "updateTime": "2026-04-17T09:55:34.932485Z"
+    },
+    {
+      "name": "projects/importok-6ef77/databases/(default)/documents/quotes/DVS-2604009",
+      "fields": {
+        "partenaire_code": {
+          "nullValue": null
+        },
+        "client_adresse": {
+          "stringValue": "12 Rue des Palmiers, 97200, Fort-de-France, MQ"
+        },
+        "solde_restant": {
+          "integerValue": "48600"
+        },
+        "statut": {
+          "stringValue": "nouveau"
+        },
+        "client_nom": {
+          "stringValue": "Jean Dupont"
+        },
+        "is_vip": {
+          "booleanValue": false
+        },
+        "client_siret": {
+          "stringValue": ""
+        },
+        "numero": {
+          "stringValue": "DVS-2604009"
+        },
+        "id": {
+          "stringValue": "DVS-2604009"
+        },
+        "partenaire_id": {
+          "nullValue": null
+        },
+        "lignes": {
+          "arrayValue": {
+            "values": [
+              {
+                "mapValue": {
+                  "fields": {
+                    "type": {
+                      "stringValue": "product"
+                    },
+                    "prix_unitaire": {
+                      "integerValue": "24300"
+                    },
+                    "ref": {
+                      "stringValue": "TEST-MP-R22"
+                    },
+                    "total": {
+                      "integerValue": "48600"
+                    },
+                    "qte": {
+                      "integerValue": "2"
+                    },
+                    "nom_fr": {
+                      "stringValue": "Mini-pelle R22 PRO"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "createdAt": {
+          "timestampValue": "2026-04-16T18:51:26.234Z"
+        },
+        "updatedAt": {
+          "timestampValue": "2026-04-16T18:52:58.126Z"
+        },
+        "client_tel": {
+          "stringValue": "+596 6 96 12 34 56"
+        },
+        "total_encaisse": {
+          "integerValue": "0"
+        },
+        "total_ht": {
+          "integerValue": "48600"
+        },
+        "client_email": {
+          "stringValue": "client@97import.com"
+        },
+        "client_id": {
+          "stringValue": "d4FH6o9ZukOZZBKRAidreFJUEji2"
+        },
+        "acomptes": {
+          "arrayValue": {
+            "values": [
+              {
+                "mapValue": {
+                  "fields": {
+                    "montant": {
+                      "integerValue": "1111"
+                    },
+                    "statut": {
+                      "stringValue": "declare"
+                    },
+                    "type_compte": {
+                      "stringValue": "personnel"
+                    },
+                    "date": {
+                      "stringValue": "2026-04-16T18:51:26.151Z"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "destination": {
+          "stringValue": "MQ"
+        },
+        "acompte_pct": {
+          "integerValue": "30"
+        },
+        "statut_paiement": {
+          "stringValue": "non_paye"
+        }
+      },
+      "createTime": "2026-04-16T18:51:26.274528Z",
+      "updateTime": "2026-04-17T09:55:34.991273Z"
+    },
+    {
+      "name": "projects/importok-6ef77/databases/(default)/documents/quotes/DVS-2604010",
+      "fields": {
+        "partenaire_code": {
+          "stringValue": "MC"
+        },
+        "client_siret": {
+          "stringValue": ""
+        },
+        "client_nom": {
+          "stringValue": "Jean Dupont"
+        },
+        "is_vip": {
+          "booleanValue": false
+        },
+        "statut": {
+          "stringValue": "nouveau"
+        },
+        "solde_restant": {
+          "integerValue": "10740"
+        },
+        "client_adresse": {
+          "stringValue": "12 Rue des Palmiers, 97200, Fort-de-France, MQ"
+        },
+        "partenaire_id": {
+          "nullValue": null
+        },
+        "id": {
+          "stringValue": "DVS-2604010"
+        },
+        "numero": {
+          "stringValue": "DVS-2604010"
+        },
+        "updatedAt": {
+          "timestampValue": "2026-04-17T08:15:49.661Z"
+        },
+        "lignes": {
+          "arrayValue": {
+            "values": [
+              {
+                "mapValue": {
+                  "fields": {
+                    "nom_fr": {
+                      "stringValue": "Kit Solaire Complet 10kW"
+                    },
+                    "total": {
+                      "integerValue": "10740"
+                    },
+                    "qte": {
+                      "integerValue": "1"
+                    },
+                    "ref": {
+                      "stringValue": "TEST-SOL-10"
+                    },
+                    "prix_unitaire": {
+                      "integerValue": "10740"
+                    },
+                    "type": {
+                      "stringValue": "product"
+                    }
+                  }
+                }
+              },
+              {
+                "mapValue": {
+                  "fields": {
+                    "total": {
+                      "integerValue": "0"
+                    },
+                    "qte": {
+                      "integerValue": "2"
+                    },
+                    "description": {
+                      "stringValue": "20 pouces"
+                    },
+                    "nom_fr": {
+                      "stringValue": "pneu"
+                    },
+                    "type": {
+                      "stringValue": "custom"
+                    },
+                    "prix_unitaire": {
+                      "integerValue": "0"
+                    },
+                    "ref": {
+                      "stringValue": "SUR-MESURE"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "createdAt": {
+          "timestampValue": "2026-04-17T08:14:56.928Z"
+        },
+        "client_tel": {
+          "stringValue": "+596 6 96 12 34 56"
+        },
+        "total_encaisse": {
+          "integerValue": "0"
+        },
+        "acomptes": {
+          "arrayValue": {
+            "values": [
+              {
+                "mapValue": {
+                  "fields": {
+                    "type_compte": {
+                      "stringValue": "personnel"
+                    },
+                    "statut": {
+                      "stringValue": "declare"
+                    },
+                    "date": {
+                      "stringValue": "2026-04-17T08:14:56.809Z"
+                    },
+                    "montant": {
+                      "integerValue": "0"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "client_id": {
+          "stringValue": "d4FH6o9ZukOZZBKRAidreFJUEji2"
+        },
+        "client_email": {
+          "stringValue": "client@97import.com"
+        },
+        "total_ht": {
+          "integerValue": "10740"
+        },
+        "statut_paiement": {
+          "stringValue": "non_paye"
+        },
+        "acompte_pct": {
+          "integerValue": "30"
+        },
+        "destination": {
+          "stringValue": "MQ"
+        }
+      },
+      "createTime": "2026-04-17T08:14:56.979225Z",
+      "updateTime": "2026-04-17T09:55:35.044225Z"
+    },
+    {
+      "name": "projects/importok-6ef77/databases/(default)/documents/quotes/DVS-2604011",
+      "fields": {
+        "destination": {
+          "stringValue": "MQ"
+        },
+        "prix_negocies": {
+          "mapValue": {
+            "fields": {
+              "TEST-MP-R22": {
+                "integerValue": "18000"
+              }
+            }
+          }
+        },
+        "statut_paiement": {
+          "stringValue": "non_paye"
+        },
+        "client_email": {
+          "stringValue": "client@97import.com"
+        },
+        "total_ht": {
+          "integerValue": "18000"
+        },
+        "client_id": {
+          "stringValue": "d4FH6o9ZukOZZBKRAidreFJUEji2"
+        },
+        "acomptes": {
+          "arrayValue": {
+            "values": [
+              {
+                "mapValue": {
+                  "fields": {
+                    "type_compte": {
+                      "stringValue": "personnel"
+                    },
+                    "statut": {
+                      "stringValue": "declare"
+                    },
+                    "date": {
+                      "stringValue": "2026-04-17T08:16:47.142Z"
+                    },
+                    "montant": {
+                      "integerValue": "500"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "total_ht_public": {
+          "integerValue": "24300"
+        },
+        "total_encaisse": {
+          "integerValue": "0"
+        },
+        "client_tel": {
+          "stringValue": "+596 6 96 12 34 56"
+        },
+        "updatedAt": {
+          "timestampValue": "2026-04-17T08:17:14.357Z"
+        },
+        "lignes": {
+          "arrayValue": {
+            "values": [
+              {
+                "mapValue": {
+                  "fields": {
+                    "total": {
+                      "integerValue": "24300"
+                    },
+                    "qte": {
+                      "integerValue": "1"
+                    },
+                    "nom_fr": {
+                      "stringValue": "Mini-pelle R22 PRO"
+                    },
+                    "prix_unitaire": {
+                      "integerValue": "24300"
+                    },
+                    "type": {
+                      "stringValue": "product"
+                    },
+                    "ref": {
+                      "stringValue": "TEST-MP-R22"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "createdAt": {
+          "timestampValue": "2026-04-17T08:16:47.253Z"
+        },
+        "numero": {
+          "stringValue": "DVS-2604011"
+        },
+        "statut": {
+          "stringValue": "vip_envoye"
+        },
+        "client_adresse": {
+          "stringValue": "12 Rue des Palmiers, 97200, Fort-de-France, MQ"
+        },
+        "solde_restant": {
+          "integerValue": "24300"
+        },
+        "client_siret": {
+          "stringValue": ""
+        },
+        "client_nom": {
+          "stringValue": "Jean Dupont"
+        },
+        "is_vip": {
+          "booleanValue": true
+        },
+        "partenaire_code": {
+          "stringValue": "PB"
+        }
+      },
+      "createTime": "2026-04-17T08:16:47.292011Z",
+      "updateTime": "2026-04-17T10:51:53.722057Z"
+    },
+    {
+      "name": "projects/importok-6ef77/databases/(default)/documents/quotes/DVS-2604012",
+      "fields": {
+        "client_email": {
+          "stringValue": "client@97import.com"
+        },
+        "facture_acompte_url": {
+          "stringValue": "https://firebasestorage.googleapis.com/v0/b/importok-6ef77.firebasestorage.app/o/factures_acompte%2FFA-2604004.pdf?alt=media&token=f4c95bad-5faf-4215-abfe-4ee7f8e8e129"
+        },
+        "total_ht_public": {
+          "integerValue": "10740"
+        },
+        "client_tel": {
+          "stringValue": "+596 6 96 12 34 56"
+        },
+        "updatedAt": {
+          "timestampValue": "2026-04-17T11:05:08.603Z"
+        },
+        "createdAt": {
+          "timestampValue": "2026-04-17T10:28:44.983Z"
+        },
+        "lignes": {
+          "arrayValue": {
+            "values": [
+              {
+                "mapValue": {
+                  "fields": {
+                    "ref": {
+                      "stringValue": "TEST-SOL-10"
+                    },
+                    "prix_unitaire": {
+                      "integerValue": "10740"
+                    },
+                    "type": {
+                      "stringValue": "product"
+                    },
+                    "nom_fr": {
+                      "stringValue": "Kit Solaire Complet 10kW"
+                    },
+                    "qte": {
+                      "integerValue": "1"
+                    },
+                    "total": {
+                      "integerValue": "10740"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "numero": {
+          "stringValue": "DVS-2604012"
+        },
+        "id": {
+          "stringValue": "DVS-2604012"
+        },
+        "solde_restant": {
+          "integerValue": "4500"
+        },
+        "client_siret": {
+          "stringValue": ""
+        },
+        "factures_acompte_urls": {
+          "arrayValue": {
+            "values": [
+              {
+                "mapValue": {
+                  "fields": {
+                    "url": {
+                      "stringValue": "https://firebasestorage.googleapis.com/v0/b/importok-6ef77.firebasestorage.app/o/factures_acompte%2FFA-2604004.pdf?alt=media&token=f4c95bad-5faf-4215-abfe-4ee7f8e8e129"
+                    },
+                    "date": {
+                      "stringValue": "2026-04-17T11:06:03.389Z"
+                    },
+                    "ref_fa": {
+                      "stringValue": "FA-2604004"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "acompte_pct": {
+          "integerValue": "30"
+        },
+        "destination": {
+          "stringValue": "MQ"
+        },
+        "prix_negocies": {
+          "mapValue": {
+            "fields": {
+              "TEST-SOL-10": {
+                "integerValue": "10000"
+              }
+            }
+          }
+        },
+        "statut_paiement": {
+          "stringValue": "paye_partiel"
+        },
+        "total_ht": {
+          "integerValue": "10000"
+        },
+        "client_id": {
+          "stringValue": "d4FH6o9ZukOZZBKRAidreFJUEji2"
+        },
+        "acomptes": {
+          "arrayValue": {
+            "values": [
+              {
+                "mapValue": {
+                  "fields": {
+                    "type_compte": {
+                      "stringValue": "personnel"
+                    },
+                    "date_encaissement": {
+                      "stringValue": "2026-04-17T11:06:02.438Z"
+                    },
+                    "date": {
+                      "stringValue": "2026-04-17T10:28:44.932Z"
+                    },
+                    "montant": {
+                      "integerValue": "500"
+                    },
+                    "ref_fa": {
+                      "stringValue": "FA-2604004"
+                    },
+                    "statut": {
+                      "stringValue": "encaisse"
+                    }
+                  }
+                }
+              },
+              {
+                "mapValue": {
+                  "fields": {
+                    "date": {
+                      "stringValue": "2026-04-17T11:05:08.603Z"
+                    },
+                    "date_encaissement": {
+                      "stringValue": "2026-04-17T11:05:46.855Z"
+                    },
+                    "type_compte": {
+                      "stringValue": "perso"
+                    },
+                    "ref_fa": {
+                      "stringValue": "FA-2604003"
+                    },
+                    "montant": {
+                      "integerValue": "5000"
+                    },
+                    "iban_utilise": {
+                      "stringValue": "DE93 1001 1001 2625 2584 23"
+                    },
+                    "statut": {
+                      "stringValue": "encaisse"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "total_encaisse": {
+          "integerValue": "5500"
+        },
+        "updated_at": {
+          "timestampValue": "2026-04-17T11:06:03.442Z"
+        },
+        "partenaire_id": {
+          "nullValue": null
+        },
+        "statut": {
+          "stringValue": "en_cours"
+        },
+        "client_adresse": {
+          "stringValue": "12 Rue des Palmiers, 97200, Fort-de-France, MQ"
+        },
+        "client_nom": {
+          "stringValue": "Jean Dupont"
+        },
+        "is_vip": {
+          "booleanValue": true
+        },
+        "partenaire_code": {
+          "stringValue": "PB"
+        }
+      },
+      "createTime": "2026-04-17T10:28:45.027708Z",
+      "updateTime": "2026-04-17T11:06:03.498953Z"
+    },
+    {
+      "name": "projects/importok-6ef77/databases/(default)/documents/quotes/DVS-2604013",
+      "fields": {
+        "statut_paiement": {
+          "stringValue": "paye_partiel"
+        },
+        "destination": {
+          "stringValue": "MQ"
+        },
+        "facture_acompte_url": {
+          "stringValue": "https://firebasestorage.googleapis.com/v0/b/importok-6ef77.firebasestorage.app/o/factures_acompte%2FFA-2604006.pdf?alt=media&token=930bb72c-0230-49b4-ada8-91d53c13d242"
+        },
+        "acomptes": {
+          "arrayValue": {
+            "values": [
+              {
+                "mapValue": {
+                  "fields": {
+                    "statut": {
+                      "stringValue": "encaisse"
+                    },
+                    "montant": {
+                      "integerValue": "140"
+                    },
+                    "ref_fa": {
+                      "stringValue": "FA-2604005"
+                    },
+                    "type_compte": {
+                      "stringValue": "professionnel"
+                    },
+                    "date_encaissement": {
+                      "stringValue": "2026-04-17T11:36:47.917Z"
+                    },
+                    "date": {
+                      "stringValue": "2026-04-17T11:36:29.799Z"
+                    }
+                  }
+                }
+              },
+              {
+                "mapValue": {
+                  "fields": {
+                    "date": {
+                      "stringValue": "2026-04-17T11:37:40.580Z"
+                    },
+                    "type_compte": {
+                      "stringValue": "pro"
+                    },
+                    "date_encaissement": {
+                      "stringValue": "2026-04-17T11:37:47.956Z"
+                    },
+                    "montant": {
+                      "integerValue": "1000"
+                    },
+                    "ref_fa": {
+                      "stringValue": "FA-2604006"
+                    },
+                    "iban_utilise": {
+                      "stringValue": "DE76 2022 0800 0059 5688 30"
+                    },
+                    "statut": {
+                      "stringValue": "encaisse"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "client_email": {
+          "stringValue": "client@97import.com"
+        },
+        "total_ht": {
+          "integerValue": "6140"
+        },
+        "client_id": {
+          "stringValue": "d4FH6o9ZukOZZBKRAidreFJUEji2"
+        },
+        "total_encaisse": {
+          "integerValue": "1140"
+        },
+        "updated_at": {
+          "timestampValue": "2026-04-17T11:37:49.024Z"
+        },
+        "devis_url": {
+          "stringValue": "https://firebasestorage.googleapis.com/v0/b/importok-6ef77.firebasestorage.app/o/devis%2FDVS-2604013.pdf?alt=media&token=6cce960c-33bc-4463-9ae5-3b1ecca7a894"
+        },
+        "client_tel": {
+          "stringValue": "+596 6 96 12 34 56"
+        },
+        "lignes": {
+          "arrayValue": {
+            "values": [
+              {
+                "mapValue": {
+                  "fields": {
+                    "type": {
+                      "stringValue": "product"
+                    },
+                    "prix_unitaire": {
+                      "integerValue": "6140"
+                    },
+                    "ref": {
+                      "stringValue": "SOL-5KW-001"
+                    },
+                    "qte": {
+                      "integerValue": "1"
+                    },
+                    "total": {
+                      "integerValue": "6140"
+                    },
+                    "nom_fr": {
+                      "stringValue": "Kit Solaire 5kW"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "createdAt": {
+          "timestampValue": "2026-04-17T11:36:29.893Z"
+        },
+        "updatedAt": {
+          "timestampValue": "2026-04-17T11:43:20.659Z"
+        },
+        "numero": {
+          "stringValue": "DVS-2604013"
+        },
+        "client_nom": {
+          "stringValue": "Jean Dupont"
+        },
+        "is_vip": {
+          "booleanValue": false
+        },
+        "client_siret": {
+          "stringValue": ""
+        },
+        "client_adresse": {
+          "stringValue": "12 Rue des Palmiers, 97200, Fort-de-France, MQ"
+        },
+        "solde_restant": {
+          "integerValue": "5000"
+        },
+        "statut": {
+          "stringValue": "en_cours"
+        },
+        "partenaire_code": {
+          "stringValue": "PB"
+        },
+        "factures_acompte_urls": {
+          "arrayValue": {
+            "values": [
+              {
+                "mapValue": {
+                  "fields": {
+                    "ref_fa": {
+                      "stringValue": "FA-2604006"
+                    },
+                    "url": {
+                      "stringValue": "https://firebasestorage.googleapis.com/v0/b/importok-6ef77.firebasestorage.app/o/factures_acompte%2FFA-2604006.pdf?alt=media&token=930bb72c-0230-49b4-ada8-91d53c13d242"
+                    },
+                    "date": {
+                      "stringValue": "2026-04-17T11:37:48.939Z"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      "createTime": "2026-04-17T11:36:29.931811Z",
+      "updateTime": "2026-04-17T11:43:20.697391Z"
+    },
+    {
+      "name": "projects/importok-6ef77/databases/(default)/documents/quotes/DVS-2604014",
+      "fields": {
+        "partenaire_code": {
+          "stringValue": "PB"
+        },
+        "statut": {
+          "stringValue": "en_cours"
+        },
+        "client_adresse": {
+          "stringValue": "12 Rue des Palmiers, 97200, Fort-de-France, MQ"
+        },
+        "client_nom": {
+          "stringValue": "Jean Dupont"
+        },
+        "is_vip": {
+          "booleanValue": false
+        },
+        "partenaire_id": {
+          "nullValue": null
+        },
+        "total_encaisse": {
+          "integerValue": "2000"
+        },
+        "updated_at": {
+          "timestampValue": "2026-04-17T11:59:02.416Z"
+        },
+        "total_ht": {
+          "integerValue": "35040"
+        },
+        "client_id": {
+          "stringValue": "d4FH6o9ZukOZZBKRAidreFJUEji2"
+        },
+        "acomptes": {
+          "arrayValue": {
+            "values": [
+              {
+                "mapValue": {
+                  "fields": {
+                    "date_encaissement": {
+                      "stringValue": "2026-04-17T11:58:54.706Z"
+                    },
+                    "type_compte": {
+                      "stringValue": "personnel"
+                    },
+                    "date": {
+                      "stringValue": "2026-04-17T11:58:27.534Z"
+                    },
+                    "ref_fa": {
+                      "stringValue": "FA-2604007"
+                    },
+                    "montant": {
+                      "integerValue": "500"
+                    },
+                    "statut": {
+                      "stringValue": "encaisse"
+                    }
+                  }
+                }
+              },
+              {
+                "mapValue": {
+                  "fields": {
+                    "montant": {
+                      "integerValue": "1500"
+                    },
+                    "ref_fa": {
+                      "stringValue": "FA-2604008"
+                    },
+                    "iban_utilise": {
+                      "stringValue": "DE93 1001 1001 2625 2584 23"
+                    },
+                    "statut": {
+                      "stringValue": "encaisse"
+                    },
+                    "date": {
+                      "stringValue": "2026-04-17T11:58:38.422Z"
+                    },
+                    "type_compte": {
+                      "stringValue": "perso"
+                    },
+                    "date_encaissement": {
+                      "stringValue": "2026-04-17T11:59:01.317Z"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "acompte_pct": {
+          "integerValue": "30"
+        },
+        "destination": {
+          "stringValue": "MQ"
+        },
+        "statut_paiement": {
+          "stringValue": "paye_partiel"
+        },
+        "factures_acompte_urls": {
+          "arrayValue": {
+            "values": [
+              {
+                "mapValue": {
+                  "fields": {
+                    "ref_fa": {
+                      "stringValue": "FA-2604008"
+                    },
+                    "date": {
+                      "stringValue": "2026-04-17T11:59:02.330Z"
+                    },
+                    "url": {
+                      "stringValue": "https://firebasestorage.googleapis.com/v0/b/importok-6ef77.firebasestorage.app/o/factures_acompte%2FFA-2604008.pdf?alt=media&token=a41ba251-2c0d-4f8b-afaf-ba3de814facc"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "solde_restant": {
+          "integerValue": "33040"
+        },
+        "client_siret": {
+          "stringValue": ""
+        },
+        "numero": {
+          "stringValue": "DVS-2604014"
+        },
+        "id": {
+          "stringValue": "DVS-2604014"
+        },
+        "updatedAt": {
+          "timestampValue": "2026-04-20T21:23:39.036Z"
+        },
+        "createdAt": {
+          "timestampValue": "2026-04-17T11:58:27.615Z"
+        },
+        "lignes": {
+          "arrayValue": {
+            "values": [
+              {
+                "mapValue": {
+                  "fields": {
+                    "prix_unitaire": {
+                      "integerValue": "24300"
+                    },
+                    "type": {
+                      "stringValue": "product"
+                    },
+                    "ref": {
+                      "stringValue": "TEST-MP-R22"
+                    },
+                    "qte": {
+                      "integerValue": "1"
+                    },
+                    "total": {
+                      "integerValue": "24300"
+                    },
+                    "nom_fr": {
+                      "stringValue": "Mini-pelle R22 PRO"
+                    }
+                  }
+                }
+              },
+              {
+                "mapValue": {
+                  "fields": {
+                    "qte": {
+                      "integerValue": "1"
+                    },
+                    "total": {
+                      "integerValue": "10740"
+                    },
+                    "nom_fr": {
+                      "stringValue": "Kit Solaire Complet 10kW"
+                    },
+                    "type": {
+                      "stringValue": "product"
+                    },
+                    "prix_unitaire": {
+                      "integerValue": "10740"
+                    },
+                    "ref": {
+                      "stringValue": "TEST-SOL-10"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "client_tel": {
+          "stringValue": "+596 6 96 12 34 56"
+        },
+        "client_email": {
+          "stringValue": "client@97import.com"
+        },
+        "facture_acompte_url": {
+          "stringValue": "https://firebasestorage.googleapis.com/v0/b/importok-6ef77.firebasestorage.app/o/factures_acompte%2FFA-2604008.pdf?alt=media&token=a41ba251-2c0d-4f8b-afaf-ba3de814facc"
+        }
+      },
+      "createTime": "2026-04-17T11:58:27.659281Z",
+      "updateTime": "2026-04-20T21:23:39.074373Z"
+    },
+    {
+      "name": "projects/importok-6ef77/databases/(default)/documents/quotes/DVS-2604015",
+      "fields": {
+        "is_vip": {
+          "booleanValue": true
+        },
+        "client_nom": {
+          "stringValue": "Jean Dupont"
+        },
+        "client_siret": {
+          "stringValue": ""
+        },
+        "client_adresse": {
+          "stringValue": "12 Rue des Palmiers, 97200, Fort-de-France, MQ"
+        },
+        "solde_restant": {
+          "integerValue": "19889"
+        },
+        "statut": {
+          "stringValue": "vip_envoye"
+        },
+        "partenaire_code": {
+          "stringValue": "PB"
+        },
+        "factures_acompte_urls": {
+          "arrayValue": {
+            "values": [
+              {
+                "mapValue": {
+                  "fields": {
+                    "date": {
+                      "stringValue": "2026-04-17T12:06:17.294Z"
+                    },
+                    "url": {
+                      "stringValue": "https://firebasestorage.googleapis.com/v0/b/importok-6ef77.firebasestorage.app/o/factures_acompte%2FFA-2604010.pdf?alt=media&token=13954338-beb7-49d5-8831-4491cb60d413"
+                    },
+                    "ref_fa": {
+                      "stringValue": "FA-2604010"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "createdAt": {
+          "timestampValue": "2026-04-17T12:05:09.889Z"
+        },
+        "lignes": {
+          "arrayValue": {
+            "values": [
+              {
+                "mapValue": {
+                  "fields": {
+                    "prix_unitaire": {
+                      "integerValue": "24300"
+                    },
+                    "type": {
+                      "stringValue": "product"
+                    },
+                    "ref": {
+                      "stringValue": "TEST-MP-R22"
+                    },
+                    "total": {
+                      "integerValue": "24300"
+                    },
+                    "qte": {
+                      "integerValue": "1"
+                    },
+                    "nom_fr": {
+                      "stringValue": "Mini-pelle R22 PRO"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "updatedAt": {
+          "timestampValue": "2026-04-17T12:07:47.386Z"
+        },
+        "numero": {
+          "stringValue": "DVS-2604015"
+        },
+        "updated_at": {
+          "timestampValue": "2026-04-17T12:06:17.377Z"
+        },
+        "total_encaisse": {
+          "integerValue": "4411"
+        },
+        "total_ht_public": {
+          "integerValue": "24300"
+        },
+        "client_tel": {
+          "stringValue": "+596 6 96 12 34 56"
+        },
+        "statut_paiement": {
+          "stringValue": "paye_partiel"
+        },
+        "prix_negocies": {
+          "mapValue": {
+            "fields": {
+              "TEST-MP-R22": {
+                "integerValue": "23000"
+              }
+            }
+          }
+        },
+        "destination": {
+          "stringValue": "MQ"
+        },
+        "facture_acompte_url": {
+          "stringValue": "https://firebasestorage.googleapis.com/v0/b/importok-6ef77.firebasestorage.app/o/factures_acompte%2FFA-2604010.pdf?alt=media&token=13954338-beb7-49d5-8831-4491cb60d413"
+        },
+        "acomptes": {
+          "arrayValue": {
+            "values": [
+              {
+                "mapValue": {
+                  "fields": {
+                    "type_compte": {
+                      "stringValue": "personnel"
+                    },
+                    "date_encaissement": {
+                      "stringValue": "2026-04-17T12:06:09.433Z"
+                    },
+                    "date": {
+                      "stringValue": "2026-04-17T12:05:09.804Z"
+                    },
+                    "statut": {
+                      "stringValue": "encaisse"
+                    },
+                    "montant": {
+                      "integerValue": "111"
+                    },
+                    "ref_fa": {
+                      "stringValue": "FA-2604009"
+                    }
+                  }
+                }
+              },
+              {
+                "mapValue": {
+                  "fields": {
+                    "statut": {
+                      "stringValue": "encaisse"
+                    },
+                    "iban_utilise": {
+                      "stringValue": "DE93 1001 1001 2625 2584 23"
+                    },
+                    "ref_fa": {
+                      "stringValue": "FA-2604010"
+                    },
+                    "montant": {
+                      "integerValue": "4300"
+                    },
+                    "type_compte": {
+                      "stringValue": "perso"
+                    },
+                    "date_encaissement": {
+                      "stringValue": "2026-04-17T12:06:16.392Z"
+                    },
+                    "date": {
+                      "stringValue": "2026-04-17T12:05:39.438Z"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "client_id": {
+          "stringValue": "d4FH6o9ZukOZZBKRAidreFJUEji2"
+        },
+        "client_email": {
+          "stringValue": "client@97import.com"
+        },
+        "total_ht": {
+          "integerValue": "23000"
+        }
+      },
+      "createTime": "2026-04-17T12:05:09.909705Z",
+      "updateTime": "2026-04-17T12:07:47.535739Z"
+    },
+    {
+      "name": "projects/importok-6ef77/databases/(default)/documents/quotes/DVS-2604016",
+      "fields": {
+        "partenaire_code": {
+          "stringValue": "PB"
+        },
+        "client_nom": {
+          "stringValue": "Jean Dupont"
+        },
+        "is_vip": {
+          "booleanValue": true
+        },
+        "client_adresse": {
+          "stringValue": "12 Rue des Palmiers, 97200, Fort-de-France, MQ"
+        },
+        "statut": {
+          "stringValue": "vip_envoye"
+        },
+        "client_prenom": {
+          "stringValue": "Jean"
+        },
+        "partenaire_id": {
+          "nullValue": null
+        },
+        "pays_livraison": {
+          "stringValue": "MQ"
+        },
+        "total_encaisse": {
+          "integerValue": "0"
+        },
+        "acomptes": {
+          "arrayValue": {}
+        },
+        "client_id": {
+          "stringValue": "d4FH6o9ZukOZZBKRAidreFJUEji2"
+        },
+        "total_ht": {
+          "integerValue": "10740"
+        },
+        "prix_negocies": {
+          "mapValue": {
+            "fields": {
+              "TEST-SOL-10": {
+                "integerValue": "9500"
+              }
+            }
+          }
+        },
+        "destination": {
+          "stringValue": "MQ"
+        },
+        "acompte_pct": {
+          "integerValue": "30"
+        },
+        "client_siret": {
+          "stringValue": ""
+        },
+        "solde_restant": {
+          "integerValue": "10740"
+        },
+        "id": {
+          "stringValue": "DVS-2604016"
+        },
+        "numero": {
+          "stringValue": "DVS-2604016"
+        },
+        "createdAt": {
+          "timestampValue": "2026-04-17T13:11:34.072Z"
+        },
+        "lignes": {
+          "arrayValue": {
+            "values": [
+              {
+                "mapValue": {
+                  "fields": {
+                    "ref": {
+                      "stringValue": "TEST-SOL-10"
+                    },
+                    "type": {
+                      "stringValue": "product"
+                    },
+                    "prix_unitaire": {
+                      "integerValue": "10740"
+                    },
+                    "nom_fr": {
+                      "stringValue": "Kit Solaire Complet 10kW"
+                    },
+                    "total": {
+                      "integerValue": "10740"
+                    },
+                    "qte": {
+                      "integerValue": "1"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "updatedAt": {
+          "timestampValue": "2026-04-18T06:03:09.597Z"
+        },
+        "client_tel": {
+          "stringValue": "+596 6 96 12 34 56"
+        },
+        "total_ht_public": {
+          "integerValue": "9500"
+        },
+        "client_email": {
+          "stringValue": "client@97import.com"
+        }
+      },
+      "createTime": "2026-04-17T13:11:34.088341Z",
+      "updateTime": "2026-04-18T06:03:09.639579Z"
+    },
+    {
+      "name": "projects/importok-6ef77/databases/(default)/documents/quotes/DVS-2604017",
+      "fields": {
+        "client_tel": {
+          "stringValue": "+596 6 96 12 34 56"
+        },
+        "pays_livraison": {
+          "stringValue": "MQ"
+        },
+        "client_id": {
+          "stringValue": "d4FH6o9ZukOZZBKRAidreFJUEji2"
+        },
+        "total_ht": {
+          "integerValue": "51100"
+        },
+        "client_email": {
+          "stringValue": "client@97import.com"
+        },
+        "acomptes": {
+          "arrayValue": {
+            "values": [
+              {
+                "mapValue": {
+                  "fields": {
+                    "montant": {
+                      "integerValue": "100"
+                    },
+                    "statut": {
+                      "stringValue": "declare"
+                    },
+                    "type_compte": {
+                      "stringValue": "professionnel"
+                    },
+                    "date": {
+                      "stringValue": "2026-04-22T14:58:03.680Z"
+                    }
+                  }
+                }
+              },
+              {
+                "mapValue": {
+                  "fields": {
+                    "montant": {
+                      "integerValue": "500"
+                    },
+                    "statut": {
+                      "stringValue": "declare"
+                    },
+                    "iban_utilise": {
+                      "stringValue": "DE76 2022 0800 0059 5688 30"
+                    },
+                    "type_compte": {
+                      "stringValue": "pro"
+                    },
+                    "date": {
+                      "stringValue": "2026-04-22T14:58:17.007Z"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "destination": {
+          "stringValue": "MQ"
+        },
+        "partenaire_code": {
+          "stringValue": "PB"
+        },
+        "client_adresse": {
+          "stringValue": "12 Rue des Palmiers, 97200, Fort-de-France, MQ"
+        },
+        "statut": {
+          "stringValue": "nouveau"
+        },
+        "client_nom": {
+          "stringValue": "Jean Dupont"
+        },
+        "is_vip": {
+          "booleanValue": false
+        },
+        "client_siret": {
+          "stringValue": ""
+        },
+        "numero": {
+          "stringValue": "DVS-2604017"
+        },
+        "client_prenom": {
+          "stringValue": "Jean"
+        },
+        "lignes": {
+          "arrayValue": {
+            "values": [
+              {
+                "mapValue": {
+                  "fields": {
+                    "nom_fr": {
+                      "stringValue": "Mini-pelle R32 PRO — Chenilles caoutchouc"
+                    },
+                    "total": {
+                      "integerValue": "28050"
+                    },
+                    "qte": {
+                      "integerValue": "1"
+                    },
+                    "ref": {
+                      "stringValue": "MP-R32-001"
+                    },
+                    "prix_unitaire": {
+                      "integerValue": "28050"
+                    },
+                    "type": {
+                      "stringValue": "product"
+                    }
+                  }
+                }
+              },
+              {
+                "mapValue": {
+                  "fields": {
+                    "ref": {
+                      "stringValue": "MP-R22-001"
+                    },
+                    "type": {
+                      "stringValue": "product"
+                    },
+                    "prix_unitaire": {
+                      "integerValue": "23050"
+                    },
+                    "nom_fr": {
+                      "stringValue": "Mini-pelle R22 PRO — Chenilles caoutchouc"
+                    },
+                    "qte": {
+                      "integerValue": "1"
+                    },
+                    "total": {
+                      "integerValue": "23050"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "createdAt": {
+          "timestampValue": "2026-04-22T14:58:03.782Z"
+        },
+        "updatedAt": {
+          "timestampValue": "2026-04-22T14:58:17.007Z"
+        }
+      },
+      "createTime": "2026-04-22T14:58:03.837660Z",
+      "updateTime": "2026-04-22T14:58:17.098092Z"
+    },
+    {
+      "name": "projects/importok-6ef77/databases/(default)/documents/quotes/DVS-2604018",
+      "fields": {
+        "destination": {
+          "stringValue": "MQ"
+        },
+        "client_id": {
+          "stringValue": "d4FH6o9ZukOZZBKRAidreFJUEji2"
+        },
+        "client_email": {
+          "stringValue": "client@97import.com"
+        },
+        "total_ht": {
+          "integerValue": "51100"
+        },
+        "acomptes": {
+          "arrayValue": {
+            "values": [
+              {
+                "mapValue": {
+                  "fields": {
+                    "date": {
+                      "stringValue": "2026-04-22T16:22:20.935Z"
+                    },
+                    "type_compte": {
+                      "stringValue": "professionnel"
+                    },
+                    "statut": {
+                      "stringValue": "declare"
+                    },
+                    "montant": {
+                      "integerValue": "0"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "pays_livraison": {
+          "stringValue": "MQ"
+        },
+        "client_tel": {
+          "stringValue": "+596 6 96 12 34 56"
+        },
+        "updatedAt": {
+          "timestampValue": "2026-04-22T16:22:20.983Z"
+        },
+        "createdAt": {
+          "timestampValue": "2026-04-22T16:22:20.983Z"
+        },
+        "lignes": {
+          "arrayValue": {
+            "values": [
+              {
+                "mapValue": {
+                  "fields": {
+                    "type": {
+                      "stringValue": "product"
+                    },
+                    "prix_unitaire": {
+                      "integerValue": "23050"
+                    },
+                    "ref": {
+                      "stringValue": "MP-R22-001"
+                    },
+                    "total": {
+                      "integerValue": "23050"
+                    },
+                    "qte": {
+                      "integerValue": "1"
+                    },
+                    "nom_fr": {
+                      "stringValue": "Mini-pelle R22 PRO — Chenilles caoutchouc"
+                    }
+                  }
+                }
+              },
+              {
+                "mapValue": {
+                  "fields": {
+                    "ref": {
+                      "stringValue": "MP-R32-001"
+                    },
+                    "prix_unitaire": {
+                      "integerValue": "28050"
+                    },
+                    "type": {
+                      "stringValue": "product"
+                    },
+                    "nom_fr": {
+                      "stringValue": "Mini-pelle R32 PRO — Chenilles caoutchouc"
+                    },
+                    "qte": {
+                      "integerValue": "1"
+                    },
+                    "total": {
+                      "integerValue": "28050"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "numero": {
+          "stringValue": "DVS-2604018"
+        },
+        "client_prenom": {
+          "stringValue": "Jean"
+        },
+        "statut": {
+          "stringValue": "nouveau"
+        },
+        "client_adresse": {
+          "stringValue": "12 Rue des Palmiers, 97200, Fort-de-France, MQ"
+        },
+        "client_siret": {
+          "stringValue": ""
+        },
+        "client_nom": {
+          "stringValue": "Jean Dupont"
+        },
+        "is_vip": {
+          "booleanValue": false
+        },
+        "partenaire_code": {
+          "stringValue": "TD"
+        }
+      },
+      "createTime": "2026-04-22T16:22:21.032590Z",
+      "updateTime": "2026-04-22T16:22:21.032590Z"
+    },
+    {
+      "name": "projects/importok-6ef77/databases/(default)/documents/quotes/DVS-2604019",
+      "fields": {
+        "client_siret": {
+          "stringValue": ""
+        },
+        "solde_restant": {
+          "integerValue": "39610"
+        },
+        "factures_acompte_urls": {
+          "arrayValue": {
+            "values": [
+              {
+                "mapValue": {
+                  "fields": {
+                    "url": {
+                      "stringValue": "https://firebasestorage.googleapis.com/v0/b/importok-6ef77.firebasestorage.app/o/factures_acompte%2FFA-2604013.pdf?alt=media&token=dc071963-ae60-4bfe-a65e-d806de4f3c10"
+                    },
+                    "date": {
+                      "stringValue": "2026-04-22T17:28:00.541Z"
+                    },
+                    "ref_fa": {
+                      "stringValue": "FA-2604013"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "createdAt": {
+          "timestampValue": "2026-04-22T16:25:56.341Z"
+        },
+        "lignes": {
+          "arrayValue": {
+            "values": [
+              {
+                "mapValue": {
+                  "fields": {
+                    "nom_fr": {
+                      "stringValue": "Mini-pelle R22 PRO — Chenilles caoutchouc"
+                    },
+                    "total": {
+                      "integerValue": "23050"
+                    },
+                    "qte": {
+                      "integerValue": "1"
+                    },
+                    "ref": {
+                      "stringValue": "MP-R22-001"
+                    },
+                    "type": {
+                      "stringValue": "product"
+                    },
+                    "prix_unitaire": {
+                      "integerValue": "23050"
+                    }
+                  }
+                }
+              },
+              {
+                "mapValue": {
+                  "fields": {
+                    "prix_unitaire": {
+                      "integerValue": "28050"
+                    },
+                    "type": {
+                      "stringValue": "product"
+                    },
+                    "ref": {
+                      "stringValue": "MP-R32-001"
+                    },
+                    "qte": {
+                      "integerValue": "1"
+                    },
+                    "total": {
+                      "integerValue": "28050"
+                    },
+                    "nom_fr": {
+                      "stringValue": "Mini-pelle R32 PRO — Chenilles caoutchouc"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "updatedAt": {
+          "timestampValue": "2026-04-22T17:01:57.570Z"
+        },
+        "numero": {
+          "stringValue": "DVS-2604019"
+        },
+        "total_ht_public": {
+          "integerValue": "42221"
+        },
+        "client_tel": {
+          "stringValue": "+596 6 96 12 34 56"
+        },
+        "facture_acompte_url": {
+          "stringValue": "https://firebasestorage.googleapis.com/v0/b/importok-6ef77.firebasestorage.app/o/factures_acompte%2FFA-2604013.pdf?alt=media&token=dc071963-ae60-4bfe-a65e-d806de4f3c10"
+        },
+        "client_email": {
+          "stringValue": "client@97import.com"
+        },
+        "client_nom": {
+          "stringValue": "Jean Dupont"
+        },
+        "is_vip": {
+          "booleanValue": true
+        },
+        "client_adresse": {
+          "stringValue": "12 Rue des Palmiers, 97200, Fort-de-France, MQ"
+        },
+        "statut": {
+          "stringValue": "en_cours"
+        },
+        "partenaire_code": {
+          "stringValue": "PB"
+        },
+        "client_prenom": {
+          "stringValue": "Jean"
+        },
+        "pays_livraison": {
+          "stringValue": "MQ"
+        },
+        "updated_at": {
+          "timestampValue": "2026-04-22T17:28:00.555Z"
+        },
+        "total_encaisse": {
+          "integerValue": "1500"
+        },
+        "devis_url": {
+          "stringValue": "https://firebasestorage.googleapis.com/v0/b/importok-6ef77.firebasestorage.app/o/devis%2FDVS-2604019.pdf?alt=media&token=e545c88e-152d-4bdd-b0be-6407c48ae61f"
+        },
+        "statut_paiement": {
+          "stringValue": "paye_partiel"
+        },
+        "prix_negocies": {
+          "mapValue": {
+            "fields": {
+              "MP-R22-001": {
+                "integerValue": "18888"
+              },
+              "MP-R32-001": {
+                "integerValue": "22222"
+              }
+            }
+          }
+        },
+        "destination": {
+          "stringValue": "MQ"
+        },
+        "acomptes": {
+          "arrayValue": {
+            "values": [
+              {
+                "mapValue": {
+                  "fields": {
+                    "date_encaissement": {
+                      "stringValue": "2026-04-22T16:30:39.454Z"
+                    },
+                    "type_compte": {
+                      "stringValue": "professionnel"
+                    },
+                    "date": {
+                      "stringValue": "2026-04-22T16:25:56.290Z"
+                    },
+                    "ref_fa": {
+                      "stringValue": "FA-2604011"
+                    },
+                    "montant": {
+                      "integerValue": "500"
+                    },
+                    "statut": {
+                      "stringValue": "encaisse"
+                    }
+                  }
+                }
+              },
+              {
+                "mapValue": {
+                  "fields": {
+                    "iban_utilise": {
+                      "stringValue": "DE93 1001 1001 2625 2584 23"
+                    },
+                    "statut": {
+                      "stringValue": "encaisse"
+                    },
+                    "ref_fa": {
+                      "stringValue": "FA-2604012"
+                    },
+                    "montant": {
+                      "integerValue": "500"
+                    },
+                    "date": {
+                      "stringValue": "2026-04-22T16:27:31.110Z"
+                    },
+                    "type_compte": {
+                      "stringValue": "perso"
+                    },
+                    "date_encaissement": {
+                      "stringValue": "2026-04-22T17:27:49.388Z"
+                    }
+                  }
+                }
+              },
+              {
+                "mapValue": {
+                  "fields": {
+                    "date_encaissement": {
+                      "stringValue": "2026-04-22T17:27:59.328Z"
+                    },
+                    "type_compte": {
+                      "stringValue": "perso"
+                    },
+                    "date": {
+                      "stringValue": "2026-04-22T17:01:57.570Z"
+                    },
+                    "statut": {
+                      "stringValue": "encaisse"
+                    },
+                    "iban_utilise": {
+                      "stringValue": "DE93 1001 1001 2625 2584 23"
+                    },
+                    "montant": {
+                      "integerValue": "500"
+                    },
+                    "ref_fa": {
+                      "stringValue": "FA-2604013"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "total_ht": {
+          "integerValue": "41110"
+        },
+        "client_id": {
+          "stringValue": "d4FH6o9ZukOZZBKRAidreFJUEji2"
+        }
+      },
+      "createTime": "2026-04-22T16:25:56.375782Z",
+      "updateTime": "2026-04-22T17:28:00.592845Z"
+    },
+    {
+      "name": "projects/importok-6ef77/databases/(default)/documents/quotes/DVS-2604020",
+      "fields": {
+        "numero": {
+          "stringValue": "DVS-2604020"
+        },
+        "client_prenom": {
+          "stringValue": "Jean"
+        },
+        "createdAt": {
+          "timestampValue": "2026-04-22T20:21:48.796Z"
+        },
+        "lignes": {
+          "arrayValue": {
+            "values": [
+              {
+                "mapValue": {
+                  "fields": {
+                    "ref": {
+                      "stringValue": "MP-R22-001"
+                    },
+                    "type": {
+                      "stringValue": "product"
+                    },
+                    "prix_unitaire": {
+                      "integerValue": "23050"
+                    },
+                    "nom_fr": {
+                      "stringValue": "Mini-pelle R22 PRO — Chenilles caoutchouc"
+                    },
+                    "total": {
+                      "integerValue": "46100"
+                    },
+                    "qte": {
+                      "integerValue": "2"
+                    }
+                  }
+                }
+              },
+              {
+                "mapValue": {
+                  "fields": {
+                    "prix_unitaire": {
+                      "integerValue": "28050"
+                    },
+                    "type": {
+                      "stringValue": "product"
+                    },
+                    "ref": {
+                      "stringValue": "MP-R32-001"
+                    },
+                    "qte": {
+                      "integerValue": "1"
+                    },
+                    "total": {
+                      "integerValue": "28050"
+                    },
+                    "nom_fr": {
+                      "stringValue": "Mini-pelle R32 PRO — Chenilles caoutchouc"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "updatedAt": {
+          "timestampValue": "2026-04-22T20:22:49.878Z"
+        },
+        "partenaire_code": {
+          "stringValue": "PB"
+        },
+        "client_adresse": {
+          "stringValue": "12 Rue des Palmiers, 97200, Fort-de-France, MQ"
+        },
+        "statut": {
+          "stringValue": "vip_envoye"
+        },
+        "client_nom": {
+          "stringValue": "Jean Dupont"
+        },
+        "is_vip": {
+          "booleanValue": true
+        },
+        "client_siret": {
+          "stringValue": ""
+        },
+        "client_id": {
+          "stringValue": "d4FH6o9ZukOZZBKRAidreFJUEji2"
+        },
+        "client_email": {
+          "stringValue": "client@97import.com"
+        },
+        "total_ht": {
+          "integerValue": "45109"
+        },
+        "acomptes": {
+          "arrayValue": {
+            "values": [
+              {
+                "mapValue": {
+                  "fields": {
+                    "type_compte": {
+                      "stringValue": "personnel"
+                    },
+                    "statut": {
+                      "stringValue": "declare"
+                    },
+                    "date": {
+                      "stringValue": "2026-04-22T20:21:48.745Z"
+                    },
+                    "montant": {
+                      "integerValue": "1111"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "destination": {
+          "stringValue": "MQ"
+        },
+        "prix_negocies": {
+          "mapValue": {
+            "fields": {
+              "MP-R22-001": {
+                "integerValue": "15555"
+              },
+              "MP-R32-001": {
+                "integerValue": "13999"
+              }
+            }
+          }
+        },
+        "client_tel": {
+          "stringValue": "+596 6 96 12 34 56"
+        },
+        "total_ht_public": {
+          "integerValue": "74150"
+        },
+        "pays_livraison": {
+          "stringValue": "MQ"
+        }
+      },
+      "createTime": "2026-04-22T20:21:48.829354Z",
+      "updateTime": "2026-04-22T20:22:49.960726Z"
+    },
+    {
+      "name": "projects/importok-6ef77/databases/(default)/documents/quotes/DVS-2604021",
+      "fields": {
+        "client_prenom": {
+          "stringValue": "Jean"
+        },
+        "numero": {
+          "stringValue": "DVS-2604021"
+        },
+        "lignes": {
+          "arrayValue": {
+            "values": [
+              {
+                "mapValue": {
+                  "fields": {
+                    "total": {
+                      "integerValue": "60000"
+                    },
+                    "qte": {
+                      "integerValue": "1"
+                    },
+                    "nom_fr": {
+                      "stringValue": "Maison Premium 30 Pieds"
+                    },
+                    "prix_unitaire": {
+                      "integerValue": "60000"
+                    },
+                    "type": {
+                      "stringValue": "product"
+                    },
+                    "ref": {
+                      "stringValue": "MP-30-001"
+                    }
+                  }
+                }
+              },
+              {
+                "mapValue": {
+                  "fields": {
+                    "total": {
+                      "integerValue": "23060"
+                    },
+                    "qte": {
+                      "integerValue": "1"
+                    },
+                    "nom_fr": {
+                      "stringValue": "Mini-pelle R22 PRO — Chenilles caoutchouc"
+                    },
+                    "type": {
+                      "stringValue": "product"
+                    },
+                    "prix_unitaire": {
+                      "integerValue": "23060"
+                    },
+                    "ref": {
+                      "stringValue": "MP-R22-001"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "createdAt": {
+          "timestampValue": "2026-04-23T14:51:59.980Z"
+        },
+        "updatedAt": {
+          "timestampValue": "2026-04-23T14:51:59.980Z"
+        },
+        "partenaire_code": {
+          "stringValue": "PB"
+        },
+        "is_vip": {
+          "booleanValue": false
+        },
+        "client_nom": {
+          "stringValue": "Jean Dupont"
+        },
+        "client_siret": {
+          "stringValue": ""
+        },
+        "client_adresse": {
+          "stringValue": "12 Rue des Palmiers, 97200, Fort-de-France, MQ"
+        },
+        "statut": {
+          "stringValue": "en_negociation_partenaire"
+        },
+        "acomptes": {
+          "arrayValue": {}
+        },
+        "client_id": {
+          "stringValue": "d4FH6o9ZukOZZBKRAidreFJUEji2"
+        },
+        "client_email": {
+          "stringValue": "client@97import.com"
+        },
+        "total_ht": {
+          "integerValue": "83060"
+        },
+        "destination": {
+          "stringValue": "MQ"
+        },
+        "client_tel": {
+          "stringValue": "+596 6 96 12 34 56"
+        },
+        "pays_livraison": {
+          "stringValue": "MQ"
+        }
+      },
+      "createTime": "2026-04-23T14:52:00.033676Z",
+      "updateTime": "2026-04-23T14:52:00.033676Z"
+    },
+    {
+      "name": "projects/importok-6ef77/databases/(default)/documents/quotes/DVS-2604022",
+      "fields": {
+        "numero": {
+          "stringValue": "DVS-2604022"
+        },
+        "partenaire_id": {
+          "nullValue": null
+        },
+        "id": {
+          "stringValue": "DVS-2604022"
+        },
+        "client_prenom": {
+          "stringValue": "dubourg"
+        },
+        "updatedAt": {
+          "timestampValue": "2026-04-23T20:35:54.058Z"
+        },
+        "lignes": {
+          "arrayValue": {
+            "values": [
+              {
+                "mapValue": {
+                  "fields": {
+                    "nom_fr": {
+                      "stringValue": "Mini-pelle R22 PRO — Chenilles métal"
+                    },
+                    "qte": {
+                      "integerValue": "1"
+                    },
+                    "total": {
+                      "integerValue": "0"
+                    },
+                    "ref": {
+                      "stringValue": "MP-R22-002"
+                    },
+                    "prix_unitaire": {
+                      "integerValue": "0"
+                    },
+                    "type": {
+                      "stringValue": "product"
+                    }
+                  }
+                }
+              },
+              {
+                "mapValue": {
+                  "fields": {
+                    "ref": {
+                      "stringValue": "MP-R22-001"
+                    },
+                    "prix_unitaire": {
+                      "integerValue": "23060"
+                    },
+                    "type": {
+                      "stringValue": "product"
+                    },
+                    "nom_fr": {
+                      "stringValue": "Mini-pelle R22 PRO — Chenilles caoutchouc"
+                    },
+                    "total": {
+                      "integerValue": "23060"
+                    },
+                    "qte": {
+                      "integerValue": "1"
+                    }
+                  }
+                }
+              },
+              {
+                "mapValue": {
+                  "fields": {
+                    "nom_fr": {
+                      "stringValue": "Mini-pelle R32 PRO — Chenilles caoutchouc"
+                    },
+                    "qte": {
+                      "integerValue": "1"
+                    },
+                    "total": {
+                      "integerValue": "28050"
+                    },
+                    "ref": {
+                      "stringValue": "MP-R32-001"
+                    },
+                    "prix_unitaire": {
+                      "integerValue": "28050"
+                    },
+                    "type": {
+                      "stringValue": "product"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "createdAt": {
+          "timestampValue": "2026-04-23T20:33:53.359Z"
+        },
+        "partenaire_code": {
+          "stringValue": "MC"
+        },
+        "statut": {
+          "stringValue": "en_negociation_partenaire"
+        },
+        "client_adresse": {
+          "stringValue": "2 RUE MARTIN LUTHER KING, 97200,  FORT-DE-FRANCE, MQ"
+        },
+        "solde_restant": {
+          "integerValue": "51110"
+        },
+        "client_siret": {
+          "stringValue": ""
+        },
+        "is_vip": {
+          "booleanValue": false
+        },
+        "client_nom": {
+          "stringValue": "dubourg thierry"
+        },
+        "client_id": {
+          "stringValue": "zfxfAjlWS4OQOMY2m3FNWdyoCv33"
+        },
+        "client_email": {
+          "stringValue": "tt@sasfr.com"
+        },
+        "total_ht": {
+          "integerValue": "51110"
+        },
+        "acomptes": {
+          "arrayValue": {}
+        },
+        "acompte_pct": {
+          "integerValue": "30"
+        },
+        "destination": {
+          "stringValue": "MQ"
+        },
+        "client_tel": {
+          "stringValue": "+33767897711"
+        },
+        "pays_livraison": {
+          "stringValue": "MQ"
+        },
+        "total_encaisse": {
+          "integerValue": "0"
+        }
+      },
+      "createTime": "2026-04-23T20:33:53.397174Z",
+      "updateTime": "2026-04-23T20:35:54.190120Z"
+    },
+    {
+      "name": "projects/importok-6ef77/databases/(default)/documents/quotes/DVS-2604023",
+      "fields": {
+        "destination": {
+          "stringValue": "FR"
+        },
+        "acomptes": {
+          "arrayValue": {}
+        },
+        "client_email": {
+          "stringValue": "interenovations@gmail.com"
+        },
+        "total_ht": {
+          "integerValue": "23060"
+        },
+        "client_id": {
+          "stringValue": "gRqs14EKgUeIoOZ1ubf8q4t6YFh2"
+        },
+        "pays_livraison": {
+          "stringValue": "FR"
+        },
+        "client_tel": {
+          "stringValue": "+33620607448"
+        },
+        "updatedAt": {
+          "timestampValue": "2026-04-24T08:29:44.162Z"
+        },
+        "createdAt": {
+          "timestampValue": "2026-04-24T08:29:44.162Z"
+        },
+        "lignes": {
+          "arrayValue": {
+            "values": [
+              {
+                "mapValue": {
+                  "fields": {
+                    "ref": {
+                      "stringValue": "MP-R22-001"
+                    },
+                    "prix_unitaire": {
+                      "integerValue": "23060"
+                    },
+                    "type": {
+                      "stringValue": "product"
+                    },
+                    "nom_fr": {
+                      "stringValue": "Mini-pelle R22 PRO — Chenilles caoutchouc"
+                    },
+                    "total": {
+                      "integerValue": "23060"
+                    },
+                    "qte": {
+                      "integerValue": "1"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "client_prenom": {
+          "stringValue": "Yueer"
+        },
+        "numero": {
+          "stringValue": "DVS-2604023"
+        },
+        "client_siret": {
+          "stringValue": ""
+        },
+        "client_nom": {
+          "stringValue": "Yueer WENG"
+        },
+        "is_vip": {
+          "booleanValue": false
+        },
+        "statut": {
+          "stringValue": "en_negociation_partenaire"
+        },
+        "client_adresse": {
+          "stringValue": "13 Rue de Chevilly, 77400, LAGNY SUR MARNE, FR"
+        },
+        "partenaire_code": {
+          "stringValue": "PB"
+        }
+      },
+      "createTime": "2026-04-24T08:29:44.189859Z",
+      "updateTime": "2026-04-24T08:29:44.189859Z"
+    },
+    {
+      "name": "projects/importok-6ef77/databases/(default)/documents/quotes/DVS-2604024",
+      "fields": {
+        "pays_livraison": {
+          "stringValue": "FR"
+        },
+        "updated_at": {
+          "timestampValue": "2026-04-24T08:50:19.938Z"
+        },
+        "total_encaisse": {
+          "integerValue": "5000"
+        },
+        "prix_negocies": {
+          "mapValue": {
+            "fields": {
+              "MP-R32-001": {
+                "integerValue": "25000"
+              }
+            }
+          }
+        },
+        "statut_paiement": {
+          "stringValue": "paye_partiel"
+        },
+        "destination": {
+          "stringValue": "FR"
+        },
+        "acomptes": {
+          "arrayValue": {
+            "values": [
+              {
+                "mapValue": {
+                  "fields": {
+                    "statut": {
+                      "stringValue": "encaisse"
+                    },
+                    "iban_utilise": {
+                      "stringValue": "DE93 1001 1001 2625 2584 23"
+                    },
+                    "ref_fa": {
+                      "stringValue": "FA-2604014"
+                    },
+                    "montant": {
+                      "integerValue": "5000"
+                    },
+                    "type_compte": {
+                      "stringValue": "perso"
+                    },
+                    "date_encaissement": {
+                      "stringValue": "2026-04-24T08:50:18.667Z"
+                    },
+                    "date": {
+                      "stringValue": "2026-04-24T08:49:18.104Z"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "total_ht": {
+          "integerValue": "25000"
+        },
+        "client_id": {
+          "stringValue": "gRqs14EKgUeIoOZ1ubf8q4t6YFh2"
+        },
+        "is_vip": {
+          "booleanValue": true
+        },
+        "client_nom": {
+          "stringValue": "Yueer WENG"
+        },
+        "statut": {
+          "stringValue": "signe"
+        },
+        "signature_token_expiry": {
+          "stringValue": "2026-05-24T08:46:03.298Z"
+        },
+        "client_adresse": {
+          "stringValue": "13 Rue de Chevilly, 77400, LAGNY SUR MARNE, FR"
+        },
+        "partenaire_code": {
+          "stringValue": "UD"
+        },
+        "client_prenom": {
+          "stringValue": "Yueer"
+        },
+        "total_ht_public": {
+          "integerValue": "28050"
+        },
+        "client_tel": {
+          "stringValue": "+33620607448"
+        },
+        "facture_acompte_url": {
+          "stringValue": "https://firebasestorage.googleapis.com/v0/b/importok-6ef77.firebasestorage.app/o/factures_acompte%2FFA-2604014.pdf?alt=media&token=5a23dfa4-b3db-4917-b75e-edf31a0cd309"
+        },
+        "client_email": {
+          "stringValue": "interenovations@gmail.com"
+        },
+        "client_siret": {
+          "stringValue": ""
+        },
+        "solde_restant": {
+          "integerValue": "20000"
+        },
+        "factures_acompte_urls": {
+          "arrayValue": {
+            "values": [
+              {
+                "mapValue": {
+                  "fields": {
+                    "ref_fa": {
+                      "stringValue": "FA-2604014"
+                    },
+                    "date": {
+                      "stringValue": "2026-04-24T08:50:19.867Z"
+                    },
+                    "url": {
+                      "stringValue": "https://firebasestorage.googleapis.com/v0/b/importok-6ef77.firebasestorage.app/o/factures_acompte%2FFA-2604014.pdf?alt=media&token=5a23dfa4-b3db-4917-b75e-edf31a0cd309"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "updatedAt": {
+          "timestampValue": "2026-04-24T08:49:18.104Z"
+        },
+        "signature_token_used": {
+          "booleanValue": false
+        },
+        "createdAt": {
+          "timestampValue": "2026-04-24T08:43:17.351Z"
+        },
+        "lignes": {
+          "arrayValue": {
+            "values": [
+              {
+                "mapValue": {
+                  "fields": {
+                    "nom_fr": {
+                      "stringValue": "Mini-pelle R32 PRO — Chenilles caoutchouc"
+                    },
+                    "qte": {
+                      "integerValue": "1"
+                    },
+                    "total": {
+                      "integerValue": "28050"
+                    },
+                    "ref": {
+                      "stringValue": "MP-R32-001"
+                    },
+                    "prix_unitaire": {
+                      "integerValue": "28050"
+                    },
+                    "type": {
+                      "stringValue": "product"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "signature_token": {
+          "stringValue": "2521c7134e6a490dbef0ee48881ac4e4"
+        },
+        "signe_le": {
+          "timestampValue": "2026-04-24T08:47:43.764Z"
+        },
+        "numero": {
+          "stringValue": "DVS-2604024"
+        }
+      },
+      "createTime": "2026-04-24T08:43:17.392447Z",
+      "updateTime": "2026-04-24T08:50:19.975941Z"
+    },
+    {
+      "name": "projects/importok-6ef77/databases/(default)/documents/quotes/DVS-2604025",
+      "fields": {
+        "client_email": {
+          "stringValue": "interenovations@gmail.com"
+        },
+        "facture_acompte_url": {
+          "stringValue": "https://firebasestorage.googleapis.com/v0/b/importok-6ef77.firebasestorage.app/o/factures_acompte%2FFA-2604017.pdf?alt=media&token=f7434bc6-9f05-484c-b7ae-c718ef745952"
+        },
+        "total_ht_public": {
+          "integerValue": "4000"
+        },
+        "client_tel": {
+          "stringValue": "+33620607448"
+        },
+        "signature_token": {
+          "stringValue": "ea3e50b7a7ce4ee2abaf1d2e9dce1b20"
+        },
+        "createdAt": {
+          "timestampValue": "2026-04-24T09:10:37.508Z"
+        },
+        "lignes": {
+          "arrayValue": {
+            "values": [
+              {
+                "mapValue": {
+                  "fields": {
+                    "qte": {
+                      "integerValue": "1"
+                    },
+                    "total": {
+                      "integerValue": "4000"
+                    },
+                    "nom_fr": {
+                      "stringValue": "Maison Standard 20 Pieds"
+                    },
+                    "type": {
+                      "stringValue": "product"
+                    },
+                    "prix_unitaire": {
+                      "integerValue": "4000"
+                    },
+                    "ref": {
+                      "stringValue": "MS-20-001"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "updatedAt": {
+          "timestampValue": "2026-04-24T09:32:04.886Z"
+        },
+        "signature_token_used": {
+          "booleanValue": false
+        },
+        "signe_le": {
+          "timestampValue": "2026-04-24T09:14:58.221Z"
+        },
+        "numero": {
+          "stringValue": "DVS-2604025"
+        },
+        "solde_restant": {
+          "integerValue": "120"
+        },
+        "client_siret": {
+          "stringValue": ""
+        },
+        "factures_acompte_urls": {
+          "arrayValue": {
+            "values": [
+              {
+                "mapValue": {
+                  "fields": {
+                    "date": {
+                      "stringValue": "2026-04-24T09:32:52.196Z"
+                    },
+                    "url": {
+                      "stringValue": "https://firebasestorage.googleapis.com/v0/b/importok-6ef77.firebasestorage.app/o/factures_acompte%2FFA-2604017.pdf?alt=media&token=f7434bc6-9f05-484c-b7ae-c718ef745952"
+                    },
+                    "ref_fa": {
+                      "stringValue": "FA-2604017"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "destination": {
+          "stringValue": "FR"
+        },
+        "statut_paiement": {
+          "stringValue": "paye_partiel"
+        },
+        "prix_negocies": {
+          "mapValue": {
+            "fields": {
+              "MS-20-001": {
+                "integerValue": "2000"
+              }
+            }
+          }
+        },
+        "total_ht": {
+          "integerValue": "2000"
+        },
+        "client_id": {
+          "stringValue": "gRqs14EKgUeIoOZ1ubf8q4t6YFh2"
+        },
+        "acomptes": {
+          "arrayValue": {
+            "values": [
+              {
+                "mapValue": {
+                  "fields": {
+                    "date": {
+                      "stringValue": "2026-04-24T09:16:17.129Z"
+                    },
+                    "date_encaissement": {
+                      "stringValue": "2026-04-24T09:17:29.218Z"
+                    },
+                    "type_compte": {
+                      "stringValue": "perso"
+                    },
+                    "montant": {
+                      "integerValue": "500"
+                    },
+                    "ref_fa": {
+                      "stringValue": "FA-2604015"
+                    },
+                    "iban_utilise": {
+                      "stringValue": "DE93 1001 1001 2625 2584 23"
+                    },
+                    "statut": {
+                      "stringValue": "encaisse"
+                    }
+                  }
+                }
+              },
+              {
+                "mapValue": {
+                  "fields": {
+                    "ref_fa": {
+                      "stringValue": "FA-2604016"
+                    },
+                    "montant": {
+                      "integerValue": "1000"
+                    },
+                    "statut": {
+                      "stringValue": "encaisse"
+                    },
+                    "iban_utilise": {
+                      "stringValue": "DE93 1001 1001 2625 2584 23"
+                    },
+                    "type_compte": {
+                      "stringValue": "perso"
+                    },
+                    "date_encaissement": {
+                      "stringValue": "2026-04-24T09:31:32.420Z"
+                    },
+                    "date": {
+                      "stringValue": "2026-04-24T09:30:48.983Z"
+                    }
+                  }
+                }
+              },
+              {
+                "mapValue": {
+                  "fields": {
+                    "montant": {
+                      "integerValue": "380"
+                    },
+                    "ref_fa": {
+                      "stringValue": "FA-2604017"
+                    },
+                    "iban_utilise": {
+                      "stringValue": "DE93 1001 1001 2625 2584 23"
+                    },
+                    "statut": {
+                      "stringValue": "encaisse"
+                    },
+                    "date": {
+                      "stringValue": "2026-04-24T09:32:04.886Z"
+                    },
+                    "date_encaissement": {
+                      "stringValue": "2026-04-24T09:32:50.979Z"
+                    },
+                    "type_compte": {
+                      "stringValue": "perso"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "pays_livraison": {
+          "stringValue": "FR"
+        },
+        "updated_at": {
+          "timestampValue": "2026-04-24T09:32:52.269Z"
+        },
+        "total_encaisse": {
+          "integerValue": "1880"
+        },
+        "client_prenom": {
+          "stringValue": "Yueer"
+        },
+        "signature_token_expiry": {
+          "stringValue": "2026-05-24T09:13:43.241Z"
+        },
+        "client_adresse": {
+          "stringValue": "13 Rue de Chevilly, 77400, LAGNY SUR MARNE, FR"
+        },
+        "statut": {
+          "stringValue": "signe"
+        },
+        "is_vip": {
+          "booleanValue": true
+        },
+        "client_nom": {
+          "stringValue": "Yueer WENG"
+        },
+        "partenaire_code": {
+          "stringValue": "UD"
+        }
+      },
+      "createTime": "2026-04-24T09:10:37.548850Z",
+      "updateTime": "2026-04-24T09:32:52.309550Z"
+    },
+    {
+      "name": "projects/importok-6ef77/databases/(default)/documents/quotes/DVS-2604026",
+      "fields": {
+        "prix_negocies": {
+          "mapValue": {
+            "fields": {
+              "MP-R22-001": {
+                "integerValue": "13000"
+              },
+              "MP-R32-001": {
+                "integerValue": "18000"
+              }
+            }
+          }
+        },
+        "destination": {
+          "stringValue": "FR"
+        },
+        "acomptes": {
+          "arrayValue": {
+            "values": [
+              {
+                "mapValue": {
+                  "fields": {
+                    "montant": {
+                      "integerValue": "9300"
+                    },
+                    "ref_fa": {
+                      "stringValue": ""
+                    },
+                    "statut": {
+                      "stringValue": "declare"
+                    },
+                    "date": {
+                      "stringValue": "2026-04-24T09:51:11.112Z"
+                    },
+                    "type_compte": {
+                      "stringValue": "perso"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "client_id": {
+          "stringValue": "gRqs14EKgUeIoOZ1ubf8q4t6YFh2"
+        },
+        "total_ht": {
+          "integerValue": "31000"
+        },
+        "client_email": {
+          "stringValue": "interenovations@gmail.com"
+        },
+        "pays_livraison": {
+          "stringValue": "FR"
+        },
+        "total_ht_public": {
+          "integerValue": "51110"
+        },
+        "client_tel": {
+          "stringValue": "+33620607448"
+        },
+        "lignes": {
+          "arrayValue": {
+            "values": [
+              {
+                "mapValue": {
+                  "fields": {
+                    "ref": {
+                      "stringValue": "MP-R22-001"
+                    },
+                    "prix_unitaire": {
+                      "integerValue": "23060"
+                    },
+                    "type": {
+                      "stringValue": "product"
+                    },
+                    "nom_fr": {
+                      "stringValue": "Mini-pelle R22 PRO — Chenilles caoutchouc"
+                    },
+                    "total": {
+                      "integerValue": "23060"
+                    },
+                    "qte": {
+                      "integerValue": "1"
+                    }
+                  }
+                }
+              },
+              {
+                "mapValue": {
+                  "fields": {
+                    "nom_fr": {
+                      "stringValue": "Mini-pelle R32 PRO — Chenilles caoutchouc"
+                    },
+                    "total": {
+                      "integerValue": "28050"
+                    },
+                    "qte": {
+                      "integerValue": "1"
+                    },
+                    "ref": {
+                      "stringValue": "MP-R32-001"
+                    },
+                    "prix_unitaire": {
+                      "integerValue": "28050"
+                    },
+                    "type": {
+                      "stringValue": "product"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "createdAt": {
+          "timestampValue": "2026-04-24T09:45:53.143Z"
+        },
+        "updatedAt": {
+          "timestampValue": "2026-04-24T10:02:14.065Z"
+        },
+        "signature_token_used": {
+          "booleanValue": true
+        },
+        "signature_token": {
+          "stringValue": "ee7954121708476490d0fb5dc11ad185"
+        },
+        "client_prenom": {
+          "stringValue": "Yueer"
+        },
+        "numero": {
+          "stringValue": "DVS-2604026"
+        },
+        "signe_le": {
+          "timestampValue": "2026-04-24T10:02:14.065Z"
+        },
+        "client_nom": {
+          "stringValue": "Yueer WENG"
+        },
+        "is_vip": {
+          "booleanValue": true
+        },
+        "client_siret": {
+          "stringValue": ""
+        },
+        "client_adresse": {
+          "stringValue": "13 Rue de Chevilly, 77400, LAGNY SUR MARNE, FR"
+        },
+        "signature_token_expiry": {
+          "stringValue": "2026-05-24T09:46:35.117Z"
+        },
+        "statut": {
+          "stringValue": "signe"
+        },
+        "partenaire_code": {
+          "stringValue": "UD"
+        }
+      },
+      "createTime": "2026-04-24T09:45:53.174217Z",
+      "updateTime": "2026-04-24T10:02:14.094548Z"
+    },
+    {
+      "name": "projects/importok-6ef77/databases/(default)/documents/quotes/DVS-2604027",
+      "fields": {
+        "signature_token": {
+          "stringValue": "3c4e4659f64c4df9a7c2695c9e4d81f8"
+        },
+        "signature_token_used": {
+          "booleanValue": true
+        },
+        "updatedAt": {
+          "timestampValue": "2026-04-24T09:58:10.933Z"
+        },
+        "createdAt": {
+          "timestampValue": "2026-04-24T09:54:46.721Z"
+        },
+        "lignes": {
+          "arrayValue": {
+            "values": [
+              {
+                "mapValue": {
+                  "fields": {
+                    "qte": {
+                      "integerValue": "1"
+                    },
+                    "total": {
+                      "integerValue": "23060"
+                    },
+                    "nom_fr": {
+                      "stringValue": "Mini-pelle R22 PRO — Chenilles caoutchouc"
+                    },
+                    "prix_unitaire": {
+                      "integerValue": "23060"
+                    },
+                    "type": {
+                      "stringValue": "product"
+                    },
+                    "ref": {
+                      "stringValue": "MP-R22-001"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "signe_le": {
+          "timestampValue": "2026-04-24T09:56:04.575Z"
+        },
+        "numero": {
+          "stringValue": "DVS-2604027"
+        },
+        "solde_restant": {
+          "integerValue": "7453"
+        },
+        "client_siret": {
+          "stringValue": ""
+        },
+        "factures_acompte_urls": {
+          "arrayValue": {
+            "values": [
+              {
+                "mapValue": {
+                  "fields": {
+                    "url": {
+                      "stringValue": "https://firebasestorage.googleapis.com/v0/b/importok-6ef77.firebasestorage.app/o/factures_acompte%2FFA-2604020.pdf?alt=media&token=ccd38f35-12a9-499d-9438-5005b93a198f"
+                    },
+                    "date": {
+                      "stringValue": "2026-04-24T09:58:41.157Z"
+                    },
+                    "ref_fa": {
+                      "stringValue": "FA-2604020"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "client_email": {
+          "stringValue": "interenovations@gmail.com"
+        },
+        "facture_acompte_url": {
+          "stringValue": "https://firebasestorage.googleapis.com/v0/b/importok-6ef77.firebasestorage.app/o/factures_acompte%2FFA-2604020.pdf?alt=media&token=ccd38f35-12a9-499d-9438-5005b93a198f"
+        },
+        "total_ht_public": {
+          "integerValue": "23060"
+        },
+        "client_tel": {
+          "stringValue": "+33620607448"
+        },
+        "client_prenom": {
+          "stringValue": "Yueer"
+        },
+        "statut": {
+          "stringValue": "signe"
+        },
+        "client_adresse": {
+          "stringValue": "13 Rue de Chevilly, 77400, LAGNY SUR MARNE, FR"
+        },
+        "signature_token_expiry": {
+          "stringValue": "2026-05-24T09:55:33.293Z"
+        },
+        "is_vip": {
+          "booleanValue": true
+        },
+        "client_nom": {
+          "stringValue": "Yueer WENG"
+        },
+        "partenaire_code": {
+          "stringValue": "UD"
+        },
+        "destination": {
+          "stringValue": "FR"
+        },
+        "prix_negocies": {
+          "mapValue": {
+            "fields": {
+              "MP-R22-001": {
+                "integerValue": "12222"
+              }
+            }
+          }
+        },
+        "statut_paiement": {
+          "stringValue": "paye_partiel"
+        },
+        "client_id": {
+          "stringValue": "gRqs14EKgUeIoOZ1ubf8q4t6YFh2"
+        },
+        "total_ht": {
+          "integerValue": "12222"
+        },
+        "acomptes": {
+          "arrayValue": {
+            "values": [
+              {
+                "mapValue": {
+                  "fields": {
+                    "type_compte": {
+                      "stringValue": "perso"
+                    },
+                    "date_encaissement": {
+                      "stringValue": "2026-04-24T09:57:03.139Z"
+                    },
+                    "date": {
+                      "stringValue": "2026-04-24T09:56:17.530Z"
+                    },
+                    "statut": {
+                      "stringValue": "encaisse"
+                    },
+                    "ref_fa": {
+                      "stringValue": "FA-2604018"
+                    },
+                    "montant": {
+                      "integerValue": "3667"
+                    }
+                  }
+                }
+              },
+              {
+                "mapValue": {
+                  "fields": {
+                    "statut": {
+                      "stringValue": "encaisse"
+                    },
+                    "iban_utilise": {
+                      "stringValue": "DE93 1001 1001 2625 2584 23"
+                    },
+                    "montant": {
+                      "integerValue": "501"
+                    },
+                    "ref_fa": {
+                      "stringValue": "FA-2604019"
+                    },
+                    "type_compte": {
+                      "stringValue": "perso"
+                    },
+                    "date_encaissement": {
+                      "stringValue": "2026-04-24T09:58:34.310Z"
+                    },
+                    "date": {
+                      "stringValue": "2026-04-24T09:57:45.389Z"
+                    }
+                  }
+                }
+              },
+              {
+                "mapValue": {
+                  "fields": {
+                    "montant": {
+                      "integerValue": "601"
+                    },
+                    "ref_fa": {
+                      "stringValue": "FA-2604020"
+                    },
+                    "statut": {
+                      "stringValue": "encaisse"
+                    },
+                    "iban_utilise": {
+                      "stringValue": "DE93 1001 1001 2625 2584 23"
+                    },
+                    "date_encaissement": {
+                      "stringValue": "2026-04-24T09:58:40.479Z"
+                    },
+                    "type_compte": {
+                      "stringValue": "perso"
+                    },
+                    "date": {
+                      "stringValue": "2026-04-24T09:58:10.933Z"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "pays_livraison": {
+          "stringValue": "FR"
+        },
+        "updated_at": {
+          "timestampValue": "2026-04-24T09:58:41.257Z"
+        },
+        "total_encaisse": {
+          "integerValue": "4769"
+        }
+      },
+      "createTime": "2026-04-24T09:54:46.765073Z",
+      "updateTime": "2026-04-24T09:58:41.288907Z"
+    },
+    {
+      "name": "projects/importok-6ef77/databases/(default)/documents/quotes/DVS-2604028",
+      "fields": {
+        "statut": {
+          "stringValue": "signe"
+        },
+        "client_adresse": {
+          "stringValue": "13 Rue de Chevilly, 77400, LAGNY SUR MARNE, FR"
+        },
+        "signature_token_expiry": {
+          "stringValue": "2026-05-24T10:11:11.531Z"
+        },
+        "is_vip": {
+          "booleanValue": true
+        },
+        "client_nom": {
+          "stringValue": "Yueer WENG"
+        },
+        "partenaire_code": {
+          "stringValue": "UD"
+        },
+        "client_prenom": {
+          "stringValue": "Yueer"
+        },
+        "total_encaisse": {
+          "integerValue": "5555"
+        },
+        "updated_at": {
+          "timestampValue": "2026-04-24T10:11:46.176Z"
+        },
+        "pays_livraison": {
+          "stringValue": "FR"
+        },
+        "destination": {
+          "stringValue": "FR"
+        },
+        "prix_negocies": {
+          "mapValue": {
+            "fields": {
+              "MP-R22-001": {
+                "integerValue": "13333"
+              }
+            }
+          }
+        },
+        "statut_paiement": {
+          "stringValue": "paye_partiel"
+        },
+        "client_id": {
+          "stringValue": "gRqs14EKgUeIoOZ1ubf8q4t6YFh2"
+        },
+        "total_ht": {
+          "integerValue": "13333"
+        },
+        "acomptes": {
+          "arrayValue": {
+            "values": [
+              {
+                "mapValue": {
+                  "fields": {
+                    "date": {
+                      "stringValue": "2026-04-24T10:11:32.011Z"
+                    },
+                    "type_compte": {
+                      "stringValue": "perso"
+                    },
+                    "date_encaissement": {
+                      "stringValue": "2026-04-24T10:11:45.003Z"
+                    },
+                    "iban_utilise": {
+                      "stringValue": "DE93 1001 1001 2625 2584 23"
+                    },
+                    "statut": {
+                      "stringValue": "encaisse"
+                    },
+                    "montant": {
+                      "integerValue": "5555"
+                    },
+                    "ref_fa": {
+                      "stringValue": "FA-2604021"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "solde_restant": {
+          "integerValue": "7778"
+        },
+        "client_siret": {
+          "stringValue": ""
+        },
+        "factures_acompte_urls": {
+          "arrayValue": {
+            "values": [
+              {
+                "mapValue": {
+                  "fields": {
+                    "date": {
+                      "stringValue": "2026-04-24T10:11:46.066Z"
+                    },
+                    "url": {
+                      "stringValue": "https://firebasestorage.googleapis.com/v0/b/importok-6ef77.firebasestorage.app/o/factures_acompte%2FFA-2604021.pdf?alt=media&token=ab1c7c98-b3ea-46d6-aee1-95fc10cb12d0"
+                    },
+                    "ref_fa": {
+                      "stringValue": "FA-2604021"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "signature_token": {
+          "stringValue": "14e6e2ba75134000b26e8f4823a087ad"
+        },
+        "updatedAt": {
+          "timestampValue": "2026-04-24T10:11:32.011Z"
+        },
+        "signature_token_used": {
+          "booleanValue": false
+        },
+        "createdAt": {
+          "timestampValue": "2026-04-24T10:10:55.177Z"
+        },
+        "lignes": {
+          "arrayValue": {
+            "values": [
+              {
+                "mapValue": {
+                  "fields": {
+                    "qte": {
+                      "integerValue": "1"
+                    },
+                    "total": {
+                      "integerValue": "23060"
+                    },
+                    "nom_fr": {
+                      "stringValue": "Mini-pelle R22 PRO — Chenilles caoutchouc"
+                    },
+                    "prix_unitaire": {
+                      "integerValue": "23060"
+                    },
+                    "type": {
+                      "stringValue": "product"
+                    },
+                    "ref": {
+                      "stringValue": "MP-R22-001"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "signe_le": {
+          "timestampValue": "2026-04-24T10:11:19.565Z"
+        },
+        "numero": {
+          "stringValue": "DVS-2604028"
+        },
+        "total_ht_public": {
+          "integerValue": "23060"
+        },
+        "client_tel": {
+          "stringValue": "+33620607448"
+        },
+        "client_email": {
+          "stringValue": "interenovations@gmail.com"
+        },
+        "facture_acompte_url": {
+          "stringValue": "https://firebasestorage.googleapis.com/v0/b/importok-6ef77.firebasestorage.app/o/factures_acompte%2FFA-2604021.pdf?alt=media&token=ab1c7c98-b3ea-46d6-aee1-95fc10cb12d0"
+        }
+      },
+      "createTime": "2026-04-24T10:10:55.218249Z",
+      "updateTime": "2026-04-24T10:11:46.214645Z"
+    }
+  ]
+}
