@@ -1,0 +1,99 @@
+=== MAJ FIX-URLS-EMAILS-VERCEL ===
+Date : 2026-04-24 11:08
+Branche : v2
+Commit : 09ad862
+Build : OK
+
+PROBLÈME RÉSOLU :
+  Tous les boutons/liens dans les emails pointaient vers
+  https://97import.com (prod pas encore déployée).
+  Les tests sur Vercel preview avaient des liens cassés.
+
+SOLUTION :
+  Constante centralisée SITE_URL :
+    AVANT : 'https://97import.com'
+    APRÈS : 'https://97import-firebase-git-v2-parisb2bs-projects.vercel.app'
+
+  Les constantes dérivées utilisent maintenant des template literals :
+    ESPACE_CLIENT_URL = `${SITE_URL}/espace-client`
+    ESPACE_PARTENAIRE_URL = `${SITE_URL}/espace-partenaire`
+
+  Toutes les URLs dans les templates HTML des emails
+  utilisent maintenant ${SITE_URL} ou les constantes dérivées.
+
+BASCULEMENT VERS PROD (futur) :
+  Quand le domaine 97import.com sera configuré :
+  1. Modifier UNE SEULE ligne dans emailService.ts :
+     const SITE_URL = 'https://97import.com';
+  2. Commit + push
+  3. Tous les emails utiliseront automatiquement la prod
+
+FICHIER MODIFIÉ (1) :
+  ✅ src/lib/emailService.ts (12 lignes : +9, -3)
+
+FICHIERS INTERDITS (intacts) :
+  ✅ src/front/pages/Panier.tsx
+  ✅ src/front/pages/espace-partenaire/GestionDevisPartner.tsx
+  ✅ src/front/pages/espace-client/DevisCard.tsx
+  ✅ src/lib/pdf-generator.ts
+  ✅ src/admin/styles/admin.css
+
+COMMIT :
+  09ad862 FIX-URLS-EMAILS-VERCEL: URLs emails → Vercel preview
+
+TESTS À EFFECTUER (workflow E2E) :
+  [ ] Créer un nouveau devis → vérifier le lien dans l'email partenaire
+      → doit ouvrir https://97import-firebase-git-v2-parisb2bs-projects.vercel.app/espace-partenaire
+
+  [ ] Renvoyer devis VIP → vérifier le lien de signature dans email client
+      → doit ouvrir https://97import-firebase-git-v2-parisb2bs-projects.vercel.app/signature/TOKEN
+
+  [ ] Signer le devis → vérifier les liens dans les 3 emails
+      → tous doivent ouvrir la preview Vercel
+
+  [ ] Déclarer acompte → vérifier les liens
+      → tous doivent ouvrir la preview Vercel
+
+  [ ] Encaisser acompte → vérifier les liens
+      → tous doivent ouvrir la preview Vercel
+
+DÉTAILS TECHNIQUES :
+
+  Modification dans src/lib/emailService.ts (lignes 5-17) :
+
+  AVANT :
+    const SITE_URL = 'https://97import.com';
+    const ESPACE_CLIENT_URL = 'https://97import.com/espace-client';
+    const ESPACE_PARTENAIRE_URL = 'https://97import.com/espace-partenaire';
+
+  APRÈS :
+    // ═══════════════════════════════════════════════════
+    // URL du site — à modifier quand on passera en prod
+    // ═══════════════════════════════════════════════════
+    // En test : URL Vercel preview
+    // En prod : remplacer par 'https://97import.com'
+    const SITE_URL = 'https://97import-firebase-git-v2-parisb2bs-projects.vercel.app';
+    const ESPACE_CLIENT_URL = `${SITE_URL}/espace-client`;
+    const ESPACE_PARTENAIRE_URL = `${SITE_URL}/espace-partenaire`;
+
+  Tous les templates email utilisent ces constantes :
+    - Signature devis : ${SITE_URL}/signature/${token}
+    - Admin devis : ${SITE_URL}/admin/devis/${numero}
+    - Espace client : ${ESPACE_CLIENT_URL}
+    - Espace partenaire : ${ESPACE_PARTENAIRE_URL}
+
+COMPATIBILITÉ :
+  ✅ Aucun changement de structure
+  ✅ Aucun changement d'API
+  ✅ Rétrocompatible avec les emails déjà envoyés
+  ✅ Les futurs emails pointeront vers Vercel
+
+BUILD :
+  ✅ TypeScript : 0 erreur
+  ✅ Vite build : SUCCESS
+  ✅ Warnings : uniquement taille chunks (attendu)
+
+BACKUP TAG :
+  backup-urls-20260424-1107
+
+✅ CORRECTIF APPLIQUÉ ET POUSSÉ SUR origin/v2

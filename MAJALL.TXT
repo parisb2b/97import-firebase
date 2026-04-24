@@ -768,3 +768,5 @@ P3-QOL-C — 2026-04-23 — Bouton Dupliquer en ligne dans liste catalogue admin
 P3-QOL-D1 — 2026-04-23 — Toast auto-dismiss après suppression produit (remplace popup OK) — OK
 
 P3-QOL-D2 — 2026-04-23 — Enrichissement section Prix & fournisseur (multi-devises USD/CNY/EUR + prix de vente calculés) — OK
+
+FIX-URLS-EMAILS-VERCEL — 2026-04-24 — URLs emails pointent vers Vercel preview — OK
