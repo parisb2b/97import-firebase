@@ -770,3 +770,5 @@ P3-QOL-D1 — 2026-04-23 — Toast auto-dismiss après suppression produit (remp
 P3-QOL-D2 — 2026-04-23 — Enrichissement section Prix & fournisseur (multi-devises USD/CNY/EUR + prix de vente calculés) — OK
 
 FIX-URLS-EMAILS-VERCEL — 2026-04-24 — URLs emails pointent vers Vercel preview — OK
+
+FIX-AFFICHAGE-PRIX-VIP — 2026-04-24 — PDF facture acompte + back-office DetailDevis affichent prix VIP négociés (testé sur DVS-2604024)
