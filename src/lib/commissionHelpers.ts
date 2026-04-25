@@ -2,6 +2,7 @@
 // Calcul de commission par ligne + génération note de commission (NC)
 
 import { QuoteLine } from './quoteStatusHelpers';
+import { logError, logInfo } from './logService';
 
 export interface CommissionLigne {
   reference: string;
@@ -149,6 +150,7 @@ export async function creerCommissionDevis(params: {
   const calc = calculerCommissionDevis(devis.lignes || []);
   if (!calc.valid) {
     console.error('[V43-E3.2] Vente à perte détectée :', calc.erreur);
+    logError('commission-helpers', `Vente à perte détectée: ${calc.erreur}`, { devisNumero: devis.numero });
     return { ok: false, skipped: false, reason: `vente_a_perte: ${calc.erreur}` };
   }
 
@@ -172,6 +174,7 @@ export async function creerCommissionDevis(params: {
     numeroNC = await generateNumeroDocument('note_commission');
   } catch (err: any) {
     console.error('[V43-E3.2] Génération numéro NC échouée :', err);
+    logError('commission-helpers', 'Génération numéro NC échouée', { devisNumero: devis.numero }, err);
     return { ok: false, skipped: false, reason: `numero_generation: ${err.message || err}` };
   }
 
@@ -198,6 +201,7 @@ export async function creerCommissionDevis(params: {
       commission_total: calc.total,
     });
     console.log('[V43-E3.2] Commission créée :', numeroNC, '—', calc.total, '€');
+    logInfo('commission-helpers', `Commission créée ${numeroNC}`, { devisNumero: devis.numero, total: calc.total, partenaire_code: devis.partenaire_code });
     return {
       ok: true,
       skipped: false,
@@ -207,6 +211,7 @@ export async function creerCommissionDevis(params: {
     };
   } catch (err: any) {
     console.error('[V43-E3.2] Création commission Firestore échouée :', err);
+    logError('commission-helpers', 'Création commission Firestore échouée', { devisNumero: devis.numero, numeroNC }, err);
     return { ok: false, skipped: false, reason: `firestore_write: ${err.message || err}` };
   }
 }

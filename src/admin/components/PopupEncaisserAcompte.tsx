@@ -6,6 +6,7 @@ import { generateFactureAcomptePDF } from '../../lib/generateInvoiceAcompte';
 import { validerNouveauPaiement, prochainPaiementEstSolde, getNbAcomptesEncaisses, generateNumeroDocument } from '../../lib/quoteStatusHelpers';
 import { notifyAcompteEncaisse } from '../../lib/emailService';
 import { creerCommissionDevis } from '../../lib/commissionHelpers';
+import { logError, logWarn } from '../../lib/logService';
 
 /**
  * v43-E3.2 — Cascade best-effort à exécuter quand un devis passe à `solde_paye`.
@@ -48,6 +49,7 @@ async function traiterCascadeSoldePaye(devis: any): Promise<void> {
       factureFinalePdfUrl = await getDownloadURL(fileRef);
     } catch (pdfErr: any) {
       console.warn('[V43-E3.2] PDF facture finale non généré (continue sans PDF) :', pdfErr?.message || pdfErr);
+      logWarn('cascade-e3.2-facture', 'PDF facture finale non généré', { devisNumero: devis.numero, factureFinaleNumero });
     }
 
     await updateDoc(doc(db, 'quotes', devisId), {
@@ -61,6 +63,7 @@ async function traiterCascadeSoldePaye(devis: any): Promise<void> {
     console.log('[V43-E3.2] Facture finale créée :', factureFinaleNumero);
   } catch (err: any) {
     console.error('[V43-E3.2] Génération facture finale échouée :', err);
+    logError('cascade-e3.2-facture', 'Génération facture finale échouée', { devisNumero: devis.numero }, err);
   }
 
   // ÉTAPE 2 : Création commission + email partenaire
@@ -83,6 +86,7 @@ async function traiterCascadeSoldePaye(devis: any): Promise<void> {
           // v43-E3.2-fix V1 : guard contre partenaire sans email valide (évite faux positifs)
           if (!partner.email || typeof partner.email !== 'string' || !partner.email.includes('@')) {
             console.warn('[V43-E3.2-fix] Partenaire sans email valide, code=', devis.partenaire_code, 'partner=', partner);
+            logWarn('cascade-e3.2-email', 'Partenaire sans email valide', { partenaire_code: devis.partenaire_code, devisNumero: devis.numero });
             // Pas d'envoi email mais cascade continue
           } else {
             const { envoyerEmailCommissionPartenaire } = await import('../../lib/emailService');
@@ -102,10 +106,12 @@ async function traiterCascadeSoldePaye(devis: any): Promise<void> {
         }
       } catch (emailErr) {
         console.error('[V43-E3.2] Email commission partenaire échoué (non bloquant) :', emailErr);
+        logError('cascade-e3.2-email', 'Email commission partenaire échoué', { devisNumero: devis.numero, partenaire_code: devis.partenaire_code }, emailErr);
       }
     }
   } catch (err: any) {
     console.error('[V43-E3.2] Cascade commission échouée :', err);
+    logError('cascade-e3.2-commission', 'Cascade commission échouée', { devisNumero: devis.numero }, err);
   }
 
   // ÉTAPE 3 : Email client facture finale
@@ -123,6 +129,7 @@ async function traiterCascadeSoldePaye(devis: any): Promise<void> {
       console.log('[V43-E3.2] Email client facture finale envoyé');
     } catch (emailErr) {
       console.error('[V43-E3.2] Email client facture finale échoué (non bloquant) :', emailErr);
+      logError('cascade-e3.2-email', 'Email client facture finale échoué', { devisNumero: devis.numero, factureFinaleNumero }, emailErr);
     }
   }
 
@@ -317,6 +324,7 @@ export default function PopupEncaisserAcompte({ devis, onClose, onSuccess }: Pro
         };
         traiterCascadeSoldePaye(devisFinal).catch(err => {
           console.error('[V43-E3.2] Cascade solde_paye échouée (non bloquant) :', err);
+          logError('cascade-e3.2', 'Cascade solde_paye échouée (top-level)', { devisNumero: devis.numero }, err);
         });
       }
 

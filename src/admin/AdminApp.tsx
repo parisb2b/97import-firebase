@@ -30,6 +30,7 @@ import Partenaires from './pages/Partenaires';
 import TauxRMB from './pages/TauxRMB';
 import GestionSite from './pages/GestionSite';
 import Logs from './pages/Logs';
+import LogsDebug from './pages/LogsDebug';
 import Parametres from './pages/Parametres';
 import DetailFacture from './pages/DetailFacture';
 import DetailCommission from './pages/DetailCommission';
@@ -94,7 +95,8 @@ const SIDEBAR_SECTIONS: SidebarSection[] = [
     items: [
       { path: '/admin/taux', label: 'Taux RMB', icon: '💱', badgeValue: true },
       { path: '/admin/site', label: 'Gestion site', icon: '🌐' },
-      { path: '/admin/logs', label: 'Logs', icon: '🚨', badge: 4 },
+      { path: '/admin/logs', label: 'Logs', icon: '🚨' },
+      { path: '/admin/logs-debug', label: 'Logs Debug', icon: '🔧' },
       { path: '/admin/parametres', label: 'Parametres', icon: '⚙' },
     ],
   },
@@ -118,6 +120,7 @@ const PAGE_TITLES: Record<string, string> = {
   '/admin/taux': 'Taux RMB',
   '/admin/site': 'Gestion site',
   '/admin/logs': 'Logs',
+  '/admin/logs-debug': 'Logs Debug',
   '/admin/parametres': 'Parametres',
 };
 
@@ -324,6 +327,7 @@ export default function AdminApp() {
               <Route path="/admin/taux" component={TauxRMB} />
               <Route path="/admin/site" component={GestionSite} />
               <Route path="/admin/logs" component={Logs} />
+              <Route path="/admin/logs-debug" component={LogsDebug} />
               <Route path="/admin/parametres" component={Parametres} />
               <Route>
                 <Dashboard />

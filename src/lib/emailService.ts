@@ -1,6 +1,7 @@
 // src/lib/emailService.ts
 import { collection, addDoc, serverTimestamp, query, where, getDocs } from 'firebase/firestore';
 import { db } from './firebase';
+import { logInfo } from './logService';
 
 // ═══ Constantes de config ═══
 const FROM_ADDRESS = '97import <notifications@97import.com>';
@@ -732,6 +733,11 @@ export async function notifyAcompteEncaisse(
  * Envoie l'email de confirmation de paiement acompte au client
  * avec le PDF en pièce jointe (via URL Firebase Storage)
  */
+// v43-M1 : trace via logService
+async function _logEmailService(category: string, message: string, ctx: Record<string, any>): Promise<void> {
+  try { logInfo(category, message, ctx); } catch { /* best-effort */ }
+}
+
 export async function envoyerEmailFactureAcompte(params: {
   clientEmail: string;
   clientNom: string;
@@ -745,6 +751,7 @@ export async function envoyerEmailFactureAcompte(params: {
   pdfUrl: string;
   estEntierementPaye: boolean;
 }): Promise<void> {
+  void _logEmailService('email-service', 'envoyerEmailFactureAcompte', { devisNumero: params.devisNumero, factureNumero: params.factureNumero, estSolde: params.estSolde });
   const subject = params.estEntierementPaye
     ? `✅ Facture payée intégralement — ${params.devisNumero}`
     : params.estSolde
@@ -918,9 +925,10 @@ export async function envoyerEmailFactureFinale(params: {
   total: number;
   pdfUrl: string;
 }): Promise<void> {
+  void _logEmailService('email-service', 'envoyerEmailFactureFinale', { devisNumero: params.devisNumero, factureFinaleNumero: params.factureFinaleNumero });
   const { db } = await import('./firebase');
   const { collection, addDoc, serverTimestamp } = await import('firebase/firestore');
-  
+
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
       <div style="background: linear-gradient(135deg, #10B981 0%, #059669 100%); padding: 32px; text-align: center; color: #fff;">
@@ -961,9 +969,10 @@ export async function envoyerEmailCommissionPartenaire(params: {
   noteCommissionNumero?: string;
   whatsappLink?: string;
 }): Promise<void> {
+  void _logEmailService('email-service', 'envoyerEmailCommissionPartenaire', { devisNumero: params.devisNumero, noteCommissionNumero: params.noteCommissionNumero, montantCommission: params.montantCommission });
   const { db } = await import('./firebase');
   const { collection, addDoc, serverTimestamp } = await import('firebase/firestore');
-  
+
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
       <div style="background: linear-gradient(135deg, #1E3A5F 0%, #3B82F6 100%); padding: 32px; text-align: center; color: #fff;">
