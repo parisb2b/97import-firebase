@@ -6,6 +6,12 @@
 .vite
 *-service-account.json
 *.log
+# Service Account Firebase (NE JAMAIS COMMITER)
+firebase-admin-sdk.json
+*.serviceaccount.json
+*-firebase-adminsdk-*.json
+# Backups migration v43
+backups/quotes-pre-migration-v43-*.json
 # Build
 # Clé privée Firebase Admin — NE JAMAIS COMMITTER
 # Dépendances
