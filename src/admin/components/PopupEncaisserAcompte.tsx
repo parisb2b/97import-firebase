@@ -7,6 +7,7 @@ import { validerNouveauPaiement, prochainPaiementEstSolde, getNbAcomptesEncaisse
 import { notifyAcompteEncaisse } from '../../lib/emailService';
 import { creerCommissionDevis } from '../../lib/commissionHelpers';
 import { logError, logWarn } from '../../lib/logService';
+import { sanitizeForFirestore } from '../../lib/firebaseUtils';
 
 /**
  * v43-E3.2 — Cascade best-effort à exécuter quand un devis passe à `solde_paye`.
@@ -52,14 +53,14 @@ async function traiterCascadeSoldePaye(devis: any): Promise<void> {
       logWarn('cascade-e3.2-facture', 'PDF facture finale non généré', { devisNumero: devis.numero, factureFinaleNumero });
     }
 
-    await updateDoc(doc(db, 'quotes', devisId), {
+    await updateDoc(doc(db, 'quotes', devisId), sanitizeForFirestore({
       facture_finale: {
         numero: factureFinaleNumero,
         pdf_url: factureFinalePdfUrl,
         date_emission: new Date().toISOString(),
         total: devis.total_ht || 0,
       },
-    });
+    }));
     console.log('[V43-E3.2] Facture finale créée :', factureFinaleNumero);
   } catch (err: any) {
     console.error('[V43-E3.2] Génération facture finale échouée :', err);
@@ -280,7 +281,7 @@ export default function PopupEncaisserAcompte({ devis, onClose, onSuccess }: Pro
         updatePayload.date_commande = nouvelleDateCommande;
       }
 
-      await updateDoc(doc(db, 'quotes', devis.id || devis.numero), updatePayload);
+      await updateDoc(doc(db, 'quotes', devis.id || devis.numero), sanitizeForFirestore(updatePayload));
 
       // v43-E3.1 : email best-effort si transition vers commande_ferme
       if (nouveauStatut === 'commande_ferme' && devis.statut !== 'commande_ferme') {
