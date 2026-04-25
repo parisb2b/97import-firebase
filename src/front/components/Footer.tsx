@@ -1,5 +1,6 @@
 import { Link } from 'wouter';
 import { useI18n } from '../../i18n';
+import { VERSION_LABEL } from '../../lib/version';
 
 export default function Footer() {
   const { t } = useI18n();
@@ -90,6 +91,9 @@ export default function Footer() {
           color: 'rgba(255,255,255,0.4)',
         }}>
           {t('footer.copyright')}
+          <div style={{ marginTop: 6, fontSize: 11, color: 'rgba(255,255,255,0.3)', fontFamily: 'monospace' }}>
+            {VERSION_LABEL}
+          </div>
         </div>
       </div>
     </footer>
