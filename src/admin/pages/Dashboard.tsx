@@ -82,6 +82,8 @@ export default function Dashboard() {
         const devisVip = allQuotes.filter((q) => q.is_vip || q.statut === 'vip_envoye').length;
 
         // CA encaisse: sum of acomptes where encaisse === true (v43 P3-COMPLET format)
+        // v43-E3.1 : la ligne "if (q.total_encaisse) caEncaisse += q.total_encaisse"
+        // créait un double-comptage avec la boucle ci-dessus (signalé Opus 4.7 + Grok).
         let caEncaisse = 0;
         allQuotes.forEach((q) => {
           if (q.acomptes && Array.isArray(q.acomptes)) {
@@ -89,7 +91,6 @@ export default function Dashboard() {
               if (a.encaisse === true) caEncaisse += (a.montant || 0);
             });
           }
-          if (q.total_encaisse) caEncaisse += q.total_encaisse;
         });
 
         // Solde restant

@@ -115,24 +115,57 @@ export default function PopupEncaisserAcompte({ devis, onClose, onSuccess }: Pro
       const totalHt = devis.total_ht || devis.total || 0;
       const soldeRestant = totalHt - totalEncaisse;
 
-      // Déterminer le nouveau statut du devis
+      // Déterminer le nouveau statut du devis (v43-E3.1 : option b, atomique intégré)
+      const nbEncaissesAvant = (devis.acomptes || []).filter((a: any) => a.encaisse === true).length;
+      const nbEncaissesApres = nbEncaissesAvant + 1;
+      const estPremierEncaissement = nbEncaissesAvant === 0;
+      const statutsAvances = [
+        'commande_ferme', 'en_production', 'embarque_chine',
+        'arrive_port_domtom', 'livre', 'termine',
+      ];
+
       let nouveauStatut = devis.statut;
+      let nouvelleDateCommande = devis.date_commande;
+
       if (Math.abs(soldeRestant) < 0.01) {
         nouveauStatut = 'solde_paye';
-      } else if (nouveauStatut === 'nouveau' || nouveauStatut === 'brouillon') {
-        const nbEncaisses = acomptesActuels.filter((a: any) => a.encaisse).length;
-        if (nbEncaisses === 1) nouveauStatut = 'acompte_1';
-        else if (nbEncaisses === 2) nouveauStatut = 'acompte_2';
-        else if (nbEncaisses === 3) nouveauStatut = 'acompte_3';
+      } else if (estPremierEncaissement && !statutsAvances.includes(devis.statut)) {
+        // v43-E3.1 : bascule directe Devis → Commande au premier acompte encaissé
+        nouveauStatut = 'commande_ferme';
+        nouvelleDateCommande = new Date().toISOString();
+      } else if (devis.statut === 'nouveau' || devis.statut === 'brouillon') {
+        if (nbEncaissesApres === 1) nouveauStatut = 'acompte_1';
+        else if (nbEncaissesApres === 2) nouveauStatut = 'acompte_2';
+        else if (nbEncaissesApres === 3) nouveauStatut = 'acompte_3';
       }
 
-      await updateDoc(doc(db, 'quotes', devis.id || devis.numero), {
+      const updatePayload: any = {
         acomptes: acomptesActuels,
         total_encaisse: totalEncaisse,
         solde_restant: soldeRestant,
         statut: nouveauStatut,
         updated_at: serverTimestamp(),
-      });
+      };
+      if (nouvelleDateCommande !== devis.date_commande) {
+        updatePayload.date_commande = nouvelleDateCommande;
+      }
+
+      await updateDoc(doc(db, 'quotes', devis.id || devis.numero), updatePayload);
+
+      // v43-E3.1 : email best-effort si transition vers commande_ferme
+      if (nouveauStatut === 'commande_ferme' && devis.statut !== 'commande_ferme') {
+        try {
+          const { notifyCommandeFerme } = await import('../../lib/emailService');
+          await notifyCommandeFerme({
+            clientEmail: devis.client_email,
+            clientNom: devis.client_nom || 'Client',
+            devisNumero: devis.numero,
+            clientWhatsApp: devis.client_whatsapp || devis.client_tel,
+          });
+        } catch (emailErr) {
+          console.error('[V43-E3.1] Email commande_ferme échoué (non bloquant) :', emailErr);
+        }
+      }
 
       // Notification email
       try {

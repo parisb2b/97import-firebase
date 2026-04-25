@@ -999,3 +999,54 @@ export async function envoyerEmailCommissionPartenaire(params: {
     created_at: serverTimestamp(),
   });
 }
+
+// ═══ NOUVEAUX TEMPLATES STATUTS MÉTIER (v43 Étape 3.1) ═══
+
+interface NotifyStatutParams {
+  clientEmail: string;
+  clientNom: string;
+  devisNumero: string;
+  clientWhatsApp?: string;
+}
+
+export async function notifyCommandeFerme(params: NotifyStatutParams): Promise<void> {
+  const { clientEmail, clientNom, devisNumero } = params;
+
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <div style="background: linear-gradient(135deg, #059669 0%, #10B981 100%); color: #fff; padding: 32px; text-align: center; border-radius: 8px 8px 0 0;">
+        <div style="font-size: 48px; margin-bottom: 12px;">📦</div>
+        <h1 style="margin: 0; font-size: 22px; font-weight: 800;">Commande lancée !</h1>
+      </div>
+      <div style="background: #fff; padding: 24px; border-radius: 0 0 8px 8px;">
+        <p>Bonjour <strong>${clientNom}</strong>,</p>
+        <p>Excellente nouvelle ! Votre commande <strong>${devisNumero}</strong> a été officiellement lancée chez notre fournisseur en Chine.</p>
+        <p>Nous vous tiendrons informé(e) à chaque étape :</p>
+        <ul>
+          <li>🏭 Lancement en production</li>
+          <li>🚢 Embarquement en conteneur</li>
+          <li>🏗️ Arrivée au port DOM-TOM</li>
+          <li>🎉 Livraison finale</li>
+        </ul>
+        <p>Merci pour votre confiance !</p>
+        <p style="color: #6B7280; font-size: 12px; margin-top: 24px;">
+          97import — LUXENT LIMITED — London
+        </p>
+      </div>
+    </div>
+  `;
+
+  await addDoc(collection(db, 'mail'), {
+    to: clientEmail,
+    message: {
+      subject: `📦 Commande lancée — ${devisNumero}`,
+      html,
+    },
+    _metadata: {
+      event: 'commande_ferme',
+      devis_numero: devisNumero,
+      created_at: serverTimestamp(),
+    },
+    created_at: serverTimestamp(),
+  });
+}

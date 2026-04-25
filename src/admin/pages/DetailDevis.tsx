@@ -15,6 +15,7 @@ import { OrangeIndicator } from '../../components/OrangeIndicator';
 import { generateDevis, downloadPDF } from '../../lib/pdf-generator';
 import { Card, Button } from '../components/Icons';
 import PopupEncaisserAcompte from '../components/PopupEncaisserAcompte';
+import ModalDupliquerDevis from '../components/ModalDupliquerDevis';
 
 interface LigneDevis {
   ref: string;
@@ -77,8 +78,16 @@ export default function DetailDevis() {
   const [errorMsg, setErrorMsg] = useState('');
   const [emetteurData, setEmetteurData] = useState<any>(null);
   const [showEncaisserModal, setShowEncaisserModal] = useState(false);
+  const [modalDupliquerOpen, setModalDupliquerOpen] = useState(false);
 
   const isNew = params?.id === 'nouveau';
+
+  // v43-E3.1 : devis verrouillé en lecture seule à partir de la signature et au-delà
+  const estLectureSeule = [
+    'signe', 'acompte_1', 'acompte_2', 'acompte_3', 'solde_paye',
+    'commande_ferme', 'en_production', 'embarque_chine',
+    'arrive_port_domtom', 'livre', 'termine',
+  ].includes(devis.statut);
 
   useEffect(() => {
     const fetchEmetteur = async () => {
@@ -272,6 +281,28 @@ export default function DetailDevis() {
     <>
       {successMsg && <div className="card" style={{ background: '#DCFCE7', color: '#166534', padding: '12px 20px', marginBottom: 16, borderLeft: '4px solid #22C55E' }}>✅ {successMsg}</div>}
       {errorMsg && <div className="card" style={{ background: '#FEE2E2', color: '#991B1B', padding: '12px 20px', marginBottom: 16, borderLeft: '4px solid #EF4444' }}>❌ {errorMsg}</div>}
+      {estLectureSeule && (
+        <div style={{
+          background: '#FEF3C7',
+          border: '1px solid #F59E0B',
+          borderRadius: 8,
+          padding: '14px 16px',
+          marginBottom: 20,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 12,
+        }}>
+          <span style={{ fontSize: 22 }}>🔒</span>
+          <div>
+            <div style={{ fontSize: 14, fontWeight: 700, color: '#92400E' }}>
+              Devis en lecture seule (commande en cours)
+            </div>
+            <div style={{ fontSize: 12, color: '#78350F', marginTop: 2 }}>
+              Pour créer un devis similaire, utilisez le bouton "📋 Dupliquer" ci-dessous.
+            </div>
+          </div>
+        </div>
+      )}
       {/* Header */}
       <div className="filters" style={{ justifyContent: 'space-between' }}>
         <div className="ct" style={{ fontSize: 18 }}>
@@ -283,9 +314,14 @@ export default function DetailDevis() {
               {t('btn.encaisser')}
             </Button>
           )}
-          <Button variant="p" onClick={handleSave} disabled={saving}>
+          <Button variant="p" onClick={handleSave} disabled={saving || estLectureSeule}>
             {saving ? t('loading') : t('btn.enregistrer')}
           </Button>
+          {!isNew && (
+            <Button variant="t" onClick={() => setModalDupliquerOpen(true)}>
+              📋 Dupliquer
+            </Button>
+          )}
           {!isNew && (
             <Button variant="t" onClick={async () => {
               try {
@@ -313,31 +349,37 @@ export default function DetailDevis() {
           <div className="fg">
             <div className="fl">Nom <OrangeIndicator show={!devis.client_nom} /></div>
             <input className="fi" type="text" value={devis.client_nom}
+              disabled={estLectureSeule}
               onChange={(e) => setDevis({ ...devis, client_nom: e.target.value })} />
           </div>
           <div className="fg">
             <div className="fl">Email <OrangeIndicator show={!devis.client_email} /></div>
             <input className="fi" type="email" value={devis.client_email}
+              disabled={estLectureSeule}
               onChange={(e) => setDevis({ ...devis, client_email: e.target.value })} />
           </div>
           <div className="fg">
             <div className="fl">Téléphone</div>
             <input className="fi" type="tel" value={devis.client_tel}
+              disabled={estLectureSeule}
               onChange={(e) => setDevis({ ...devis, client_tel: e.target.value })} />
           </div>
           <div className="fg">
             <div className="fl">SIRET</div>
             <input className="fi" type="text" value={devis.client_siret}
+              disabled={estLectureSeule}
               onChange={(e) => setDevis({ ...devis, client_siret: e.target.value })} />
           </div>
           <div className="fg" style={{ gridColumn: 'span 2' }}>
             <div className="fl">Adresse</div>
             <textarea className="fi" value={devis.client_adresse} rows={2}
+              disabled={estLectureSeule}
               onChange={(e) => setDevis({ ...devis, client_adresse: e.target.value })} />
           </div>
           <div className="fg">
             <div className="fl">Destination</div>
             <select className="fsel" value={devis.destination}
+              disabled={estLectureSeule}
               onChange={(e) => setDevis({ ...devis, destination: e.target.value })}>
               <option value="MQ">Martinique</option>
               <option value="GP">Guadeloupe</option>
@@ -362,7 +404,7 @@ export default function DetailDevis() {
 
       {/* Lignes */}
       <Card title="Lignes du devis" actions={
-        <Button variant="o" onClick={handleAddLigne} style={{ fontSize: 12 }}>
+        <Button variant="o" onClick={handleAddLigne} disabled={estLectureSeule} style={{ fontSize: 12 }}>
           + Ajouter une ligne
         </Button>
       }>
@@ -385,15 +427,18 @@ export default function DetailDevis() {
                 <tr key={index}>
                   <td>
                     <input className="fi" type="text" value={ligne.ref}
+                      disabled={estLectureSeule}
                       onChange={(e) => handleLigneChange(index, 'ref', e.target.value)} />
                   </td>
                   <td>
                     <input className="fi" type="text" value={ligne.nom_fr}
+                      disabled={estLectureSeule}
                       onChange={(e) => handleLigneChange(index, 'nom_fr', e.target.value)} />
                   </td>
                   <td>
                     <input className="fi" type="number" value={ligne.qte} min={1}
                       style={{ textAlign: 'right' }}
+                      disabled={estLectureSeule}
                       onChange={(e) => handleLigneChange(index, 'qte', Number(e.target.value))} />
                   </td>
                   <td style={{ textAlign: 'right', verticalAlign: 'middle', paddingRight: 8 }}>
@@ -459,7 +504,8 @@ export default function DetailDevis() {
                   </td>
                   <td>
                     <button onClick={() => handleRemoveLigne(index)}
-                      style={{ color: 'var(--rd)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 16 }}>
+                      disabled={estLectureSeule}
+                      style={{ color: 'var(--rd)', background: 'none', border: 'none', cursor: estLectureSeule ? 'not-allowed' : 'pointer', fontSize: 16, opacity: estLectureSeule ? 0.4 : 1 }}>
                       ✕
                     </button>
                   </td>
@@ -526,6 +572,18 @@ export default function DetailDevis() {
           }}
         />
       )}
+
+      {/* Modal Dupliquer (v43-E3.1) */}
+      <ModalDupliquerDevis
+        isOpen={modalDupliquerOpen}
+        onClose={() => setModalDupliquerOpen(false)}
+        devisSource={devis}
+        onDuplicated={(newId) => {
+          setModalDupliquerOpen(false);
+          setSuccessMsg(`Devis dupliqué : ${newId}`);
+          setLocation(`/admin/devis/${newId}`);
+        }}
+      />
     </>
   );
 }
