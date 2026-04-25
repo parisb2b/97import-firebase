@@ -44,8 +44,18 @@ export interface CreerCommissionResult {
 export function calculerCommissionLigne(
   ligne: QuoteLine
 ): CommissionLigne | null {
-  const prix_partenaire = ligne.prix_partenaire || 0;
-  const prix_vip = ligne.prix_vip_negocie || ligne.prix_unitaire_final;
+  // v43-E3.2-fix B1 : guards contre NaN si lignes mal saisies (Firestore refuse NaN)
+  const prix_vip = ligne.prix_vip_negocie ?? ligne.prix_unitaire_final ?? 0;
+  const prix_partenaire = ligne.prix_partenaire ?? 0;
+
+  if (typeof prix_vip !== 'number' || isNaN(prix_vip)) {
+    console.warn('[V43-E3.2-fix] Ligne avec prix_vip invalide, skip:', ligne);
+    return null;
+  }
+  if (typeof prix_partenaire !== 'number' || isNaN(prix_partenaire)) {
+    console.warn('[V43-E3.2-fix] Ligne avec prix_partenaire invalide, skip:', ligne);
+    return null;
+  }
 
   // Interdit de vendre sous le prix partenaire
   if (prix_vip < prix_partenaire - 0.01) {

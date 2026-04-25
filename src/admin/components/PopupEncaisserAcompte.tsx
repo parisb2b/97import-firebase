@@ -79,17 +79,24 @@ async function traiterCascadeSoldePaye(devis: any): Promise<void> {
 
         if (!partnersSnap.empty) {
           const partner = partnersSnap.docs[0].data() as any;
-          const { envoyerEmailCommissionPartenaire } = await import('../../lib/emailService');
-          await envoyerEmailCommissionPartenaire({
-            partenaireEmail: partner.email,
-            partenaireNom: `${partner.prenom || ''} ${partner.nom || ''}`.trim() || partner.code || 'Partenaire',
-            devisNumero: devis.numero,
-            clientNom: devis.client_nom || 'Client',
-            montantCommission: commissionResult.totalCommission!,
-            noteCommissionNumero: commissionResult.numeroNC,
-            whatsappLink: partner.whatsapp ? `https://wa.me/${String(partner.whatsapp).replace(/\D/g, '')}` : undefined,
-          });
-          console.log('[V43-E3.2] Email partenaire envoyé');
+
+          // v43-E3.2-fix V1 : guard contre partenaire sans email valide (évite faux positifs)
+          if (!partner.email || typeof partner.email !== 'string' || !partner.email.includes('@')) {
+            console.warn('[V43-E3.2-fix] Partenaire sans email valide, code=', devis.partenaire_code, 'partner=', partner);
+            // Pas d'envoi email mais cascade continue
+          } else {
+            const { envoyerEmailCommissionPartenaire } = await import('../../lib/emailService');
+            await envoyerEmailCommissionPartenaire({
+              partenaireEmail: partner.email,
+              partenaireNom: `${partner.prenom || ''} ${partner.nom || ''}`.trim() || partner.code || 'Partenaire',
+              devisNumero: devis.numero,
+              clientNom: devis.client_nom || 'Client',
+              montantCommission: commissionResult.totalCommission!,
+              noteCommissionNumero: commissionResult.numeroNC,
+              whatsappLink: partner.whatsapp ? `https://wa.me/${String(partner.whatsapp).replace(/\D/g, '')}` : undefined,
+            });
+            console.log('[V43-E3.2] Email partenaire envoyé à', partner.email);
+          }
         } else {
           console.warn('[V43-E3.2] Partenaire introuvable code=', devis.partenaire_code);
         }
