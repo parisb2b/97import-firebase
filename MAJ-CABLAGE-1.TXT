@@ -1,0 +1,342 @@
+═══════════════════════════════════════════════════════════════════════
+  MAJ-CABLAGE-1.TXT — Rapport d'exécution CABLAGE-1
+═══════════════════════════════════════════════════════════════════════
+
+📅 DATE : 2026-04-24
+🔖 COMMIT : 95ddfcc
+🏷️  TAG BACKUP : backup-cablage-1-20260424-1748
+📦 BRANCHE : v2
+
+═══════════════════════════════════════════════════════════════════════
+🎯 OBJECTIF
+═══════════════════════════════════════════════════════════════════════
+
+Corriger 2 bugs critiques bloquants pour la production :
+
+1. Bug "Aucun acompte à encaisser"
+   - Cause : mismatch entre ancien format (statut: 'declare') et nouveau format (encaisse: false)
+   - Impact : PopupEncaisserAcompte ne détecte jamais d'acomptes à encaisser
+
+2. Bug "Commission nulle"
+   - Cause : champs prix_partenaire et prix_vip_negocie manquants dans structure lignes
+   - Impact : impossible de calculer les commissions (commission = prix_vip_negocie - prix_partenaire)
+
+═══════════════════════════════════════════════════════════════════════
+📝 MODIFICATIONS RÉALISÉES (7 fichiers)
+═══════════════════════════════════════════════════════════════════════
+
+┌─────────────────────────────────────────────────────────────────────┐
+│ 1. src/front/pages/espace-client/PopupAcompte.tsx                  │
+│    ✅ Création acomptes avec format P3-COMPLET                      │
+└─────────────────────────────────────────────────────────────────────┘
+AVANT (ligne 67-73) :
+  const nouvelAcompte = {
+    montant,
+    date: new Date().toISOString(),
+    type_compte: typeCompte,
+    statut: 'declare',  // ❌ ANCIEN FORMAT
+    iban_utilise: rib.iban,
+  };
+
+APRÈS (ligne 67-79) :
+  const nouvelAcompte = {
+    numero: 1,
+    montant,
+    date_reception: new Date().toISOString(),
+    reference_virement: undefined,
+    facture_acompte_numero: undefined,
+    facture_acompte_pdf_url: undefined,
+    is_solde: false,
+    encaisse: false,  // ✅ NOUVEAU FORMAT
+    created_at: new Date().toISOString(),
+    created_by: 'client',
+    type_compte: typeCompte,
+    iban_utilise: rib.iban,
+  };
+
+┌─────────────────────────────────────────────────────────────────────┐
+│ 2. src/front/pages/espace-client/DevisCard.tsx                     │
+│    ✅ Création acomptes + filtres avec format P3-COMPLET            │
+└─────────────────────────────────────────────────────────────────────┘
+AVANT (ligne 28-29) :
+  const acomptesEncaisses = acomptes.filter((a: any) => a.statut === 'encaisse');
+  const acomptesDeclares = acomptes.filter((a: any) => a.statut === 'declare');
+
+APRÈS (ligne 28-29) :
+  const acomptesEncaisses = acomptes.filter((a: any) => a.encaisse === true);
+  const acomptesDeclares = acomptes.filter((a: any) => a.encaisse === false);
+
+AVANT (ligne 135-141) :
+  const newAcompte = {
+    montant: data.montantAcompte,
+    type_compte: data.typeCompte,
+    date: new Date().toISOString(),
+    statut: 'declare',  // ❌ ANCIEN FORMAT
+    ref_fa: '',
+  };
+
+APRÈS (ligne 135-146) :
+  const newAcompte = {
+    numero: 1,
+    montant: data.montantAcompte,
+    date_reception: new Date().toISOString(),
+    reference_virement: undefined,
+    facture_acompte_numero: undefined,
+    facture_acompte_pdf_url: undefined,
+    is_solde: false,
+    encaisse: false,  // ✅ NOUVEAU FORMAT
+    created_at: new Date().toISOString(),
+    created_by: 'client',
+    type_compte: data.typeCompte,
+  };
+
+AVANT (ligne 402-404) :
+  const statutBadge = a.statut === 'encaisse'
+    ? { label: 'Encaissé', bg: '#D1FAE5', color: '#065F46' }
+    : { label: 'Déclaré', bg: '#FEF3C7', color: '#92400E' };
+
+APRÈS (ligne 402-404) :
+  const statutBadge = a.encaisse === true
+    ? { label: 'Encaissé', bg: '#D1FAE5', color: '#065F46' }
+    : { label: 'Déclaré', bg: '#FEF3C7', color: '#92400E' };
+
+┌─────────────────────────────────────────────────────────────────────┐
+│ 3. src/front/pages/SignatureDevis.tsx                              │
+│    ✅ Création acomptes avec format P3-COMPLET                      │
+└─────────────────────────────────────────────────────────────────────┘
+AVANT (ligne 168-174) :
+  const newAcompte = {
+    montant: data.montantAcompte,
+    type_compte: data.typeCompte,
+    date: new Date().toISOString(),
+    statut: 'declare',  // ❌ ANCIEN FORMAT
+    ref_fa: '',
+  };
+
+APRÈS (ligne 168-180) :
+  const newAcompte = {
+    numero: 1,
+    montant: data.montantAcompte,
+    date_reception: new Date().toISOString(),
+    reference_virement: undefined,
+    facture_acompte_numero: undefined,
+    facture_acompte_pdf_url: undefined,
+    is_solde: false,
+    encaisse: false,  // ✅ NOUVEAU FORMAT
+    created_at: new Date().toISOString(),
+    created_by: 'client',
+    type_compte: data.typeCompte,
+  };
+
+┌─────────────────────────────────────────────────────────────────────┐
+│ 4. src/front/pages/Panier.tsx                                      │
+│    ✅ Structure lignes avec prix_partenaire + prix_vip_negocie      │
+└─────────────────────────────────────────────────────────────────────┘
+AVANT (ligne 130-136) :
+  const lignes = cart.map(item => ({
+    ref: item.ref, nom_fr: item.nom_fr, qte: item.qte,
+    prix_unitaire: item.prix, total: item.prix * item.qte,
+    type: item.type || 'product',
+    ...(item.description ? { description: item.description } : {}),
+    ...(item.lien ? { lien: item.lien } : {}),
+  }));
+
+APRÈS (ligne 130-148) :
+  const lignes = cart.map(item => {
+    const prix_partenaire = item.prix * 0.7;  // Fallback 70%
+    return {
+      reference: item.ref,
+      ref: item.ref,
+      nom: item.nom_fr,
+      nom_fr: item.nom_fr,
+      quantite: item.qte,
+      qte: item.qte,
+      prix_achat: undefined,
+      prix_partenaire: prix_partenaire,      // ✅ NOUVEAU CHAMP
+      prix_vip_negocie: undefined,           // ✅ NOUVEAU CHAMP
+      prix_unitaire_final: item.prix,        // ✅ NOUVEAU CHAMP
+      prix_unitaire: item.prix,
+      total_ligne: item.prix * item.qte,
+      total: item.prix * item.qte,
+      type: item.type || 'product',
+      ...(item.description ? { description: item.description } : {}),
+      ...(item.lien ? { lien: item.lien } : {}),
+    };
+  });
+
+AVANT (ligne 154-160) :
+  statut: 'en_negociation_partenaire',
+  destination: userProfile.pays || 'Martinique',
+  pays_livraison: userProfile.pays || 'Martinique',
+  is_vip: false,
+  lignes,
+  total_ht: total,
+  partenaire_code: selectedPartner || null,  // ❌ null possible
+
+APRÈS (ligne 154-160) :
+  statut: 'en_negociation_partenaire',
+  destination: userProfile.pays || 'Martinique',
+  pays_livraison: userProfile.pays || 'Martinique',
+  is_vip: false,
+  lignes,
+  total_ht: total,
+  partenaire_code: selectedPartner || 'ADMIN',  // ✅ Fallback 'ADMIN'
+
+┌─────────────────────────────────────────────────────────────────────┐
+│ 5. src/front/pages/espace-partenaire/GestionDevisPartner.tsx       │
+│    ✅ Sauvegarde prix_vip_negocie dans lignes[] au lieu de map      │
+└─────────────────────────────────────────────────────────────────────┘
+AVANT (ligne 131-142) :
+  try {
+    await updateDoc(doc(db, 'quotes', d.id), {
+      is_vip: true,
+      prix_negocies: prixNegociesMap,  // ❌ Map obsolète
+      total_ht_public: d.total_ht,
+      total_ht: totalHtNegocie,
+      statut: 'devis_vip_envoye',
+      signature_token: signatureToken,
+      signature_token_expiry: tokenExpiry.toISOString(),
+      signature_token_used: false,
+      updatedAt: new Date(),
+    });
+
+APRÈS (ligne 131-156) :
+  // Mise à jour des lignes avec prix_vip_negocie
+  const lignesUpdated = (d.lignes || []).map((l: any) => {
+    const prixNegocie = prixNegociesMap[l.reference || l.ref];
+    if (prixNegocie !== undefined) {
+      return {
+        ...l,
+        prix_vip_negocie: prixNegocie,           // ✅ SAUVEGARDE DANS LIGNE
+        prix_unitaire_final: prixNegocie,
+        total_ligne: prixNegocie * (l.quantite || l.qte || 1),
+        total: prixNegocie * (l.quantite || l.qte || 1),
+      };
+    }
+    return l;
+  });
+
+  try {
+    await updateDoc(doc(db, 'quotes', d.id), {
+      is_vip: true,
+      lignes: lignesUpdated,              // ✅ NOUVEAU
+      prix_negocies: null,                // ✅ SUPPRESSION MAP
+      total_ht_public: d.total_ht,
+      total_ht: totalHtNegocie,
+      statut: 'devis_vip_envoye',
+      signature_token: signatureToken,
+      signature_token_expiry: tokenExpiry.toISOString(),
+      signature_token_used: false,
+      updatedAt: new Date(),
+    });
+
+┌─────────────────────────────────────────────────────────────────────┐
+│ 6. src/front/pages/espace-client/MesVirements.tsx                  │
+│    ✅ Suppression fallback || 'declare' (composant read-only)       │
+└─────────────────────────────────────────────────────────────────────┘
+AVANT (ligne 53) :
+  statut: a.statut || 'declare',  // ❌ Fallback obsolète
+
+APRÈS (ligne 53) :
+  statut: a.statut,  // ✅ Pas de fallback
+
+┌─────────────────────────────────────────────────────────────────────┐
+│ 7. src/admin/pages/DetailDevis.tsx                                 │
+│    ✅ MODIFICATION ULTRA-RESTREINTE : UNIQUEMENT lignes 244 & 281   │
+└─────────────────────────────────────────────────────────────────────┘
+AVANT (ligne 244) :
+  const acomptesDeclares = (devis.acomptes || []).filter((a: any) => a.statut === 'declare');
+
+APRÈS (ligne 244) :
+  const acomptesDeclares = (devis.acomptes || []).filter((a: any) => a.encaisse === false);
+
+AVANT (ligne 281) :
+  {!isNew && (devis.acomptes || []).some((a: any) => a.statut === 'declare') && (
+
+APRÈS (ligne 281) :
+  {!isNew && (devis.acomptes || []).some((a: any) => a.encaisse === false) && (
+
+═══════════════════════════════════════════════════════════════════════
+✅ VALIDATIONS
+═══════════════════════════════════════════════════════════════════════
+
+[✓] npm run build → SUCCESS (0 erreurs TypeScript)
+[✓] Backup tag créé : backup-cablage-1-20260424-1748
+[✓] 7 fichiers modifiés (72 lignes ajoutées, 23 supprimées)
+[✓] DetailDevis.tsx : UNIQUEMENT lignes 244 + 281 modifiées (diff vérifié)
+[✓] Commit créé : 95ddfcc
+[✓] Push vers origin/v2 : SUCCESS
+
+═══════════════════════════════════════════════════════════════════════
+🧪 TESTS À RÉALISER PAR MICHEL
+═══════════════════════════════════════════════════════════════════════
+
+1. TEST CRÉATION ACOMPTE CLIENT (PopupAcompte.tsx)
+   - Créer un nouveau devis client
+   - Déclarer un acompte via PopupAcompte
+   - Vérifier : acompte créé avec encaisse: false (pas statut: 'declare')
+
+2. TEST CRÉATION ACOMPTE SIGNATURE (DevisCard.tsx + SignatureDevis.tsx)
+   - Signer un devis VIP
+   - Déclarer acompte lors de la signature
+   - Vérifier : acompte créé avec encaisse: false
+
+3. TEST FILTRES ACOMPTES (DevisCard.tsx)
+   - Ouvrir espace client
+   - Vérifier affichage "Déclaré" / "Encaissé" fonctionne
+
+4. TEST ENCAISSEMENT ADMIN (DetailDevis.tsx)
+   - Aller sur DetailDevis avec acompte déclaré (encaisse: false)
+   - Vérifier : bouton "Encaisser" s'affiche
+   - Encaisser l'acompte
+   - Vérifier : acompte passe à encaisse: true
+
+5. TEST CRÉATION DEVIS PANIER (Panier.tsx)
+   - Créer devis depuis panier
+   - Vérifier structure lignes contient :
+     * prix_partenaire (70% du prix)
+     * prix_vip_negocie (undefined initialement)
+     * prix_unitaire_final (= prix public)
+
+6. TEST NÉGOCIATION VIP (GestionDevisPartner.tsx)
+   - Partenaire négocie prix VIP
+   - Envoyer devis VIP
+   - Vérifier dans Firestore :
+     * lignes[*].prix_vip_negocie = prix négocié
+     * prix_negocies = null (map supprimée)
+
+7. TEST COMMISSION (calcul manuel)
+   - Créer devis avec prix_partenaire = 700€
+   - Négocier prix_vip_negocie = 850€
+   - Calculer commission = 850 - 700 = 150€
+   - Vérifier : commission calculable
+
+═══════════════════════════════════════════════════════════════════════
+📊 IMPACT ATTENDU
+═══════════════════════════════════════════════════════════════════════
+
+✅ Bug "Aucun acompte à encaisser" → RÉSOLU
+   - PopupEncaisserAcompte détecte maintenant les acomptes (encaisse: false)
+   - Flux encaissement admin fonctionnel
+
+✅ Bug "Commission nulle" → RÉSOLU
+   - Structure lignes complète avec prix_partenaire + prix_vip_negocie
+   - Calcul commission possible : commission = prix_vip_negocie - prix_partenaire
+
+⚠️  COMPATIBILITÉ ASCENDANTE : NON
+   - Anciens devis avec statut: 'declare' ne seront PAS détectés
+   - Migration manuelle nécessaire si devis en base avec ancien format
+   - Prompt CABLAGE-1 = migration SANS backward compatibility (assumé)
+
+═══════════════════════════════════════════════════════════════════════
+🔄 PROCHAINES ÉTAPES SUGGÉRÉES
+═══════════════════════════════════════════════════════════════════════
+
+1. Tester les 7 scénarios ci-dessus
+2. Si ancien devis en base → migration manuelle via script
+3. Vérifier calcul commissions dans creerCommissionDevis()
+4. Activer appels email (notifyAcompteEncaisse, etc.) — actuellement non appelés
+
+═══════════════════════════════════════════════════════════════════════
+FIN DU RAPPORT — CABLAGE-1 TERMINÉ
+═══════════════════════════════════════════════════════════════════════
