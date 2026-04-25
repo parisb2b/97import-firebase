@@ -81,12 +81,12 @@ export default function Dashboard() {
         const devisEnAttente = allQuotes.filter((q) => q.statut === 'nouveau' || q.statut === 'envoye').length;
         const devisVip = allQuotes.filter((q) => q.is_vip || q.statut === 'vip_envoye').length;
 
-        // CA encaisse: sum of acomptes where statut='encaisse'
+        // CA encaisse: sum of acomptes where encaisse === true (v43 P3-COMPLET format)
         let caEncaisse = 0;
         allQuotes.forEach((q) => {
           if (q.acomptes && Array.isArray(q.acomptes)) {
             q.acomptes.forEach((a: any) => {
-              if (a.statut === 'encaisse') caEncaisse += (a.montant || 0);
+              if (a.encaisse === true) caEncaisse += (a.montant || 0);
             });
           }
           if (q.total_encaisse) caEncaisse += q.total_encaisse;

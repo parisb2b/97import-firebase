@@ -157,9 +157,9 @@ export default function MesClientsPartner({ partnerCode }: { partnerCode: string
 
           {filtered.map(c => {
             const isOpen = expandedId === c.userId;
-            const encaisse = c.devis.reduce((s, d) => s + (d.acomptes || []).filter((a: any) => a.statut === 'encaisse').reduce((ss: number, a: any) => ss + a.montant, 0), 0);
+            const encaisse = c.devis.reduce((s, d) => s + (d.acomptes || []).filter((a: any) => a.encaisse === true).reduce((ss: number, a: any) => ss + a.montant, 0), 0);
             const devisEnCours = c.devis.filter(d => d.statut !== 'expire' && d.statut !== 'refuse' && d.statut !== 'livre').length;
-            const cmdTotal = c.devis.filter(d => d.acomptes?.some((a: any) => a.statut === 'encaisse')).length;
+            const cmdTotal = c.devis.filter(d => d.acomptes?.some((a: any) => a.encaisse === true)).length;
 
             return (
               <div key={c.userId}>

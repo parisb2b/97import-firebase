@@ -175,7 +175,7 @@ export default function MesVirements({ userId, profile }: MesVirementsProps) {
             </thead>
             <tbody>
               {sorted.map((v, idx) => {
-                const statutBadge = v.statut === 'encaisse'
+                const statutBadge = v.encaisse === true
                   ? { label: 'Encaissé', bg: '#D1FAE5', color: '#065F46' }
                   : { label: 'Déclaré', bg: '#FEF3C7', color: '#92400E' };
 
@@ -292,11 +292,11 @@ function ModalVirement({ v, onClose }: { v: any, onClose: () => void }) {
           <DetailRow label="Type de compte" value={v.type_compte === 'perso' ? 'Personnel (N26)' : 'Professionnel (Banking Circle)'} />
           <DetailRow label="Statut" value={
             <span style={{
-              background: v.statut === 'encaisse' ? '#D1FAE5' : '#FEF3C7',
-              color: v.statut === 'encaisse' ? '#065F46' : '#92400E',
+              background: v.encaisse === true ? '#D1FAE5' : '#FEF3C7',
+              color: v.encaisse === true ? '#065F46' : '#92400E',
               padding: '3px 10px', borderRadius: 20, fontSize: 11, fontWeight: 600,
             }}>
-              {v.statut === 'encaisse' ? 'Encaissé' : 'Déclaré'}
+              {v.encaisse === true ? 'Encaissé' : 'Déclaré'}
             </span>
           } />
           {v.ref_fa && <DetailRow label="Référence FA" value={v.ref_fa} />}

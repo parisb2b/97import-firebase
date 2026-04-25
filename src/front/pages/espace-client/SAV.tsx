@@ -45,7 +45,7 @@ export default function SAV({ userId, profile }: { userId: string; profile: any 
       const qCmd = query(collection(db, 'quotes'), where('client_id', '==', userId));
       const snapCmd = await getDocs(qCmd);
       const cmds = snapCmd.docs
-        .filter(d => d.data().acomptes?.some((a: any) => a.statut === 'encaisse'))
+        .filter(d => d.data().acomptes?.some((a: any) => a.encaisse === true)) // v43 P3-COMPLET format
         .map(d => ({
           id: d.id,
           numero: `CMD-${(d.data().numero || '').replace(/^DVS-/, '')}`,

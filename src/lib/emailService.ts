@@ -606,7 +606,7 @@ export async function notifyAcompteEncaisse(
   // Recalculer le cumul
   const acomptes = Array.isArray(devis.acomptes) ? devis.acomptes : [];
   const totalEncaisse = acomptes
-    .filter((a: any) => a.statut === 'encaisse')
+    .filter((a: any) => a.encaisse === true) // v43 P3-COMPLET format
     .reduce((s: number, a: any) => s + (a.montant || 0), 0);
   const soldeRestant = totalHt - totalEncaisse;
 

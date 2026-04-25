@@ -446,7 +446,7 @@ function ModalAjoutProduits({ existingRefs, onAdd, onClose }: ModalAjoutProduits
       // Filtrer : seulement ceux avec acompte encaissé
       const valides = all.filter((d: any) => {
         const acomptes = d.acomptes || [];
-        return acomptes.some((a: any) => a.statut === 'encaisse');
+        return acomptes.some((a: any) => a.encaisse === true); // v43 P3-COMPLET format
       });
       setDevisList(valides);
     } catch (err) {
