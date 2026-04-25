@@ -25,6 +25,19 @@ export interface CommissionDevis {
 }
 
 /**
+ * Résultat de la création d'une note de commission (V43-E3.2).
+ * Best-effort : la fonction ne lance pas d'exception, elle retourne ce résultat.
+ */
+export interface CreerCommissionResult {
+  ok: boolean;
+  skipped: boolean;
+  reason?: string;             // 'already_generated' | 'ADMIN' | 'zero_or_negative' | 'vente_a_perte: …' | 'firestore_write: …' | …
+  commissionId?: string;       // ID Firestore (= numeroNC en V43)
+  numeroNC?: string;           // NC-AAMM-NNN
+  totalCommission?: number;
+}
+
+/**
  * Calcule la commission d'une ligne
  * Retourne null si vente à perte (refus)
  */
@@ -79,45 +92,112 @@ export function calculerCommissionDevis(
 }
 
 /**
- * Créer la commission dans Firestore quand solde_paye atteint
+ * Crée une note de commission pour un devis dont le solde a été payé.
+ *
+ * V43-E3.2 — Refonte :
+ *  - Idempotence : skip si devis.commission_generated === true
+ *  - Règle ADMIN : skip + marker commission_skipped_reason = 'ADMIN'
+ *  - Skip commission ≤ 0 : marker commission_skipped_reason = 'zero_or_negative'
+ *  - ID Firestore = numéro NC-AAMM-NNN (lisible, cohérent avec quotes/{DVS-…})
+ *  - Statut 'en_attente' (compat NotesCommission/MesCommissionsPartner)
+ *  - Best-effort : retourne CreerCommissionResult, ne throw pas
+ *
+ * @param params.devis - doc Firestore quotes complet (avec id, numero, partenaire_code, lignes, …)
  */
 export async function creerCommissionDevis(params: {
-  devis_id: string;
-  devis_numero: string;
-  partenaire_code: string;
-  lignes: QuoteLine[];
-}): Promise<{ ok: boolean; commission_id?: string; erreur?: string }> {
-  const { db } = await import('./firebase');
-  const { collection, addDoc, serverTimestamp } = await import('firebase/firestore');
+  devis: any;
+}): Promise<CreerCommissionResult> {
+  const { devis } = params;
 
-  // Si partenaire = admin (code "ADMIN" ou vide), pas de commission
-  if (!params.partenaire_code || params.partenaire_code === 'ADMIN' || params.partenaire_code === 'admin') {
-    return { ok: true };  // Pas d'erreur, juste pas de commission
+  console.log('[V43-E3.2] creerCommissionDevis appelée pour', devis.numero);
+
+  // Idempotence : skip si déjà générée
+  if (devis.commission_generated === true) {
+    console.log('[V43-E3.2] Commission déjà générée pour', devis.numero, '— skip');
+    return { ok: true, skipped: true, reason: 'already_generated' };
   }
 
-  const calc = calculerCommissionDevis(params.lignes);
+  const { db } = await import('./firebase');
+  const { doc, setDoc, updateDoc, serverTimestamp } = await import('firebase/firestore');
+  const devisId = devis.id || devis.numero;
+
+  // Règle ADMIN : skip si pas de partenaire ou ADMIN
+  if (!devis.partenaire_code || devis.partenaire_code === 'ADMIN' || devis.partenaire_code === 'admin') {
+    console.log('[V43-E3.2] partenaire_code ADMIN ou absent — skip commission');
+    try {
+      await updateDoc(doc(db, 'quotes', devisId), {
+        commission_generated: true,
+        commission_skipped_reason: 'ADMIN',
+      });
+    } catch (e) {
+      console.error('[V43-E3.2] Update marker ADMIN échoué :', e);
+    }
+    return { ok: true, skipped: true, reason: 'ADMIN' };
+  }
+
+  // Calcul commission par ligne (signature existante conservée — Q3)
+  const calc = calculerCommissionDevis(devis.lignes || []);
   if (!calc.valid) {
-    return { ok: false, erreur: calc.erreur };
+    console.error('[V43-E3.2] Vente à perte détectée :', calc.erreur);
+    return { ok: false, skipped: false, reason: `vente_a_perte: ${calc.erreur}` };
   }
 
   if (calc.total <= 0.01) {
-    // Commission nulle → on ne crée pas
-    return { ok: true };
+    console.log('[V43-E3.2] Commission ≤ 0€ pour', devis.numero, '— skip avec marqueur');
+    try {
+      await updateDoc(doc(db, 'quotes', devisId), {
+        commission_generated: true,
+        commission_skipped_reason: 'zero_or_negative',
+      });
+    } catch (e) {
+      console.error('[V43-E3.2] Update marker zero échoué :', e);
+    }
+    return { ok: true, skipped: true, reason: 'zero_or_negative' };
   }
 
+  // Génération numéro NC-AAMM-NNN
+  const { generateNumeroDocument } = await import('./quoteStatusHelpers');
+  let numeroNC: string;
   try {
-    const docRef = await addDoc(collection(db, 'commissions'), {
-      devis_id: params.devis_id,
-      devis_numero: params.devis_numero,
-      partenaire_code: params.partenaire_code,
-      lignes: calc.commissions,
-      total_commission: calc.total,
-      statut: 'en_attente',
-      created_at: serverTimestamp(),
-    });
-    return { ok: true, commission_id: docRef.id };
+    numeroNC = await generateNumeroDocument('note_commission');
   } catch (err: any) {
-    return { ok: false, erreur: err.message };
+    console.error('[V43-E3.2] Génération numéro NC échouée :', err);
+    return { ok: false, skipped: false, reason: `numero_generation: ${err.message || err}` };
+  }
+
+  // Création doc Firestore commissions/{numeroNC} (Q2 : ID = numero NC)
+  const commissionDoc = {
+    numero: numeroNC,
+    devis_id: devisId,
+    devis_numero: devis.numero,
+    partenaire_code: devis.partenaire_code,
+    client_id: devis.client_id || null,
+    client_nom: devis.client_nom || null,
+    lignes: calc.commissions,                  // Q3 : format CommissionLigne[] actuel
+    total_commission: calc.total,
+    statut: 'en_attente',                      // Q1 : compat existant
+    created_at: serverTimestamp(),
+    created_by: 'cascade_v43_e3.2',
+  };
+
+  try {
+    await setDoc(doc(db, 'commissions', numeroNC), commissionDoc);
+    await updateDoc(doc(db, 'quotes', devisId), {
+      commission_generated: true,
+      commission_numero: numeroNC,
+      commission_total: calc.total,
+    });
+    console.log('[V43-E3.2] Commission créée :', numeroNC, '—', calc.total, '€');
+    return {
+      ok: true,
+      skipped: false,
+      commissionId: numeroNC,
+      numeroNC,
+      totalCommission: calc.total,
+    };
+  } catch (err: any) {
+    console.error('[V43-E3.2] Création commission Firestore échouée :', err);
+    return { ok: false, skipped: false, reason: `firestore_write: ${err.message || err}` };
   }
 }
 
@@ -197,5 +277,5 @@ export async function calculateCommission(devis: LegacyDevis): Promise<LegacyCom
 export function estEligibleCommission(devis: LegacyDevis): boolean {
   if (!devis.partenaire_code) return false;
   if (!Array.isArray(devis.acomptes)) return false;
-  return devis.acomptes.some((a: any) => a.statut === 'encaisse' || a.statut === 'confirme' || a.encaisse === true);
+  return devis.acomptes.some((a: any) => a.encaisse === true); // v43-E3.2 : nettoyage hybrid check (migration E2 effectuée)
 }

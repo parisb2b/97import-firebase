@@ -4,6 +4,7 @@ import { db } from '../../../lib/firebase';
 import { useToast } from '../../components/Toast';
 import { montantAcompteParDefaut } from '../../../lib/devisHelpers';
 import { notifyAcompteDeclare } from '../../../lib/emailService';
+import { validerNouveauPaiement, prochainPaiementEstSolde, getSoldeRestant } from '../../../lib/quoteStatusHelpers';
 
 interface Props {
   devisId: string;
@@ -35,8 +36,14 @@ export default function PopupAcompte({ devisId, devisNumero, clientNom, onClose,
   const [typeCompte, setTypeCompte] = useState<'perso' | 'pro'>('perso');
   const [montant, setMontant] = useState(500);
   const [submitting, setSubmitting] = useState(false);
+  const [devisCharge, setDevisCharge] = useState<any>(null); // v43-E3.2
 
   const rib = RIB_DATA[typeCompte];
+
+  // v43-E3.2 : dérivés pour la logique limite 3 acomptes + montant forcé au solde
+  const acomptesCharges = devisCharge?.acomptes || [];
+  const soldeRestant = devisCharge ? getSoldeRestant(devisCharge.total_ht || 0, acomptesCharges) : 0;
+  const estSolde = prochainPaiementEstSolde(acomptesCharges);
 
   // Calculer le montant par défaut adapté au solde restant
   useEffect(() => {
@@ -45,8 +52,14 @@ export default function PopupAcompte({ devisId, devisNumero, clientNom, onClose,
         const snap = await getDocs(query(collection(db, 'quotes'), where('__name__', '==', devisId)));
         const devisData = snap.docs[0]?.data();
         if (devisData) {
-          const defaultAmount = montantAcompteParDefaut(devisData);
-          setMontant(defaultAmount);
+          setDevisCharge(devisData);
+          const acomptesEnBase = devisData.acomptes || [];
+          if (prochainPaiementEstSolde(acomptesEnBase)) {
+            // Forcer au montant exact du solde restant
+            setMontant(getSoldeRestant(devisData.total_ht || 0, acomptesEnBase));
+          } else {
+            setMontant(montantAcompteParDefaut(devisData));
+          }
         }
       } catch (err) {
         console.error('Error fetching devis for default montant:', err);
@@ -57,21 +70,39 @@ export default function PopupAcompte({ devisId, devisNumero, clientNom, onClose,
 
   const handleConfirm = async () => {
     if (montant <= 0) { showToast('Montant invalide', 'error'); return; }
+    if (!devisCharge) {
+      showToast('Devis non chargé, attendez quelques secondes', 'error');
+      return;
+    }
     setSubmitting(true);
     try {
       const devisRef = doc(db, 'quotes', devisId);
       const snap = await getDocs(query(collection(db, 'quotes'), where('__name__', '==', devisId)));
       const currentData = snap.docs[0]?.data();
       const currentAcomptes = currentData?.acomptes || [];
+      const totalHt = currentData?.total_ht || 0;
+
+      // v43-E3.2 : forcer le montant au solde restant si c'est le 4e paiement
+      const estSoldeFresh = prochainPaiementEstSolde(currentAcomptes);
+      const soldeRestantFresh = getSoldeRestant(totalHt, currentAcomptes);
+      const montantFinal = estSoldeFresh ? soldeRestantFresh : montant;
+
+      // v43-E3.2 : validation centralisée (min 50€, max solde, 4e = solde forcé)
+      const validation = validerNouveauPaiement(totalHt, currentAcomptes, montantFinal);
+      if (!validation.ok) {
+        showToast(validation.erreur || 'Validation échouée', 'error');
+        setSubmitting(false);
+        return;
+      }
 
       const nouvelAcompte = {
-        numero: 1,
-        montant,
+        numero: estSoldeFresh ? 0 : (currentAcomptes.length + 1),
+        montant: montantFinal,
         date_reception: new Date().toISOString(),
         reference_virement: undefined,
         facture_acompte_numero: undefined,
         facture_acompte_pdf_url: undefined,
-        is_solde: false,
+        is_solde: estSoldeFresh,                     // v43-E3.2 : marqueur solde
         encaisse: false,
         created_at: new Date().toISOString(),
         created_by: 'client',
@@ -92,7 +123,7 @@ export default function PopupAcompte({ devisId, devisNumero, clientNom, onClose,
         console.error('Erreur notification acompte déclaré:', err);
       }
 
-      showToast(`Acompte de ${montant.toLocaleString('fr-FR')} € déclaré ✅`);
+      showToast(`${estSoldeFresh ? 'Solde' : 'Acompte'} de ${montantFinal.toLocaleString('fr-FR')} € déclaré ✅`);
       onAcompteAdded();
       onClose();
     } catch (err) {
@@ -128,12 +159,31 @@ export default function PopupAcompte({ devisId, devisNumero, clientNom, onClose,
           ))}
         </div>
 
+        {/* v43-E3.2 : bandeau Solde si 4e paiement */}
+        {estSolde && (
+          <div style={{
+            background: '#D1FAE5',
+            border: '1px solid #10B981',
+            borderRadius: 12,
+            padding: 12,
+            marginBottom: 16,
+          }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: '#065F46', display: 'flex', alignItems: 'center', gap: 6 }}>
+              🏁 Paiement du Solde
+            </div>
+            <div style={{ fontSize: 12, color: '#047857', marginTop: 4 }}>
+              Le montant est verrouillé à <strong>{soldeRestant.toFixed(2)} €</strong> (solde restant exact).
+            </div>
+          </div>
+        )}
+
         {/* Montant */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: '#E0F2F1', border: '2px solid #26A69A', borderRadius: 12, padding: '12px 16px', marginBottom: 16 }}>
-          <label style={{ fontSize: 13, color: '#00897B', fontWeight: 600, flex: 1 }}>💶 Montant</label>
-          <input type="number" value={montant} onChange={e => setMontant(Number(e.target.value))}
-            style={{ width: 90, padding: '7px 10px', border: 'none', background: 'rgba(255,255,255,.8)', borderRadius: 8, fontSize: 17, fontWeight: 700, color: '#00897B', textAlign: 'center' }} />
-          <span style={{ fontSize: 10, color: '#00897B', background: 'rgba(0,137,123,.12)', padding: '2px 8px', borderRadius: 20 }}>modifiable</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: estSolde ? '#D1FAE5' : '#E0F2F1', border: `2px solid ${estSolde ? '#10B981' : '#26A69A'}`, borderRadius: 12, padding: '12px 16px', marginBottom: 16 }}>
+          <label style={{ fontSize: 13, color: estSolde ? '#065F46' : '#00897B', fontWeight: 600, flex: 1 }}>{estSolde ? '🏁 Solde' : '💶 Montant'}</label>
+          <input type="number" value={estSolde ? soldeRestant.toFixed(2) : montant} onChange={e => setMontant(Number(e.target.value))}
+            disabled={estSolde}
+            style={{ width: 90, padding: '7px 10px', border: 'none', background: 'rgba(255,255,255,.8)', borderRadius: 8, fontSize: 17, fontWeight: 700, color: estSolde ? '#065F46' : '#00897B', textAlign: 'center', cursor: estSolde ? 'not-allowed' : 'text' }} />
+          <span style={{ fontSize: 10, color: estSolde ? '#065F46' : '#00897B', background: estSolde ? 'rgba(6,95,70,.12)' : 'rgba(0,137,123,.12)', padding: '2px 8px', borderRadius: 20 }}>{estSolde ? 'verrouillé' : 'modifiable'}</span>
         </div>
 
         {/* RIB Card */}

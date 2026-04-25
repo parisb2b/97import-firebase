@@ -11,6 +11,7 @@ import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage
 import { db, storage } from '../../lib/firebase';
 import { useI18n } from '../../i18n';
 import { getNextNumber } from '../../lib/counters';
+import { prochainPaiementEstSolde, getSoldeRestant } from '../../lib/quoteStatusHelpers';
 import { OrangeIndicator } from '../../components/OrangeIndicator';
 import { generateDevis, downloadPDF } from '../../lib/pdf-generator';
 import { Card, Button } from '../components/Icons';
@@ -309,11 +310,19 @@ export default function DetailDevis() {
           {isNew ? 'Nouveau devis' : devis.numero}
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
-          {!isNew && (devis.acomptes || []).some((a: any) => a.encaisse === false) && (
-            <Button variant="s" onClick={handleEncaisser}>
-              {t('btn.encaisser')}
-            </Button>
-          )}
+          {!isNew && (devis.acomptes || []).some((a: any) => a.encaisse === false) && (() => {
+            // v43-E3.2 : libellé adaptatif selon que le prochain paiement est un acompte ou le solde
+            const acomptes = devis.acomptes || [];
+            const soldeRestant = getSoldeRestant(devis.total_ht || 0, acomptes);
+            const estSolde = prochainPaiementEstSolde(acomptes);
+            return (
+              <Button variant="s" onClick={handleEncaisser}>
+                {estSolde
+                  ? `🏁 Encaisser le Solde (${soldeRestant.toFixed(2)}€)`
+                  : t('btn.encaisser')}
+              </Button>
+            );
+          })()}
           <Button variant="p" onClick={handleSave} disabled={saving || estLectureSeule}>
             {saving ? t('loading') : t('btn.enregistrer')}
           </Button>

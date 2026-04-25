@@ -5,6 +5,122 @@ import { db, storage } from '../../lib/firebase';
 import { generateFactureAcomptePDF } from '../../lib/generateInvoiceAcompte';
 import { validerNouveauPaiement, prochainPaiementEstSolde, getNbAcomptesEncaisses, generateNumeroDocument } from '../../lib/quoteStatusHelpers';
 import { notifyAcompteEncaisse } from '../../lib/emailService';
+import { creerCommissionDevis } from '../../lib/commissionHelpers';
+
+/**
+ * v43-E3.2 — Cascade best-effort à exécuter quand un devis passe à `solde_paye`.
+ * Génère la facture finale globale, crée la commission, envoie les emails.
+ * N'est PAS bloquant pour le flux principal d'encaissement.
+ */
+async function traiterCascadeSoldePaye(devis: any): Promise<void> {
+  console.log('[V43-E3.2] === CASCADE SOLDE_PAYE ===', devis.numero);
+  const devisId = devis.id || devis.numero;
+
+  // ÉTAPE 1 : Génération facture finale globale (FA-AAMM-NNN) + PDF + Storage
+  let factureFinaleNumero: string | null = null;
+  let factureFinalePdfUrl: string | null = null;
+  try {
+    const { generateNumeroDocument } = await import('../../lib/quoteStatusHelpers');
+    factureFinaleNumero = await generateNumeroDocument('facture_finale');
+
+    try {
+      const { generateFactureFinalePDF } = await import('../../lib/generateInvoiceFinale');
+      const pdfBlob = await generateFactureFinalePDF({
+        numero: factureFinaleNumero,
+        devis_numero: devis.numero,
+        date_emission: new Date().toISOString(),
+        client: {
+          nom: devis.client_nom || '',
+          email: devis.client_email || '',
+          adresse: devis.client_adresse,
+          ville: devis.client_ville,
+          cp: devis.client_cp,
+          pays: devis.destination,
+        },
+        lignes: devis.lignes || [],
+        total_ht: devis.total_ht || 0,
+        acomptes: devis.acomptes || [],
+        date_solde_paye: new Date().toISOString(),
+      });
+
+      const fileRef = storageRef(storage, `factures/${factureFinaleNumero}.pdf`);
+      await uploadBytes(fileRef, pdfBlob, { contentType: 'application/pdf' });
+      factureFinalePdfUrl = await getDownloadURL(fileRef);
+    } catch (pdfErr: any) {
+      console.warn('[V43-E3.2] PDF facture finale non généré (continue sans PDF) :', pdfErr?.message || pdfErr);
+    }
+
+    await updateDoc(doc(db, 'quotes', devisId), {
+      facture_finale: {
+        numero: factureFinaleNumero,
+        pdf_url: factureFinalePdfUrl,
+        date_emission: new Date().toISOString(),
+        total: devis.total_ht || 0,
+      },
+    });
+    console.log('[V43-E3.2] Facture finale créée :', factureFinaleNumero);
+  } catch (err: any) {
+    console.error('[V43-E3.2] Génération facture finale échouée :', err);
+  }
+
+  // ÉTAPE 2 : Création commission + email partenaire
+  try {
+    const commissionResult = await creerCommissionDevis({ devis });
+    console.log('[V43-E3.2] Résultat commission :', commissionResult);
+
+    if (commissionResult.ok && !commissionResult.skipped && commissionResult.numeroNC) {
+      try {
+        const { collection, query, where, getDocs } = await import('firebase/firestore');
+        const partnersQuery = query(
+          collection(db, 'partners'),
+          where('code', '==', devis.partenaire_code)
+        );
+        const partnersSnap = await getDocs(partnersQuery);
+
+        if (!partnersSnap.empty) {
+          const partner = partnersSnap.docs[0].data() as any;
+          const { envoyerEmailCommissionPartenaire } = await import('../../lib/emailService');
+          await envoyerEmailCommissionPartenaire({
+            partenaireEmail: partner.email,
+            partenaireNom: `${partner.prenom || ''} ${partner.nom || ''}`.trim() || partner.code || 'Partenaire',
+            devisNumero: devis.numero,
+            clientNom: devis.client_nom || 'Client',
+            montantCommission: commissionResult.totalCommission!,
+            noteCommissionNumero: commissionResult.numeroNC,
+            whatsappLink: partner.whatsapp ? `https://wa.me/${String(partner.whatsapp).replace(/\D/g, '')}` : undefined,
+          });
+          console.log('[V43-E3.2] Email partenaire envoyé');
+        } else {
+          console.warn('[V43-E3.2] Partenaire introuvable code=', devis.partenaire_code);
+        }
+      } catch (emailErr) {
+        console.error('[V43-E3.2] Email commission partenaire échoué (non bloquant) :', emailErr);
+      }
+    }
+  } catch (err: any) {
+    console.error('[V43-E3.2] Cascade commission échouée :', err);
+  }
+
+  // ÉTAPE 3 : Email client facture finale
+  if (factureFinaleNumero) {
+    try {
+      const { envoyerEmailFactureFinale } = await import('../../lib/emailService');
+      await envoyerEmailFactureFinale({
+        clientEmail: devis.client_email,
+        clientNom: devis.client_nom || 'Client',
+        factureFinaleNumero,
+        devisNumero: devis.numero,
+        total: devis.total_ht || 0,
+        pdfUrl: factureFinalePdfUrl || '',
+      });
+      console.log('[V43-E3.2] Email client facture finale envoyé');
+    } catch (emailErr) {
+      console.error('[V43-E3.2] Email client facture finale échoué (non bloquant) :', emailErr);
+    }
+  }
+
+  console.log('[V43-E3.2] === CASCADE TERMINÉE ===', devis.numero);
+}
 
 interface Props {
   devis: any;
@@ -181,6 +297,20 @@ export default function PopupEncaisserAcompte({ devis, onClose, onSuccess }: Pro
         );
       } catch (err) {
         console.error('Erreur notification acompte encaissé:', err);
+      }
+
+      // v43-E3.2 : Cascade solde_paye (best-effort, non bloquant)
+      if (nouveauStatut === 'solde_paye') {
+        const devisFinal = {
+          ...devis,
+          acomptes: acomptesActuels,
+          total_encaisse: totalEncaisse,
+          solde_restant: soldeRestant,
+          statut: nouveauStatut,
+        };
+        traiterCascadeSoldePaye(devisFinal).catch(err => {
+          console.error('[V43-E3.2] Cascade solde_paye échouée (non bloquant) :', err);
+        });
       }
 
       // Download local pour admin

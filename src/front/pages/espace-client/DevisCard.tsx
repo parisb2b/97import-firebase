@@ -3,6 +3,7 @@ import PopupAcompte from './PopupAcompte';
 import PopupSaisieRIB from '../../components/PopupSaisieRIB';
 import PopupVerserAcompte from '../../components/PopupVerserAcompte';
 import { peutVerserAcompte } from '../../../lib/devisHelpers';
+import { prochainPaiementEstSolde, getSoldeRestant } from '../../../lib/quoteStatusHelpers';
 import { db } from '../../../lib/firebase';
 import { doc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { generateDevis, downloadPDF } from '../../../lib/pdf-generator';
@@ -492,29 +493,60 @@ export default function DevisCard({ devis, profile, onRefresh, forceOpen = false
             </div>
           )}
 
-          {/* Bouton Verser un acompte */}
-          {peutVerserAcompte(devis) && (
-            <button
-              onClick={() => setShowPopupAcompte(true)}
-              style={{
-                width: '100%',
-                padding: 14,
-                background: '#059669',
-                color: '#fff',
-                border: 'none',
-                borderRadius: 12,
-                fontSize: 14,
-                fontWeight: 600,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 8,
-              }}
-            >
-              💶 Verser un acompte
-            </button>
-          )}
+          {/* Bouton Verser un acompte / Payer le Solde (v43-E3.2) */}
+          {peutVerserAcompte(devis) && (() => {
+            const acomptes = devis.acomptes || [];
+            const soldeRestant = getSoldeRestant(devis.total_ht || 0, acomptes);
+            const estSolde = prochainPaiementEstSolde(acomptes);
+
+            if (estSolde) {
+              return (
+                <button
+                  onClick={() => setShowPopupAcompte(true)}
+                  style={{
+                    width: '100%',
+                    padding: 14,
+                    background: '#10B981',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: 12,
+                    fontSize: 14,
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 8,
+                  }}
+                >
+                  🏁 Payer le Solde ({soldeRestant.toFixed(2)}€)
+                </button>
+              );
+            }
+
+            return (
+              <button
+                onClick={() => setShowPopupAcompte(true)}
+                style={{
+                  width: '100%',
+                  padding: 14,
+                  background: '#059669',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: 12,
+                  fontSize: 14,
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 8,
+                }}
+              >
+                💶 Verser un acompte
+              </button>
+            );
+          })()}
         </div>
       )}
 
