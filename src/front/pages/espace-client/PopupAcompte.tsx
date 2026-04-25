@@ -97,7 +97,8 @@ export default function PopupAcompte({ devisId, devisNumero, clientNom, onClose,
       onClose();
     } catch (err) {
       console.error(err);
-      showToast('Erreur lors de la déclaration', 'error');
+      const errorMsg = err instanceof Error ? err.message : String(err);
+      showToast(`Erreur: ${errorMsg}`, 'error');
     } finally {
       setSubmitting(false);
     }
