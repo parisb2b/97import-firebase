@@ -4,6 +4,8 @@ import { execSync } from 'node:child_process'
 import { readFileSync } from 'node:fs'
 
 // ── Métadonnées de build injectées dans le bundle (badge version v43-mini) ──
+// On injecte des DONNÉES BRUTES (ISO 8601 UTC) — le formatage en heure de Paris
+// est fait à l'affichage dans src/lib/version.ts (formatBuildDate).
 const pkg = JSON.parse(readFileSync('./package.json', 'utf-8'))
 
 let commitHash = 'dev'
@@ -13,12 +15,7 @@ try {
   // git non disponible (env CI sans .git, etc.) — on garde 'dev'
 }
 
-const now = new Date()
-const dd = String(now.getDate()).padStart(2, '0')
-const mm = String(now.getMonth() + 1).padStart(2, '0')
-const hh = String(now.getHours()).padStart(2, '0')
-const min = String(now.getMinutes()).padStart(2, '0')
-const buildDate = `${dd}/${mm} ${hh}:${min}`
+const buildIsoUtc = new Date().toISOString()  // ex: "2026-04-25T17:55:30.123Z"
 
 export default defineConfig({
   plugins: [react()],
@@ -29,7 +26,7 @@ export default defineConfig({
   },
   define: {
     __APP_VERSION__: JSON.stringify(pkg.version),
-    __BUILD_DATE__: JSON.stringify(buildDate),
+    __BUILD_ISO__: JSON.stringify(buildIsoUtc),
     __COMMIT_HASH__: JSON.stringify(commitHash),
   },
 })
