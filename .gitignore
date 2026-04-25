@@ -32,3 +32,7 @@ backup-products-*.json
 scripts/audit-partenaires.js
 AUDIT-PARTENAIRES-*.md
 AUDIT-SYSTEME-PARTENAIRES-*.md
+
+# Fichiers d'extraction temporaires (pour analyse externe Gemini)
+EXTRACT-COMPLET-*.md
+FULL_PROJECT_SNAPSHOT_*.md
