@@ -6,6 +6,7 @@ import { getNextNumber } from '../../lib/counters';
 import { useI18n } from '../../i18n';
 import { useToast } from '../components/Toast';
 import { notifyDevisCree } from '../../lib/emailService';
+import { sanitizeForFirestore } from '../../lib/firebaseUtils';
 
 interface CartItem {
   id: string;
@@ -177,7 +178,7 @@ export default function Panier() {
         updatedAt: serverTimestamp(),
       };
 
-      await setDoc(doc(db, 'quotes', devisId), devisData);
+      await setDoc(doc(db, 'quotes', devisId), sanitizeForFirestore(devisData));
 
       // Notification email
       try {
