@@ -323,10 +323,15 @@ export default function PopupEncaisserAcompte({ devis, onClose, onSuccess }: Pro
           solde_restant: soldeRestant,
           statut: nouveauStatut,
         };
-        traiterCascadeSoldePaye(devisFinal).catch(err => {
+        // v43-E3.2-fix2 : await pour ne pas être tué par le window.location.reload()
+        // que onSuccess() déclenche dans le parent. Best-effort = on log mais on
+        // ne propage pas l'erreur (le flux d'encaissement principal a réussi).
+        try {
+          await traiterCascadeSoldePaye(devisFinal);
+        } catch (err: any) {
           console.error('[V43-E3.2] Cascade solde_paye échouée (non bloquant) :', err);
           logError('cascade-e3.2', 'Cascade solde_paye échouée (top-level)', { devisNumero: devis.numero }, err);
-        });
+        }
       }
 
       // Download local pour admin
