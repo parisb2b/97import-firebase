@@ -36,6 +36,7 @@ interface Devis {
   client_adresse: string;
   client_siret: string;
   partenaire_id: string | null;
+  partenaire_code?: string | null;
   statut: string;
   lignes: LigneDevis[];
   total_ht: number;
@@ -154,6 +155,9 @@ export default function DetailDevis() {
               client_adresse: clientAdresse,
               client_siret: clientSiret,
               partenaire_id: data.partenaire_id || null,
+              partenaire_code: data.partenaire_code || null,
+              is_vip: data.is_vip || false,
+              prix_negocies: data.prix_negocies || {},
               statut: data.statut || 'brouillon',
               lignes: data.lignes || [],
               total_ht: data.total_ht || 0,
