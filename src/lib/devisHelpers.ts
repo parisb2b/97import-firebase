@@ -30,8 +30,18 @@ export function peutVerserAcompte(devis: DevisLike): boolean {
   const soldeRestant = totalHt - totalEncaisse;
   if (soldeRestant <= 0) return false;
 
-  const nbAcomptes = Array.isArray(devis.acomptes) ? devis.acomptes.length : 0;
-  if (nbAcomptes >= 3) return false;
+  // v43-E3.2 : permettre jusqu'à 3 acomptes partiels + 1 solde forcé
+  const nbAcomptesEncaisses = Array.isArray(devis.acomptes)
+    ? devis.acomptes.filter((a: any) => a.encaisse === true).length
+    : 0;
+  const nbAcomptesDeclaresEnAttente = Array.isArray(devis.acomptes)
+    ? devis.acomptes.filter((a: any) => a.encaisse === false).length
+    : 0;
+
+  // Bloquer si tous les 4 paiements encaissés
+  if (nbAcomptesEncaisses >= 4) return false;
+  // Bloquer si déjà 1 déclaré en attente (le client doit attendre validation admin)
+  if (nbAcomptesDeclaresEnAttente >= 1) return false;
 
   return true;
 }
