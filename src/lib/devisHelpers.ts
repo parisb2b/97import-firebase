@@ -30,20 +30,31 @@ export function peutVerserAcompte(devis: DevisLike): boolean {
   const soldeRestant = totalHt - totalEncaisse;
   if (soldeRestant <= 0) return false;
 
-  // v43-E3.2 : permettre jusqu'à 3 acomptes partiels + 1 solde forcé
-  const nbAcomptesEncaisses = Array.isArray(devis.acomptes)
-    ? devis.acomptes.filter((a: any) => a.encaisse === true).length
-    : 0;
-  const nbAcomptesDeclaresEnAttente = Array.isArray(devis.acomptes)
-    ? devis.acomptes.filter((a: any) => a.encaisse === false).length
-    : 0;
-
-  // Bloquer si tous les 4 paiements encaissés
-  if (nbAcomptesEncaisses >= 4) return false;
-  // Bloquer si déjà 1 déclaré en attente (le client doit attendre validation admin)
-  if (nbAcomptesDeclaresEnAttente >= 1) return false;
+  // v43-E3.2 v2 : workflow libre — limite uniquement le nb total de paiements
+  // (encaissés + déclarés en attente). Le client peut enchaîner les versements
+  // sans attendre la validation admin. Max strict : 4 paiements totaux.
+  const acomptes = Array.isArray(devis.acomptes) ? devis.acomptes : [];
+  const nbPaiementsTotal = acomptes.length;
+  if (nbPaiementsTotal >= 4) return false;
 
   return true;
+}
+
+/**
+ * Montant restant que le client peut encore verser.
+ * = Total HT - (Encaissés + Déclarés en attente)
+ *
+ * Différent de getSoldeRestant() qui ne soustrait que les encaissés.
+ * Cette fonction est utilisée pour l'affichage côté CLIENT, pour
+ * éviter de proposer de payer le solde 2 fois (une fois en déclaré,
+ * une fois en bouton solde).
+ */
+export function getMontantRestantAVerser(devis: DevisLike): number {
+  if (!devis) return 0;
+  const totalHt = devis.total_ht || 0;
+  const acomptes = Array.isArray(devis.acomptes) ? devis.acomptes : [];
+  const totalPaiements = acomptes.reduce((sum: number, a: any) => sum + (a.montant || 0), 0);
+  return Math.max(0, totalHt - totalPaiements);
 }
 
 /**
