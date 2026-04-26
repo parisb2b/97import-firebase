@@ -11,6 +11,7 @@ interface Props {
   devisId: string;
   devisNumero: string;
   clientNom: string;
+  montantInitial?: number;
   onClose: () => void;
   onAcompteAdded: () => void;
 }
@@ -32,10 +33,10 @@ const RIB_DATA = {
   },
 };
 
-export default function PopupAcompte({ devisId, devisNumero, clientNom, onClose, onAcompteAdded }: Props) {
+export default function PopupAcompte({ devisId, devisNumero, clientNom, montantInitial, onClose, onAcompteAdded }: Props) {
   const { showToast } = useToast();
   const [typeCompte, setTypeCompte] = useState<'perso' | 'pro'>('perso');
-  const [montant, setMontant] = useState(500);
+  const [montant, setMontant] = useState(montantInitial ?? 500);
   const [submitting, setSubmitting] = useState(false);
   const [devisCharge, setDevisCharge] = useState<any>(null); // v43-E3.2
 
@@ -54,6 +55,9 @@ export default function PopupAcompte({ devisId, devisNumero, clientNom, onClose,
         const devisData = snap.docs[0]?.data();
         if (devisData) {
           setDevisCharge(devisData);
+          // v43-E3.2 V3 : si montantInitial fourni par le parent (ex: clic "Payer le Solde"),
+          // ne PAS écraser le montant — on garde la valeur transmise.
+          if (montantInitial !== undefined) return;
           const acomptesEnBase = devisData.acomptes || [];
           if (prochainPaiementEstSolde(acomptesEnBase)) {
             // Forcer au montant exact du solde restant
@@ -67,7 +71,7 @@ export default function PopupAcompte({ devisId, devisNumero, clientNom, onClose,
       }
     };
     fetchDefaultMontant();
-  }, [devisId]);
+  }, [devisId, montantInitial]);
 
   const handleConfirm = async () => {
     if (montant <= 0) { showToast('Montant invalide', 'error'); return; }

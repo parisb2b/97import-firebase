@@ -2,8 +2,7 @@ import { useState } from 'react';
 import PopupAcompte from './PopupAcompte';
 import PopupSaisieRIB from '../../components/PopupSaisieRIB';
 import PopupVerserAcompte from '../../components/PopupVerserAcompte';
-import { peutVerserAcompte, getMontantRestantAVerser } from '../../../lib/devisHelpers';
-import { prochainPaiementEstSolde } from '../../../lib/quoteStatusHelpers';
+import { getMontantRestantAVerser } from '../../../lib/devisHelpers';
 import { db } from '../../../lib/firebase';
 import { doc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { generateDevis, downloadPDF } from '../../../lib/pdf-generator';
@@ -21,8 +20,19 @@ export default function DevisCard({ devis, profile, onRefresh, forceOpen = false
   const { showToast } = useToast();
   const [open, setOpen] = useState(forceOpen);
   const [showPopupAcompte, setShowPopupAcompte] = useState(false);
+  const [popupMontantInitial, setPopupMontantInitial] = useState<number | undefined>();
   const [showPopupRIB, setShowPopupRIB] = useState(false);
   const [showPopupVerserAcompte, setShowPopupVerserAcompte] = useState(false);
+
+  // v43-E3.2 V3 : handlers pour ouvrir le popup en mode acompte ou solde
+  const openPopupAcompte = () => {
+    setPopupMontantInitial(undefined);
+    setShowPopupAcompte(true);
+  };
+  const openPopupSolde = (montant: number) => {
+    setPopupMontantInitial(montant);
+    setShowPopupAcompte(true);
+  };
 
   // Calculs
   const acomptes = Array.isArray(devis.acomptes) ? devis.acomptes : [];
@@ -493,21 +503,23 @@ export default function DevisCard({ devis, profile, onRefresh, forceOpen = false
             </div>
           )}
 
-          {/* Boutons paiement (v43-E3.2 v2 — workflow libre, 2 boutons parallèles) */}
+          {/* Boutons paiement (v43-E3.2 V3 — mirror admin sur nb paiements totaux) */}
           {(() => {
             const acomptes = devis.acomptes || [];
+            const nbPaiementsTotal = acomptes.length;
             const montantRestantAVerser = getMontantRestantAVerser(devis);
-            const peutVerser = peutVerserAcompte(devis);
-            const estSoldeForce = prochainPaiementEstSolde(acomptes);
 
-            // Cas final : aucun bouton (devis intégralement déclaré ou payé)
+            // Cas 1 : Plus rien à payer
             if (montantRestantAVerser <= 0.01) return null;
 
-            // Cas solde forcé (3 acomptes encaissés) : bouton solde uniquement
-            if (estSoldeForce && peutVerser) {
+            // Cas 2 : 4+ paiements (saturé)
+            if (nbPaiementsTotal >= 4) return null;
+
+            // Cas 3 : 3 paiements → SEUL bouton "Payer le Solde"
+            if (nbPaiementsTotal >= 3) {
               return (
                 <button
-                  onClick={() => setShowPopupAcompte(true)}
+                  onClick={() => openPopupSolde(montantRestantAVerser)}
                   style={{
                     width: '100%', padding: 14, background: '#10B981',
                     color: '#fff', border: 'none', borderRadius: 12,
@@ -521,25 +533,23 @@ export default function DevisCard({ devis, profile, onRefresh, forceOpen = false
               );
             }
 
-            // Cas normal : 2 boutons en parallèle si possible
+            // Cas 4 : 0-2 paiements → 2 boutons en parallèle
             return (
               <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-                {peutVerser && (
-                  <button
-                    onClick={() => setShowPopupAcompte(true)}
-                    style={{
-                      flex: '1 1 200px', padding: 14, background: '#059669',
-                      color: '#fff', border: 'none', borderRadius: 12,
-                      fontSize: 14, fontWeight: 600, cursor: 'pointer',
-                      display: 'flex', alignItems: 'center',
-                      justifyContent: 'center', gap: 8,
-                    }}
-                  >
-                    💶 Verser un acompte
-                  </button>
-                )}
                 <button
-                  onClick={() => setShowPopupAcompte(true)}
+                  onClick={openPopupAcompte}
+                  style={{
+                    flex: '1 1 200px', padding: 14, background: '#059669',
+                    color: '#fff', border: 'none', borderRadius: 12,
+                    fontSize: 14, fontWeight: 600, cursor: 'pointer',
+                    display: 'flex', alignItems: 'center',
+                    justifyContent: 'center', gap: 8,
+                  }}
+                >
+                  💶 Verser un acompte
+                </button>
+                <button
+                  onClick={() => openPopupSolde(montantRestantAVerser)}
                   style={{
                     flex: '1 1 200px', padding: 14, background: '#10B981',
                     color: '#fff', border: 'none', borderRadius: 12,
@@ -561,6 +571,7 @@ export default function DevisCard({ devis, profile, onRefresh, forceOpen = false
           devisId={devis.id}
           devisNumero={devis.numero}
           clientNom={devis.client_nom || `${profile?.firstName || ''} ${profile?.lastName || ''}`}
+          montantInitial={popupMontantInitial}
           onClose={() => setShowPopupAcompte(false)}
           onAcompteAdded={() => {
             setShowPopupAcompte(false);
