@@ -5,6 +5,7 @@ import { useToast } from '../../components/Toast';
 import { montantAcompteParDefaut } from '../../../lib/devisHelpers';
 import { notifyAcompteDeclare } from '../../../lib/emailService';
 import { validerNouveauPaiement, prochainPaiementEstSolde, getSoldeRestant } from '../../../lib/quoteStatusHelpers';
+import { sanitizeForFirestore } from '../../../lib/firebaseUtils';
 
 interface Props {
   devisId: string;
@@ -110,10 +111,10 @@ export default function PopupAcompte({ devisId, devisNumero, clientNom, onClose,
         iban_utilise: rib.iban,
       };
 
-      await updateDoc(devisRef, {
+      await updateDoc(devisRef, sanitizeForFirestore({
         acomptes: [...currentAcomptes, nouvelAcompte],
         updatedAt: new Date(),
-      });
+      }));
 
       // Notification email
       try {
