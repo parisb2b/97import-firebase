@@ -3,6 +3,7 @@ import { useRoute, useLocation } from 'wouter';
 import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { Card, Button, Pill, InfoRow } from '../components/Icons';
+import PromouvoirPartenaireModal from '../components/PromouvoirPartenaireModal';
 
 export default function DetailClient() {
   const [, params] = useRoute('/admin/clients/:id');
@@ -10,6 +11,7 @@ export default function DetailClient() {
   const [client, setClient] = useState<any>(null);
   const [devis, setDevis] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showPromouvoirModal, setShowPromouvoirModal] = useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -38,7 +40,29 @@ export default function DetailClient() {
     <>
       <div className="filters" style={{ justifyContent: 'space-between' }}>
         <div className="ct" style={{ fontSize: 18 }}>{client.nom || client.displayName || client.email}</div>
-        <Button variant="out" onClick={() => setLocation('/admin/clients')}>← Retour</Button>
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+          {client.role !== 'partner' ? (
+            <button
+              onClick={() => setShowPromouvoirModal(true)}
+              style={{
+                padding: '8px 14px',
+                background: 'linear-gradient(135deg, #7C3AED, #A855F7)',
+                color: '#fff', border: 'none', borderRadius: 8,
+                fontSize: 13, fontWeight: 700, cursor: 'pointer',
+              }}
+            >
+              ⭐ Promouvoir partenaire
+            </button>
+          ) : (
+            <span style={{
+              padding: '6px 12px', background: '#EDE9FE', color: '#6D28D9',
+              borderRadius: 20, fontSize: 12, fontWeight: 700,
+            }}>
+              ✓ Partenaire actif
+            </span>
+          )}
+          <Button variant="out" onClick={() => setLocation('/admin/clients')}>← Retour</Button>
+        </div>
       </div>
 
       <Card title="Informations client">
@@ -52,6 +76,17 @@ export default function DetailClient() {
           <InfoRow label="Inscription" value={client.createdAt?.toDate?.()?.toLocaleDateString('fr-FR') || '—'} />
         </div>
       </Card>
+
+      {showPromouvoirModal && (
+        <PromouvoirPartenaireModal
+          client={client}
+          onClose={() => setShowPromouvoirModal(false)}
+          onSuccess={() => {
+            setShowPromouvoirModal(false);
+            window.location.reload();
+          }}
+        />
+      )}
 
       {devis.length > 0 && (
         <Card title={`Devis du client (${devis.length})`}>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { collection, query, orderBy, getDocs, doc, updateDoc, addDoc, where } from 'firebase/firestore';
+import { collection, query, orderBy, getDocs, doc, updateDoc } from 'firebase/firestore';
 import { useLocation } from 'wouter';
 import { db } from '../../lib/firebase';
 import { Card, Kpi, Pill, Button, IconButton, EyeIcon } from '../components/Icons';
@@ -18,8 +18,6 @@ export default function Partenaires() {
   const [partners, setPartners] = useState<Partner[]>([]);
   const [loading, setLoading] = useState(true);
   const [, setLocation] = useLocation();
-  const [showAdd, setShowAdd] = useState(false);
-  const [newP, setNewP] = useState({ nom: '', email: '', code: '', telephone: '', userId: '' });
   const [successMsg, setSuccessMsg] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
 
@@ -53,47 +51,6 @@ export default function Partenaires() {
     }
   };
 
-  const handleAddPartner = async () => {
-    if (!newP.nom || !newP.code) return;
-    try {
-      // Validation format
-      if (!/^[A-Z]{2,3}$/.test(newP.code)) {
-        setErrorMsg('Le code doit contenir 2 ou 3 lettres en majuscules');
-        setTimeout(() => setErrorMsg(''), 3000);
-        return;
-      }
-
-      // Vérifier unicité du code
-      const existingQ = query(collection(db, 'partners'), where('code', '==', newP.code));
-      const existingSnap = await getDocs(existingQ);
-      if (!existingSnap.empty) {
-        setErrorMsg(`Le code "${newP.code}" est déjà utilisé par un autre partenaire`);
-        setTimeout(() => setErrorMsg(''), 3000);
-        return;
-      }
-
-      await addDoc(collection(db, 'partners'), {
-        nom: newP.nom,
-        email: newP.email,
-        code: newP.code,
-        tel: newP.telephone,
-        userId: newP.userId || null,
-        commission_taux: 0,
-        actif: true,
-        createdAt: new Date(),
-      });
-      setShowAdd(false);
-      setNewP({ nom: '', email: '', code: '', telephone: '', userId: '' });
-      setSuccessMsg('Partenaire ajouté avec succès');
-      setTimeout(() => setSuccessMsg(''), 3000);
-      load();
-    } catch (err) {
-      console.error('Error adding partner:', err);
-      setErrorMsg('Erreur lors de l\'ajout du partenaire');
-      setTimeout(() => setErrorMsg(''), 3000);
-    }
-  };
-
   const actifs = partners.filter(p => p.actif).length;
 
   if (loading) return <div style={{ textAlign: 'center', padding: 32 }}>Chargement...</div>;
@@ -109,8 +66,17 @@ export default function Partenaires() {
         <Kpi label="Inactifs" value={partners.length - actifs} />
       </div>
 
-      <div className="filters">
-        <Button variant="p" onClick={() => setShowAdd(true)}>+ Ajouter partenaire</Button>
+      <div style={{
+        padding: '12px 16px',
+        background: '#FEF3C7',
+        border: '1px solid #FDE68A',
+        borderRadius: 8,
+        marginBottom: 16,
+        fontSize: 14,
+        color: '#92400E',
+      }}>
+        💡 Pour créer un nouveau partenaire, ouvrez la fiche d'un client existant
+        dans <strong>/admin/clients</strong> et cliquez sur <strong>⭐ Promouvoir partenaire</strong>.
       </div>
 
       <Card title={`Partenaires (${partners.length})`} subtitle="Cliquer sur une ligne pour voir le détail">
@@ -142,38 +108,6 @@ export default function Partenaires() {
           </tbody>
         </table>
       </Card>
-
-      {showAdd && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div className="card" style={{ width: 440, padding: 32 }}>
-            <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 20 }}>Nouveau partenaire</h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              <input className="fi" placeholder="Nom complet" value={newP.nom} onChange={e => setNewP({...newP, nom: e.target.value})} />
-              <input className="fi" placeholder="Email" type="email" value={newP.email} onChange={e => setNewP({...newP, email: e.target.value})} />
-              <input className="fi" placeholder="Code (2-3 lettres)" value={newP.code} onChange={e => setNewP({...newP, code: e.target.value.toUpperCase().slice(0,3)})} maxLength={3} />
-              <input className="fi" placeholder="Telephone (optionnel)" value={newP.telephone} onChange={e => setNewP({...newP, telephone: e.target.value})} />
-              <div>
-                <label style={{ fontSize: 11, color: '#6B7280', display: 'block', marginBottom: 4, fontWeight: 600 }}>
-                  User ID Firebase (pour espace partenaire)
-                </label>
-                <input
-                  className="fi"
-                  placeholder="Ex: AbC123XyZ..."
-                  value={newP.userId}
-                  onChange={e => setNewP({...newP, userId: e.target.value})}
-                />
-                <div style={{ fontSize: 10, color: '#9CA3AF', marginTop: 2 }}>
-                  Optionnel. Se trouve dans Firebase Console → Authentication → UID
-                </div>
-              </div>
-            </div>
-            <div style={{ display: 'flex', gap: 12, marginTop: 20, justifyContent: 'flex-end' }}>
-              <button className="btn" onClick={() => setShowAdd(false)}>Annuler</button>
-              <button className="btn p" onClick={handleAddPartner} disabled={!newP.nom || !newP.code}>Ajouter</button>
-            </div>
-          </div>
-        </div>
-      )}
     </>
   );
 }

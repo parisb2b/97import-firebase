@@ -38,10 +38,15 @@ export default function EspacePartenaire() {
         const p = snap.exists() ? snap.data() : null;
         setProfile(p);
 
-        // Load partner code
-        const pSnap = await getDocs(query(collection(db, 'partners'), where('userId', '==', u.uid)));
-        if (!pSnap.empty) {
-          setPartnerCode(pSnap.docs[0].data().code);
+        // v44 — try nouvelle convention (id = uid), puis fallback ancien schéma (userId field)
+        const partnerDocSnap = await getDoc(doc(db, 'partners', u.uid));
+        if (partnerDocSnap.exists()) {
+          setPartnerCode(partnerDocSnap.data().code);
+        } else {
+          const pSnap = await getDocs(query(collection(db, 'partners'), where('userId', '==', u.uid)));
+          if (!pSnap.empty) {
+            setPartnerCode(pSnap.docs[0].data().code);
+          }
         }
       } catch (err) {
         console.error(err);
