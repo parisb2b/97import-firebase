@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useRoute } from 'wouter';
+import { useRoute, Link } from 'wouter';
 import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { db, clientAuth } from '../../lib/firebase';
@@ -7,6 +7,16 @@ import { useI18n } from '../../i18n';
 import Breadcrumb from '../components/Breadcrumb';
 import ProductCard from '../components/ProductCard';
 import { regrouperProduitsParGroupe, getAccessoiresCompatibles } from '../../lib/productGroupHelpers';
+
+// V44 — sections accessoires mini-pelle (par préfixe ref)
+const ACCESSOIRES_SECTIONS: Array<{ prefix: string; titre: string }> = [
+  { prefix: 'ACC-GC', titre: '🪣 Godets de curage' },
+  { prefix: 'ACC-GD', titre: '🛠️ Godets à dents' },
+  { prefix: 'ACC-GI', titre: '⚙️ Godets inclinables' },
+  { prefix: 'ACC-GP', titre: '🦞 Grappins' },
+  { prefix: 'ACC-MH', titre: '🔨 Marteaux hydrauliques' },
+  { prefix: 'ACC-TA', titre: '🌀 Tarières' },
+];
 
 const CATEGORIES_INFO: Record<string, { label: string; desc: string; image: string | null; color: string; icon: string }> = {
   'mini-pelle': {
@@ -48,7 +58,12 @@ const CATEGORIES_INFO: Record<string, { label: string; desc: string; image: stri
 
 export default function Catalogue() {
   const [, params] = useRoute('/catalogue/:categorie');
-  const categorie = params?.categorie || '';
+  // V44 — route 3-segments pour la page accessoires par gamme
+  const [matchAcc, paramsAcc] = useRoute('/catalogue/:categorie/:gamme/accessoires');
+  const isAccessoiresPage = !!matchAcc;
+  const targetCategorie = paramsAcc?.categorie || '';
+  const targetGamme = paramsAcc?.gamme || '';
+  const categorie = isAccessoiresPage ? targetCategorie : (params?.categorie || '');
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [_user, setUser] = useState<User | null>(null);
@@ -103,6 +118,23 @@ export default function Catalogue() {
           return;
         }
 
+        // V44 — Page accessoires par gamme : /catalogue/{cat}/{gamme}/accessoires
+        if (isAccessoiresPage) {
+          const targetCatNorm = normalizeCategorie(targetCategorie);
+          const gammeRegex = new RegExp(`\\b${targetGamme}\\b`, 'i');
+          const accs = all.filter((p) => {
+            if (p.actif === false) return false;
+            if (normalizeCategorie(p.categorie) !== targetCatNorm) return false;
+            const typeLower = String(p.type || '').toLowerCase();
+            const isAcc = p.sous_categorie === 'accessoire' || typeLower === 'accessoire' || typeLower === 'accessory';
+            if (!isAcc) return false;
+            return gammeRegex.test(p.nom_fr || '');
+          });
+          setProducts(accs);
+          setLoading(false);
+          return;
+        }
+
         const filtered = categorie
           ? all.filter(p => {
               const catNormalisee = normalizeCategorie(p.categorie);
@@ -129,21 +161,95 @@ export default function Catalogue() {
     };
     load();
     setFilterGamme('');
-  }, [categorie, compatibleFilter]);
+  }, [categorie, compatibleFilter, isAccessoiresPage, targetCategorie, targetGamme]);
 
   // Get distinct gammes for filter chips
   const gammes = [...new Set(products.map(p => p.gamme).filter(Boolean))].sort();
 
   const displayed = filterGamme ? products.filter(p => p.gamme === filterGamme) : products;
 
-  // Only show "parent" products — hide accessories and options
+  // Only show "parent" products — hide accessories and options.
+  // V44 — filtre case-insensitive (Accessoire/accessoire) + sous_categorie.
   const mainProducts = displayed.filter(p => {
     if (p.ref_parente || p.option_payante) return false;
-    const isAccessoire = p.machine_id || p.machine_compatible || p.type === 'accessoire' || p.type === 'accessory';
+    const typeLower = String(p.type || '').toLowerCase();
+    const isAccessoire =
+      p.machine_id ||
+      p.machine_compatible ||
+      typeLower === 'accessoire' ||
+      typeLower === 'accessory' ||
+      p.sous_categorie === 'accessoire';
     return !isAccessoire;
   }).sort((a, b) => (a.ordre || 99) - (b.ordre || 99) || (a.reference || '').localeCompare(b.reference || ''));
 
   const catInfo = categorie ? CATEGORIES_INFO[categorie] : null;
+
+  // V44 — Render dédié pour la page accessoires par gamme
+  if (isAccessoiresPage) {
+    const productsBySection = ACCESSOIRES_SECTIONS
+      .map((s) => ({ ...s, products: products.filter((p) => String(p.reference || '').startsWith(s.prefix)) }))
+      .filter((s) => s.products.length > 0);
+
+    return (
+      <div style={{ minHeight: '100vh', background: '#F9FAFB' }}>
+        <section style={{
+          color: '#fff', padding: '40px 24px',
+          background: 'linear-gradient(135deg, #1565C0 0%, #1E88E5 100%)',
+        }}>
+          <div style={{ maxWidth: 1400, margin: '0 auto' }}>
+            <Breadcrumb items={[
+              { label: t('nav.accueil'), href: '/' },
+              { label: 'Mini-Pelles', href: '/catalogue/mini-pelle' },
+              { label: `${targetGamme} PRO`, href: `/produit/MP-${targetGamme}-001` },
+              { label: 'Accessoires' },
+            ]} />
+            <div style={{ fontSize: 40, marginBottom: 12, marginTop: 12 }}>🛠️</div>
+            <h1 style={{ fontSize: 'clamp(22px, 4vw, 36px)', fontWeight: 800, margin: '0 0 10px', lineHeight: 1.1 }}>
+              Accessoires compatibles {targetGamme} PRO
+            </h1>
+            <p style={{ fontSize: 14, opacity: 0.9, marginBottom: 4 }}>
+              {loading ? 'Chargement...' : `${products.length} accessoire(s) disponible(s) pour la mini-pelle ${targetGamme}`}
+            </p>
+          </div>
+        </section>
+
+        <div style={{ maxWidth: 1400, margin: '0 auto', padding: '24px 24px 60px' }}>
+          {loading ? (
+            <div style={{ textAlign: 'center', padding: 80, color: '#6B7280', fontSize: 15 }}>
+              <div style={{ fontSize: 48, marginBottom: 16 }}>⏳</div>
+              Chargement des accessoires...
+            </div>
+          ) : productsBySection.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: 80, color: '#6B7280', fontSize: 15 }}>
+              <div style={{ fontSize: 48, marginBottom: 16 }}>📦</div>
+              Aucun accessoire disponible pour la {targetGamme} PRO actuellement.
+              <div style={{ marginTop: 16 }}>
+                <Link href="/catalogue/mini-pelle">
+                  <a style={{ color: '#1565C0', fontWeight: 600, textDecoration: 'underline' }}>← Retour aux mini-pelles</a>
+                </Link>
+              </div>
+            </div>
+          ) : (
+            productsBySection.map((section) => (
+              <section key={section.prefix} style={{ marginTop: 32 }}>
+                <h2 style={{ fontSize: 20, fontWeight: 700, color: '#1E3A5F', marginBottom: 14, display: 'flex', alignItems: 'baseline', gap: 10 }}>
+                  {section.titre}
+                  <span style={{ fontSize: 13, fontWeight: 400, color: '#6B7280' }}>
+                    ({section.products.length} produit{section.products.length > 1 ? 's' : ''})
+                  </span>
+                </h2>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 16 }}>
+                  {section.products.map((p) => (
+                    <ProductCard key={p.id} product={p} userRole={userRole} lang={lang} />
+                  ))}
+                </div>
+              </section>
+            ))
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ minHeight: '100vh', background: '#F9FAFB' }}>

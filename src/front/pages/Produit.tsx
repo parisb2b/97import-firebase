@@ -504,6 +504,40 @@ export default function Produit() {
         );
       })()}
 
+      {/* V44 — Bouton "Voir accessoires compatibles" (mini-pelles R22/R32/R57 uniquement) */}
+      {(() => {
+        if (product.categorie !== 'mini-pelle') return null;
+        const m = String(product.reference || '').match(/^MP-(R\d+)-/);
+        const gamme = m?.[1];
+        if (!gamme || !['R22', 'R32', 'R57'].includes(gamme)) return null;
+        return (
+          <div style={{ maxWidth: 1280, margin: '0 auto', padding: '24px 20px 0' }}>
+            <Link href={`/catalogue/mini-pelle/${gamme}/accessoires`}>
+              <a style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 10,
+                padding: '14px 24px',
+                background: 'linear-gradient(135deg, #EA580C, #F97316)',
+                color: 'white',
+                borderRadius: 12,
+                textDecoration: 'none',
+                fontWeight: 700,
+                fontSize: 15,
+                boxShadow: '0 4px 14px rgba(234, 88, 12, 0.25)',
+                transition: 'transform 0.15s, box-shadow 0.15s',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '0 6px 20px rgba(234, 88, 12, 0.35)'; }}
+              onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 14px rgba(234, 88, 12, 0.25)'; }}
+              >
+                🛠️ Voir les accessoires compatibles avec la {gamme} PRO →
+              </a>
+            </Link>
+          </div>
+        );
+      })()}
+
       {/* Documents PDF téléchargeables */}
       {(() => {
         const docs = getDocumentsPdf(product);
