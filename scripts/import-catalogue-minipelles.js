@@ -111,6 +111,57 @@ function sanitizeForFirestore(obj) {
   return obj;
 }
 
+// ─── Conversion devises (Frankfurter API gratuite) ─────────────────────────
+
+let RATES = null;
+
+async function fetchRates() {
+  if (RATES) return RATES;
+  try {
+    const res = await fetch('https://api.frankfurter.app/latest?from=USD&to=EUR,CNY');
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    RATES = {
+      USD_EUR: data.rates.EUR,                          // ex: 0.92
+      USD_CNY: data.rates.CNY,                          // ex: 7.20
+      CNY_EUR: data.rates.EUR / data.rates.CNY,         // ex: 0.128
+    };
+    console.log('💱 Taux Frankfurter récupérés :', JSON.stringify(RATES));
+  } catch (err) {
+    RATES = { USD_EUR: 0.92, USD_CNY: 7.20, CNY_EUR: 0.128 };
+    console.warn('⚠️ Frankfurter indisponible, fallback :', JSON.stringify(RATES), '—', err.message);
+  }
+  return RATES;
+}
+
+function calculPrixAchat(usd, cny, eur) {
+  // EUR fourni → source of truth, on calcule USD/CNY si manquants
+  if (eur && eur > 0) {
+    return {
+      eur: +eur.toFixed(2),
+      usd: usd && usd > 0 ? +usd.toFixed(2) : +(eur / RATES.USD_EUR).toFixed(2),
+      cny: cny && cny > 0 ? +cny.toFixed(2) : +(eur / RATES.CNY_EUR).toFixed(2),
+    };
+  }
+  // USD fourni → on calcule EUR + CNY
+  if (usd && usd > 0) {
+    return {
+      eur: +(usd * RATES.USD_EUR).toFixed(2),
+      usd: +usd.toFixed(2),
+      cny: cny && cny > 0 ? +cny.toFixed(2) : +(usd * RATES.USD_CNY).toFixed(2),
+    };
+  }
+  // CNY fourni → on calcule EUR + USD
+  if (cny && cny > 0) {
+    return {
+      eur: +(cny * RATES.CNY_EUR).toFixed(2),
+      usd: +(cny / RATES.USD_CNY).toFixed(2),
+      cny: +cny.toFixed(2),
+    };
+  }
+  return { eur: 0, usd: 0, cny: 0 };
+}
+
 // ─── Lecture Excel ─────────────────────────────────────────────────────────
 
 if (!existsSync(XLSX_PATH)) {
@@ -131,6 +182,8 @@ console.log('Sheet     :', wb.SheetNames[0]);
 console.log('Lignes    :', rows.length);
 console.log('');
 
+await fetchRates();
+
 // ─── Boucle produits ───────────────────────────────────────────────────────
 
 const stats = { traites: 0, crees: 0, majs: 0, inchanges: 0, ignores: 0, erreurs: 0 };
@@ -149,6 +202,19 @@ for (let i = 1; i < rows.length; i++) {
 
   stats.traites++;
 
+  // Phase 2 V44 : conversion devises auto si EUR vide
+  const usdRaw = parseNumber(r[9]);
+  const cnyRaw = parseNumber(r[10]);
+  const eurRaw = parseNumber(r[11]);
+  const prix = calculPrixAchat(usdRaw, cnyRaw, eurRaw);
+
+  // Phase 1 V44 : ne copier image_principale QUE si URL valide.
+  // L'Excel contient parfois des chemins partiels ("ACC-GC-.jpeg") qui
+  // ne sont pas des URLs Firebase Storage utilisables → préserver l'existant
+  // via le mécanisme isEmptyValue() en passant '' ici.
+  const imgRaw = String(r[14] || '').trim();
+  const image_principale = imgRaw.startsWith('https://') ? imgRaw : '';
+
   // Mapping colonnes Excel → champs Firestore
   const excelData = {
     reference,
@@ -160,12 +226,13 @@ for (let i = 1; i < rows.length; i++) {
     description_en: String(r[6] || '').trim(),
     description_zh: String(r[7] || '').trim(),
     sous_categorie: String(r[8] || '').trim(),
-    prix_achat_usd: parseNumber(r[9]),
-    prix_achat_cny: parseNumber(r[10]),
-    prix_achat_eur: parseNumber(r[11]),
+    prix_achat_usd: prix.usd > 0 ? prix.usd : null,
+    prix_achat_cny: prix.cny > 0 ? prix.cny : null,
+    prix_achat_eur: prix.eur > 0 ? prix.eur : null,
+    prix_achat: prix.eur > 0 ? prix.eur : null, // canonical = EUR (compat legacy)
     fournisseur: String(r[12] || '').trim(),
     contact_fournisseur: String(r[13] || '').trim(),
-    image_principale: String(r[14] || '').trim(),
+    image_principale,
     actif: parseBool(r[15]),
     groupe_produit: String(r[16] || '').trim(),
     duplique_de: String(r[17] || '').trim(),
@@ -197,6 +264,18 @@ for (let i = 1; i < rows.length; i++) {
   // caracteristiques : toujours réécrit (champ nouveau)
   if (caracteristiques) {
     update.caracteristiques = caracteristiques;
+  }
+
+  // Phase 1 V44 — cleanup auto des image_principale cassés.
+  // Si Firestore a une valeur image_principale qui n'est PAS une URL https://,
+  // on l'écrase avec '' pour que le fallback images_urls[0] reprenne le relais.
+  if (
+    existing &&
+    typeof existing.image_principale === 'string' &&
+    existing.image_principale &&
+    !existing.image_principale.startsWith('https://')
+  ) {
+    update.image_principale = '';
   }
 
   const action = !exists ? 'CRÉER' : Object.keys(update).length > 0 ? 'MAJ' : 'INCHANGÉ';
