@@ -1,6 +1,6 @@
 // scripts/repair-97importcom.js
 // Réparation ponctuelle du compte 97importcom@gmail.com après refonte Bug Auth.
-// Usage : node scripts/repair-97importcom.js
+// Usage : node scripts/repair-97importcom.js [password_optionnel]
 //
 // Étapes :
 // 1. Set un password sur le compte Auth (compat Google OAuth gardée)
@@ -8,8 +8,12 @@
 // 3. Crée /partners/{uid} avec ID = uid Firebase réel
 // 4. Supprime l'ancien doc orphelin /partners/GFMaadQp0tbzuJ9vaBCx
 
-const admin = require('firebase-admin');
-const serviceAccount = require('../firebase-admin-sdk.json');
+import admin from 'firebase-admin';
+import { readFileSync } from 'node:fs';
+
+const serviceAccount = JSON.parse(
+  readFileSync(new URL('../firebase-admin-sdk.json', import.meta.url), 'utf8'),
+);
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),

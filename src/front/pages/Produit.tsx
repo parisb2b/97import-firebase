@@ -442,6 +442,47 @@ export default function Produit() {
         );
       })()}
 
+      {/* Caractéristiques techniques (mini-pelles enrichies) */}
+      {product.caracteristiques?.donnees_techniques?.length > 0 && (
+        <div style={{ maxWidth: 1280, margin: '0 auto', padding: '32px 20px 0' }}>
+          <h3 style={{ fontSize: 18, color: B, marginBottom: 12, fontWeight: 700 }}>
+            📋 Caractéristiques techniques
+          </h3>
+          <div style={{ background: '#F9FAFB', borderRadius: 10, overflow: 'hidden', border: '1px solid #E5E7EB' }}>
+            {product.caracteristiques.donnees_techniques.map((dt: any, i: number) => (
+              <div key={i} style={{
+                display: 'flex',
+                padding: '10px 16px',
+                background: i % 2 === 0 ? '#fff' : '#F9FAFB',
+                borderBottom: i < product.caracteristiques.donnees_techniques.length - 1 ? '1px solid #E5E7EB' : 'none',
+              }}>
+                <span style={{ fontSize: 13, color: '#6B7280', flex: '0 0 40%', fontWeight: 500 }}>{dt.label}</span>
+                <span style={{ fontSize: 13, color: '#1E3A5F', flex: 1, fontWeight: 600 }}>{dt.valeur}</span>
+              </div>
+            ))}
+          </div>
+
+          {product.caracteristiques.equipements?.length > 0 && (
+            <>
+              <h4 style={{ fontSize: 15, color: B, marginTop: 20, marginBottom: 10, fontWeight: 700 }}>
+                🛠️ Équipements inclus
+              </h4>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                {product.caracteristiques.equipements.map((eq: string, i: number) => (
+                  <li key={i} style={{
+                    fontSize: 14, color: '#374151',
+                    paddingLeft: 24, position: 'relative',
+                  }}>
+                    <span style={{ position: 'absolute', left: 0, color: '#10B981', fontWeight: 700 }}>✓</span>
+                    {eq}
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+        </div>
+      )}
+
       {/* Documents PDF téléchargeables */}
       {(() => {
         const docs = getDocumentsPdf(product);

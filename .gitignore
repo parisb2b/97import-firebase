@@ -42,3 +42,9 @@ AUDIT-SYSTEME-PARTENAIRES-*.md
 # Fichiers d'extraction temporaires (pour analyse externe Gemini)
 EXTRACT-COMPLET-*.md
 FULL_PROJECT_SNAPSHOT_*.md
+
+# Catalogues Excel (binaires, données métier sensibles)
+data/*.xlsx
+data/*.xls
+data/*.csv
+!data/.gitkeep

@@ -2,6 +2,7 @@ import { useState, useRef } from 'react';
 import { traduireTexte } from '../../../lib/deeplService';
 import { calculerVolumeDepuisDimensions } from '../../../lib/productHelpers';
 import { uploadCertificatCe, supprimerFichierStorage } from '../../../lib/storageHelpers';
+import CaracteristiquesEditor from './CaracteristiquesEditor';
 
 interface Props {
   product: any;
@@ -221,6 +222,14 @@ export default function OngletDetails({ product, onChange }: Props) {
             {!volumeCalc && <Hint>Remplissez L, l, H ci-dessus pour calcul automatique</Hint>}
           </Field>
         </FormGrid3>
+      </Card>
+
+      {/* Caractéristiques techniques */}
+      <Card title="Caractéristiques techniques" subtitle="Affichées sur la fiche produit publique. Données techniques (label/valeur) + équipements inclus.">
+        <CaracteristiquesEditor
+          value={product.caracteristiques}
+          onChange={(next) => onChange('caracteristiques', next)}
+        />
       </Card>
 
       {/* Matières */}
