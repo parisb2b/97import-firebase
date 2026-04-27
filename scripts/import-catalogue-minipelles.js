@@ -223,6 +223,40 @@ for (let i = 1; i < rows.length; i++) {
   }
 }
 
+// ─── Héritage caracteristiques variants → parent -001 ────────────────────
+// Si un variant (-002, -003, -004…) a une section vide (donnees_techniques
+// ou equipements) ET que le parent -001 du même groupe l'a, on hérite la
+// section manquante. L'admin pourra ajuster les différences via l'UI.
+{
+  const parents = {};
+  for (const w of writes) {
+    if (w.reference.endsWith('-001') && w.update.caracteristiques) {
+      const groupe = w.reference.replace(/-001$/, '');
+      parents[groupe] = w.update.caracteristiques;
+    }
+  }
+  for (const w of writes) {
+    const m = w.reference.match(/^(.+)-(00[2-9])$/);
+    if (!m) continue;
+    const parent = parents[m[1]];
+    if (!parent) continue;
+    const c = w.update.caracteristiques;
+    if (!c) {
+      w.update.caracteristiques = JSON.parse(JSON.stringify(parent));
+      console.log(`  📋 Héritage complet : ${w.reference} ← ${m[1]}-001`);
+    } else {
+      if (c.donnees_techniques.length === 0 && parent.donnees_techniques.length > 0) {
+        c.donnees_techniques = JSON.parse(JSON.stringify(parent.donnees_techniques));
+        console.log(`  📋 Héritage donnees_techniques : ${w.reference} ← ${m[1]}-001`);
+      }
+      if (c.equipements.length === 0 && parent.equipements.length > 0) {
+        c.equipements = JSON.parse(JSON.stringify(parent.equipements));
+        console.log(`  📋 Héritage equipements : ${w.reference} ← ${m[1]}-001`);
+      }
+    }
+  }
+}
+
 console.log('');
 console.log('═══ Bilan ═══');
 console.log(`  Traités    : ${stats.traites}`);
