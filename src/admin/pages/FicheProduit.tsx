@@ -3,7 +3,8 @@ import { useRoute, useLocation, Link } from 'wouter';
 import { doc, getDoc, setDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { calculerCompletude, CHAMPS_ESSENTIEL, migrerGalerieImages } from '../../lib/productHelpers';
-import FicheProduitTabs from '../components/produit/FicheProduitTabs';
+import FicheProduitTabs, { TabId } from '../components/produit/FicheProduitTabs';
+import OngletGestionPrix from '../components/produit/OngletGestionPrix';
 import OngletEssentiel from '../components/produit/OngletEssentiel';
 import OngletDetails from '../components/produit/OngletDetails';
 import OngletMedias from '../components/produit/OngletMedias';
@@ -36,7 +37,8 @@ export default function FicheProduit() {
   const [loading, setLoading] = useState(!isCreation);
   const [saving, setSaving] = useState(false);
   const [dirty, setDirty] = useState(false);
-  const [activeTab, setActiveTab] = useState<'essentiel' | 'details' | 'medias' | 'options'>('essentiel');
+  // V44 Phase 6 — onglet GESTION DES PRIX par défaut (sauf en création où il faut l'essentiel d'abord)
+  const [activeTab, setActiveTab] = useState<TabId>(isCreation ? 'essentiel' : 'prix');
   const [modalDupliquerOpen, setModalDupliquerOpen] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: ToastType; details?: string[] } | null>(null);
 
@@ -289,6 +291,11 @@ export default function FicheProduit() {
 
       {/* Tabs */}
       <FicheProduitTabs activeTab={activeTab} onChange={setActiveTab} completude={completude} locked={isCreation} />
+
+      {/* V44 Phase 6 — Onglet GESTION DES PRIX (1ère position) */}
+      {activeTab === 'prix' && !isCreation && product?.reference && (
+        <OngletGestionPrix productId={product.reference} product={product} />
+      )}
 
       {/* Onglet Essentiel */}
       {activeTab === 'essentiel' && (

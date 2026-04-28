@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { CATEGORIES, SOUS_CATEGORIES, genererReferenceAuto } from '../../../lib/productHelpers';
 import { uploadImagePrincipale, supprimerFichierStorage } from '../../../lib/storageHelpers';
-import { getExchangeRates, toEUR, fromEUR, round2 } from '../../../lib/currencyHelpers';
 import CompositionKitEditor from './CompositionKitEditor';
 
 interface Props {
@@ -12,8 +11,6 @@ interface Props {
 
 export default function OngletEssentiel({ product, onChange, isCreation }: Props) {
   const [modeleAffine, setModeleAffine] = useState('');
-  const [rates, setRates] = useState<{ EUR: number; USD: number; CNY: number; fetched_at: number } | null>(null);
-  const [ratesLoading, setRatesLoading] = useState(true);
 
   const sousCats = product.categorie ? SOUS_CATEGORIES[product.categorie] || [] : [];
 
@@ -97,42 +94,6 @@ export default function OngletEssentiel({ product, onChange, isCreation }: Props
     generer();
   }, [product.categorie, product.sous_categorie, modeleAffine, isCreation]);
 
-  // Chargement des taux de change
-  useEffect(() => {
-    getExchangeRates().then(r => {
-      setRates(r);
-      setRatesLoading(false);
-    });
-  }, []);
-
-  // Handlers de synchronisation multi-devises
-  function handlePrixUSDChange(valUSD: number) {
-    if (!rates) return;
-    const valEUR = round2(toEUR(valUSD, 'USD', rates));
-    const valCNY = round2(fromEUR(valEUR, 'CNY', rates));
-    onChange('prix_achat', valEUR);
-    onChange('prix_achat_usd', valUSD);
-    onChange('prix_achat_cny', valCNY);
-  }
-
-  function handlePrixCNYChange(valCNY: number) {
-    if (!rates) return;
-    const valEUR = round2(toEUR(valCNY, 'CNY', rates));
-    const valUSD = round2(fromEUR(valEUR, 'USD', rates));
-    onChange('prix_achat', valEUR);
-    onChange('prix_achat_cny', valCNY);
-    onChange('prix_achat_usd', valUSD);
-  }
-
-  function handlePrixEURChange(valEUR: number) {
-    if (!rates) return;
-    const valUSD = round2(fromEUR(valEUR, 'USD', rates));
-    const valCNY = round2(fromEUR(valEUR, 'CNY', rates));
-    onChange('prix_achat', valEUR);
-    onChange('prix_achat_usd', valUSD);
-    onChange('prix_achat_cny', valCNY);
-  }
-
   return (
     <>
       {/* Identification */}
@@ -207,157 +168,8 @@ export default function OngletEssentiel({ product, onChange, isCreation }: Props
         </Card>
       )}
 
-      {/* Prix & Fournisseur */}
-      <Card title="Prix & Fournisseur">
-        {/* Sous-bloc : Prix d'achat multi-devises */}
-        <div style={{ marginBottom: 16 }}>
-          <div style={{
-            fontSize: 12,
-            fontWeight: 600,
-            color: '#374151',
-            marginBottom: 8,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 10,
-            flexWrap: 'wrap',
-          }}>
-            <span>💰 Prix d'achat fournisseur</span>
-            {ratesLoading ? (
-              <span style={{ fontSize: 11, fontWeight: 400, color: '#9CA3AF' }}>Chargement des taux...</span>
-            ) : rates && (
-              <span style={{ fontSize: 11, fontWeight: 400, color: '#6B7280' }}>
-                Taux du jour : 1 EUR = {rates.USD.toFixed(4)} USD = {rates.CNY.toFixed(4)} CNY
-              </span>
-            )}
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
-            <div>
-              <label style={{ display: 'block', fontSize: 11, color: '#6B7280', marginBottom: 4 }}>
-                USD $
-              </label>
-              <input
-                type="number"
-                step="0.01"
-                min="0"
-                value={product.prix_achat_usd ?? ''}
-                onChange={e => handlePrixUSDChange(parseFloat(e.target.value) || 0)}
-                disabled={ratesLoading}
-                placeholder="0.00"
-                style={{
-                  width: '100%',
-                  padding: '8px 10px',
-                  border: '1px solid #D1D5DB',
-                  borderRadius: 6,
-                  fontSize: 14,
-                  fontFamily: 'inherit',
-                  outline: 'none',
-                  boxSizing: 'border-box',
-                }}
-              />
-            </div>
-
-            <div>
-              <label style={{ display: 'block', fontSize: 11, color: '#6B7280', marginBottom: 4 }}>
-                CNY ¥
-              </label>
-              <input
-                type="number"
-                step="0.01"
-                min="0"
-                value={product.prix_achat_cny ?? ''}
-                onChange={e => handlePrixCNYChange(parseFloat(e.target.value) || 0)}
-                disabled={ratesLoading}
-                placeholder="0.00"
-                style={{
-                  width: '100%',
-                  padding: '8px 10px',
-                  border: '1px solid #D1D5DB',
-                  borderRadius: 6,
-                  fontSize: 14,
-                  fontFamily: 'inherit',
-                  outline: 'none',
-                  boxSizing: 'border-box',
-                }}
-              />
-            </div>
-
-            <div>
-              <label style={{ display: 'block', fontSize: 11, color: '#6B7280', marginBottom: 4 }}>
-                EUR € <span style={{ color: '#10B981', fontSize: 10 }}>(source)</span>
-              </label>
-              <input
-                type="number"
-                step="0.01"
-                min="0"
-                value={product.prix_achat ?? ''}
-                onChange={e => handlePrixEURChange(parseFloat(e.target.value) || 0)}
-                disabled={ratesLoading}
-                placeholder="0.00"
-                style={{
-                  width: '100%',
-                  padding: '8px 10px',
-                  border: '1px solid #10B981',
-                  borderRadius: 6,
-                  fontSize: 14,
-                  fontFamily: 'inherit',
-                  outline: 'none',
-                  boxSizing: 'border-box',
-                  fontWeight: 600,
-                }}
-              />
-            </div>
-          </div>
-
-          <div style={{ fontSize: 10, color: '#9CA3AF', marginTop: 6, fontStyle: 'italic' }}>
-            ℹ️ Saisis dans n'importe quelle devise, les 2 autres se calculent automatiquement. EUR = référence pour prix de vente.
-          </div>
-        </div>
-
-        {/* Sous-bloc : Prix de vente calculés (lecture seule) */}
-        <div style={{
-          marginBottom: 16,
-          padding: 12,
-          background: '#F0F9FF',
-          borderRadius: 6,
-          border: '1px dashed #93C5FD',
-        }}>
-          <div style={{
-            fontSize: 12,
-            fontWeight: 600,
-            color: '#1E40AF',
-            marginBottom: 8,
-          }}>
-            🏷️ Prix de vente calculés (lecture seule)
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10 }}>
-            <div style={{ background: '#fff', padding: 10, borderRadius: 4, textAlign: 'center' }}>
-              <div style={{ fontSize: 10, color: '#6B7280', textTransform: 'uppercase', letterSpacing: 0.3 }}>
-                Public (User)
-              </div>
-              <div style={{ fontSize: 18, fontWeight: 700, color: '#1565C0', marginTop: 2 }}>
-                {Math.ceil((product.prix_achat || 0) * 2).toLocaleString('fr-FR')} €
-              </div>
-              <div style={{ fontSize: 9, color: '#9CA3AF', fontStyle: 'italic' }}>
-                × 2 du prix d'achat
-              </div>
-            </div>
-
-            <div style={{ background: '#fff', padding: 10, borderRadius: 4, textAlign: 'center' }}>
-              <div style={{ fontSize: 10, color: '#6B7280', textTransform: 'uppercase', letterSpacing: 0.3 }}>
-                Partenaire
-              </div>
-              <div style={{ fontSize: 18, fontWeight: 700, color: '#EA580C', marginTop: 2 }}>
-                {Math.ceil((product.prix_achat || 0) * 1.2).toLocaleString('fr-FR')} €
-              </div>
-              <div style={{ fontSize: 9, color: '#9CA3AF', fontStyle: 'italic' }}>
-                × 1.2 du prix d'achat
-              </div>
-            </div>
-          </div>
-        </div>
-
+      {/* Fournisseur — V44 Phase 6 : prix gérés dans onglet GESTION DES PRIX */}
+      <Card title="Fournisseur" subtitle="💰 La gestion des prix (achat CNY, USD, EUR, vente public/partenaire) est désormais dans l'onglet 💰 GESTION DES PRIX">
         <FormGrid2>
           <Field label="Fournisseur" required full>
             <input type="text" value={product.fournisseur || ''}

@@ -1,8 +1,10 @@
 import { CompletudeProduit, CHAMPS_ESSENTIEL, CHAMPS_DETAILS, CHAMPS_MEDIAS } from '../../../lib/productHelpers';
 
+export type TabId = 'prix' | 'essentiel' | 'details' | 'medias' | 'options';
+
 interface Props {
-  activeTab: 'essentiel' | 'details' | 'medias' | 'options';
-  onChange: (tab: 'essentiel' | 'details' | 'medias' | 'options') => void;
+  activeTab: TabId;
+  onChange: (tab: TabId) => void;
   completude: CompletudeProduit;
   locked?: boolean;
 }
@@ -10,6 +12,9 @@ interface Props {
 export default function FicheProduitTabs({ activeTab, onChange, completude, locked }: Props) {
   return (
     <div style={{ display: 'flex', gap: 0, borderBottom: '2px solid #E5E7EB', marginBottom: 24, overflowX: 'auto' }}>
+      <TabButton active={activeTab === 'prix'} onClick={() => !locked && onChange('prix')} locked={locked} noCount>
+        💰 GESTION DES PRIX
+      </TabButton>
       <TabButton active={activeTab === 'essentiel'} onClick={() => onChange('essentiel')} required count={completude.essentiel} total={CHAMPS_ESSENTIEL.length}>Essentiel</TabButton>
       <TabButton active={activeTab === 'details'} onClick={() => !locked && onChange('details')} count={completude.details} total={CHAMPS_DETAILS.length} locked={locked}>Détails techniques</TabButton>
       <TabButton active={activeTab === 'medias'} onClick={() => !locked && onChange('medias')} count={completude.medias} total={CHAMPS_MEDIAS.length} locked={locked}>Médias site web</TabButton>

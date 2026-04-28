@@ -13,11 +13,11 @@ export interface CompletudeProduit {
 }
 
 export const CHAMPS_ESSENTIEL = [
-  'reference', 'categorie', 'nom_fr', 'prix_achat',
+  'reference', 'categorie', 'nom_fr',
   'fournisseur', 'poids_brut_kg', 'volume_m3',
   'est_kit', 'composition_kit', 'actif', 'image_principale',
 ] as const;
-// ⚠️ 11 champs désormais au lieu de 12 (code_hs déplacé dans CHAMPS_DETAILS)
+// V44 Phase 6 : 10 champs (prix_achat retiré, géré dans onglet GESTION DES PRIX)
 
 export const CHAMPS_DETAILS = [
   'code_hs',
@@ -57,7 +57,7 @@ export function calculerCompletude(product: any): CompletudeProduit {
       }
       continue;
     }
-    if (['prix_achat', 'poids_brut_kg', 'volume_m3'].includes(champ)) {
+    if (['poids_brut_kg', 'volume_m3'].includes(champ)) {
       if (typeof val === 'number' && val > 0) essentiel++;
       else champs_manquants_essentiel.push(champ);
       continue;
