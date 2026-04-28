@@ -1,50 +1,104 @@
 // src/lib/currencyHelpers.ts
-// Helper pour conversion EUR/USD/CNY via Frankfurter API
-// API gratuite, sans clé : https://www.frankfurter.app/
+// Helper pour conversion EUR/USD/CNY.
+// V44 Phase 5 — chaîne de fallback : cache mémoire 1h → Frankfurter → Firestore /admin_params/global → hardcoded
+
+import { db } from './firebase';
+import { doc, getDoc } from 'firebase/firestore';
 
 export type Currency = 'EUR' | 'USD' | 'CNY';
 
-interface Rates {
+export interface Rates {
   EUR: number;
   USD: number;
   CNY: number;
   fetched_at: number;
+  source?: 'cache' | 'frankfurter' | 'firestore' | 'hardcoded';
 }
 
 let cachedRates: Rates | null = null;
 const CACHE_DURATION = 60 * 60 * 1000; // 1 heure
 
-/**
- * Récupère les taux de change depuis Frankfurter API.
- * EUR = 1 par défaut (devise de base).
- * Cache 1h pour éviter de solliciter l'API à chaque ouverture de fiche.
- */
-export async function getExchangeRates(): Promise<Rates> {
-  if (cachedRates && (Date.now() - cachedRates.fetched_at < CACHE_DURATION)) {
-    return cachedRates;
-  }
+// V44 — fallback hardcoded mis à jour (avril 2026)
+const FALLBACK_HARDCODED: Omit<Rates, 'fetched_at' | 'source'> = {
+  EUR: 1,
+  USD: 1.17,
+  CNY: 8.00,
+};
 
+async function fetchFrankfurter(): Promise<Rates | null> {
   try {
     const response = await fetch('https://api.frankfurter.app/latest?from=EUR&to=USD,CNY');
     if (!response.ok) throw new Error('Frankfurter API indisponible');
     const data = await response.json();
-
-    cachedRates = {
+    return {
       EUR: 1,
       USD: data.rates.USD,
       CNY: data.rates.CNY,
       fetched_at: Date.now(),
+      source: 'frankfurter',
     };
-    return cachedRates;
   } catch (err) {
-    console.error('Erreur taux de change, fallback utilisé:', err);
-    return cachedRates || {
-      EUR: 1,
-      USD: 1.08,
-      CNY: 7.80,
-      fetched_at: Date.now(),
-    };
+    console.warn('Frankfurter KO :', err);
+    return null;
   }
+}
+
+async function fetchFirestoreRates(): Promise<Rates | null> {
+  try {
+    const snap = await getDoc(doc(db, 'admin_params', 'global'));
+    if (!snap.exists()) return null;
+    const data = snap.data() as { taux_eur_usd?: number; taux_rmb_eur?: number };
+    if (!data.taux_eur_usd && !data.taux_rmb_eur) return null;
+    return {
+      EUR: 1,
+      USD: data.taux_eur_usd || FALLBACK_HARDCODED.USD,
+      CNY: data.taux_rmb_eur || FALLBACK_HARDCODED.CNY,
+      fetched_at: Date.now(),
+      source: 'firestore',
+    };
+  } catch (err) {
+    console.warn('Firestore /admin_params/global KO :', err);
+    return null;
+  }
+}
+
+/**
+ * Récupère les taux de change. Stratégie en cascade :
+ * 1. Cache mémoire (1h)
+ * 2. Frankfurter (source live)
+ * 3. Firestore /admin_params/global (taux admin)
+ * 4. Hardcoded (USD 1.17 / CNY 8.00)
+ */
+export async function getExchangeRates(): Promise<Rates> {
+  // 1) Cache mémoire
+  if (cachedRates && (Date.now() - cachedRates.fetched_at < CACHE_DURATION)) {
+    return cachedRates;
+  }
+
+  // 2) Frankfurter
+  const live = await fetchFrankfurter();
+  if (live) {
+    cachedRates = live;
+    return live;
+  }
+
+  // 3) Firestore
+  const fs = await fetchFirestoreRates();
+  if (fs) {
+    cachedRates = fs;
+    return fs;
+  }
+
+  // 4) Hardcoded
+  cachedRates = { ...FALLBACK_HARDCODED, fetched_at: Date.now(), source: 'hardcoded' };
+  return cachedRates;
+}
+
+/**
+ * Force le refresh du cache mémoire (utilisé après save admin).
+ */
+export function clearRatesCache(): void {
+  cachedRates = null;
 }
 
 export function toEUR(amount: number, from: Currency, rates: Rates): number {
