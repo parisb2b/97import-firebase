@@ -25,6 +25,7 @@ import type { Rates, Multipliers, PricingResult } from '../hooks/usePricingEngin
 export interface RatesWithMeta extends Rates {
   source?: 'firestore' | 'frankfurter' | 'exchangerate-api' | 'fallback';
   derniere_maj_taux?: any;
+  derniere_maj_source?: string;
 }
 
 export interface MultipliersWithMeta extends Multipliers {
@@ -61,6 +62,7 @@ export async function getRates(): Promise<RatesWithMeta> {
         usd_cny,
         source: 'firestore',
         derniere_maj_taux: data.derniere_maj_taux,
+        derniere_maj_source: data.derniere_maj_source,
       };
     }
   } catch (err) {
@@ -85,6 +87,7 @@ export function subscribeToRates(callback: (rates: RatesWithMeta) => void): Unsu
       usd_cny,
       source: 'firestore',
       derniere_maj_taux: data.derniere_maj_taux,
+      derniere_maj_source: data.derniere_maj_source,
     });
   });
 }
