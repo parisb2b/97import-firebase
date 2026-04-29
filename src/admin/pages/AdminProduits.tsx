@@ -138,7 +138,9 @@ export default function AdminProduits() {
         <div>
           <h1 style={{ fontSize: 24, fontWeight: 700, color: '#1E3A5F', margin: 0 }}>Produits</h1>
           <p style={{ color: '#6B7280', fontSize: 14, margin: '4px 0 0' }}>
-            Gestion du catalogue — {stats.total} produit{stats.total > 1 ? 's' : ''} au total
+            Gestion du catalogue — {sorted.length === stats.total
+              ? `${stats.total} produit${stats.total > 1 ? 's' : ''} au total`
+              : `${sorted.length} affiché${sorted.length > 1 ? 's' : ''} sur ${stats.total} au total (filtres actifs)`}
           </p>
         </div>
         <Link href="/admin/produits/nouveau">
@@ -210,6 +212,47 @@ export default function AdminProduits() {
           </button>
         )}
       </div>
+
+      {/* V44-BIS FIX 3 — Banner d'alerte si filtres masquent des produits */}
+      {!loading && sorted.length < stats.total && hasActiveFilters({ recherche: searchTerm, categorie: categoryFilter, statut: statutFilter, actif: actifFilter }) && (
+        <div style={{
+          padding: '10px 14px',
+          background: '#FEF3C7',
+          border: '1px solid #FCD34D',
+          borderRadius: 8,
+          marginBottom: 12,
+          fontSize: 13,
+          color: '#92400E',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
+        }}>
+          <span>
+            ⚠️ <strong>{stats.total - sorted.length} produit{stats.total - sorted.length > 1 ? 's' : ''} masqué{stats.total - sorted.length > 1 ? 's' : ''}</strong> par les filtres actifs (persistés depuis ta dernière session).
+          </span>
+          <button
+            onClick={() => {
+              setSearchTerm('');
+              setCategoryFilter('TOUS');
+              setStatutFilter('TOUS');
+              setActifFilter('TOUS');
+              resetFilters();
+            }}
+            style={{
+              padding: '6px 12px',
+              background: '#92400E',
+              color: '#fff',
+              border: 'none',
+              borderRadius: 6,
+              fontSize: 12,
+              fontWeight: 600,
+              cursor: 'pointer',
+              fontFamily: 'inherit',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            🔄 Voir tous les produits
+          </button>
+        </div>
+      )}
 
       {/* Table */}
       {loading ? (
