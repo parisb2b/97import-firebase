@@ -66,9 +66,15 @@ export default function TauxRMB() {
     { from: '1 CNY', to: `${(1 / rates.usd_cny).toFixed(4)} USD` },
   ], [rates]);
 
-  // FIX 4 — Bascule mode édition
+  // FIX 4 — Bascule mode édition. V44-BIS : copie aussi usd_cny pour permettre override manuel.
   const handleStartEdit = useCallback(() => {
-    setDraftRates({ ...rates });
+    setDraftRates({
+      eur_usd: rates.eur_usd,
+      eur_cny: rates.eur_cny,
+      usd_cny: rates.usd_cny || (rates.eur_cny / rates.eur_usd),
+      derniere_maj_taux: rates.derniere_maj_taux,
+      derniere_maj_source: rates.derniere_maj_source,
+    });
     setModeEdition(true);
   }, [rates]);
 
@@ -81,7 +87,11 @@ export default function TauxRMB() {
   const handleConfirmSave = useCallback(async () => {
     setSavingRates(true);
     try {
-      const usd_cny = draftRates.eur_cny / draftRates.eur_usd;
+      // V44-BIS FIX 1 : écrire les 3 taux tels que saisis (pas de recalcul auto).
+      // Si admin a modifié usd_cny manuellement, on respecte sa saisie.
+      const usd_cny = draftRates.usd_cny && draftRates.usd_cny > 0
+        ? draftRates.usd_cny
+        : draftRates.eur_cny / draftRates.eur_usd;
       await updateGlobalRates(
         { eur_usd: draftRates.eur_usd, eur_cny: draftRates.eur_cny, usd_cny },
         'admin-taux-page',
@@ -179,10 +189,14 @@ export default function TauxRMB() {
               style={{ background: modeEdition ? '#FFFBEB' : '#F3F4F6' }} />
           </div>
           <div className="fg">
-            <div className="fl">1 USD = X CNY (auto)</div>
-            <input className="fi" type="number" readOnly
-              value={(draftRates.eur_cny / draftRates.eur_usd || 0).toFixed(4)}
-              style={{ background: '#F3F4F6', color: '#6B7280' }} />
+            <div className="fl">
+              1 USD = X CNY {modeEdition ? '(auto ou manuel)' : '(auto)'}
+            </div>
+            <input className="fi" type="number" step="0.0001"
+              value={modeEdition ? draftRates.usd_cny : (draftRates.eur_cny / draftRates.eur_usd || 0).toFixed(4)}
+              disabled={!modeEdition}
+              onChange={(e) => setDraftRates({ ...draftRates, usd_cny: parseFloat(e.target.value) || 0 })}
+              style={{ background: modeEdition ? '#FFFBEB' : '#F3F4F6', color: modeEdition ? '#111827' : '#6B7280' }} />
           </div>
         </div>
       </Card>
