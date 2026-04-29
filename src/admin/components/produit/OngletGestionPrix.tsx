@@ -1,5 +1,9 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
+import { doc, updateDoc } from 'firebase/firestore';
+import { db } from '../../../lib/firebase';
+import { sanitizeForFirestore } from '../../../lib/firebaseUtils';
 import { useToast } from '../../../front/components/Toast';
+import { formatDateHeure } from '../../../lib/dateHelpers';
 import {
   subscribeToRates,
   subscribeToMultipliers,
@@ -10,7 +14,7 @@ import {
   type RatesWithMeta,
   type MultipliersWithMeta,
 } from '../../services/pricingService';
-import { usePricingEngine } from '../../hooks/usePricingEngine';
+import { usePricingEngine, type Overrides } from '../../hooks/usePricingEngine';
 
 interface Props {
   productId: string;
@@ -18,16 +22,6 @@ interface Props {
 }
 
 type Devise = 'CNY' | 'USD' | 'EUR';
-
-const FR_DATE = (ts: any): string => {
-  if (!ts) return '—';
-  try {
-    const d = ts.toDate ? ts.toDate() : (ts._seconds ? new Date(ts._seconds * 1000) : new Date(ts));
-    return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
-  } catch {
-    return '—';
-  }
-};
 
 export default function OngletGestionPrix({ productId, product }: Props) {
   const { showToast } = useToast();
@@ -59,6 +53,21 @@ export default function OngletGestionPrix({ productId, product }: Props) {
   const [draftMultipliers, setDraftMultipliers] = useState<MultipliersWithMeta>(multipliers);
   const [savingMultipliers, setSavingMultipliers] = useState(false);
 
+  // FEATURE 6 (Dogme 5) — overrides manuels admin
+  const [overridePublicActif, setOverridePublicActif] = useState<boolean>(
+    typeof product.prix_public_override === 'number' && product.prix_public_override > 0,
+  );
+  const [overridePartenaireActif, setOverridePartenaireActif] = useState<boolean>(
+    typeof product.prix_partenaire_override === 'number' && product.prix_partenaire_override > 0,
+  );
+  const [prixPublicOverride, setPrixPublicOverride] = useState<number>(
+    product.prix_public_override ?? 0,
+  );
+  const [prixPartenaireOverride, setPrixPartenaireOverride] = useState<number>(
+    product.prix_partenaire_override ?? 0,
+  );
+  const [savingOverrides, setSavingOverrides] = useState(false);
+
   // ─── Subscriptions Firestore (temps réel) ─────────────────────────────
   useEffect(() => {
     const unsubRates = subscribeToRates((r) => {
@@ -84,11 +93,19 @@ export default function OngletGestionPrix({ productId, product }: Props) {
     }
   }, [product.prix_achat_cny, editMode]);
 
-  // ─── Calculs (Rubrique 1+2) ─────────────────────────────────────────────
+  // ─── Calculs (Rubrique 1+2 + Dogme 5 overrides) ─────────────────────────
+  const overridesForEngine: Overrides = useMemo(
+    () => ({
+      public: overridePublicActif && prixPublicOverride > 0 ? prixPublicOverride : null,
+      partner: overridePartenaireActif && prixPartenaireOverride > 0 ? prixPartenaireOverride : null,
+    }),
+    [overridePublicActif, prixPublicOverride, overridePartenaireActif, prixPartenaireOverride],
+  );
   const live = usePricingEngine(
     editMode ? draftCny : (product.prix_achat_cny ?? 0),
     rates,
     { client: multipliers.client, partner: multipliers.partner },
+    overridesForEngine,
   );
 
   // ─── Conversion rapide (Rubrique 4) ─────────────────────────────────────
@@ -201,6 +218,26 @@ export default function OngletGestionPrix({ productId, product }: Props) {
     }
   }, [draftMultipliers, showToast]);
 
+  // FEATURE 6 — handler sauvegarde overrides
+  const handleSaveOverrides = useCallback(async () => {
+    if (!productId) return;
+    setSavingOverrides(true);
+    try {
+      const updates = sanitizeForFirestore({
+        prix_public_override:
+          overridePublicActif && prixPublicOverride > 0 ? prixPublicOverride : null,
+        prix_partenaire_override:
+          overridePartenaireActif && prixPartenaireOverride > 0 ? prixPartenaireOverride : null,
+      });
+      await updateDoc(doc(db, 'products', productId), updates);
+      showToast('Overrides mis à jour', 'success');
+    } catch (err: any) {
+      showToast(`Erreur : ${err.message}`, 'error');
+    } finally {
+      setSavingOverrides(false);
+    }
+  }, [productId, overridePublicActif, prixPublicOverride, overridePartenaireActif, prixPartenaireOverride, showToast]);
+
   // ─── Render ────────────────────────────────────────────────────────────
   if (!ratesLoaded || !multipliersLoaded) {
     return <div style={{ padding: 60, textAlign: 'center', color: '#9CA3AF' }}>Chargement des taux et multiplicateurs…</div>;
@@ -210,7 +247,7 @@ export default function OngletGestionPrix({ productId, product }: Props) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
       {/* ═══════════ RUBRIQUE 1 — Prix d'achat fournisseur ═══════════ */}
-      <Card title="1 — Prix d'achat fournisseur" subtitle={`Dernière validation : ${FR_DATE(product.date_derniere_validation)}`}>
+      <Card title="1 — Prix d'achat fournisseur" subtitle={`Dernière validation : ${formatDateHeure(product.date_derniere_validation)}`}>
         <div style={{ display: 'flex', gap: 8, marginBottom: 14, flexWrap: 'wrap' }}>
           <button onClick={handleToggleEdit} style={editMode ? styles.btnSecondary : styles.btnPrimary}>
             {editMode ? '👁️ MODE LECTURE' : '✏️ MODE ÉDITION'}
@@ -241,27 +278,99 @@ export default function OngletGestionPrix({ productId, product }: Props) {
       </Card>
 
       {/* ═══════════ RUBRIQUE 2 — Prix de vente calculés ═══════════ */}
-      <Card title="2 — Prix de vente calculés (lecture seule)" subtitle={`Dernière validation : ${FR_DATE(product.date_derniere_validation)}`}>
+      <Card title="2 — Prix de vente (lecture seule)" subtitle={`Dernière validation : ${formatDateHeure(product.date_derniere_validation)}`}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
           <PriceCard
-            label="Prix PUBLIC"
+            label={live.override_public_actif ? 'Prix PUBLIC 🎯' : 'Prix PUBLIC'}
             color="#1565C0"
             bg="#DBEAFE"
             value={live.prix_public}
-            formula={`${live.prix_eur.toLocaleString('fr-FR')} € × ${multipliers.client}`}
+            formula={
+              live.override_public_actif
+                ? `Override manuel (auto: ${live.prix_public_auto.toLocaleString('fr-FR')} €)`
+                : `${live.prix_eur.toLocaleString('fr-FR')} € × ${multipliers.client}`
+            }
           />
           <PriceCard
-            label="Prix PARTENAIRE"
+            label={live.override_partenaire_actif ? 'Prix PARTENAIRE 🎯' : 'Prix PARTENAIRE'}
             color="#7C3AED"
             bg="#EDE9FE"
             value={live.prix_partenaire}
-            formula={`${live.prix_eur.toLocaleString('fr-FR')} € × ${multipliers.partner}`}
+            formula={
+              live.override_partenaire_actif
+                ? `Override manuel (auto: ${live.prix_partenaire_auto.toLocaleString('fr-FR')} €)`
+                : `${live.prix_eur.toLocaleString('fr-FR')} € × ${multipliers.partner}`
+            }
           />
         </div>
       </Card>
 
+      {/* ═══════════ FEATURE 6 (Dogme 5) — Override manuel admin ═══════════ */}
+      <Card title="🎯 Override manuel (optionnel)" subtitle="Force un prix custom qui remplace le calcul automatique. Utile pour promotions ou prix négociés.">
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+          {/* Override Public */}
+          <div>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, fontSize: 13, fontWeight: 600 }}>
+              <input
+                type="checkbox"
+                checked={overridePublicActif}
+                onChange={(e) => setOverridePublicActif(e.target.checked)}
+              />
+              <span>Override prix PUBLIC</span>
+            </label>
+            {overridePublicActif && (
+              <div>
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={prixPublicOverride || ''}
+                  onChange={(e) => setPrixPublicOverride(parseFloat(e.target.value) || 0)}
+                  placeholder={`Calcul auto : ${live.prix_public_auto.toFixed(2)} €`}
+                  style={styles.input}
+                />
+                <div style={{ fontSize: 11, color: '#6B7280', marginTop: 4 }}>
+                  Calcul auto : {live.prix_public_auto.toLocaleString('fr-FR')} €
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Override Partenaire */}
+          <div>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, fontSize: 13, fontWeight: 600 }}>
+              <input
+                type="checkbox"
+                checked={overridePartenaireActif}
+                onChange={(e) => setOverridePartenaireActif(e.target.checked)}
+              />
+              <span>Override prix PARTENAIRE</span>
+            </label>
+            {overridePartenaireActif && (
+              <div>
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={prixPartenaireOverride || ''}
+                  onChange={(e) => setPrixPartenaireOverride(parseFloat(e.target.value) || 0)}
+                  placeholder={`Calcul auto : ${live.prix_partenaire_auto.toFixed(2)} €`}
+                  style={styles.input}
+                />
+                <div style={{ fontSize: 11, color: '#6B7280', marginTop: 4 }}>
+                  Calcul auto : {live.prix_partenaire_auto.toLocaleString('fr-FR')} €
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+        <button onClick={handleSaveOverrides} disabled={savingOverrides} style={{ ...styles.btnPrimary, marginTop: 14 }}>
+          {savingOverrides ? 'Sauvegarde…' : '💾 Enregistrer les overrides'}
+        </button>
+      </Card>
+
       {/* ═══════════ RUBRIQUE 3 — Taux moyens 97IMPORT ═══════════ */}
-      <Card title="3 — Taux moyens utilisés par 97IMPORT (modifiables par Admin)" subtitle={`Dernière modification : ${FR_DATE(rates.derniere_maj_taux)}`}>
+      <Card title="3 — Taux moyens utilisés par 97IMPORT (modifiables par Admin)" subtitle={`Dernière modification : ${formatDateHeure(rates.derniere_maj_taux)}`}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 12 }}>
           <RateInput label="1 EUR = X USD" value={draftRates.eur_usd} onChange={(v) => setDraftRates({ ...draftRates, eur_usd: v })} />
           <RateInput label="1 EUR = X CNY" value={draftRates.eur_cny} onChange={(v) => setDraftRates({ ...draftRates, eur_cny: v })} />
@@ -316,7 +425,7 @@ export default function OngletGestionPrix({ productId, product }: Props) {
 
       {/* ═══════════ RUBRIQUE 6 — Multiplicateurs ═══════════ */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-        <Card title="6a — Multiplicateur Partenaire" subtitle={`Dernière modification : ${FR_DATE(multipliers.derniere_maj)}`}>
+        <Card title="6a — Multiplicateur Partenaire" subtitle={`Dernière modification : ${formatDateHeure(multipliers.derniere_maj)}`}>
           <RateInput
             label="× Multiplicateur Partenaire"
             value={draftMultipliers.partner}
@@ -327,7 +436,7 @@ export default function OngletGestionPrix({ productId, product }: Props) {
           </button>
         </Card>
 
-        <Card title="6b — Multiplicateur Client" subtitle={`Dernière modification : ${FR_DATE(multipliers.derniere_maj)}`}>
+        <Card title="6b — Multiplicateur Client" subtitle={`Dernière modification : ${formatDateHeure(multipliers.derniere_maj)}`}>
           <RateInput
             label="× Multiplicateur Client"
             value={draftMultipliers.client}
