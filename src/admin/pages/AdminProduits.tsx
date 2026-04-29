@@ -5,6 +5,7 @@ import { db } from '../../lib/firebase';
 import { calculerCompletude, CATEGORIES, StatutCompletude, manqueCodeHs, CHAMPS_ESSENTIEL } from '../../lib/productHelpers';
 import { loadFilters, saveFilters, resetFilters, hasActiveFilters } from '../../lib/filterPersistence';
 import ModalDupliquerProduit from '../components/produit/ModalDupliquerProduit';
+import { getCompletenessStatus, getBadgeConfig, countByStatus, type CompletenessStatus } from '../utils/productCompleteness';
 
 interface Product {
   id: string;
@@ -44,6 +45,9 @@ export default function AdminProduits() {
   const [sortCol, setSortCol] = useState<SortColumn>('reference');
   const [sortDir, setSortDir] = useState<SortDir>('asc');
 
+  // V44-BIS FEAT 8 — filtre business 3 statuts (parallèle au filtre complétude existant)
+  const [businessFilter, setBusinessFilter] = useState<CompletenessStatus | 'TOUS'>('TOUS');
+
   const [produitADupliquer, setProduitADupliquer] = useState<any | null>(null);
   const [toastDuplication, setToastDuplication] = useState<string | null>(null);
 
@@ -82,7 +86,10 @@ export default function AdminProduits() {
   }
 
   const productsAvecCompletude = useMemo(() =>
-    products.map(p => ({ ...p, _completude: calculerCompletude(p) })), [products]);
+    products.map(p => ({ ...p, _completude: calculerCompletude(p), _businessStatus: getCompletenessStatus(p) })), [products]);
+
+  // V44-BIS FEAT 8 — compteurs business
+  const businessCounts = useMemo(() => countByStatus(productsAvecCompletude), [productsAvecCompletude]);
 
   const stats = useMemo(() => {
     const s = { total: productsAvecCompletude.length, complet: 0, pret_site: 0, a_enrichir: 0, bloquant: 0, code_hs_manquant: 0 };
@@ -99,13 +106,15 @@ export default function AdminProduits() {
       if (statutFilter !== 'TOUS' && p._completude.statut !== statutFilter) return false;
       if (actifFilter === 'ACTIF' && p.actif !== true) return false;
       if (actifFilter === 'MASQUE' && p.actif === true) return false;
+      // V44-BIS FEAT 8 — filtre business 3 statuts
+      if (businessFilter !== 'TOUS' && p._businessStatus !== businessFilter) return false;
       if (!searchTerm.trim()) return true;
       const term = searchTerm.toLowerCase();
       return p.reference?.toLowerCase().includes(term) ||
         p.nom_fr?.toLowerCase().includes(term) ||
         p.fournisseur?.toLowerCase().includes(term);
     });
-  }, [productsAvecCompletude, categoryFilter, statutFilter, actifFilter, searchTerm]);
+  }, [productsAvecCompletude, categoryFilter, statutFilter, actifFilter, searchTerm, businessFilter]);
 
   const sorted = useMemo(() => {
     const list = [...filtered];
@@ -160,6 +169,34 @@ export default function AdminProduits() {
         {stats.code_hs_manquant > 0 && (
           <StatCard label="⚠️ Code HS manquant" value={stats.code_hs_manquant} bg="#FEF3C7" color="#92400E" border="#FCD34D" />
         )}
+      </div>
+
+      {/* V44-BIS FEAT 8 — Chips filtres business 3 statuts */}
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
+        <BusinessChip
+          label={`Tous (${businessCounts.total})`}
+          active={businessFilter === 'TOUS'}
+          onClick={() => setBusinessFilter('TOUS')}
+          color="#1565C0"
+        />
+        <BusinessChip
+          label={`🟢 Complets (${businessCounts.complet})`}
+          active={businessFilter === 'complet'}
+          onClick={() => setBusinessFilter('complet')}
+          color="#10B981"
+        />
+        <BusinessChip
+          label={`🟡 Incomplets (${businessCounts.incomplet})`}
+          active={businessFilter === 'incomplet'}
+          onClick={() => setBusinessFilter('incomplet')}
+          color="#F59E0B"
+        />
+        <BusinessChip
+          label={`🔴 Bloquants devis (${businessCounts.bloquant})`}
+          active={businessFilter === 'bloquant'}
+          onClick={() => setBusinessFilter('bloquant')}
+          color="#EF4444"
+        />
       </div>
 
       {/* Filtres */}
@@ -318,13 +355,37 @@ export default function AdminProduits() {
                         : <span style={{ color: '#9CA3AF' }}>—</span>}
                     </td>
                     <td style={{ ...tdStyle, textAlign: 'center' }}>
-                      <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                      <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', justifyContent: 'center' }}>
                         <div style={{ width: 60, height: 6, background: '#E5E7EB', borderRadius: 3, overflow: 'hidden' }}>
                           <div style={{ width: `${percent}%`, height: '100%', background: badge.bar }}></div>
                         </div>
                         <span style={{ background: badge.bg, color: badge.color, padding: '3px 10px', borderRadius: 20, fontSize: 11, fontWeight: 600 }}>
                           {badge.label}
                         </span>
+                        {/* V44-BIS FEAT 8 — badge business 3 statuts */}
+                        {(() => {
+                          const bs = getBadgeConfig(p._businessStatus);
+                          return (
+                            <span
+                              title={p._businessStatus === 'bloquant'
+                                ? 'Devis impossible : poids ou volume manquant'
+                                : p._businessStatus === 'incomplet'
+                                  ? 'Détails manquants (fournisseur, image, description, code HS)'
+                                  : 'Toutes les infos requises sont remplies'}
+                              style={{
+                                background: bs.bg,
+                                color: bs.color,
+                                border: `1px solid ${bs.border}`,
+                                padding: '2px 8px',
+                                borderRadius: 12,
+                                fontSize: 11,
+                                fontWeight: 700,
+                              }}
+                            >
+                              {bs.emoji} {bs.label}
+                            </span>
+                          );
+                        })()}
                       </div>
                     </td>
                     <td style={{ ...tdStyle, textAlign: 'center' }}>
@@ -399,6 +460,28 @@ export default function AdminProduits() {
         </div>
       )}
     </div>
+  );
+}
+
+function BusinessChip({ label, active, onClick, color }: { label: string; active: boolean; onClick: () => void; color: string }) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        padding: '8px 14px',
+        background: active ? color : '#fff',
+        color: active ? '#fff' : color,
+        border: `1.5px solid ${color}`,
+        borderRadius: 20,
+        fontSize: 13,
+        fontWeight: 600,
+        cursor: 'pointer',
+        fontFamily: 'inherit',
+        whiteSpace: 'nowrap',
+      }}
+    >
+      {label}
+    </button>
   );
 }
 
