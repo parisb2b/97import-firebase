@@ -96,6 +96,18 @@ export default function TauxRMB() {
         { eur_usd: draftRates.eur_usd, eur_cny: draftRates.eur_cny, usd_cny },
         'admin-taux-page',
       );
+      // V44-BIS FIX 2 — Optimistic update local du state pour rafraîchir le KPI
+      // immédiatement. Sans ça, le KPI affiche '—' pendant que serverTimestamp()
+      // n'est pas encore résolu côté client (le sentinel ne passe pas le toDate()).
+      // L'onSnapshot Firestore mettra à jour avec la valeur exacte ~quelques ms après.
+      setRates((prev) => ({
+        ...prev,
+        eur_usd: draftRates.eur_usd,
+        eur_cny: draftRates.eur_cny,
+        usd_cny,
+        derniere_maj_taux: new Date(),
+        derniere_maj_source: 'admin-taux-page',
+      }));
       showToast('Taux 97IMPORT mis à jour avec succès', 'success');
       setModeEdition(false);
       setShowConfirmPopup(false);
