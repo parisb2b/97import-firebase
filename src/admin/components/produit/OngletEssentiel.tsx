@@ -171,10 +171,22 @@ export default function OngletEssentiel({ product, onChange, isCreation }: Props
       {/* Fournisseur — V44 Phase 6 : prix gérés dans onglet GESTION DES PRIX */}
       <Card title="Fournisseur" subtitle="💰 La gestion des prix (achat CNY, USD, EUR, vente public/partenaire) est désormais dans l'onglet 💰 GESTION DES PRIX">
         <FormGrid2>
-          <Field label="Fournisseur" required full>
-            <input type="text" value={product.fournisseur || ''}
+          <Field label="Fournisseur" full>
+            <input
+              type="text"
+              list="suppliers-list"
+              value={product.fournisseur || ''}
               onChange={e => onChange('fournisseur', e.target.value)}
-              placeholder="Ex: JinkoSolar / DEYE" style={inputStyle} />
+              placeholder="Optionnel — TAOBAO.COM, 1688.COM, ou nom libre"
+              style={inputStyle}
+            />
+            <datalist id="suppliers-list">
+              <option value="TAOBAO.COM" />
+              <option value="1688.COM" />
+              <option value="JinkoSolar" />
+              <option value="DEYE" />
+            </datalist>
+            <Hint>Optionnel. V44-BIS : non bloquant pour création produit.</Hint>
           </Field>
         </FormGrid2>
       </Card>
@@ -182,14 +194,15 @@ export default function OngletEssentiel({ product, onChange, isCreation }: Props
       {/* Logistique */}
       <Card title="Logistique" subtitle="Informations indispensables pour les Excel et la génération de devis">
         <FormGrid2>
-          <Field label="Poids brut (kg)" required>
+          <Field label="Poids brut (kg)">
             <input type="number" step="0.1" value={product.poids_brut_kg ?? ''}
               onChange={e => onChange('poids_brut_kg', parseFloat(e.target.value) || 0)} style={inputStyle} />
+            <Hint>V44-BIS : optionnel à la création, requis pour générer un devis.</Hint>
           </Field>
-          <Field label="Volume (m³)" required>
+          <Field label="Volume (m³)">
             <input type="number" step="0.001" value={product.volume_m3 ?? ''}
               onChange={e => onChange('volume_m3', parseFloat(e.target.value) || 0)} style={inputStyle} />
-            <Hint>Calculé auto si L×l×H renseignés en onglet Détails techniques</Hint>
+            <Hint>Calculé auto si L×l×H renseignés en onglet Détails techniques. Optionnel à la création.</Hint>
           </Field>
         </FormGrid2>
       </Card>

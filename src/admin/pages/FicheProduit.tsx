@@ -128,6 +128,10 @@ export default function FicheProduit() {
       // Calcul complétude à jour
       const completudeActuelle = calculerCompletude(product);
 
+      // V44-BIS FEAT 7 : flag champs_incomplets calculé à la création
+      const nbManquants = CHAMPS_ESSENTIEL.length - completudeActuelle.essentiel;
+      const champsIncomplets = nbManquants > 0;
+
       const data = {
         ...product,
         completude: {
@@ -136,6 +140,7 @@ export default function FicheProduit() {
           medias: completudeActuelle.medias,
           statut: completudeActuelle.statut,
         },
+        champs_incomplets: champsIncomplets,
         updated_at: serverTimestamp(),
         ...(isCreation ? { created_at: serverTimestamp() } : {}),
       };
@@ -143,18 +148,17 @@ export default function FicheProduit() {
       await setDoc(doc(db, 'products', ref), data, { merge: !isCreation });
       setDirty(false);
 
-      // === Message de feedback adapté à la complétude ===
-      const nbManquants = CHAMPS_ESSENTIEL.length - completudeActuelle.essentiel;
+      // V44-BIS FEAT 7 : toast adapté selon complétude
       if (nbManquants === 0) {
-        // Tout OK
         setToast({
-          message: isCreation ? 'Produit créé avec succès ✓' : 'Modifications enregistrées ✓',
+          message: isCreation ? '✅ Produit créé et publié' : 'Modifications enregistrées ✓',
           type: 'success',
         });
       } else {
-        // Sauvegarde partielle : info non bloquante
         setToast({
-          message: isCreation ? 'Produit créé avec succès' : 'Modifications enregistrées',
+          message: isCreation
+            ? '⚠️ Produit créé, mais champs incomplets à compléter avant devis'
+            : 'Modifications enregistrées (champs incomplets)',
           type: 'warning',
           details: [
             `${nbManquants} champ(s) essentiel(s) manquant(s) :`,
@@ -359,22 +363,22 @@ export default function FicheProduit() {
               📋 Dupliquer
             </button>
           )}
+          {/* V44-BIS FEAT 7 : bouton uniformisé. Couleur orange si essentiels incomplets,
+              vert si OK. Plus de '(incomplet)' dans le label. */}
           <button onClick={handleSave} disabled={saving}
             style={{
               padding: '10px 24px',
-              background: saving ? '#D1D5DB' : '#EA580C',
+              background: saving
+                ? '#D1D5DB'
+                : completude.essentiel < CHAMPS_ESSENTIEL.length
+                  ? '#EA580C'   // orange si incomplet
+                  : '#10B981',  // vert si tout OK
               color: '#fff', border: 'none', borderRadius: 10,
               fontSize: 14, fontWeight: 600,
               cursor: saving ? 'not-allowed' : 'pointer',
               fontFamily: 'inherit',
             }}>
-            {saving
-              ? 'Enregistrement...'
-              : isCreation
-                ? 'Créer le produit'
-                : completude.essentiel < CHAMPS_ESSENTIEL.length
-                  ? 'Enregistrer (incomplet)'
-                  : 'Enregistrer'}
+            {saving ? 'Enregistrement...' : isCreation ? '💾 Créer le produit' : '💾 Enregistrer le produit'}
           </button>
         </div>
       </div>

@@ -267,7 +267,7 @@ export default function OngletGestionPrix({ productId, product }: Props) {
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
-          <PriceInput label="Prix CNY ¥" value={live.prix_cny} editable={editMode} draft={draftCny} onChange={setDraftCny} accent="#DC2626" highlight />
+          <PriceInput label="Prix CNY ¥ *" value={live.prix_cny} editable={editMode} draft={draftCny} onChange={setDraftCny} accent="#DC2626" highlight />
           <PriceInput label="Prix USD $" value={live.prix_usd} editable={false} accent="#2563EB" />
           <PriceInput label="Prix EUR €" value={live.prix_eur} editable={false} accent="#059669" />
         </div>
