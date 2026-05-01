@@ -15,8 +15,13 @@ const firebaseConfig = {
 // Instance FRONT (clients)
 export const clientApp = initializeApp(firebaseConfig, 'client');
 export const clientAuth = getAuth(clientApp);
+// V46 Checkpoint A — ignoreUndefinedProperties global :
+// Firebase JS SDK rejette par défaut tout champ `undefined` dans setDoc/updateDoc.
+// Cette option remplace silencieusement undefined → champ omis du payload.
+// Reste cohérent avec sanitizeForFirestore (V44-TER + V45 Bug A) en defense-in-depth.
 export const db = initializeFirestore(clientApp, {
-  experimentalForceLongPolling: true
+  experimentalForceLongPolling: true,
+  ignoreUndefinedProperties: true,
 });
 export const storage = getStorage(clientApp);
 
