@@ -1,0 +1,327 @@
+═══════════════════════════════════════════════════════════════════════════
+  MAJ-V44-TER — Rapport de session
+═══════════════════════════════════════════════════════════════════════════
+
+Date          : 2026-05-01 (matin GMT+2)
+Branche       : v2
+HEAD initial  : 1b9c587  docs(v44-bis): rapport MAJ-V44-BIS.txt + prompt de mission
+HEAD final    : fcf2c8f  fix(admin/produits): "Jamais valide" + optimistic date (Bug 3 V44-TER)
+Tag backup    : backup-pre-v44ter-20260501-0810  (poussé sur origin)
+Workflow      : Superpowers (systematic-debugging → writing-plans → executing-plans → verification-before-completion)
+Plugins actifs: Superpowers, UI-UX-PRO-MAX, Claude-Mem
+
+
+═══════════════════════════════════════════════════════════════════════════
+  PHASE 0 — NETTOYAGE WORKING TREE
+═══════════════════════════════════════════════════════════════════════════
+
+▸ d9b43c3  chore(claude): activate plugins superpowers + ui-ux-pro-max + claude-mem
+            .claude/settings.json — ajout enabledPlugins (superpowers@claude-plugins-official,
+            ui-ux-pro-max@ui-ux-pro-max-skill, claude-mem@thedotmack)
+
+▸ 6bb5db6  chore(gitignore): ignore backups/ directory (local-only safety dumps)
+            .gitignore — règle "backups/quotes-pre-migration-v43-*.json" remplacée par
+            "backups/" (générique). Effet immédiat : 3 fichiers backups/*.json
+            (images-pre-update + 2× products-pre-import-minipelles) ne polluent plus
+            le working tree.
+
+▸ Tag backup-pre-v44ter-20260501-0810 → poussé sur origin avant les fixes.
+   Permet rollback unitaire si besoin via : git reset --hard <tag>
+
+
+═══════════════════════════════════════════════════════════════════════════
+  BUG 1 — SAUVEGARDE ALÉATOIRE FICHE PRODUIT  ✅ RÉSOLU
+═══════════════════════════════════════════════════════════════════════════
+
+> Priorité HAUTE — investigation cause racine demandée et obtenue.
+
+CAUSE RACINE IDENTIFIÉE
+───────────────────────
+Stale-state cross-component. La fiche produit possède DEUX flux d'écriture
+INDÉPENDANTS qui touchent le même document Firestore mais ne partagent pas
+leur state local :
+
+  Flux A — FicheProduit.handleSave() (bouton « Enregistrer le produit »)
+    ▸ src/admin/pages/FicheProduit.tsx:135-148 (avant fix)
+    ▸ payload = { ...product, completude, champs_incomplets, updated_at }
+    ▸ setDoc(ref, payload, { merge: !isCreation })
+    ▸ Spread TOUS les champs du state parent (≈40 champs incluant prix_*).
+
+  Flux B — OngletGestionPrix.handleValidatePrices()
+        et OngletGestionPrix.handleSaveOverrides()
+    ▸ src/admin/services/pricingService.ts:216-249 (validateProductPrices)
+    ▸ src/admin/components/produit/OngletGestionPrix.tsx:222-239 (overrides)
+    ▸ Écrit prix_achat_cny/usd/eur, prix_public, prix_partenaire,
+      prix_*_override, date_derniere_validation directement en BD.
+    ▸ Le state parent FicheProduit.product n'est JAMAIS resynchronisé.
+
+Scénario reproductible (déterministe, pas de race OS) :
+  1. Admin ouvre fiche  → state parent product.prix_achat_cny = 100 (initial load)
+  2. Rubrique 1 → MODE ÉDITION → CNY = 200 → VALIDER PRIX
+       → Firestore = 200, state parent = 100 (jamais re-fetché)
+  3. Onglet Essentiel → modif nom_fr → ENREGISTRER LE PRODUIT
+       → setDoc({ ...product, ... }, merge:true) → écrit prix_achat_cny = 100
+       → Firestore = 100 (le 200 validé en étape 2 est ÉCRASÉ)
+  4. Reload post-save (FicheProduit.tsx:175-178) recharge depuis Firestore
+       → écran montre 100. L'admin voit son prix sauter et conclut « save random ».
+
+SCORING DES 5 HYPOTHÈSES UTILISATEUR
+────────────────────────────────────
+  1. Race setDoc vs calculerCompletude        ❌ calculerCompletude est sync
+  2. undefined casse sanitizeForFirestore     ❌ handleSave ne l'utilisait pas ;
+                                                  un undefined aurait throw
+                                                  → toast erreur (pas silencieux)
+                                                  Renforcé en defense-in-depth.
+  3. useEffect rebascule la valeur saisie     ❌ useEffect FicheProduit:47 mount-only,
+                                                  useEffect OngletEssentiel:83 creation-only
+  4. State local pas synchronisé avec draft   ✅ Bonne intuition mais granularité
+                                                  fine : la désync est entre
+                                                  FicheProduit.product et les
+                                                  écritures externes de
+                                                  OngletGestionPrix
+  5. Bouton submit pendant un save en cours   ❌ Bouton disabled={saving}
+
+FIX APPLIQUÉ
+────────────
+Whitelist d'exclusion dans handleSave : on retire du payload les champs gérés
+exclusivement par OngletGestionPrix, puis grâce à merge:true, ces champs
+restent intacts en Firestore lors du Save « principal ».
+
+  - Champs exclus : prix_achat_cny, prix_achat_usd, prix_achat_eur, prix_achat
+                    prix_public, prix_partenaire,
+                    prix_public_override, prix_partenaire_override,
+                    date_derniere_validation,
+                    id (le doc ID ne doit pas être stocké comme un champ)
+  - Defense-in-depth : payload passé par sanitizeForFirestore avant setDoc
+                       (élimine tout undefined futur).
+
+FICHIERS MODIFIÉS
+─────────────────
+  M  src/admin/pages/FicheProduit.tsx          (+34, -3 sur handleSave + 1 import)
+  +  docs/superpowers/plans/2026-05-01-bug1-fiche-produit-stale-state.md
+                                                (plan formel writing-plans)
+
+COMMIT / TAG
+────────────
+  ▸ commit f32a3d9
+  ▸ tag    checkpoint-v44ter-A-bug1
+  ▸ pushé  origin v2 + tag
+
+BUILD
+─────
+  ▸ npm run build → ✓ built in 3.68s (exit 0)
+  ▸ Warnings dynamic-imports & chunk size : préexistants, hors scope.
+
+TESTS À EFFECTUER (manuel admin, post-déploiement)
+──────────────────────────────────────────────────
+  1. Ouvrir fiche produit existant (avec prix déjà validés).
+  2. Rubrique 1 → MODE ÉDITION → modifier CNY → VALIDER PRIX → toast OK.
+  3. Onglet Essentiel → modifier nom_fr → ENREGISTRER LE PRODUIT.
+  4. ATTENDU : prix CNY conservé tel que validé en étape 2.
+  5. Reload page → mêmes valeurs persistantes.
+  6. Optionnel : refaire avec overrides (Public / Partenaire) idem.
+
+
+═══════════════════════════════════════════════════════════════════════════
+  BUG 2 — CHAMPS_ESSENTIEL INCOHÉRENT FEAT 7 V44-BIS  ✅ RÉSOLU
+═══════════════════════════════════════════════════════════════════════════
+
+CAUSE
+─────
+src/lib/productHelpers.ts:15 listait 10 champs comme essentiels, dont
+poids_brut_kg, volume_m3, image_principale, fournisseur, est_kit, etc.
+Or FEAT 7 V44-BIS a déplacé poids_brut_kg / volume_m3 vers la catégorie
+« bloquant devis » et image_principale vers une simple option d'affichage.
+
+Effet : toast warning « 3 champ(s) essentiel(s) manquant(s) » incluant des
+champs qui ne sont PLUS essentiels selon FEAT 7.
+
+FIX APPLIQUÉ
+────────────
+  CHAMPS_ESSENTIEL = ['categorie', 'reference', 'nom_fr', 'prix_achat_cny']
+                                                                       ^^^^^
+                                            (numérique strict > 0, branche dédiée
+                                             ajoutée dans calculerCompletude)
+
+  CHAMPS_BLOQUANT_DEVIS = ['poids_brut_kg', 'volume_m3']        (NEW export)
+    → utilisé conceptuellement par les badges 🔴 BLOQUANT
+      (badge logique business déjà gérée par
+       src/admin/utils/productCompleteness.ts:32-38, intacte).
+
+  image_principale : retiré de toute liste essentiel/bloquant. C'est un
+  pur attribut d'affichage géré par OngletEssentiel et le placeholder front.
+
+  calculerCompletude() simplifiée : suppression des branches est_kit/actif/
+  composition_kit/poids/volume devenues inutiles au regard de la nouvelle
+  liste à 4 champs.
+
+FICHIER MODIFIÉ
+───────────────
+  M  src/lib/productHelpers.ts  (+11, -19)
+
+COMMIT / TAG
+────────────
+  ▸ commit 86e86f0
+  ▸ tag    checkpoint-v44ter-B-bug2
+  ▸ pushé  origin v2 + tag
+
+BUILD
+─────
+  ▸ npm run build → ✓ built in 3.38s (exit 0)
+
+
+═══════════════════════════════════════════════════════════════════════════
+  BUG 3 — « INVALID DATE » RUBRIQUE 1 GESTION DES PRIX  ✅ RÉSOLU
+═══════════════════════════════════════════════════════════════════════════
+
+CAUSE
+─────
+src/admin/components/produit/OngletGestionPrix.tsx:250 et :281 affichaient :
+  Card subtitle = `Dernière validation : ${formatDateHeure(product.date_derniere_validation)}`
+
+Pour un produit jamais validé, formatDateHeure retournait '—' → UX peu claire
+(« Dernière validation : — » lu comme une date manquante / Invalid Date).
+De plus, après VALIDER PRIX, la date n'apparaissait qu'après round-trip
+Firestore (le state parent FicheProduit.product n'étant pas resynchronisé,
+il fallait recharger la page — même problématique sous-jacente que Bug 1).
+
+FIX APPLIQUÉ
+────────────
+1. State local optimiste localValidationDate dans OngletGestionPrix.
+2. Memo subtitleValidation :
+     - si localValidationDate ?? product.date_derniere_validation présent
+         → "Dernière validation : <JJ-M-AAAA HHhMM>" (formatDateHeure)
+     - sinon → "Jamais validé"
+3. handleValidatePrices : après succès, setLocalValidationDate(new Date())
+   → affichage immédiat sans attendre Firestore.
+4. useEffect : reset du local quand la prop product transmet la vraie
+   Timestamp Firestore (la prop devient source de vérité).
+
+Cohérent avec la logique V44-BIS Bug 2 (Taux RMB optimistic update).
+
+FICHIER MODIFIÉ
+───────────────
+  M  src/admin/components/produit/OngletGestionPrix.tsx  (+19, -2)
+
+COMMIT / TAG
+────────────
+  ▸ commit fcf2c8f
+  ▸ tag    checkpoint-v44ter-C-bug3
+  ▸ pushé  origin v2 + tag
+
+BUILD
+─────
+  ▸ npm run build → ✓ built in 3.33s (exit 0)
+
+
+═══════════════════════════════════════════════════════════════════════════
+  RÈGLES NON NÉGOCIABLES — RESPECT
+═══════════════════════════════════════════════════════════════════════════
+
+✅ Convention nommage Firestore : taux_eur_usd, taux_rmb_eur, taux_usd_cny,
+   derniere_maj_taux. Aucun autre nom introduit. Vérification :
+     grep -rn 'taux_cny_usd\|taux_usd_eur\|date_maj_taux' src/  → 0 résultat.
+✅ Lazy compute : aucun calcul de prix stocké côté handleSave (justement
+   l'objet du fix Bug 1).
+✅ Build npm run build après chaque fix : 3 builds exit 0.
+✅ Commits granulaires + push v2 : 1 fix = 1 commit = 1 tag = 1 push.
+✅ Tags intermédiaires : checkpoint-v44ter-A-bug1 / -B-bug2 / -C-bug3.
+✅ Format date FR : formatDateHeure() inchangé, retourne « JJ-M-AAAA HHhMM ».
+✅ Aucun appel à scripts/migrate-product-prices.js
+✅ Zéro modification de produits Firestore (pas de mutation BD pendant cette
+   session — uniquement du code).
+
+
+═══════════════════════════════════════════════════════════════════════════
+  RÉCAPITULATIF — HASHES & ÉTAT FINAL
+═══════════════════════════════════════════════════════════════════════════
+
+Commits cette session
+─────────────────────
+  d9b43c3  chore(claude): activate plugins superpowers + ui-ux-pro-max + claude-mem
+  6bb5db6  chore(gitignore): ignore backups/ directory (local-only safety dumps)
+  f32a3d9  fix(admin/produits): isolate price fields from handleSave (Bug 1 V44-TER)
+  86e86f0  fix(productHelpers): align CHAMPS_ESSENTIEL with FEAT 7 V44-BIS (Bug 2 V44-TER)
+  fcf2c8f  fix(admin/produits): "Jamais valide" + optimistic date (Bug 3 V44-TER)
+
+Tags poussés sur origin
+───────────────────────
+  backup-pre-v44ter-20260501-0810  → 6bb5db6  (avant tout travail bug)
+  checkpoint-v44ter-A-bug1         → f32a3d9
+  checkpoint-v44ter-B-bug2         → 86e86f0
+  checkpoint-v44ter-C-bug3         → fcf2c8f
+
+Fichiers modifiés (toutes phases)
+─────────────────────────────────
+  M  .claude/settings.json
+  M  .gitignore
+  M  src/admin/pages/FicheProduit.tsx
+  M  src/lib/productHelpers.ts
+  M  src/admin/components/produit/OngletGestionPrix.tsx
+  +  docs/superpowers/plans/2026-05-01-bug1-fiche-produit-stale-state.md
+  +  MAJ-V44-TER.txt   (ce rapport)
+
+Build final
+───────────
+  npm run build → ✓ built in 3.46s (exit 0)
+  Warnings : dynamic-imports + chunk size — préexistants, hors scope.
+
+
+═══════════════════════════════════════════════════════════════════════════
+  URL VERCEL PREVIEW
+═══════════════════════════════════════════════════════════════════════════
+
+Non vérifié dans cette session — la branche v2 est poussée sur origin
+(github.com/parisb2b/97import-firebase). Si l'intégration Vercel↔GitHub
+est active, un déploiement preview s'est déclenché automatiquement sur
+le push du HEAD fcf2c8f. Vérifier dans le dashboard Vercel ou via :
+  vercel inspect <preview-url>
+
+Le présent rapport ne lance volontairement AUCUN déploiement Vercel
+manuel (vercel deploy/promote) — pas demandé par la mission.
+
+
+═══════════════════════════════════════════════════════════════════════════
+  ANOMALIES / OBSERVATIONS
+═══════════════════════════════════════════════════════════════════════════
+
+1. Warnings Vite sur dynamic-imports : 4 warnings (firebase/firestore,
+   src/lib/firebase.ts, src/lib/quoteStatusHelpers.ts, src/lib/emailService.ts)
+   — modules importés à la fois en static et dynamic. Aucun blocage build,
+   mais empêche le code-splitting optimal. PRÉEXISTANT, hors scope V44-TER.
+
+2. Bundle index principal = 2.91 MB (gzip 803 kB). Au-dessus du seuil
+   conseillé Vite (500 kB). PRÉEXISTANT, hors scope V44-TER.
+
+3. firebase.ts n'a pas l'option `ignoreUndefinedProperties: true` sur
+   initializeFirestore. Conséquence : tout champ undefined fait throw →
+   le sanitizeForFirestore désormais appliqué sur handleSave (Bug 1) compense.
+   Recommandation future : ajouter cette option globalement, en complément
+   du sanitize, pour homogénéiser tous les setDoc/updateDoc du projet.
+
+4. validateProductPrices et handleSaveOverrides côté OngletGestionPrix
+   ne remontent toujours pas la valeur écrite vers le state parent
+   FicheProduit.product. Le fix Bug 1 (isolation des champs) règle le
+   symptôme. Une amélioration future propre serait : faire passer un
+   callback onPricesUpdated au composant OngletGestionPrix pour que
+   FicheProduit.product reflète la BD en temps réel. Hors scope V44-TER.
+
+5. Le bouton « 🔄 Actualiser selon taux » Rubrique 1 reset draftCny vers
+   product.prix_achat_cny — ce qui est le comportement attendu.
+   Cependant, après VALIDER PRIX (le state parent étant stale jusqu'à
+   reload), ce bouton revient à la valeur AVANT validation. Bizarre mais
+   rare en pratique. Voir observation 4 pour la solution propre.
+
+6. OngletGestionPrix utilise sanitizeForFirestore pour les overrides
+   (handleSaveOverrides) mais le code de validateProductPrices côté
+   pricingService.ts l'utilise aussi. Cohérence OK.
+
+7. productCompleteness.ts (utils business 3 statuts) reste indépendant de
+   CHAMPS_ESSENTIEL/CHAMPS_BLOQUANT_DEVIS. Sa logique est inchangée et
+   continue de produire les badges 🟢🟡🔴 corrects. Pas de duplication
+   nuisible — c'est un domaine séparé (badge business vs check essentiel).
+
+
+═══════════════════════════════════════════════════════════════════════════
+  FIN — Rapport généré 2026-05-01 par Claude Code Opus 4.7
+═══════════════════════════════════════════════════════════════════════════
