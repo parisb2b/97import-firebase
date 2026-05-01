@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { getNextNumber } from '../../lib/counters';
+import { sanitizeForFirestore } from '../../lib/firebaseUtils';
 
 interface ModalDupliquerDevisProps {
   isOpen: boolean;
@@ -54,10 +55,12 @@ export default function ModalDupliquerDevis({
         duplique_de: devisSource.numero,
         duplique_le: new Date().toISOString(),
         // Reset prix VIP négocié sur les lignes
+        // V45 Bug A : null au lieu de undefined (Firestore refuse undefined sans
+        // ignoreUndefinedProperties). null exprime correctement "pas de prix VIP négocié".
         lignes: (devisSource.lignes || []).map((l: any) => ({
           ...l,
-          prix_vip_negocie: undefined,
-          prix_unitaire_final: l.prix_unitaire,
+          prix_vip_negocie: null,
+          prix_unitaire_final: l.prix_unitaire ?? l.prix_unitaire_final ?? 0,
         })),
         prix_negocies: {},
         createdAt: serverTimestamp(),
@@ -67,7 +70,11 @@ export default function ModalDupliquerDevis({
       // Le doc Firestore aura comme ID le nouveau numéro — on supprime l'ID source
       delete newDevis.id;
 
-      await setDoc(doc(db, 'quotes', newNumero), newDevis);
+      // V45 Bug A : defense-in-depth contre les undefined propagés par
+      // ...devisSource ou ...l (Firestore SDK n'a pas ignoreUndefinedProperties).
+      const cleanedDevis = sanitizeForFirestore(newDevis);
+
+      await setDoc(doc(db, 'quotes', newNumero), cleanedDevis);
 
       onDuplicated(newNumero, newNumero);
       onClose();
