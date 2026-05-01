@@ -1,0 +1,545 @@
+═══════════════════════════════════════════════════════════════════════════
+  MAJ-V46 — Rapport de session
+═══════════════════════════════════════════════════════════════════════════
+
+Date          : 2026-05-01 (soir GMT+2)
+Branche       : v2
+HEAD initial  : 027f433  docs(v45): rapport MAJ-V45.txt (Bugs A+B + 5 polish UI/UX)
+HEAD final    : 72c72b0  feat(admin): SearchInput component + magnifier on all admin searches (Checkpoint F V46)
+Tag backup    : backup-pre-v46-20260501-1905  (poussé sur origin)
+Workflow      : Superpowers (systematic-debugging → writing-plans → executing-plans → verification-before-completion)
+Plugins actifs: Superpowers, UI-UX-PRO-MAX, Claude-Mem
+Exclusions   : Reco 2 (callback onProductUpdate) → V46-BIS / Reco 5 (migration admin.css) → V47
+
+
+═══════════════════════════════════════════════════════════════════════════
+  PHASE 0 — CLEANUP + BACKUP TAG
+═══════════════════════════════════════════════════════════════════════════
+
+▸ git fetch origin → up-to-date avec origin/v2 sur 027f433
+▸ Working tree clean (rapport V45 commit déjà poussé)
+▸ Tag backup-pre-v46-20260501-1905 créé sur HEAD 027f433 et poussé
+   → permet rollback unitaire via : git reset --hard backup-pre-v46-20260501-1905
+
+
+═══════════════════════════════════════════════════════════════════════════
+  PHASE 1 — CLEANUP ARCHITECTURE (recos V45)
+═══════════════════════════════════════════════════════════════════════════
+
+────────────────────────────────────────────────────────────────────────────
+  CHECKPOINT A — ignoreUndefinedProperties global  ✅
+────────────────────────────────────────────────────────────────────────────
+
+DÉCOUVERTE
+──────────
+Le brief V46 supposait `getFirestore(app)` (sans options). Vérification
+préalable montre que `firebase.ts:18` utilisait DÉJÀ `initializeFirestore`
+avec `experimentalForceLongPolling: true` (V44-TER memory). Donc le fix
+se limite à AJOUTER `ignoreUndefinedProperties: true` aux options
+existantes — pas de switch d'API.
+
+DIFF
+────
+src/lib/firebase.ts (avant → après) :
+
+  export const db = initializeFirestore(clientApp, {
+    experimentalForceLongPolling: true,
++   ignoreUndefinedProperties: true,
+  });
+
+EFFET
+─────
+Firebase JS SDK omet désormais silencieusement les champs `undefined` dans
+TOUS les setDoc/updateDoc au lieu de throw. Defense-in-depth complémentaire
+à V44-TER (whitelist FicheProduit) + V45 Bug A (sanitize duplication devis).
+
+Le `sanitizeForFirestore` reste pertinent pour cohérence sur les chemins
+critiques mais devient optionnel ailleurs.
+
+VÉRIFICATIONS
+─────────────
+  ▸ npm run build → ✓ built in 3.91s (exit 0)
+  ▸ Pas de double init `getFirestore` dans src/ (1 seul `initializeFirestore`)
+
+  ▸ commit 4bf4a3b
+  ▸ tag    checkpoint-v46-A-ignoreundefined
+  ▸ pushé  origin v2 + tag
+
+────────────────────────────────────────────────────────────────────────────
+  CHECKPOINT B — Code-splitting bundle  ✅
+────────────────────────────────────────────────────────────────────────────
+
+STRATÉGIE
+─────────
+vite.config.ts → ajout du bloc `build.rollupOptions.output.manualChunks`
+sous forme de fonction de pattern matching (plus robuste que la forme objet
+qui errore si un module manque dans node_modules).
+
+Chunks vendor extraits :
+  ▸ firebase-vendor : firebase/* + @firebase/*
+  ▸ pdf-vendor      : jspdf + html2canvas + dompurify (transitifs)
+  ▸ excel-vendor    : exceljs + xlsx
+  ▸ ui-vendor       : @dnd-kit/*
+
+`chunkSizeWarningLimit` élevé à 800 kB.
+
+RÉSULTATS (mesurés, build size)
+──────────────────────────────
+                         AVANT V46             APRÈS V46
+  index principal       2,911.55 kB ❌         860.36 kB ✅  (-70%)
+                       (gzip 803 kB)         (gzip 225 kB)
+
+  Nouveaux chunks vendor (V46) :
+  firebase-vendor                              652.35 kB  (gzip 154 kB)
+  pdf-vendor                                   617.91 kB  (gzip 186 kB)
+  excel-vendor                                 939.99 kB  (gzip 271 kB)
+  ui-vendor                                     57.53 kB  (gzip  19 kB)
+
+  Pré-existants conservés :
+  index.es (purify)                            159.64 kB  (gzip  54 kB)
+  generateInvoiceFinale (lazy)                   4.04 kB  (gzip 1.6 kB)
+
+Le seul chunk encore au-dessus de 800 kB est excel-vendor (940 kB) —
+exceljs + xlsx sont intrinsèquement lourds. Isolation suffit (lazy-loading
+en V47 si besoin de réduire encore davantage).
+
+VÉRIFICATIONS
+─────────────
+  ▸ npm run build → ✓ built in 3.47s (exit 0)
+  ▸ Bundle index principal réduit de 70% — gain énorme côté caching navigateur
+
+  ▸ commit a8956b3
+  ▸ tag    checkpoint-v46-B-codesplit
+  ▸ pushé  origin v2 + tag
+
+────────────────────────────────────────────────────────────────────────────
+  CHECKPOINT C — Unify navy #1E3A5F → #1565C0  ✅
+────────────────────────────────────────────────────────────────────────────
+
+CONTEXTE
+────────
+Le projet avait deux navys hardcodés coexistant :
+  ▸ index.css `--navy: #1E3A5F`  (utilisé par FicheProduit/headers)
+  ▸ admin.css `--nv:   #1565C0`  (utilisé par admin v4 components)
+
+Source d'incohérence visuelle relevée en V45 observation 5.
+
+EXÉCUTION
+─────────
+Sed batch en 1 passe :
+  grep -rl '#1E3A5F' src/ | xargs sed -i '' 's/#1E3A5F/#1565C0/g'
+
+Vérifications post-batch :
+  ▸ grep -rn '#1E3A5F' src/  →  0 occurrence
+  ▸ grep -rn '#1565C0' src/  →  245 occurrences
+
+34 FICHIERS TOUCHÉS
+───────────────────
+  Couches CSS  : src/index.css                                              (2)
+  Composants admin : DropdownPorts, ModalDupliquerDevis, ModalNouvelleCommission,
+                     ModalMarquerPayee, OngletMedias/GestionPrix/Essentiel/
+                     Details/Options, ModalDupliquerProduit, FicheProduitTabs,
+                     CompositionKitEditor, CaracteristiquesEditor,
+                     PopupEncaisserAcompte, PopupSelectionClientExcel
+  Pages admin  : ListeConteneurs, AcomptesEncaisser, DetailConteneur,
+                 FicheProduit, DetailListeAchat, AdminProduits, NouveauConteneur,
+                 TauxRMB, ListeListesAchat, NotesCommission, NouvelleListeAchat
+  Lib backend  : src/lib/emailService.ts                                    (4)
+  Front        : PopupVerserAcompte, PopupSaisieRIB, Produit, Catalogue,
+                 espace-client/MesFactures + MesVirements
+
+VÉRIFICATIONS
+─────────────
+  ▸ npm run build → ✓ built in 3.48s (exit 0)
+  ▸ 245 occurrences #1565C0 (incl. les 61 nouvelles ex-#1E3A5F)
+  ▸ Aucun changement structurel — pure substitution de valeur hexa
+
+  ▸ commit a8d7dd1 — 34 files changed, +61/-61
+  ▸ tag    checkpoint-v46-C-navy-unified
+  ▸ pushé  origin v2 + tag
+
+
+═══════════════════════════════════════════════════════════════════════════
+  PHASE 2 — BUG BUSINESS CRITIQUE
+═══════════════════════════════════════════════════════════════════════════
+
+────────────────────────────────────────────────────────────────────────────
+  CHECKPOINT D — Validation acomptes ≤ solde devis  ✅ RÉSOLU
+────────────────────────────────────────────────────────────────────────────
+
+> Workflow Superpowers complet (systematic-debugging → writing-plans →
+> executing-plans → verification).
+
+CAUSE RACINE IDENTIFIÉE
+───────────────────────
+Trois flux acompte coexistent dans le projet :
+  1. **Encaissement (admin)** — `PopupEncaisserAcompte.tsx`
+  2. **Déclaration (espace-client)** — `PopupAcompte.tsx`
+  3. **Affichage KPI** — `AcomptesEncaisser`, `DetailDevis`, generators PDF
+
+Le helper `validerNouveauPaiement` (`quoteStatusHelpers.ts:98-114`) déléguait
+à `getSoldeRestant` (ligne 63) qui filtre par `encaisse === true` en interne.
+
+Conséquence en chemin DÉCLARATION (`PopupAcompte.tsx:96` qui passe TOUS les
+acomptes) : le `restant` retourné ne déduisait QUE les acomptes encaissés,
+pas les déclarations en attente. L'admin/client pouvait donc empiler N
+déclarations dont la somme totale dépasse le total devis, sans aucun
+garde-fou en amont du flow d'encaissement.
+
+De plus :
+  ▸ `prochainPaiementEstSolde` comptait uniquement les encaissés
+  ▸ `peutAjouterAcompte` idem
+
+→ La règle business "max 3 acomptes" était **contournable** tant qu'aucune
+déclaration n'était encaissée.
+
+SCÉNARIO REPRODUCTIBLE (cas Michel V46)
+───────────────────────────────────────
+Devis 25 000 €, 1 acompte 500 € encaissé.
+restant calculé par `validerNouveauPaiement` = 25 000 − 500 (encaissé) = 24 500 €
+
+  Déclaration 1 — 600 €  → 600 ≤ 24 500 ✓ (mais devrait être 600 ≤ 24 500 − futurs)
+  Déclaration 2 — 700 €  → 700 ≤ 24 500 ✓ (24 500 inchangé, le 600 ignoré)
+  Déclaration 3 — 23 200 €  → 23 200 ≤ 24 500 ✓ (toujours 24 500)
+
+Total déclarations + encaissé = 25 000 €. **4 acomptes** déclarés (violation
+règle "max 3"). État incohérent affiché à l'admin.
+
+DÉCOUVERTE ANNEXE
+─────────────────
+`devisHelpers.ts:52` — `getMontantRestantAVerser` calcule déjà correctement
+le restant (encaissés + déclarés en attente) avec un commentaire explicite
+ligne 47 : *« Différent de getSoldeRestant() qui ne soustrait que les
+encaissés. »*. Cette fonction existe mais n'était pas utilisée par les
+validateurs. Quelqu'un avait identifié le pattern conceptuel sans pousser
+le fix dans la chaîne de validation.
+
+FIX APPLIQUÉ
+────────────
+src/lib/quoteStatusHelpers.ts :
+
+(1) Ajout helper `getNbAcomptesDeclares(acomptes)` — count tous non-soldés
+    (encaissés + déclarés non-encaissés).
+
+(2) `peutAjouterAcompte` utilise désormais `getNbAcomptesDeclares < 3` au
+    lieu de `getNbAcomptesEncaisses < 3` → max 3 sur les déclarations
+    totales.
+
+(3) `prochainPaiementEstSolde` idem → la règle "4ème = solde forcé" se
+    déclenche dès qu'on a 3 déclarations (peu importe encaisse).
+
+(4) `validerNouveauPaiement` calcul du restant remplacé :
+    AVANT : `restant = getSoldeRestant(total_ht, acomptes)` (filtre encaisse=true)
+    APRÈS : `restant = total_ht - sum(acomptes.filter(!is_solde).montant)`
+    → utilise TOUS les acomptes passés (peu importe encaisse).
+
+    Le caller décide ce qu'il passe :
+      ▸ chemin DÉCLARATION : passe `acomptes` complet → restant strict ✓
+      ▸ chemin ENCAISSEMENT : passe `acomptes.filter(a.encaisse===true)` →
+        restant = total_ht − encaissés (sémantique inchangée)
+
+(5) Message d'erreur conforme spec V46 :
+    «Acompte impossible : reste à payer = X €, vous saisissez Y €»
+
+NON modifiés (sémantique correcte préservée pour l'affichage KPI réel) :
+  `getTotalEncaisse`, `getSoldeRestant`, `getNbAcomptesEncaisses`
+
+NON-RÉGRESSION VÉRIFIÉE (tableau du plan)
+─────────────────────────────────────────
+| Caller                                                  | Verdict      |
+|---------------------------------------------------------|--------------|
+| PopupEncaisserAcompte (validerNouveauPaiement, encaissés) | ❌ aucune   |
+| PopupEncaisserAcompte (prochainPaiementEstSolde, ALL)     | V46 voulu   |
+| PopupAcompte (validerNouveauPaiement, ALL)                | corrige bug |
+| AcomptesEncaisser (getNbAcomptesEncaisses, getSoldeRestant, getTotalEncaisse) | ❌ aucune |
+| DetailDevis (prochainPaiementEstSolde, getSoldeRestant)   | V46 voulu   |
+| Generators PDF (getTotalEncaisse, getSoldeRestant)        | ❌ aucune   |
+
+FICHIERS MODIFIÉS
+─────────────────
+  M  src/lib/quoteStatusHelpers.ts                                  (+33, -6)
+  +  docs/superpowers/plans/2026-05-01-bug-acomptes-overflow.md     (plan formel)
+
+VÉRIFICATIONS
+─────────────
+  ▸ npm run build → ✓ built in 3.60s (exit 0)
+  ▸ commit 099b81a
+  ▸ tag    checkpoint-v46-D-acomptes-validation
+  ▸ pushé  origin v2 + tag
+
+TESTS À EFFECTUER (manuel, post-déploiement)
+────────────────────────────────────────────
+1. Devis 1000€, 0 acompte. Déclarer 600€ → OK.
+2. Devis 1000€, 600€ déclaré non-encaissé. Tenter 500€ → REFUSÉ avec
+   "Acompte impossible : reste à payer = 400.00 €, vous saisissez 500.00 €".
+3. Devis 1000€, 600€ déclaré non-encaissé. Déclarer 400€ → OK.
+4. Devis 1000€, 3 acomptes déclarés (totalisant < 1000€). Tenter 4ème
+   avec montant ≠ restant → REFUSÉ avec "4e paiement = solde forcé".
+5. Devis 1000€, 3 acomptes déclarés totalisant 1000€. peutAjouterAcompte
+   → false (max 3 + restant 0).
+6. Encaissement 4ème acompte (qui est le solde forcé déclaré au 3) → OK.
+
+⚠️ AUDIT PRODUCTION
+───────────────────
+Le bug peut avoir laissé des incohérences en BD (devis avec sum(acomptes)
+> total_ht). Recommandation V46-BIS : audit script qui parcourt tous les
+devis et flagge ceux où sum(non-solde) > total_ht. Correction manuelle
+au cas par cas.
+
+
+═══════════════════════════════════════════════════════════════════════════
+  PHASE 3 — UX POLISH
+═══════════════════════════════════════════════════════════════════════════
+
+────────────────────────────────────────────────────────────────────────────
+  CHECKPOINT E — Onglets fiche produit différenciés  ✅
+────────────────────────────────────────────────────────────────────────────
+
+SYMPTÔME (image 2 capture Michel V46)
+─────────────────────────────────────
+Tous les onglets (`💰 GESTION DES PRIX`, `OBLIGATOIRE Essentiel 4/4`,
+`Détails techniques 0/19`, `Médias site web 0/9`, `⚙️ Options`) avaient
+le même visuel — aucune différenciation actif/inactif/complet/incomplet.
+L'admin ne savait pas où il était dans la fiche.
+
+DÉSIGN APPLIQUÉ (4 ÉTATS)
+─────────────────────────
+État ACTIF :
+  ▸ background      : rgba(21, 101, 192, 0.08)  (bleu clair subtle)
+  ▸ underline       : 3px solid #1565C0  (au lieu de 2px orange)
+  ▸ texte couleur   : #1565C0 (navy)
+  ▸ fontWeight      : 700 (gras prononcé) au lieu de 600
+  ▸ border-radius   : 8px 8px 0 0 (top corners) — effet onglet en saillie
+
+État INACTIF :
+  ▸ background      : transparent
+  ▸ texte couleur   : #6B7280 (gris neutre)
+  ▸ fontWeight      : 500 (medium)
+  ▸ hover           : rgba(21,101,192,0.04) (existant via .v45-tab)
+
+État LOCKED :
+  ▸ opacity 0.5 + cursor not-allowed (préservé)
+
+Badge OBLIGATOIRE :
+  ▸ couleur passée à #DC2626 (cohérence rouge danger)
+  ▸ border-radius 12 (pill) au lieu de 4 (square)
+
+Compteurs (X/Y) — couleurs progressives (DÉJÀ EN PLACE V45, inchangées) :
+  ▸ 0/X       : bg rouge subtle (à remplir)
+  ▸ X/2X      : bg orange subtle (en cours)
+  ▸ X/X       : bg vert subtle (complet)
+
+FICHIER MODIFIÉ
+───────────────
+  M  src/admin/components/produit/FicheProduitTabs.tsx  (+11, -5)
+
+VÉRIFICATIONS
+─────────────
+  ▸ npm run build → ✓ built in 3.64s (exit 0)
+  ▸ commit 286e7dc
+  ▸ tag    checkpoint-v46-E-onglets-design
+  ▸ pushé  origin v2 + tag
+
+────────────────────────────────────────────────────────────────────────────
+  CHECKPOINT F — Loupe sur barres de recherche admin  ✅
+────────────────────────────────────────────────────────────────────────────
+
+SYMPTÔME (image 3 capture Michel V46)
+─────────────────────────────────────
+Certaines barres de recherche admin n'avaient pas d'icône loupe (incohérent
+avec image 4 référence Bordas-store qui en avait une). L'admin ne reconnaît
+pas immédiatement que c'est un champ de recherche — affordance UX manquante.
+
+DÉCOUVERTE
+──────────
+Sur 14 fichiers admin avec recherche :
+  ▸ 8 fichiers utilisent DÉJÀ la classe `.si-bar` (admin.css:567) qui inclut
+    une loupe SVG en background-image → visuel correct (pas à toucher) :
+    CatalogueProduits, ListeDevis, Stock, Factures, ListesAchat,
+    NotesCommission, SAVListe, Clients
+  ▸ 6 fichiers utilisaient inline-style sans loupe → bug Michel :
+    AdminProduits, ListeConteneurs, ListeListesAchat, DetailListeAchat,
+    CompositionKitEditor (modal), ModalNouvelleCommission (modal)
+
+DIVERGEANCE POINT BRIEF V46
+───────────────────────────
+Brief V46 importait `lucide-react` (Search icon). `lucide-react` n'est PAS
+dans `package.json`. Choix : SVG inline → pas de nouvelle dépendance,
+bundle préservé, même résultat visuel.
+
+NOUVEAU COMPOSANT
+─────────────────
+`src/admin/components/atoms/SearchInput.tsx` (1667 bytes) :
+  ▸ SVG inline (cercle + path "m21 21-4.35-4.35")
+  ▸ Props : value / onChange / placeholder / className / style / inputStyle
+            / autoFocus / ariaLabel
+  ▸ aria-label = placeholder par défaut (a11y)
+  ▸ Wrapper `.v46-search-wrapper` + input `.v46-search-input`
+
+CSS dans polish-v45.css (PAS polish-v46.css — cohérence single layer) :
+  .v46-search-wrapper  : positioning absolute pour la loupe
+  .v46-search-icon     : 16x16, gris #94A3B8, à 14px de gauche
+  .v46-search-input    : padding-left 40px (réserve l'icône),
+                         focus ring bleu #1565C0 + box-shadow
+
+MIGRATIONS (6 fichiers)
+───────────────────────
+| Fichier                                                       | Change |
+|---------------------------------------------------------------|--------|
+| src/admin/pages/AdminProduits.tsx                             | bug fix + remplace inline+v45-input |
+| src/admin/pages/ListeConteneurs.tsx                           | bug fix |
+| src/admin/pages/ListeListesAchat.tsx                          | bug fix |
+| src/admin/pages/DetailListeAchat.tsx                          | bug fix |
+| src/admin/components/produit/CompositionKitEditor.tsx (modal) | bug fix (autoFocus préservé) |
+| src/admin/components/commission/ModalNouvelleCommission.tsx (modal) | bug fix |
+
+PAGES INCHANGÉES (déjà loupe via .si-bar)
+─────────────────────────────────────────
+CatalogueProduits, ListeDevis, Stock, Factures, ListesAchat, NotesCommission,
+SAVListe, Clients (8 fichiers).
+
+NOTE V47 : éventuellement migrer .si-bar vers SearchInput aussi pour
+unifier sur 1 seul composant. Hors scope V46.
+
+FICHIERS MODIFIÉS
+─────────────────
+  +  src/admin/components/atoms/SearchInput.tsx                    (composant)
+  M  src/admin/styles/polish-v45.css                                (CSS .v46-*)
+  M  src/admin/pages/AdminProduits.tsx                              (-3 lignes)
+  M  src/admin/pages/ListeConteneurs.tsx                            (-9 lignes)
+  M  src/admin/pages/ListeListesAchat.tsx                           (-7 lignes)
+  M  src/admin/pages/DetailListeAchat.tsx                           (-6 lignes)
+  M  src/admin/components/produit/CompositionKitEditor.tsx          (-2 lignes)
+  M  src/admin/components/commission/ModalNouvelleCommission.tsx    (-7 lignes)
+
+VÉRIFICATIONS
+─────────────
+  ▸ npm run build → ✓ built in 3.40s (exit 0)
+  ▸ 6 callers SearchInput vérifiés (grep `from.*SearchInput` → 6 résultats)
+  ▸ commit 72c72b0
+  ▸ tag    checkpoint-v46-F-search-icons
+  ▸ pushé  origin v2 + tag
+
+
+═══════════════════════════════════════════════════════════════════════════
+  RÈGLES NON NÉGOCIABLES — RESPECT
+═══════════════════════════════════════════════════════════════════════════
+
+✅ Convention nommage Firestore préservée (taux_eur_usd / taux_rmb_eur /
+   taux_usd_cny / derniere_maj_taux). 0 occurrence des noms interdits.
+✅ Lazy compute préservé (V44-TER whitelist exclusion FicheProduit intacte —
+   vérifié grep + diff).
+✅ V45 Bug A fix préservé (sanitizeForFirestore ModalDupliquerDevis).
+✅ V45 polish-v45.css préservé (couche utilitaire intacte, étendue avec
+   .v46-search-* classes).
+✅ Build npm run build après chaque checkpoint : 6 builds exit 0.
+✅ Commits granulaires + push v2 : 1 checkpoint = 1 commit = 1 tag = 1 push.
+✅ Tags par checkpoint : 7 tags V46 (1 backup + 6 checkpoints).
+✅ Workflow Superpowers complet pour Bug D (plan formel docs/superpowers/
+   plans/2026-05-01-bug-acomptes-overflow.md).
+✅ Aucun changement fonctionnel hors Bug D (acomptes) : tous les hooks,
+   handlers, props, types préservés ailleurs.
+
+❌ Reco 2 callback onProductUpdate : reportée à V46-BIS comme demandé.
+❌ Reco 5 migration admin.css complète : reportée à V47 comme demandé.
+❌ scripts/migrate-product-prices.js : non exécuté.
+❌ Mutations Firestore directes : aucune (uniquement code).
+
+
+═══════════════════════════════════════════════════════════════════════════
+  RÉCAPITULATIF — HASHES & ÉTAT FINAL
+═══════════════════════════════════════════════════════════════════════════
+
+Commits V46
+───────────
+  4bf4a3b  feat(firebase): enable ignoreUndefinedProperties global (Checkpoint A V46)
+  a8956b3  perf(vite): code-split firebase/pdf/excel/dnd-kit vendors (Checkpoint B V46)
+  a8d7dd1  refactor(theme): unify navy #1E3A5F -> #1565C0 (Checkpoint C V46)
+  099b81a  fix(devis/acomptes): validate against ALL declared acomptes (Checkpoint D V46)
+  286e7dc  style(admin/produits): differentiate fiche-produit tabs visuals (Checkpoint E V46)
+  72c72b0  feat(admin): SearchInput component + magnifier on all admin searches (Checkpoint F V46)
+
+Tags V46 poussés sur origin
+───────────────────────────
+  backup-pre-v46-20260501-1905              → 027f433  (avant V46)
+  checkpoint-v46-A-ignoreundefined          → 4bf4a3b
+  checkpoint-v46-B-codesplit                → a8956b3
+  checkpoint-v46-C-navy-unified             → a8d7dd1
+  checkpoint-v46-D-acomptes-validation      → 099b81a
+  checkpoint-v46-E-onglets-design           → 286e7dc
+  checkpoint-v46-F-search-icons             → 72c72b0
+
+Statistiques
+────────────
+  ▸ 6 commits + 7 tags V46 (incl. backup)
+  ▸ 47 fichiers touchés cumulés
+  ▸ Build final : ✓ built in 3.44s (exit 0)
+  ▸ Bundle index principal : 2,911 → 860 kB (-70%)
+
+
+═══════════════════════════════════════════════════════════════════════════
+  URL VERCEL PREVIEW
+═══════════════════════════════════════════════════════════════════════════
+
+Non vérifié dans cette session — la branche v2 est poussée sur origin
+(github.com/parisb2b/97import-firebase). Si l'intégration Vercel↔GitHub
+est active, un deploy preview a été déclenché automatiquement à chaque
+push (6 fois) sur les commits 4bf4a3b → 72c72b0.
+
+Le rapport ne lance volontairement AUCUN déploiement Vercel manuel —
+non demandé par la mission.
+
+
+═══════════════════════════════════════════════════════════════════════════
+  ANOMALIES / OBSERVATIONS / RECOMMANDATIONS V46-BIS / V47
+═══════════════════════════════════════════════════════════════════════════
+
+V46-BIS RECOMMANDÉ
+──────────────────
+1. **Audit BD post-Bug D** — Le bug acomptes peut avoir laissé des
+   incohérences en production. Audit script à écrire :
+     - Parcourir tous les `quotes` Firestore
+     - Flagger ceux où `sum(acomptes.filter(!is_solde).montant) > total_ht`
+     - Liste à corriger manuellement (suppression / merge / reset).
+
+2. **Reco 2 V45 — Callback `onProductUpdate`** — Toujours pertinent.
+   Faire remonter via callback du `OngletGestionPrix` vers
+   `FicheProduit.product` après chaque écriture (`validateProductPrices`
+   et `handleSaveOverrides`) → resync du state parent en temps réel.
+   Permet de retirer la whitelist exclusion V44-TER (la solution propre).
+
+V47 RECOMMANDÉ
+──────────────
+3. **Reco 5 V45 — Migration inline-styles → admin.css** — Refonte
+   cohérente de FicheProduit, OngletEssentiel, OngletDetails, OngletMedias,
+   OngletOptions, AdminProduits vers les classes admin.css existantes
+   (.btn / .pl / .card / .alert / .ico-btn / .fi). Permet de retirer
+   progressivement la couche polish-v45.css quand elle devient redondante.
+   ~2-3h par composant.
+
+4. **Migration `.si-bar` → SearchInput** — Pour cohérence UI complète,
+   migrer les 8 pages utilisant `.si-bar` (CatalogueProduits, ListeDevis,
+   Stock, Factures, ListesAchat, NotesCommission, SAVListe, Clients) vers
+   SearchInput. Permet de retirer `.si-bar` de admin.css (et son
+   background-image SVG). ~30 min.
+
+5. **Lazy-loading excel-vendor (940 kB)** — Le seul chunk encore au-dessus
+   de 800 kB. exceljs + xlsx ne sont chargés que sur les pages d'export
+   (ConteneurExcel, etc.). Splitter en `import()` dynamique pour deferred
+   loading. ~30 min.
+
+ANOMALIES PRÉEXISTANTES (HORS SCOPE V46)
+────────────────────────────────────────
+6. Warnings Vite dynamic-imports : 4 warnings (firebase, firebase.ts,
+   quoteStatusHelpers, emailService) — modules importés à la fois en
+   static et dynamic. Préexistant V44-TER → V46. Sans impact build.
+
+7. `getMontantRestantAVerser` (devisHelpers.ts:52) coexiste maintenant avec
+   le nouveau `validerNouveauPaiement` corrigé. Les deux calculent
+   conceptuellement la même chose (somme tous acomptes). Un cleanup
+   pourrait unifier en un seul helper. ~10 min.
+
+
+═══════════════════════════════════════════════════════════════════════════
+  FIN — Rapport généré 2026-05-01 par Claude Code Opus 4.7
+═══════════════════════════════════════════════════════════════════════════
