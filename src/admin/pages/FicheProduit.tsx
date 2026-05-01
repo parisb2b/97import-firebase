@@ -285,7 +285,9 @@ export default function FicheProduit() {
       {/* Header */}
       <div style={{ marginBottom: 20 }}>
         <Link href="/admin/produits">
-          <button style={{ background: 'transparent', border: '1px solid #E5E7EB', color: '#6B7280', padding: '8px 16px', borderRadius: 8, fontSize: 13, cursor: 'pointer', marginBottom: 12 }}>
+          <button
+            className="v45-trans-fast v45-focus v45-btn-ghost"
+            style={{ background: 'transparent', border: '1px solid #E5E7EB', color: '#6B7280', padding: '8px 16px', borderRadius: 8, fontSize: 13, cursor: 'pointer', marginBottom: 12 }}>
             ← Retour à la liste
           </button>
         </Link>
@@ -300,14 +302,14 @@ export default function FicheProduit() {
               </p>
             )}
           </div>
-          <div style={{ background: statutBadge.bg, color: statutBadge.color, padding: '6px 14px', borderRadius: 20, fontSize: 13, fontWeight: 600 }}>
+          <div className="v45-pill v45-trans-fast" style={{ background: statutBadge.bg, color: statutBadge.color, padding: '6px 14px', borderRadius: 20, fontSize: 13, fontWeight: 600 }}>
             {statutBadge.label}
           </div>
         </div>
       </div>
 
       {/* Banner */}
-      <div style={{ background: bannerConfig.bg, border: `1px solid ${bannerConfig.border}`, borderRadius: 12, padding: '14px 18px', marginBottom: 20, display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+      <div className="v45-banner v45-fade-in" style={{ background: bannerConfig.bg, border: `1px solid ${bannerConfig.border}`, borderRadius: 12, padding: '14px 18px', marginBottom: 20, display: 'flex', alignItems: 'flex-start', gap: 12 }}>
         <span style={{ fontSize: 20, color: bannerConfig.color }}>{bannerConfig.icon}</span>
         <div>
           <div style={{ fontSize: 14, fontWeight: 600, color: bannerConfig.color, marginBottom: 2 }}>{bannerConfig.title}</div>
@@ -361,6 +363,7 @@ export default function FicheProduit() {
         <div style={{ display: 'flex', gap: 10 }}>
           {!isCreation && (
             <button onClick={handleDelete} disabled={saving}
+              className="v45-trans-fast v45-focus v45-btn-danger"
               style={{ padding: '10px 20px', background: 'transparent', border: '1.5px solid #FCA5A5', color: '#DC2626', borderRadius: 10, fontSize: 14, fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.5 : 1 }}>
               Supprimer
             </button>
@@ -369,6 +372,7 @@ export default function FicheProduit() {
             <button
               onClick={() => setModalDupliquerOpen(true)}
               disabled={!product?.reference}
+              className="v45-trans-fast v45-focus-or v45-btn-warning"
               style={{
                 padding: '8px 16px',
                 background: '#F59E0B',
@@ -386,8 +390,16 @@ export default function FicheProduit() {
             </button>
           )}
           {/* V44-BIS FEAT 7 : bouton uniformisé. Couleur orange si essentiels incomplets,
-              vert si OK. Plus de '(incomplet)' dans le label. */}
+              vert si OK. Plus de '(incomplet)' dans le label.
+              V45 polish : transitions/hover/focus via classes. Logique inchangée. */}
           <button onClick={handleSave} disabled={saving}
+            className={`v45-trans-fast v45-focus ${
+              saving
+                ? ''
+                : completude.essentiel < CHAMPS_ESSENTIEL.length
+                  ? 'v45-btn-warning'
+                  : 'v45-btn-success'
+            }`}
             style={{
               padding: '10px 24px',
               background: saving
@@ -400,6 +412,7 @@ export default function FicheProduit() {
               cursor: saving ? 'not-allowed' : 'pointer',
               fontFamily: 'inherit',
             }}>
+            {saving && <span className="v45-spinner" aria-hidden />}
             {saving ? 'Enregistrement...' : isCreation ? '💾 Créer le produit' : '💾 Enregistrer le produit'}
           </button>
         </div>

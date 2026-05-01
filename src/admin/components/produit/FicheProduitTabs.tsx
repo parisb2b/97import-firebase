@@ -30,6 +30,7 @@ function TabButton({ children, active, onClick, required, count, total, locked, 
 
   return (
     <button onClick={onClick} disabled={locked}
+      className="v45-tab v45-trans-fast v45-focus-or"
       style={{
         background: 'transparent', border: 'none', padding: '12px 24px',
         fontSize: 14, cursor: locked ? 'not-allowed' : 'pointer',
@@ -40,15 +41,15 @@ function TabButton({ children, active, onClick, required, count, total, locked, 
         fontFamily: 'inherit', borderRadius: 0,
       }}>
       {required && (
-        <span style={{ background: '#FEE2E2', color: '#991B1B', fontSize: 10, padding: '2px 7px', borderRadius: 4, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.3 }}>Obligatoire</span>
+        <span className="v45-pill" style={{ background: '#FEE2E2', color: '#991B1B', fontSize: 10, padding: '2px 7px', borderRadius: 4, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.3 }}>Obligatoire</span>
       )}
       {children}
       {!noCount && (
-        <span style={{ background: countBg, color: countColor, fontSize: 11, padding: '2px 8px', borderRadius: 10, fontWeight: 600 }}>
+        <span className="v45-pill" style={{ background: countBg, color: countColor, fontSize: 11, padding: '2px 8px', borderRadius: 10, fontWeight: 600 }}>
           {locked ? '🔒 Après save' : `${count} / ${total}`}
         </span>
       )}
-      {active && <div style={{ position: 'absolute', bottom: -2, left: 0, right: 0, height: 2, background: '#EA580C' }} />}
+      {active && <div className="v45-tab-underline" style={{ position: 'absolute', bottom: -2, left: 0, right: 0, height: 2, background: '#EA580C' }} />}
     </button>
   );
 }

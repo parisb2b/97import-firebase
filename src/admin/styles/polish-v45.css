@@ -1,0 +1,167 @@
+/* V45 Phase 2 — Polish layer (inline-style ergonomics).
+ * Utility classes ajoutees sur les composants admin pour offrir
+ * focus-visible / hover / transitions / shadows qui sont impossibles
+ * a faire en pur inline-style. AUCUNE migration des composants vers
+ * admin.css (= V46 future). Ces classes coexistent avec les
+ * inline-styles existants et ne touchent jamais au layout/structure.
+ */
+
+/* ===== Transitions partagees ===== */
+.v45-trans-fast {
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease, box-shadow 0.18s ease, transform 0.15s ease, opacity 0.15s ease;
+}
+.v45-trans-slow {
+  transition: background-color 0.22s ease, color 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease, transform 0.22s ease;
+}
+
+/* ===== Focus-visible (claviers) ===== */
+.v45-focus:focus-visible {
+  outline: 2px solid #1565C0;
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+.v45-focus-or:focus-visible {
+  outline: 2px solid #EA580C;
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+/* ===== Buttons hover ===== */
+.v45-btn-primary:hover:not(:disabled) {
+  filter: brightness(1.08);
+  box-shadow: 0 4px 14px rgba(21, 101, 192, 0.18);
+  transform: translateY(-1px);
+}
+.v45-btn-success:hover:not(:disabled) {
+  filter: brightness(1.06);
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.22);
+  transform: translateY(-1px);
+}
+.v45-btn-warning:hover:not(:disabled) {
+  filter: brightness(1.05);
+  box-shadow: 0 4px 14px rgba(234, 88, 12, 0.20);
+  transform: translateY(-1px);
+}
+.v45-btn-danger:hover:not(:disabled) {
+  background: #FEE2E2;
+}
+.v45-btn-ghost:hover:not(:disabled) {
+  background: #F1F5F9;
+  border-color: #CBD5E1;
+}
+.v45-btn-primary:active:not(:disabled),
+.v45-btn-success:active:not(:disabled),
+.v45-btn-warning:active:not(:disabled) {
+  transform: translateY(0);
+  filter: brightness(0.96);
+}
+
+/* ===== Tabs ===== */
+.v45-tab:hover:not(:disabled) {
+  background: rgba(21, 101, 192, 0.04);
+}
+.v45-tab-underline {
+  transition: transform 0.22s ease, opacity 0.22s ease;
+  transform-origin: center;
+}
+
+/* ===== Cards ===== */
+.v45-card {
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 2px 8px rgba(21, 101, 192, 0.06);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+.v45-card-hover:hover {
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06), 0 6px 24px rgba(21, 101, 192, 0.10);
+}
+
+/* ===== Banner / Alert (subtil) ===== */
+.v45-banner {
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+}
+
+/* ===== Inputs focus ===== */
+.v45-input {
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+.v45-input:focus-visible {
+  outline: none;
+  border-color: #1565C0 !important;
+  box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.12);
+}
+.v45-input-or:focus-visible {
+  outline: none;
+  border-color: #EA580C !important;
+  box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.14);
+}
+
+/* ===== Table rows hover ===== */
+.v45-row {
+  transition: background-color 0.15s ease;
+}
+
+/* ===== Pills / Badges ===== */
+.v45-pill {
+  transition: background-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
+}
+.v45-pill-clickable:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.04);
+}
+
+/* ===== Toast slide-in ===== */
+/* keyframes slideInToast deja dans index.css */
+.v45-toast-anim {
+  animation: slideInToast 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* ===== Spinner pour boutons en chargement ===== */
+@keyframes v45-spin { to { transform: rotate(360deg); } }
+.v45-spinner {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: v45-spin 0.7s linear infinite;
+  vertical-align: -2px;
+  margin-right: 6px;
+}
+
+/* ===== Banner alert chips fade-in ===== */
+.v45-fade-in {
+  animation: v45FadeIn 0.22s ease-out both;
+}
+@keyframes v45FadeIn {
+  from { opacity: 0; transform: translateY(-2px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== Datalist visuel polish (Chromium) ===== */
+.v45-input-list::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.5;
+  transition: opacity 0.15s ease;
+}
+.v45-input-list::-webkit-calendar-picker-indicator:hover { opacity: 1; }
+
+/* Reduced motion respect ===== */
+@media (prefers-reduced-motion: reduce) {
+  .v45-trans-fast,
+  .v45-trans-slow,
+  .v45-card,
+  .v45-tab-underline,
+  .v45-input,
+  .v45-row,
+  .v45-pill,
+  .v45-toast-anim,
+  .v45-fade-in {
+    transition: none !important;
+    animation: none !important;
+  }
+  .v45-btn-primary:hover:not(:disabled),
+  .v45-btn-success:hover:not(:disabled),
+  .v45-btn-warning:hover:not(:disabled) {
+    transform: none;
+  }
+}
