@@ -145,7 +145,7 @@ interface PillProps {
 }
 
 export const Pill = ({ children, variant = 'gy', small }: PillProps) => (
-  <span className={`pl p-${variant}`} style={small ? { fontSize: 9 } : undefined}>
+  <span className={`pl p-${variant} v45-pill`} style={small ? { fontSize: 9 } : undefined}>
     {children}
   </span>
 );
@@ -167,7 +167,7 @@ export const Button = ({
   style,
 }: ButtonProps) => (
   <button
-    className={`btn ${variant}`}
+    className={`btn ${variant} v45-trans-fast v45-focus`}
     onClick={onClick}
     disabled={disabled}
     style={style}
@@ -185,7 +185,7 @@ interface KpiProps {
 }
 
 export const Kpi = ({ label, value, color, sub }: KpiProps) => (
-  <div className="kpi">
+  <div className="kpi v45-card v45-card-hover">
     <div className="kpi-l">{label}</div>
     <div className={`kpi-v${color ? ` ${color}` : ''}`}>{value}</div>
     {sub && <div className="kpi-s">{sub}</div>}
@@ -201,7 +201,7 @@ interface CardProps {
 }
 
 export const Card = ({ title, children, actions, subtitle }: CardProps) => (
-  <div className="card">
+  <div className="card v45-card">
     <div className="ch">
       <div className="ct">{title}</div>
       {subtitle && (

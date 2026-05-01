@@ -247,6 +247,7 @@ export default function TauxRMB() {
               <button
                 onClick={() => setShowConfirmPopup(false)}
                 disabled={savingRates}
+                className="v45-trans-fast v45-focus v45-btn-ghost"
                 style={{
                   padding: '10px 18px', background: 'transparent', color: '#6B7280',
                   border: '1.5px solid #CBD5E1', borderRadius: 10, fontSize: 14, cursor: 'pointer',
@@ -256,12 +257,16 @@ export default function TauxRMB() {
               <button
                 onClick={handleConfirmSave}
                 disabled={savingRates}
+                className="v45-trans-fast v45-focus v45-btn-primary"
                 style={{
                   padding: '10px 18px', background: '#1565C0', color: '#fff',
                   border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700,
                   cursor: savingRates ? 'wait' : 'pointer', fontFamily: 'inherit',
                 }}
-              >{savingRates ? 'Sauvegarde…' : 'Confirmer'}</button>
+              >
+                {savingRates && <span className="v45-spinner" aria-hidden />}
+                {savingRates ? 'Sauvegarde…' : 'Confirmer'}
+              </button>
             </div>
           </div>
         </div>
@@ -308,11 +313,15 @@ export default function TauxRMB() {
             onClick={handleRefreshApi}
             disabled={refreshingApi}
             title="Refresh manuel API"
+            className="v45-trans-fast v45-focus v45-btn-ghost"
             style={{
               background: 'transparent', border: '1px solid #E5E7EB', color: '#6B7280',
               padding: '6px 12px', borderRadius: 6, fontSize: 12, cursor: 'pointer', fontFamily: 'inherit',
             }}
-          >{refreshingApi ? 'Refresh…' : '🔄 Refresh manuel'}</button>
+          >
+            {refreshingApi && <span className="v45-spinner" aria-hidden />}
+            {refreshingApi ? 'Refresh…' : '🔄 Refresh manuel'}
+          </button>
           {apiRates && (
             <Button variant="s" onClick={handleApplyApiRates} disabled={savingRates}>
               {savingRates ? 'Application…' : '✅ Appliquer comme taux 97IMPORT'}
@@ -354,7 +363,7 @@ export default function TauxRMB() {
       <Card title="7 — Les 6 conversions en direct" subtitle="Calculées depuis Rubrique 3 (taux 97IMPORT)">
         <div style={{ padding: 16, display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
           {conversions6.map((c, i) => (
-            <div key={i} style={{ padding: 10, background: '#F9FAFB', border: '1px solid #E5E7EB', borderRadius: 8, textAlign: 'center' }}>
+            <div key={i} className="v45-card" style={{ padding: 10, background: '#F9FAFB', border: '1px solid #E5E7EB', borderRadius: 8, textAlign: 'center' }}>
               <div style={{ fontSize: 12, color: '#6B7280' }}>{c.from}</div>
               <div style={{ fontSize: 16, fontWeight: 700, color: '#1E3A5F', marginTop: 2 }}>{c.to}</div>
             </div>
@@ -371,7 +380,7 @@ export default function TauxRMB() {
 
 function ConvCell({ label, value, active }: { label: string; value: string; active: boolean }) {
   return (
-    <div style={{
+    <div className="v45-card v45-trans-fast" style={{
       padding: 12,
       background: active ? '#FEF3C7' : '#F9FAFB',
       border: `1px solid ${active ? '#FCD34D' : '#E5E7EB'}`,
