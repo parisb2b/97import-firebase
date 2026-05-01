@@ -266,16 +266,18 @@ export default function OngletGestionPrix({ productId, product }: Props) {
       {/* ═══════════ RUBRIQUE 1 — Prix d'achat fournisseur ═══════════ */}
       <Card title="1 — Prix d'achat fournisseur" subtitle={subtitleValidation}>
         <div style={{ display: 'flex', gap: 8, marginBottom: 14, flexWrap: 'wrap' }}>
-          <button onClick={handleToggleEdit} style={editMode ? styles.btnSecondary : styles.btnPrimary}>
+          <button onClick={handleToggleEdit} className={editMode ? 'v45-trans-fast v45-focus' : 'v45-trans-fast v45-focus v45-btn-primary'} style={editMode ? styles.btnSecondary : styles.btnPrimary}>
             {editMode ? '👁️ MODE LECTURE' : '✏️ MODE ÉDITION'}
           </button>
           {editMode && (
-            <button onClick={handleValidatePrices} disabled={validating} style={styles.btnSuccess}>
+            <button onClick={handleValidatePrices} disabled={validating} className="v45-trans-fast v45-focus v45-btn-success" style={styles.btnSuccess}>
+              {validating && <span className="v45-spinner" aria-hidden />}
               {validating ? 'Validation…' : '✅ VALIDER PRIX'}
             </button>
           )}
           <button
             onClick={() => { setDraftCny(product.prix_achat_cny ?? 0); }}
+            className="v45-trans-fast v45-focus v45-btn-ghost"
             style={styles.btnGhost}
             title="Recalcule USD/EUR depuis CNY actuel et taux Rubrique 3"
           >
@@ -381,7 +383,8 @@ export default function OngletGestionPrix({ productId, product }: Props) {
             )}
           </div>
         </div>
-        <button onClick={handleSaveOverrides} disabled={savingOverrides} style={{ ...styles.btnPrimary, marginTop: 14 }}>
+        <button onClick={handleSaveOverrides} disabled={savingOverrides} className="v45-trans-fast v45-focus v45-btn-primary" style={{ ...styles.btnPrimary, marginTop: 14 }}>
+          {savingOverrides && <span className="v45-spinner" aria-hidden />}
           {savingOverrides ? 'Sauvegarde…' : '💾 Enregistrer les overrides'}
         </button>
       </Card>
@@ -393,7 +396,8 @@ export default function OngletGestionPrix({ productId, product }: Props) {
           <RateInput label="1 EUR = X CNY" value={draftRates.eur_cny} onChange={(v) => setDraftRates({ ...draftRates, eur_cny: v })} />
           <RateInput label="1 USD = X CNY (auto)" value={Number((draftRates.eur_cny / draftRates.eur_usd).toFixed(4))} onChange={() => {}} disabled />
         </div>
-        <button onClick={handleSaveRates} disabled={savingRates} style={styles.btnPrimary}>
+        <button onClick={handleSaveRates} disabled={savingRates} className="v45-trans-fast v45-focus v45-btn-primary" style={styles.btnPrimary}>
+          {savingRates && <span className="v45-spinner" aria-hidden />}
           {savingRates ? 'Sauvegarde…' : '💾 Sauvegarder taux 97IMPORT'}
         </button>
       </Card>
@@ -429,11 +433,13 @@ export default function OngletGestionPrix({ productId, product }: Props) {
           <RateInput label="USD/CNY" value={apiRates?.usd_cny ?? 0} disabled />
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
-          <button onClick={handleRefreshApi} disabled={refreshingApi} style={styles.btnPrimary}>
+          <button onClick={handleRefreshApi} disabled={refreshingApi} className="v45-trans-fast v45-focus v45-btn-primary" style={styles.btnPrimary}>
+            {refreshingApi && <span className="v45-spinner" aria-hidden />}
             {refreshingApi ? 'Actualisation…' : '🔄 Actualiser les 3 taux API'}
           </button>
           {apiRates && (
-            <button onClick={handleApplyApiRates} disabled={savingRates} style={styles.btnSuccess}>
+            <button onClick={handleApplyApiRates} disabled={savingRates} className="v45-trans-fast v45-focus v45-btn-success" style={styles.btnSuccess}>
+              {savingRates && <span className="v45-spinner" aria-hidden />}
               {savingRates ? 'Application…' : '✅ Appliquer comme taux 97IMPORT'}
             </button>
           )}
@@ -448,7 +454,8 @@ export default function OngletGestionPrix({ productId, product }: Props) {
             value={draftMultipliers.partner}
             onChange={(v) => setDraftMultipliers({ ...draftMultipliers, partner: v })}
           />
-          <button onClick={handleSaveMultipliers} disabled={savingMultipliers} style={{ ...styles.btnPrimary, marginTop: 10 }}>
+          <button onClick={handleSaveMultipliers} disabled={savingMultipliers} className="v45-trans-fast v45-focus v45-btn-primary" style={{ ...styles.btnPrimary, marginTop: 10 }}>
+            {savingMultipliers && <span className="v45-spinner" aria-hidden />}
             {savingMultipliers ? 'Sauvegarde…' : '💾 Sauvegarder'}
           </button>
         </Card>
@@ -459,7 +466,8 @@ export default function OngletGestionPrix({ productId, product }: Props) {
             value={draftMultipliers.client}
             onChange={(v) => setDraftMultipliers({ ...draftMultipliers, client: v })}
           />
-          <button onClick={handleSaveMultipliers} disabled={savingMultipliers} style={{ ...styles.btnPrimary, marginTop: 10 }}>
+          <button onClick={handleSaveMultipliers} disabled={savingMultipliers} className="v45-trans-fast v45-focus v45-btn-primary" style={{ ...styles.btnPrimary, marginTop: 10 }}>
+            {savingMultipliers && <span className="v45-spinner" aria-hidden />}
             {savingMultipliers ? 'Sauvegarde…' : '💾 Sauvegarder'}
           </button>
         </Card>
@@ -484,7 +492,7 @@ export default function OngletGestionPrix({ productId, product }: Props) {
 
 function Card({ title, subtitle, children }: { title: string; subtitle?: string; children: React.ReactNode }) {
   return (
-    <div style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 12, padding: 18 }}>
+    <div className="v45-card v45-card-hover" style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 12, padding: 18 }}>
       <h3 style={{ margin: '0 0 4px', fontSize: 15, fontWeight: 700, color: '#1E3A5F' }}>{title}</h3>
       {subtitle && <p style={{ fontSize: 12, color: '#6B7280', margin: '0 0 14px' }}>{subtitle}</p>}
       {children}
@@ -514,6 +522,7 @@ function PriceInput({ label, value, editable, draft, onChange, accent, highlight
         value={display || ''}
         onChange={(e) => onChange && onChange(parseFloat(e.target.value) || 0)}
         disabled={!editable}
+        className="v45-input v45-input-or"
         style={{
           width: '100%',
           padding: '10px 12px',
@@ -555,6 +564,7 @@ function RateInput({ label, value, onChange, disabled }: { label: string; value:
         value={value || ''}
         onChange={(e) => onChange && onChange(parseFloat(e.target.value) || 0)}
         disabled={disabled}
+        className="v45-input"
         style={{
           ...styles.input,
           background: disabled ? '#F3F4F6' : '#fff',
@@ -607,6 +617,7 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 600,
     cursor: 'pointer',
     fontFamily: 'inherit',
+    transition: 'background-color 0.15s ease, box-shadow 0.18s ease, transform 0.15s ease',
   },
   btnSuccess: {
     padding: '8px 14px',
@@ -618,6 +629,7 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 600,
     cursor: 'pointer',
     fontFamily: 'inherit',
+    transition: 'background-color 0.15s ease, box-shadow 0.18s ease, transform 0.15s ease',
   },
   btnSecondary: {
     padding: '8px 14px',
@@ -629,6 +641,7 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 600,
     cursor: 'pointer',
     fontFamily: 'inherit',
+    transition: 'background-color 0.15s ease, box-shadow 0.18s ease, transform 0.15s ease',
   },
   btnGhost: {
     padding: '8px 14px',
@@ -640,5 +653,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 600,
     cursor: 'pointer',
     fontFamily: 'inherit',
+    transition: 'background-color 0.15s ease, box-shadow 0.18s ease, transform 0.15s ease',
   },
 };
