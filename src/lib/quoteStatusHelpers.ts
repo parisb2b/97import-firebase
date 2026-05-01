@@ -72,17 +72,31 @@ export function getNbAcomptesEncaisses(acomptes: Acompte[] = []): number {
 }
 
 /**
- * Peut-on encore ajouter un acompte partiel ? (max 3)
+ * V46 Checkpoint D — Nombre total d'acomptes DÉCLARÉS (encaissés + en attente)
+ * hors solde forcé. Utilisé pour la limite "max 3 acomptes" en amont
+ * du chemin d'encaissement (sinon contournable en empilant des déclarations).
+ */
+export function getNbAcomptesDeclares(acomptes: Acompte[] = []): number {
+  return acomptes.filter(a => !a.is_solde).length;
+}
+
+/**
+ * Peut-on encore ajouter un acompte partiel ? (max 3 sur les déclarations,
+ * encaissées OU en attente — V46 Checkpoint D, anciennement comptait
+ * uniquement les encaissées ce qui permettait d'empiler des déclarations).
  */
 export function peutAjouterAcompte(acomptes: Acompte[] = [], soldeRestant: number): boolean {
-  return getNbAcomptesEncaisses(acomptes) < 3 && soldeRestant > 0.01;
+  return getNbAcomptesDeclares(acomptes) < 3 && soldeRestant > 0.01;
 }
 
 /**
  * Le prochain paiement doit-il être le solde forcé ?
+ * V46 Checkpoint D : compte les déclarations totales (encaissées + en attente),
+ * pas seulement les encaissées — la règle "4ème = solde forcé" doit s'appliquer
+ * dès qu'on a 3 déclarations même si admin n'a pas encore encaissé.
  */
 export function prochainPaiementEstSolde(acomptes: Acompte[] = []): boolean {
-  return getNbAcomptesEncaisses(acomptes) >= 3;
+  return getNbAcomptesDeclares(acomptes) >= 3;
 }
 
 /**
@@ -93,7 +107,19 @@ export function estEntierementPaye(total_ht: number, acomptes: Acompte[] = []): 
 }
 
 /**
- * Valide un nouveau paiement avant enregistrement
+ * Valide un nouveau paiement avant enregistrement.
+ *
+ * V46 Checkpoint D — calcul du restant basé sur la SOMME DE TOUS LES ACOMPTES
+ * non-soldés passés en paramètre (encaissés ET en attente d'encaissement).
+ * Le caller contrôle ce qu'il passe :
+ *   - chemin DÉCLARATION : passe `acomptes` complet → restant strict
+ *   - chemin ENCAISSEMENT : passe `acomptes.filter(a.encaisse===true)` →
+ *     restant = total_ht - encaissés (sémantique inchangée, l'acompte cible
+ *     n'est pas dans la liste donc son ajout est bien validé).
+ *
+ * Avant V46 : utilisait `getSoldeRestant` qui filtrait `encaisse === true` en
+ * interne → chemin déclaration retournait un restant trop généreux ignorant les
+ * déclarations en attente. Bug observé Michel V46 (acomptes overflow).
  */
 export function validerNouveauPaiement(
   total_ht: number,
@@ -103,9 +129,17 @@ export function validerNouveauPaiement(
   if (montant < 50) {
     return { ok: false, erreur: 'Montant minimum : 50€ par paiement' };
   }
-  const restant = getSoldeRestant(total_ht, acomptes);
+  // Somme de tous les acomptes passés (hors solde forcé) — peu importe encaisse.
+  const totalDejaAcompte = acomptes
+    .filter(a => !a.is_solde)
+    .reduce((sum, a) => sum + (a.montant || 0), 0);
+  const restant = Math.max(0, total_ht - totalDejaAcompte);
+
   if (montant > restant + 0.01) {
-    return { ok: false, erreur: `Montant supérieur au solde restant (${restant.toFixed(2)}€)` };
+    return {
+      ok: false,
+      erreur: `Acompte impossible : reste à payer = ${restant.toFixed(2)} €, vous saisissez ${montant.toFixed(2)} €`,
+    };
   }
   if (prochainPaiementEstSolde(acomptes) && Math.abs(montant - restant) > 0.01) {
     return { ok: false, erreur: `4e paiement = solde forcé (${restant.toFixed(2)}€ obligatoire)` };
