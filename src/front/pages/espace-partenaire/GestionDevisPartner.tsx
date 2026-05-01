@@ -90,6 +90,7 @@ export default function GestionDevisPartner({ partnerCode }: { partnerCode: stri
       const ligne = d.lignes[i];
       const prixNegocie = prices[i] !== undefined ? prices[i] : (ligne.prix_negocie ?? ligne.prix_unitaire ?? 0);
       const prixAchat = ligne.prix_achat ?? 0;
+      const prixPublic = ligne.prix_unitaire ?? 0;
 
       if (prixAchat > 0) {
         const prixMin = prixAchat * coefs.coefficient_vip_min;
@@ -103,6 +104,13 @@ export default function GestionDevisPartner({ partnerCode }: { partnerCode: stri
           errors.push(`${ligne.nom_fr || ligne.ref} : prix ${prixNegocie}€ > max ${prixMax.toFixed(2)}€`);
           hasError = true;
         }
+      }
+
+      // V49 Checkpoint E — Bug N1 : un client VIP ne peut JAMAIS payer plus
+      // qu'un client standard. Cap au prix public quel que soit le coefficient.
+      if (prixPublic > 0 && prixNegocie > prixPublic + 0.01) {
+        errors.push(`${ligne.nom_fr || ligne.ref} : prix VIP ${prixNegocie.toFixed(2)}€ > prix public ${prixPublic.toFixed(2)}€ — un client VIP ne peut pas payer plus cher qu'un client standard.`);
+        hasError = true;
       }
     }
 
@@ -243,8 +251,12 @@ export default function GestionDevisPartner({ partnerCode }: { partnerCode: stri
                     {/* Products with editable VIP prices */}
                     {d.lignes?.map((l, i) => {
                       const prixAchat = l.prix_achat ?? 0;
+                      const prixPublic = l.prix_unitaire ?? 0;
                       const prixMin = prixAchat > 0 ? parseFloat((prixAchat * coefs.coefficient_vip_min).toFixed(2)) : 0;
-                      const prixMax = prixAchat > 0 ? parseFloat((prixAchat * coefs.coefficient_vip_max).toFixed(2)) : (l.prix_unitaire ?? 0);
+                      // V49 Checkpoint E — Bug N1 : prixMax cappé au prix public
+                      // (jamais au-dessus). VIP ne paie pas plus qu'un standard.
+                      const prixMaxCoef = prixAchat > 0 ? parseFloat((prixAchat * coefs.coefficient_vip_max).toFixed(2)) : prixPublic;
+                      const prixMax = prixPublic > 0 ? Math.min(prixMaxCoef, prixPublic) : prixMaxCoef;
                       const prixActuel = prices[i] !== undefined ? prices[i] : (l.prix_negocie ?? l.prix_unitaire ?? 0);
                       const estValide = prixActuel >= prixMin && prixActuel <= prixMax;
 
