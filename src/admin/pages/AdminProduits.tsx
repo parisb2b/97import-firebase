@@ -203,19 +203,20 @@ export default function AdminProduits() {
       <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 16 }}>
         <input type="text" value={searchTerm} onChange={e => setSearchTerm(e.target.value)}
           placeholder="Rechercher par référence, nom, fournisseur..."
+          className="v45-input"
           style={{ flex: 1, minWidth: 250, padding: '10px 14px', border: '1px solid #E5E7EB', borderRadius: 10, fontSize: 14 }} />
-        <select value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)} style={selectStyle}>
+        <select value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)} className="v45-input" style={selectStyle}>
           <option value="TOUS">Toutes catégories</option>
           {CATEGORIES.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
         </select>
-        <select value={statutFilter} onChange={e => setStatutFilter(e.target.value)} style={selectStyle}>
+        <select value={statutFilter} onChange={e => setStatutFilter(e.target.value)} className="v45-input" style={selectStyle}>
           <option value="TOUS">Toutes complétudes</option>
           <option value="complet">● Complets</option>
           <option value="pret_site">● Prêts site</option>
           <option value="a_enrichir">● À enrichir</option>
           <option value="bloquant">● Bloquants</option>
         </select>
-        <select value={actifFilter} onChange={e => setActifFilter(e.target.value)} style={selectStyle}>
+        <select value={actifFilter} onChange={e => setActifFilter(e.target.value)} className="v45-input" style={selectStyle}>
           <option value="TOUS">Tous statuts</option>
           <option value="ACTIF">Actifs sur le site</option>
           <option value="MASQUE">Masqués</option>
@@ -231,6 +232,7 @@ export default function AdminProduits() {
               setActifFilter('TOUS');
               resetFilters();
             }}
+            className="v45-trans-fast v45-focus v45-btn-ghost"
             style={{
               padding: '6px 12px',
               background: '#E5E7EB',
@@ -252,7 +254,7 @@ export default function AdminProduits() {
 
       {/* V44-BIS FIX 3 — Banner d'alerte si filtres masquent des produits */}
       {!loading && sorted.length < stats.total && hasActiveFilters({ recherche: searchTerm, categorie: categoryFilter, statut: statutFilter, actif: actifFilter }) && (
-        <div style={{
+        <div className="v45-banner v45-fade-in" style={{
           padding: '10px 14px',
           background: '#FEF3C7',
           border: '1px solid #FCD34D',
@@ -273,6 +275,7 @@ export default function AdminProduits() {
               setActifFilter('TOUS');
               resetFilters();
             }}
+            className="v45-trans-fast v45-focus v45-btn-warning"
             style={{
               padding: '6px 12px',
               background: '#92400E',
@@ -321,8 +324,9 @@ export default function AdminProduits() {
                 return (
                   <tr key={p.id}
                     onClick={() => setLocation(`/admin/produits/${encodeURIComponent(p.reference)}`)}
+                    className="v45-row"
                     style={{ borderBottom: '1px solid #F3F4F6', cursor: 'pointer' }}
-                    onMouseEnter={e => (e.currentTarget.style.background = '#FAFBFC')}
+                    onMouseEnter={e => (e.currentTarget.style.background = '#F0F9FF')}
                     onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
                     <td style={tdStyle}><code style={refCodeStyle}>{p.reference}</code></td>
                     <td style={tdStyle}>
@@ -467,6 +471,7 @@ function BusinessChip({ label, active, onClick, color }: { label: string; active
   return (
     <button
       onClick={onClick}
+      className="v45-trans-fast v45-focus v45-pill-clickable"
       style={{
         padding: '8px 14px',
         background: active ? color : '#fff',
@@ -487,7 +492,7 @@ function BusinessChip({ label, active, onClick, color }: { label: string; active
 
 function StatCard({ label, value, bg, color, border }: any) {
   return (
-    <div style={{ padding: '14px 16px', borderRadius: 12, background: bg, border: `1px solid ${border}` }}>
+    <div className="v45-card" style={{ padding: '14px 16px', borderRadius: 12, background: bg, border: `1px solid ${border}` }}>
       <div style={{ fontSize: 11, color, textTransform: 'uppercase', letterSpacing: 0.4, fontWeight: 600, opacity: 0.8 }}>{label}</div>
       <div style={{ fontSize: 24, fontWeight: 700, color, marginTop: 4 }}>{value}</div>
     </div>
