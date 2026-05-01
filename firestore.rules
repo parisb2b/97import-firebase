@@ -1,34 +1,160 @@
 rules_version = '2';
 
-// V49 Checkpoint A — Patch d'urgence Firestore Rules versionné dans le repo.
+// V49 Checkpoint B — Firestore Rules avec RBAC granulaire.
 //
-// Reproduit à l'identique le patch déployé manuellement en console Firebase
-// le 2026-05-01 19:54 (avant l'audit V48-BIS qui a constaté l'absence de
-// firestore.rules dans le repo).
+// Évolution depuis le patch V49 Checkpoint A (versionnement de l'urgence
+// déployée en console). Introduit :
+//   • Rôles via custom claims Firebase Auth (request.auth.token.role)
+//   • Helper isOwner() pour propriété par UID
+//   • partnerCodeMatches() pour partenaires identifiés par code (string,
+//     pas UID — schéma BD existant utilise `partenaire_code`).
 //
-// Ce fichier est la BASELINE. Le Checkpoint B V49 enrichira avec RBAC
-// (rôles client / partner / admin via custom claims) — ce fichier sera
-// alors étendu avec helpers et matchers granulaires.
+// Schéma BD observé (vérifié V49) :
+//   /quotes      : { client_id (UID), partenaire_code (string), ... }
+//   /clients     : doc id == UID Firebase Auth
+//   /partners    : doc avec champ `code` (le `partenaire_code` lookup)
+//   /factures, /acomptes : `client_id` propagé depuis /quotes
+//   /commissions, /notes_commission : `partenaire_code` propagé
 //
-// Référencé par firebase.json → "firestore": { "rules": "firestore.rules" }.
+// Custom claims attendus :
+//   admin   : { role: 'admin' }
+//   partner : { role: 'partner', partenaire_code: '<CODE>' }
+//   client  : { role: 'client' }  (ou null pour comptes existants sans migration)
+//
+// Set via : node scripts/set-admin-role.cjs <email> <role> [partenaire_code]
 // Déploiement : firebase deploy --only firestore:rules
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // 📦 Catalogue public (lecture libre) — produits + paramètres taux
-    match /products/{productId} {
-      allow read: if true;
-      allow write: if request.auth != null;
-    }
-    match /admin_params/{paramId} {
-      allow read: if true;
-      allow write: if request.auth != null;
+
+    // ══════════════════════════════════════════════════════════
+    // HELPERS
+    // ══════════════════════════════════════════════════════════
+    function isAuth()    { return request.auth != null; }
+    function isAdmin()   { return isAuth() && request.auth.token.role == 'admin'; }
+    function isPartner() { return isAuth() && request.auth.token.role == 'partner'; }
+    // isClient = role == 'client' OU role == null (comptes existants pré-migration)
+    function isClient()  { return isAuth() && (request.auth.token.role == 'client' || request.auth.token.role == null); }
+    function isOwner(id) { return isAuth() && request.auth.uid == id; }
+    function partnerCodeMatches(code) {
+      return isPartner() && request.auth.token.partenaire_code == code;
     }
 
-    // 🚫 Fallback : tout le reste exige authentification.
-    // V49 Checkpoint B remplacera par du RBAC granulaire.
+    // ══════════════════════════════════════════════════════════
+    // 📦 CATALOGUE PUBLIC + PARAMÈTRES TAUX
+    // ══════════════════════════════════════════════════════════
+    match /products/{productId} {
+      allow read:  if true;
+      allow write: if isAdmin();
+
+      // Sub-collection price_history (V44-TER)
+      match /price_history/{historyId} {
+        allow read:  if true;
+        allow write: if isAdmin();
+      }
+    }
+
+    match /admin_params/{paramId} {
+      allow read:  if true;
+      allow write: if isAdmin();
+    }
+
+    // ══════════════════════════════════════════════════════════
+    // 👤 USERS / CLIENTS / PARTNERS
+    // ══════════════════════════════════════════════════════════
+    match /users/{userId} {
+      allow read:   if isOwner(userId) || isAdmin();
+      allow create: if isAuth();
+      allow update: if isOwner(userId) || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // /clients/{uid} : doc id = Firebase UID
+    match /clients/{userId} {
+      allow read:   if isOwner(userId) || isAdmin()
+                  || (isPartner() && resource.data.partenaire_code == request.auth.token.partenaire_code);
+      allow create: if isAuth();
+      allow update: if isOwner(userId) || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // /partners/{docId} : lecture par tout user auth (lookup code), write admin only
+    match /partners/{partnerId} {
+      allow read:  if isAuth();
+      allow write: if isAdmin();
+    }
+
+    // ══════════════════════════════════════════════════════════
+    // 📋 DEVIS / FACTURES / ACOMPTES / COMMISSIONS
+    // ══════════════════════════════════════════════════════════
+    match /quotes/{quoteId} {
+      allow read:   if isAdmin()
+                  || (isAuth() && resource.data.client_id == request.auth.uid)
+                  || partnerCodeMatches(resource.data.partenaire_code);
+      allow create: if isAuth();
+      allow update: if isAdmin()
+                  || partnerCodeMatches(resource.data.partenaire_code);
+      allow delete: if isAdmin();
+    }
+
+    match /factures/{factureId} {
+      allow read:  if isAdmin()
+                 || (isAuth() && resource.data.client_id == request.auth.uid);
+      allow write: if isAdmin();
+    }
+
+    match /acomptes/{acompteId} {
+      allow read:  if isAdmin()
+                 || (isAuth() && resource.data.client_id == request.auth.uid);
+      allow write: if isAdmin();
+    }
+
+    match /commissions/{commissionId} {
+      allow read:  if isAdmin()
+                 || partnerCodeMatches(resource.data.partenaire_code);
+      allow write: if isAdmin();
+    }
+
+    match /notes_commission/{noteId} {
+      allow read:  if isAdmin()
+                 || partnerCodeMatches(resource.data.partenaire_code);
+      allow write: if isAdmin();
+    }
+
+    // ══════════════════════════════════════════════════════════
+    // 🛠 SAV / LISTES ACHAT / CONTENEURS / LOGS
+    // ══════════════════════════════════════════════════════════
+    match /sav/{savId} {
+      allow read:   if isAdmin()
+                  || (isAuth() && resource.data.client_id == request.auth.uid);
+      allow create: if isAuth();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    match /listes_achat/{listeId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /conteneurs/{conteneurId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /logs/{logId} {
+      allow read:  if isAdmin();
+      allow write: if isAuth();  // permettre logging applicatif depuis client
+    }
+
+    // Compteurs atomiques (DVS-AAMM-NNN, FA-AAMM-NNN, etc.)
+    match /counters/{counterId} {
+      allow read, write: if isAuth();
+    }
+
+    // ══════════════════════════════════════════════════════════
+    // 🚫 FALLBACK : tout le reste = admin only
+    // ══════════════════════════════════════════════════════════
     match /{document=**} {
-      allow read, write: if request.auth != null;
+      allow read, write: if isAdmin();
     }
   }
 }
