@@ -32,16 +32,21 @@ function TabButton({ children, active, onClick, required, count, total, locked, 
     <button onClick={onClick} disabled={locked}
       className="v45-tab v45-trans-fast v45-focus-or"
       style={{
-        background: 'transparent', border: 'none', padding: '12px 24px',
+        // V46 Checkpoint E — Onglet actif : background bleu clair pour
+        // différenciation visuelle nette de l'onglet inactif (transparent).
+        background: active ? 'rgba(21, 101, 192, 0.08)' : 'transparent',
+        border: 'none', padding: '12px 24px',
         fontSize: 14, cursor: locked ? 'not-allowed' : 'pointer',
         color: active ? '#1565C0' : locked ? '#9CA3AF' : '#6B7280',
-        fontWeight: active ? 600 : 500,
+        // V46 Checkpoint E — fontWeight 700 sur actif (bold) au lieu de 600.
+        fontWeight: active ? 700 : 500,
         display: 'flex', alignItems: 'center', gap: 8,
         position: 'relative', whiteSpace: 'nowrap', opacity: locked ? 0.5 : 1,
-        fontFamily: 'inherit', borderRadius: 0,
+        fontFamily: 'inherit',
+        borderRadius: '8px 8px 0 0',
       }}>
       {required && (
-        <span className="v45-pill" style={{ background: '#FEE2E2', color: '#991B1B', fontSize: 10, padding: '2px 7px', borderRadius: 4, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.3 }}>Obligatoire</span>
+        <span className="v45-pill" style={{ background: '#FEE2E2', color: '#DC2626', fontSize: 10, padding: '2px 7px', borderRadius: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.3 }}>Obligatoire</span>
       )}
       {children}
       {!noCount && (
@@ -49,7 +54,8 @@ function TabButton({ children, active, onClick, required, count, total, locked, 
           {locked ? '🔒 Après save' : `${count} / ${total}`}
         </span>
       )}
-      {active && <div className="v45-tab-underline" style={{ position: 'absolute', bottom: -2, left: 0, right: 0, height: 2, background: '#EA580C' }} />}
+      {/* V46 Checkpoint E — underline 3px navy (#1565C0) au lieu de 2px orange. */}
+      {active && <div className="v45-tab-underline" style={{ position: 'absolute', bottom: -2, left: 0, right: 0, height: 3, background: '#1565C0' }} />}
     </button>
   );
 }
