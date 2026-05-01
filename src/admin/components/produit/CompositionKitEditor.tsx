@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
+import SearchInput from '../atoms/SearchInput';
 
 interface Composant { ref: string; qte_par_kit: number; }
 interface Props {
@@ -93,9 +94,13 @@ export default function CompositionKitEditor({ composition, onChange }: Props) {
 
       {showSearch ? (
         <div style={{ marginTop: 12, padding: 14, background: '#F9FAFB', borderRadius: 10, border: '1px solid #E5E7EB' }}>
-          <input type="text" value={search} onChange={e => handleSearch(e.target.value)}
-            placeholder="Rechercher un produit par référence ou nom..." autoFocus
-            style={{ width: '100%', padding: '10px 12px', border: '1px solid #E5E7EB', borderRadius: 10, fontSize: 14, outline: 'none', boxSizing: 'border-box' }} />
+          {/* V46 Checkpoint F — SearchInput avec loupe */}
+          <SearchInput
+            value={search}
+            onChange={handleSearch}
+            placeholder="Rechercher un produit par référence ou nom..."
+            autoFocus
+          />
           {searchResults.length > 0 && (
             <div style={{ marginTop: 8, maxHeight: 200, overflowY: 'auto' }}>
               {searchResults.map(p => (

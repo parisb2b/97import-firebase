@@ -3,6 +3,7 @@ import { useLocation, useRoute, Link } from 'wouter';
 import { doc, getDoc, updateDoc, collection, getDocs, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { generateBcChine } from '../../lib/excel-generators/generateBcChine';
+import SearchInput from '../components/atoms/SearchInput';
 
 export default function DetailListeAchat() {
   const [, params] = useRoute('/admin/listes-achat/:id');
@@ -587,16 +588,12 @@ function ModalAjoutProduits({ existingRefs, onAdd, onClose }: ModalAjoutProduits
           Les kits sont automatiquement éclatés en leurs composants.
         </p>
 
-        <input
-          type="text"
-          placeholder="Rechercher par devis, client, produit..."
+        {/* V46 Checkpoint F — SearchInput avec loupe */}
+        <SearchInput
           value={searchTerm}
-          onChange={e => setSearchTerm(e.target.value)}
-          style={{
-            width: '100%', padding: '10px 14px', marginBottom: 16,
-            border: '1px solid #E5E7EB', borderRadius: 10, fontSize: 13,
-            boxSizing: 'border-box',
-          }}
+          onChange={setSearchTerm}
+          placeholder="Rechercher par devis, client, produit..."
+          style={{ marginBottom: 16 }}
         />
 
         <div style={{ flex: 1, overflowY: 'auto', marginBottom: 16 }}>

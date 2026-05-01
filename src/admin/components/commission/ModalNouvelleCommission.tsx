@@ -3,6 +3,7 @@ import {
   collection, query, where, getDocs, addDoc, serverTimestamp
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import SearchInput from '@/admin/components/atoms/SearchInput';
 import {
   calculateCommission,
   estEligibleCommission
@@ -249,17 +250,12 @@ export default function ModalNouvelleCommission({ onClose, onSuccess }: Props) {
           ) : step === 1 ? (
             // ═══ ÉTAPE 1 : CHOIX PARTENAIRE ═══
             <>
-              <input
-                type="text"
-                placeholder="Rechercher par nom, code ou email..."
+              {/* V46 Checkpoint F — SearchInput avec loupe */}
+              <SearchInput
                 value={search}
-                onChange={e => setSearch(e.target.value)}
-                style={{
-                  width: '100%', padding: '10px 14px',
-                  border: '1px solid #E5E7EB', borderRadius: 10,
-                  fontSize: 14, marginBottom: 16, boxSizing: 'border-box',
-                  fontFamily: 'inherit', outline: 'none',
-                }}
+                onChange={setSearch}
+                placeholder="Rechercher par nom, code ou email..."
+                style={{ marginBottom: 16 }}
               />
 
               {partnersFiltres.length === 0 ? (

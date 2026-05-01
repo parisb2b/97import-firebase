@@ -145,6 +145,48 @@
 }
 .v45-input-list::-webkit-calendar-picker-indicator:hover { opacity: 1; }
 
+/* ===== V46 SearchInput ===== */
+.v46-search-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.v46-search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  color: #94A3B8;
+  pointer-events: none;
+  flex-shrink: 0;
+}
+
+.v46-search-input {
+  width: 100%;
+  padding: 10px 14px 10px 40px;
+  border: 1px solid #E5E7EB;
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: inherit;
+  background: #fff;
+  color: #111827;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.v46-search-input::placeholder {
+  color: #9CA3AF;
+}
+
+.v46-search-input:focus-visible {
+  border-color: #1565C0;
+  box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.12);
+}
+
 /* Reduced motion respect ===== */
 @media (prefers-reduced-motion: reduce) {
   .v45-trans-fast,

@@ -6,6 +6,7 @@ import { calculerCompletude, CATEGORIES, StatutCompletude, manqueCodeHs, CHAMPS_
 import { loadFilters, saveFilters, resetFilters, hasActiveFilters } from '../../lib/filterPersistence';
 import ModalDupliquerProduit from '../components/produit/ModalDupliquerProduit';
 import { getCompletenessStatus, getBadgeConfig, countByStatus, type CompletenessStatus } from '../utils/productCompleteness';
+import SearchInput from '../components/atoms/SearchInput';
 
 interface Product {
   id: string;
@@ -201,10 +202,13 @@ export default function AdminProduits() {
 
       {/* Filtres */}
       <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 16 }}>
-        <input type="text" value={searchTerm} onChange={e => setSearchTerm(e.target.value)}
+        {/* V46 Checkpoint F — SearchInput avec loupe */}
+        <SearchInput
+          value={searchTerm}
+          onChange={setSearchTerm}
           placeholder="Rechercher par référence, nom, fournisseur..."
-          className="v45-input"
-          style={{ flex: 1, minWidth: 250, padding: '10px 14px', border: '1px solid #E5E7EB', borderRadius: 10, fontSize: 14 }} />
+          style={{ flex: 1, minWidth: 250 }}
+        />
         <select value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)} className="v45-input" style={selectStyle}>
           <option value="TOUS">Toutes catégories</option>
           {CATEGORIES.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}

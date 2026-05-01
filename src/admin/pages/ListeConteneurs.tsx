@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { Link, useLocation } from 'wouter';
 import { collection, getDocs, orderBy, query } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
+import SearchInput from '../components/atoms/SearchInput';
 
 type SortColumn = 'numero' | 'type' | 'destination' | 'date_depart_est' | 'statut';
 type SortDirection = 'asc' | 'desc';
@@ -155,20 +156,12 @@ export default function ListeConteneurs() {
         ))}
       </div>
 
-      {/* Recherche */}
-      <input
-        type="text"
-        placeholder="Rechercher par numéro, destination, type, N° physique..."
+      {/* V46 Checkpoint F — SearchInput avec loupe */}
+      <SearchInput
         value={searchTerm}
-        onChange={e => setSearchTerm(e.target.value)}
-        style={{
-          width: '100%',
-          padding: '12px 16px',
-          marginBottom: 16,
-          border: '1px solid #E5E7EB',
-          borderRadius: 12,
-          fontSize: 14,
-        }}
+        onChange={setSearchTerm}
+        placeholder="Rechercher par numéro, destination, type, N° physique..."
+        style={{ marginBottom: 16 }}
       />
 
       {loading ? (
