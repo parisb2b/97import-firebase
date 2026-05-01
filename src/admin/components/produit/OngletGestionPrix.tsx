@@ -93,6 +93,21 @@ export default function OngletGestionPrix({ productId, product }: Props) {
     }
   }, [product.prix_achat_cny, editMode]);
 
+  // V44-TER Bug 3 — optimistic update de la date de derniere validation.
+  // Affichee tant que la prop product n'a pas recu la vraie Timestamp Firestore.
+  const [localValidationDate, setLocalValidationDate] = useState<Date | null>(null);
+  useEffect(() => {
+    if (product.date_derniere_validation) {
+      setLocalValidationDate(null);
+    }
+  }, [product.date_derniere_validation]);
+  const subtitleValidation = useMemo(() => {
+    const source = localValidationDate ?? product.date_derniere_validation;
+    return source
+      ? `Dernière validation : ${formatDateHeure(source)}`
+      : 'Jamais validé';
+  }, [localValidationDate, product.date_derniere_validation]);
+
   // ─── Calculs (Rubrique 1+2 + Dogme 5 overrides) ─────────────────────────
   const overridesForEngine: Overrides = useMemo(
     () => ({
@@ -158,6 +173,8 @@ export default function OngletGestionPrix({ productId, product }: Props) {
     setValidating(true);
     try {
       await validateProductPrices(productId, live, 'admin-onglet-gestion-prix');
+      // V44-TER Bug 3 — optimistic update local de la date de validation
+      setLocalValidationDate(new Date());
       showToast(`Prix validés : ${live.prix_cny.toLocaleString('fr-FR')} ¥ → ${live.prix_eur.toLocaleString('fr-FR')} € → public ${live.prix_public.toLocaleString('fr-FR')} €`, 'success');
       setEditMode(false);
     } catch (err: any) {
@@ -247,7 +264,7 @@ export default function OngletGestionPrix({ productId, product }: Props) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
       {/* ═══════════ RUBRIQUE 1 — Prix d'achat fournisseur ═══════════ */}
-      <Card title="1 — Prix d'achat fournisseur" subtitle={`Dernière validation : ${formatDateHeure(product.date_derniere_validation)}`}>
+      <Card title="1 — Prix d'achat fournisseur" subtitle={subtitleValidation}>
         <div style={{ display: 'flex', gap: 8, marginBottom: 14, flexWrap: 'wrap' }}>
           <button onClick={handleToggleEdit} style={editMode ? styles.btnSecondary : styles.btnPrimary}>
             {editMode ? '👁️ MODE LECTURE' : '✏️ MODE ÉDITION'}
@@ -278,7 +295,7 @@ export default function OngletGestionPrix({ productId, product }: Props) {
       </Card>
 
       {/* ═══════════ RUBRIQUE 2 — Prix de vente calculés ═══════════ */}
-      <Card title="2 — Prix de vente (lecture seule)" subtitle={`Dernière validation : ${formatDateHeure(product.date_derniere_validation)}`}>
+      <Card title="2 — Prix de vente (lecture seule)" subtitle={subtitleValidation}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
           <PriceCard
             label={live.override_public_actif ? 'Prix PUBLIC 🎯' : 'Prix PUBLIC'}
