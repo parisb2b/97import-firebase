@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Route, Switch, Link, useLocation } from 'wouter';
-import { onAuthStateChanged, User } from 'firebase/auth';
+import { onAuthStateChanged, signOut, User } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { adminAuth, db } from '../lib/firebase';
 import { ErrorBoundary } from '../components/ErrorBoundary';
@@ -190,9 +190,25 @@ export default function AdminApp() {
   const [rmbRate, setRmbRate] = useState(7.82);
   const [location] = useLocation();
 
+  // V49 Checkpoint C — admin role check via custom claim Firebase Auth.
+  // request.auth.token.role === 'admin' (set par scripts/set-admin-role.cjs).
+  // Tout user authentifie sans role 'admin' tombe sur ForbiddenPage.
+  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
+
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(adminAuth, (u) => {
+    const unsubscribe = onAuthStateChanged(adminAuth, async (u) => {
       setUser(u);
+      if (u) {
+        try {
+          const tokenResult = await u.getIdTokenResult();
+          setIsAdmin(tokenResult.claims.role === 'admin');
+        } catch (err) {
+          console.error('[AdminApp] Failed to get token claims:', err);
+          setIsAdmin(false);
+        }
+      } else {
+        setIsAdmin(null);
+      }
       setLoading(false);
     });
     return () => unsubscribe();
@@ -233,6 +249,53 @@ export default function AdminApp() {
 
   if (!user) {
     return <AdminLogin />;
+  }
+
+  // V49 Checkpoint C — bloque l'accès si role !== 'admin'.
+  // En attendant que la propagation du token (~1h) soit faite, isAdmin peut
+  // être null brièvement après login : on attend la résolution du claim.
+  if (isAdmin === null) {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <span>Vérification des droits…</span>
+      </div>
+    );
+  }
+  if (!isAdmin) {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 16, padding: 32, fontFamily: 'inherit' }}>
+        <div style={{ fontSize: 56 }} aria-hidden>🔒</div>
+        <h1 style={{ margin: 0, color: '#1565C0', fontSize: 22 }}>Accès refusé</h1>
+        <p style={{ margin: 0, color: '#6B7280', maxWidth: 480, textAlign: 'center', lineHeight: 1.5 }}>
+          Cet espace est réservé aux administrateurs 97import.
+          Si vous pensez que c'est une erreur, contactez l'administrateur.
+        </p>
+        <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
+          <a
+            href="/"
+            className="v45-trans-fast v45-focus v45-btn-ghost"
+            style={{
+              padding: '10px 20px', background: 'transparent', color: '#1565C0',
+              border: '1.5px solid #1565C0', borderRadius: 10, fontSize: 14,
+              fontWeight: 600, textDecoration: 'none', fontFamily: 'inherit',
+            }}
+          >
+            ← Retour à l'accueil
+          </a>
+          <button
+            onClick={() => signOut(adminAuth)}
+            className="v45-trans-fast v45-focus v45-btn-danger"
+            style={{
+              padding: '10px 20px', background: 'transparent', color: '#DC2626',
+              border: '1.5px solid #FCA5A5', borderRadius: 10, fontSize: 14,
+              fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
+            }}
+          >
+            Se déconnecter
+          </button>
+        </div>
+      </div>
+    );
   }
 
   // Get current page title
