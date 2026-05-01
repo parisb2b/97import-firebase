@@ -103,7 +103,7 @@ export default function OngletEssentiel({ product, onChange, isCreation }: Props
             <select value={product.categorie || ''} onChange={e => {
               onChange('categorie', e.target.value);
               onChange('sous_categorie', '');
-            }} style={inputStyle}>
+            }} className="v45-input" style={inputStyle}>
               <option value="">— Sélectionner —</option>
               {CATEGORIES.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
             </select>
@@ -111,7 +111,7 @@ export default function OngletEssentiel({ product, onChange, isCreation }: Props
 
           {sousCats.length > 0 && (
             <Field label="Sous-catégorie">
-              <select value={product.sous_categorie || ''} onChange={e => onChange('sous_categorie', e.target.value)} style={inputStyle}>
+              <select value={product.sous_categorie || ''} onChange={e => onChange('sous_categorie', e.target.value)} className="v45-input" style={inputStyle}>
                 <option value="">— Optionnel —</option>
                 {sousCats.map(sc => <option key={sc.id} value={sc.id}>{sc.label}</option>)}
               </select>
@@ -124,7 +124,7 @@ export default function OngletEssentiel({ product, onChange, isCreation }: Props
               <input type="text" value={modeleAffine}
                 onChange={e => setModeleAffine(e.target.value)}
                 placeholder="Ex: 10K (pour kit 10kW) ou R22 (pour mini-pelle)"
-                style={inputStyle} />
+                className="v45-input" style={inputStyle} />
               <Hint>Optionnel — permet d'affiner la référence auto</Hint>
             </Field>
           )}
@@ -133,7 +133,7 @@ export default function OngletEssentiel({ product, onChange, isCreation }: Props
             <input type="text" value={product.reference || ''}
               onChange={e => onChange('reference', e.target.value.toUpperCase())}
               placeholder="Ex: KS-10K-001"
-              style={inputStyle}
+              className="v45-input" style={inputStyle}
               disabled={!!product.created_at} />
             <Hint>
               {product.created_at
@@ -147,7 +147,7 @@ export default function OngletEssentiel({ product, onChange, isCreation }: Props
           <Field label="Nom (français)" required full>
             <input type="text" value={product.nom_fr || ''}
               onChange={e => onChange('nom_fr', e.target.value)}
-              placeholder="Ex: Kit Solaire 10kW" style={inputStyle} />
+              placeholder="Ex: Kit Solaire 10kW" className="v45-input" style={inputStyle} />
           </Field>
 
           <div style={{ gridColumn: 'span 2' }}>
@@ -178,6 +178,7 @@ export default function OngletEssentiel({ product, onChange, isCreation }: Props
               value={product.fournisseur || ''}
               onChange={e => onChange('fournisseur', e.target.value)}
               placeholder="Optionnel — TAOBAO.COM, 1688.COM, ou nom libre"
+              className="v45-input v45-input-list"
               style={inputStyle}
             />
             <datalist id="suppliers-list">
@@ -196,12 +197,12 @@ export default function OngletEssentiel({ product, onChange, isCreation }: Props
         <FormGrid2>
           <Field label="Poids brut (kg)">
             <input type="number" step="0.1" value={product.poids_brut_kg ?? ''}
-              onChange={e => onChange('poids_brut_kg', parseFloat(e.target.value) || 0)} style={inputStyle} />
+              onChange={e => onChange('poids_brut_kg', parseFloat(e.target.value) || 0)} className="v45-input" style={inputStyle} />
             <Hint>V44-BIS : optionnel à la création, requis pour générer un devis.</Hint>
           </Field>
           <Field label="Volume (m³)">
             <input type="number" step="0.001" value={product.volume_m3 ?? ''}
-              onChange={e => onChange('volume_m3', parseFloat(e.target.value) || 0)} style={inputStyle} />
+              onChange={e => onChange('volume_m3', parseFloat(e.target.value) || 0)} className="v45-input" style={inputStyle} />
             <Hint>Calculé auto si L×l×H renseignés en onglet Détails techniques. Optionnel à la création.</Hint>
           </Field>
         </FormGrid2>
@@ -234,6 +235,7 @@ export default function OngletEssentiel({ product, onChange, isCreation }: Props
                 <button
                   onClick={() => fileInputRef.current?.click()}
                   disabled={uploadingImage}
+                  className="v45-trans-fast v45-focus-or v45-btn-warning"
                   style={{
                     flex: 1,
                     padding: '10px 16px',
@@ -247,10 +249,12 @@ export default function OngletEssentiel({ product, onChange, isCreation }: Props
                     fontFamily: 'inherit',
                   }}
                 >
-                  {uploadingImage ? '⏳ Upload...' : '🔄 Remplacer'}
+                  {uploadingImage && <span className="v45-spinner" aria-hidden />}
+                  {uploadingImage ? 'Upload...' : '🔄 Remplacer'}
                 </button>
                 <button
                   onClick={handleRemoveImage}
+                  className="v45-trans-fast v45-focus v45-btn-danger"
                   style={{
                     padding: '10px 16px',
                     background: '#fff',
@@ -335,6 +339,7 @@ export default function OngletEssentiel({ product, onChange, isCreation }: Props
                 value={product.image_principale || ''}
                 onChange={e => onChange('image_principale', e.target.value)}
                 placeholder="https://..."
+                className="v45-input"
                 style={inputStyle}
               />
               <Hint>Pour coller une URL d'image hébergée ailleurs (optionnel)</Hint>
@@ -400,4 +405,4 @@ function CheckboxField({ checked, onChange, label, subtitle }: any) {
 function Hint({ children }: any) { return <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 4 }}>{children}</div>; }
 
 const labelStyle: React.CSSProperties = { display: 'block', fontSize: 11, color: '#6B7280', marginBottom: 6, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.3 };
-const inputStyle: React.CSSProperties = { width: '100%', padding: '10px 12px', border: '1px solid #E5E7EB', borderRadius: 10, fontSize: 14, background: '#fff', fontFamily: 'inherit', color: '#111827', outline: 'none', boxSizing: 'border-box' };
+const inputStyle: React.CSSProperties = { width: '100%', padding: '10px 12px', border: '1px solid #E5E7EB', borderRadius: 10, fontSize: 14, background: '#fff', fontFamily: 'inherit', color: '#111827', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.15s ease, box-shadow 0.15s ease' };
