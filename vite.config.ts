@@ -29,4 +29,28 @@ export default defineConfig({
     __BUILD_ISO__: JSON.stringify(buildIsoUtc),
     __COMMIT_HASH__: JSON.stringify(commitHash),
   },
+  // V46 Checkpoint B — Code-splitting des grosses dépendances vendor.
+  // Le bundle index principal était à 2.91 MB (gzip 803 kB). On extrait
+  // firebase, pdf, excel, dnd-kit dans des chunks séparés, partagés
+  // entre routes et mieux cachables côté navigateur.
+  build: {
+    chunkSizeWarningLimit: 800,
+    rollupOptions: {
+      output: {
+        manualChunks: (id: string) => {
+          if (!id.includes('node_modules')) return undefined;
+          if (id.includes('/firebase/') || id.includes('@firebase/')) return 'firebase-vendor';
+          if (
+            id.includes('/jspdf') ||
+            id.includes('/html2canvas') ||
+            id.includes('/dompurify') ||
+            id.includes('/purify.es')
+          ) return 'pdf-vendor';
+          if (id.includes('/exceljs') || id.includes('/xlsx')) return 'excel-vendor';
+          if (id.includes('/@dnd-kit/')) return 'ui-vendor';
+          return undefined;
+        },
+      },
+    },
+  },
 })
