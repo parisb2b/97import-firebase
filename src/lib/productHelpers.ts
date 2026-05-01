@@ -12,12 +12,17 @@ export interface CompletudeProduit {
   champs_manquants_essentiel: string[];
 }
 
+// V44-TER Bug 2 — CHAMPS_ESSENTIEL réduit à 4 champs (cohérent FEAT 7 V44-BIS).
+// Le toast warning « champs essentiels manquants » s'appuie uniquement sur cette liste.
 export const CHAMPS_ESSENTIEL = [
-  'reference', 'categorie', 'nom_fr',
-  'fournisseur', 'poids_brut_kg', 'volume_m3',
-  'est_kit', 'composition_kit', 'actif', 'image_principale',
+  'categorie', 'reference', 'nom_fr', 'prix_achat_cny',
 ] as const;
-// V44 Phase 6 : 10 champs (prix_achat retiré, géré dans onglet GESTION DES PRIX)
+
+// V44-TER Bug 2 — Champs requis pour pouvoir générer un devis (logistique).
+// Utilisés par les badges 🔴 BLOQUANT de la liste produits, PAS par le toast warning.
+export const CHAMPS_BLOQUANT_DEVIS = [
+  'poids_brut_kg', 'volume_m3',
+] as const;
 
 export const CHAMPS_DETAILS = [
   'code_hs',
@@ -41,23 +46,10 @@ export function calculerCompletude(product: any): CompletudeProduit {
   const champs_manquants_essentiel: string[] = [];
   let essentiel = 0;
 
+  // V44-TER Bug 2 — CHAMPS_ESSENTIEL = 4 champs (categorie, reference, nom_fr, prix_achat_cny).
   for (const champ of CHAMPS_ESSENTIEL) {
     const val = product[champ];
-    if (champ === 'est_kit' || champ === 'actif') {
-      if (val === true || val === false) essentiel++;
-      else champs_manquants_essentiel.push(champ);
-      continue;
-    }
-    if (champ === 'composition_kit') {
-      if (product.est_kit === true) {
-        if (Array.isArray(val) && val.length > 0) essentiel++;
-        else champs_manquants_essentiel.push('composition_kit (kit sans composants)');
-      } else {
-        essentiel++;
-      }
-      continue;
-    }
-    if (['poids_brut_kg', 'volume_m3'].includes(champ)) {
+    if (champ === 'prix_achat_cny') {
       if (typeof val === 'number' && val > 0) essentiel++;
       else champs_manquants_essentiel.push(champ);
       continue;
