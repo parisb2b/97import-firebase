@@ -3,6 +3,7 @@ import { useRoute, useLocation, Link } from 'wouter';
 import { doc, getDoc, setDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { calculerCompletude, CHAMPS_ESSENTIEL, migrerGalerieImages } from '../../lib/productHelpers';
+import { sanitizeForFirestore } from '../../lib/firebaseUtils';
 import FicheProduitTabs, { TabId } from '../components/produit/FicheProduitTabs';
 import OngletGestionPrix from '../components/produit/OngletGestionPrix';
 import OngletEssentiel from '../components/produit/OngletEssentiel';
@@ -132,8 +133,29 @@ export default function FicheProduit() {
       const nbManquants = CHAMPS_ESSENTIEL.length - completudeActuelle.essentiel;
       const champsIncomplets = nbManquants > 0;
 
-      const data = {
-        ...product,
+      // V44-TER Bug 1 : exclure les champs gérés exclusivement par OngletGestionPrix.
+      // Sans cette exclusion, le merge écrase les prix validés via VALIDER PRIX
+      // avec leur valeur stale du state parent
+      // (cf. docs/superpowers/plans/2026-05-01-bug1-fiche-produit-stale-state.md).
+      const {
+        prix_achat_cny: _pcny,
+        prix_achat_usd: _pusd,
+        prix_achat_eur: _peur,
+        prix_achat: _pa,
+        prix_public: _ppub,
+        prix_partenaire: _ppart,
+        prix_public_override: _opub,
+        prix_partenaire_override: _opart,
+        date_derniere_validation: _dval,
+        id: _id,
+        ...productSansChampsExternes
+      } = product;
+      void _pcny; void _pusd; void _peur; void _pa;
+      void _ppub; void _ppart; void _opub; void _opart;
+      void _dval; void _id;
+
+      const data = sanitizeForFirestore({
+        ...productSansChampsExternes,
         completude: {
           essentiel: completudeActuelle.essentiel,
           details: completudeActuelle.details,
@@ -143,7 +165,7 @@ export default function FicheProduit() {
         champs_incomplets: champsIncomplets,
         updated_at: serverTimestamp(),
         ...(isCreation ? { created_at: serverTimestamp() } : {}),
-      };
+      });
 
       await setDoc(doc(db, 'products', ref), data, { merge: !isCreation });
       setDirty(false);
