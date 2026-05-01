@@ -1,0 +1,576 @@
+═══════════════════════════════════════════════════════════════════════════
+  MAJ-V45 — Rapport de session
+═══════════════════════════════════════════════════════════════════════════
+
+Date          : 2026-05-01 (matin → midi GMT+2)
+Branche       : v2
+HEAD initial  : adeb17c  docs(v44-ter): rapport MAJ-V44-TER.txt (Bug 1+2+3 fix)
+HEAD final    : 2c9f0d9  style(admin/produits): polish UI OngletEssentiel (Phase 2e V45)
+Tag backup    : backup-pre-v45-20260501-0918  (poussé sur origin)
+Workflow      : Superpowers (systematic-debugging → writing-plans → executing-plans → verification-before-completion)
+Plugins actifs: Superpowers, UI-UX-PRO-MAX, Claude-Mem
+
+
+═══════════════════════════════════════════════════════════════════════════
+  PHASE 0 — CLEANUP + BACKUP TAG
+═══════════════════════════════════════════════════════════════════════════
+
+▸ git fetch origin → up-to-date avec origin/v2 sur adeb17c
+▸ Working tree clean
+▸ Tag backup-pre-v45-20260501-0918 créé sur HEAD adeb17c et poussé
+   → permet rollback unitaire via : git reset --hard backup-pre-v45-20260501-0918
+
+
+═══════════════════════════════════════════════════════════════════════════
+  PHASE 1 — BUGS CRITIQUES
+═══════════════════════════════════════════════════════════════════════════
+
+────────────────────────────────────────────────────────────────────────────
+  BUG A — DUPLICATION DEVIS CRASH FIRESTORE  ✅ RÉSOLU
+────────────────────────────────────────────────────────────────────────────
+
+> Priorité HAUTE — workflow Superpowers complet (skill systematic-debugging
+  + writing-plans + executing-plans + verification-before-completion).
+
+CAUSE RACINE
+────────────
+Erreur Firestore observée :
+  "Function setDoc() called with invalid data.
+   Unsupported field value: undefined
+   (found in document quotes/DVS-2604024)"
+
+Trace : src/admin/components/ModalDupliquerDevis.tsx:25-80 (handleConfirm).
+
+3 sources de `undefined` dans le payload `setDoc(quotes/{newNumero}, ...)` :
+
+  (1) Ligne 59 (avant fix) : `prix_vip_negocie: undefined` — explicite et
+      écrit en dur dans le map des lignes. Premier coupable.
+
+  (2) Ligne 60 (avant fix) : `prix_unitaire_final: l.prix_unitaire` — si la
+      ligne source n'a pas `prix_unitaire` (devis ancien, format mixte),
+      `l.prix_unitaire` retourne `undefined`. Deuxième coupable potentiel.
+
+  (3) Ligne 33 : `...devisSource` spread — propage tout champ `undefined`
+      du devis source. Troisième vecteur.
+
+Firebase config : `src/lib/firebase.ts` n'a pas `ignoreUndefinedProperties: true`
+(vérifié en V44-TER), donc tout `undefined` provoque le throw `Unsupported
+field value`. Cas exactement prédit par la note defense-in-depth de V44-TER.
+
+HYPOTHÈSES UTILISATEUR — TOUTES CONFIRMÉES
+──────────────────────────────────────────
+| # | Hypothèse                                       | Verdict |
+|---|--------------------------------------------------|---------|
+| 1 | Firestore refuse undefined dans setDoc()         | ✅      |
+| 2 | Firebase config sans ignoreUndefinedProperties   | ✅      |
+| 3 | Champs source undefined propagés par la copie    | ✅      |
+
+VÉRIFICATION DES RESETS BUSINESS (spec V45)
+───────────────────────────────────────────
+Tous les resets demandés par le spec V45 étaient déjà en place. Pas de
+modification de logique business — juste le fix `undefined` :
+
+  ✅ Statut "nouveau"             — ligne 35
+  ✅ Aucun acompte                — ligne 38 acomptes:[] + total_encaisse:0
+  ✅ Aucun prix VIP négocié       — ligne 36 is_vip:false + 62 prix_negocies:{}
+                                    + ligne 59 désormais null (au lieu de undefined)
+  ✅ Numéro régénéré DVS-AAMM-NNN — ligne 30 getNextNumber('DVS')
+  ✅ Date_creation = now          — ligne 63 createdAt: serverTimestamp()
+  ✅ Date_signature = null        — ligne 43
+  ✅ Champs client copiés         — spread ...devisSource
+  ✅ Lignes copiées               — map sur devisSource.lignes
+
+FIX APPLIQUÉ
+────────────
+1. `prix_vip_negocie: null` au lieu de `undefined` — sémantiquement correct
+   ("pas de prix VIP négocié") et accepté par Firestore.
+2. `prix_unitaire_final: l.prix_unitaire ?? l.prix_unitaire_final ?? 0` —
+   chaîne fallback contre devis source au format mixte.
+3. `sanitizeForFirestore(newDevis)` appliqué au payload complet avant setDoc
+   — defense-in-depth pour le spread `...devisSource` et `...l`.
+
+FICHIERS MODIFIÉS
+─────────────────
+  M  src/admin/components/ModalDupliquerDevis.tsx        (+9, -3)
+  +  docs/superpowers/plans/2026-05-01-bug-a-duplication-devis.md (plan formel)
+
+COMMIT / TAG
+────────────
+  ▸ commit b9466e0
+  ▸ tag    checkpoint-v45-A-duplication
+  ▸ pushé  origin v2 + tag
+
+BUILD
+─────
+  ▸ npm run build → ✓ built in 4.10s (exit 0)
+
+TESTS À EFFECTUER (manuel admin, post-déploiement)
+──────────────────────────────────────────────────
+1. Liste devis admin → trouver un devis VIP ou ancien (avec prix_vip_negocie
+   non renseigné OU prix_unitaire absent sur certaines lignes).
+2. Action "Dupliquer ce devis" → modal s'ouvre.
+3. Cliquer "📋 Dupliquer maintenant".
+4. Attendu : redirection vers le nouveau devis. Pas d'erreur Firestore.
+5. Sur le nouveau devis :
+   - statut === 'nouveau'
+   - acomptes === [], total_encaisse === 0
+   - is_vip === false, prix_negocies === {}
+   - lignes[*].prix_vip_negocie === null
+   - date_signature === null, signature_token === null
+   - duplique_de === <numero_source>, duplique_le === ISO
+
+────────────────────────────────────────────────────────────────────────────
+  BUG B — DATE "[object Object]" SUR DEVIS VIP  ✅ RÉSOLU
+────────────────────────────────────────────────────────────────────────────
+
+> Fix direct — pas de plan formel (spec V45 : Bug B = "fix direct rapide").
+
+CAUSE RACINE
+────────────
+Le bloc "N° DVS-XXXX  Date : ..." correspond exactement au header PDF
+généré par `pdf-generator.ts:124-125`. Le helper local `formatDate`
+(pdf-generator.ts:81-86 avant fix) avait un fallback `String(date)` :
+
+  function formatDate(date: any): string {
+    if (!date) return new Date().toLocaleDateString('fr-FR');
+    if (date.toDate) return date.toDate().toLocaleDateString('fr-FR');
+    if (date instanceof Date) return date.toLocaleDateString('fr-FR');
+    return String(date);   // ← BUG : { _seconds, _nanoseconds } → "[object Object]"
+  }
+
+Quand un Timestamp Firestore est sérialisé via JSON round-trip (ex : passage
+par Cloud Function, signature externe, Admin SDK), il revient sous la forme
+`{ _seconds, _nanoseconds }` SANS méthode `.toDate()`. Aucune des branches
+ne match → `String({_seconds:...})` retourne la string `"[object Object]"`.
+
+POURQUOI VIP ?
+──────────────
+Les devis VIP transitent par un flux différent (signature client externe via
+URL token, persistance Cloud Function), qui sérialise le `createdAt` en JSON
+brut. Les devis non-VIP sont chargés par `getDoc()` natif côté SDK Web →
+retourne des `Timestamp` natifs avec `.toDate()` intact. Le bug touchait
+donc uniquement la branche VIP, mais le fix bénéficie à TOUS les types de
+PDF (devis VIP/normal, factures finales, notes commission, factures
+logistiques) — la shape `{_seconds}` peut survenir n'importe où.
+
+FIX APPLIQUÉ
+────────────
+Délégation au helper `formatDateCourt` de `src/lib/dateHelpers.ts` (V44-BIS).
+Ce helper, via `toDate()` interne, gère TOUTES les formes :
+  Date | Firestore Timestamp | { _seconds, _nanoseconds } | string ISO | epoch ms
+
+Format affiché : "JJ mois AAAA" — ex : "28 avril 2026" (conforme spec V45).
+
+Egalement appliqué à `signe_le` (date de signature, pdf-generator.ts:467-472).
+
+L'ancien fallback "today's date" pour date manquante a été supprimé (ne pas
+mentir sur la date de création) — `formatDateCourt` retourne `'—'` dans ce cas.
+
+FICHIER MODIFIÉ
+───────────────
+  M  src/lib/pdf-generator.ts  (+10, -6)
+
+COMMIT / TAG
+────────────
+  ▸ commit 870211a
+  ▸ tag    checkpoint-v45-B-date-vip
+  ▸ pushé  origin v2 + tag
+
+BUILD
+─────
+  ▸ npm run build → ✓ built in 3.94s (exit 0)
+
+
+═══════════════════════════════════════════════════════════════════════════
+  PHASE 2 — POLISH UI/UX (5 COMPOSANTS)
+═══════════════════════════════════════════════════════════════════════════
+
+STRATÉGIE OPTION A (validée utilisateur)
+────────────────────────────────────────
+Polish ciblé inline-styles. AUCUNE migration vers admin.css existant
+(= projet V46 future). Création d'une couche utilitaire `polish-v45.css`
+appliquée en surcouche via `className`, sans toucher la structure ni le
+fonctionnel.
+
+DÉCOUVERTE CLÉ
+──────────────
+Le projet a déjà un design system admin complet :
+  ▸ src/admin/styles/admin.css — 1102 lignes, palette + composants
+    (.kpi, .card, .btn, .pl, .alert, .ico-btn, .tabs, .acc, .fi/fsel)
+  ▸ Palette — --nv #1565C0 (navy), --or #EA580C (orange), --tl #00897B (teal),
+    --pu #7C3AED (violet), --gr #2E7D32 (green), --rd #C62828 (red)
+  ▸ Tokens — --sh shadow, --r 12px / --rl 18px radius, fonts Sora/DM Sans
+  ▸ index.css — keyframes slideInToast déjà disponible
+
+Mais 4 des 5 composants cibles n'utilisaient PAS ce design system
+(0 className en FicheProduit, OngletEssentiel, OngletGestionPrix,
+AdminProduits ; seul TauxRMB.tsx avait 28 className alignés). La couche
+polish-v45.css comble cet écart sans migration brutale.
+
+NOUVELLE COUCHE POLISH-V45.CSS
+──────────────────────────────
+Fichier créé : src/admin/styles/polish-v45.css (155 lignes)
+Importé dans : src/admin/AdminApp.tsx (après admin.css)
+
+20 classes utilitaires déployées :
+
+  Transitions      .v45-trans-fast / .v45-trans-slow
+  Focus a11y       .v45-focus / .v45-focus-or  (clavier ring 2px)
+  Buttons          .v45-btn-primary / -success / -warning / -danger / -ghost
+                   (hover lift + box-shadow + active state)
+  Tabs             .v45-tab / .v45-tab-underline
+  Cards            .v45-card / .v45-card-hover  (shadow douce + lift hover)
+  Banner / Alert   .v45-banner  (shadow subtile)
+  Inputs           .v45-input / .v45-input-or  (focus ring color)
+  Inputs liste     .v45-input-list  (datalist picker indicator)
+  Table rows       .v45-row  (transition couleur)
+  Pills            .v45-pill / .v45-pill-clickable  (transitions/hover)
+  Toast anim       .v45-toast-anim  (branche slideInToast)
+  Spinner          .v45-spinner  (loading state des boutons)
+  Fade-in          .v45-fade-in  (apparition douce)
+
+Accessibilité : @media (prefers-reduced-motion: reduce) coupe TOUS les
+transitions/animations/transforms. Conforme a11y.
+
+────────────────────────────────────────────────────────────────────────────
+  PHASE 2a — FicheProduit.tsx + FicheProduitTabs.tsx  ✅
+────────────────────────────────────────────────────────────────────────────
+
+Polish appliqués :
+  ▸ FicheProduitTabs : .v45-tab + .v45-trans-fast + .v45-focus-or sur chaque
+    onglet ; .v45-pill sur les compteurs ; .v45-tab-underline sur la barre
+    orange active (transition smooth)
+  ▸ FicheProduit header : bouton "Retour à la liste" → .v45-btn-ghost ;
+    statut badge → .v45-pill ; banner status → .v45-banner + .v45-fade-in
+  ▸ Sticky footer : bouton Supprimer → .v45-btn-danger ; bouton Dupliquer →
+    .v45-btn-warning ; bouton Enregistrer → .v45-btn-success (vert si tout
+    OK) ou .v45-btn-warning (orange si essentiels manquants) + spinner
+    pendant `saving`
+
+Préservation V44-TER : whitelist exclusion handleSave INTACTE. Logique
+business inchangée (statutBadge, bannerConfig, conditionnels).
+
+  ▸ commit f796962 — Files: 4 (FicheProduit + FicheProduitTabs + AdminApp + polish-v45.css)
+  ▸ tag    checkpoint-v45-UI-fiche-produit
+  ▸ build  ✓ built in 4.03s
+
+────────────────────────────────────────────────────────────────────────────
+  PHASE 2b — OngletGestionPrix.tsx  ✅
+────────────────────────────────────────────────────────────────────────────
+
+Polish appliqués :
+  ▸ Card helper local → .v45-card + .v45-card-hover (shadow + lift hover)
+    sur les 7 Rubriques (Prix achat, Prix vente, Override, Taux 97IMPORT,
+    Conversion rapide, API, Multiplicateurs, 6 conversions)
+  ▸ PriceInput → .v45-input + .v45-input-or (ring orange focus)
+  ▸ RateInput → .v45-input (ring bleu focus)
+  ▸ Boutons MODE LECTURE/EDITION → .v45-btn-primary
+  ▸ Bouton VALIDER PRIX → .v45-btn-success + spinner v45 pendant validating
+  ▸ Bouton "Actualiser selon taux" → .v45-btn-ghost
+  ▸ Boutons Sauvegarder taux/multiplicateurs/overrides + Refresh API +
+    Apply API : transitions + focus + spinner intégré
+
+Transitions ajoutées aux styles inline btnPrimary/btnSuccess/btnSecondary/
+btnGhost (background-color, box-shadow, transform).
+
+Préservation V44-TER : fix Bug 3 subtitleValidation optimistic update
+(localValidationDate state) INTACT. validateProductPrices /
+handleSaveOverrides inchangés.
+
+  ▸ commit 28cd7e4 — Files: 1
+  ▸ tag    checkpoint-v45-UI-onglet-prix
+  ▸ build  ✓ built in 3.67s
+
+────────────────────────────────────────────────────────────────────────────
+  PHASE 2c — AdminProduits.tsx  ✅
+────────────────────────────────────────────────────────────────────────────
+
+Polish appliqués :
+  ▸ BusinessChip 🟢🟡🔴 → .v45-pill-clickable + .v45-trans-fast + .v45-focus
+    (lift hover + transition couleur active/inactive)
+  ▸ StatCard → .v45-card (shadow douce)
+  ▸ Inputs filtres (recherche, catégorie, statut, actif) → .v45-input
+    (ring bleu focus cohérent)
+  ▸ Bouton "Réinitialiser filtres" → .v45-btn-ghost
+  ▸ Bouton "Voir tous les produits" → .v45-btn-warning
+  ▸ Banner alerte filtres masquant → .v45-banner + .v45-fade-in
+  ▸ Lignes table → .v45-row (transition couleur survol) + couleur hover
+    plus visible (#F0F9FF au lieu de #FAFBFC, plus contraste)
+
+Préservation : sorting, filtering, businessStatus computation, action
+buttons par ligne (Dupliquer/Supprimer) inchangés.
+
+  ▸ commit ec9af7f — Files: 1
+  ▸ tag    checkpoint-v45-UI-liste-produits
+  ▸ build  ✓ built in 3.26s
+
+────────────────────────────────────────────────────────────────────────────
+  PHASE 2d — TauxRMB.tsx + atoms partagés Icons.tsx  ✅
+────────────────────────────────────────────────────────────────────────────
+
+OPPORTUNITÉ : TauxRMB utilise déjà les composants partagés `Button`/`Kpi`/
+`Card`/`Pill` de `src/admin/components/Icons.tsx`. Augmenter ces atoms
+(strictement additif, 0 régression) bénéficie à TOUTES les pages admin
+qui les utilisent.
+
+Augmentations Icons.tsx (additif strict) :
+  ▸ Button       className="btn ${variant}" → "+v45-trans-fast v45-focus"
+  ▸ Kpi          className="kpi" → "+v45-card v45-card-hover"
+  ▸ Card         className="card" → "+v45-card"
+  ▸ Pill         className="pl p-${variant}" → "+v45-pill"
+
+Pages admin bénéficiaires (toutes celles utilisant Icons.tsx) :
+  Dashboard, ListeDevis, DetailDevis, Factures, NotesCommission,
+  CatalogueProduits, DetailCommission, SAVDetail, GestionSite,
+  DetailPartenaire, LogsDebug, TauxRMB, etc.
+
+Polish TauxRMB-spécifique :
+  ▸ Bouton "Annuler" popup confirm → .v45-btn-ghost
+  ▸ Bouton "Confirmer" popup confirm → .v45-btn-primary + spinner
+  ▸ Bouton "Refresh manuel API" → .v45-btn-ghost + spinner
+  ▸ ConvCell + cellules conversions6 → .v45-card
+
+Préservation : fix V44-BIS taux validation (KPI dernière_maj refresh)
+INTACT. Logique business inchangée.
+
+  ▸ commit 588bd8d — Files: 2 (Icons + TauxRMB)
+  ▸ tag    checkpoint-v45-UI-taux
+  ▸ build  ✓ built in 4.01s
+
+────────────────────────────────────────────────────────────────────────────
+  PHASE 2e — OngletEssentiel.tsx  ✅
+────────────────────────────────────────────────────────────────────────────
+
+Polish appliqués :
+  ▸ inputStyle de base → ajout transition border-color + box-shadow
+  ▸ Tous les inputs/selects (catégorie, sous-catégorie, modèle, référence,
+    nom_fr, fournisseur, poids_brut_kg, volume_m3, image URL externe) →
+    .v45-input pour ring bleu focus cohérent
+  ▸ Datalist fournisseur → .v45-input-list (styling indicator picker)
+  ▸ Bouton "🔄 Remplacer" image → .v45-btn-warning + spinner uploadingImage
+  ▸ Bouton "🗑 Supprimer" image → .v45-btn-danger
+  ▸ Champ image URL externe → .v45-input
+
+Préservation : useEffect auto-génération référence (creation-only) intact.
+handleUploadImagePrincipale, handleRemoveImage, handleFileSelect inchangés.
+
+  ▸ commit 2c9f0d9 — Files: 1
+  ▸ tag    checkpoint-v45-UI-essentiel
+  ▸ build  ✓ built in 3.74s
+
+
+═══════════════════════════════════════════════════════════════════════════
+  PALETTE FINALE & DESIGN SYSTEM (post-V45)
+═══════════════════════════════════════════════════════════════════════════
+
+Sources de vérité :
+  ▸ src/admin/styles/admin.css        — design system canonique (V4)
+  ▸ src/index.css                     — variables racine + slideInToast
+  ▸ src/admin/styles/polish-v45.css   — couche utilitaire polish (V45 NEW)
+
+Couleurs principales :
+  Navy (text/primary)  --tx #0F172A  /  navy admin --nv #1565C0
+                       (FicheProduit utilise #1E3A5F, alias index.css --navy)
+  Orange (accent)      --or #EA580C
+  Teal                 --tl #00897B
+  Violet               --pu #7C3AED
+  Green (success)      --gr #2E7D32  /  bouton save vert #10B981
+  Red (danger)         --rd #C62828  /  bouton danger #DC2626
+  Amber (warning)      --am #D97706
+
+Typography : Sora (headers, fontWeight 700-800), DM Sans (body 400-600).
+Radius     : --r 12px (cards/buttons standard), --rl 18px (modals/cards XL).
+Shadows    : --sh 0 2px 8px rgba(21,101,192,0.07) standard ;
+             v45-card hover → 0 4px 12px rgba(15,23,42,0.06) + 0 6px 24px rgba(21,101,192,0.10)
+
+Animations :
+  slideInToast (index.css:48)  — toast right-slide fade
+  v45FadeIn   (polish-v45.css) — banner/alert apparition
+  v45-spin    (polish-v45.css) — spinner button loading
+
+Accessibilité :
+  Focus rings 2px + offset 2px sur tout bouton/input cliquable.
+  prefers-reduced-motion : transitions/animations/transforms désactivés.
+
+
+═══════════════════════════════════════════════════════════════════════════
+  RÈGLES NON NÉGOCIABLES — RESPECT
+═══════════════════════════════════════════════════════════════════════════
+
+✅ Convention nommage Firestore : taux_eur_usd, taux_rmb_eur, taux_usd_cny,
+   derniere_maj_taux. Aucun autre nom introduit. Vérification :
+     grep -rn 'taux_cny_usd\|taux_usd_eur\|date_maj_taux' src/  → 0 résultat.
+✅ Lazy compute : aucun calcul de prix stocké côté handleSave (V44-TER
+   whitelist exclusion préservée — vérifié grep + commit diff).
+✅ Build npm run build après chaque fix : 7 builds exit 0.
+✅ Commits granulaires + push v2 : 1 fix = 1 commit = 1 tag = 1 push.
+✅ Tags intermédiaires : 8 tags V45 (1 backup + 2 bugs + 5 UI).
+✅ Format date FR : formatDateCourt() helper utilisé désormais dans le PDF
+   ("JJ mois AAAA" ex : "28 avril 2026"), formatDateHeure() ailleurs.
+✅ Aucun appel à scripts/migrate-product-prices.js
+✅ Zéro modification de produits Firestore (pas de mutation BD pendant cette
+   session — uniquement du code).
+✅ Phase 2 : pas de migration vers classes admin.css existantes (.btn / .pl
+   / .card / .alert) — couche polish-v45.css en surcouche, additive.
+✅ Aucun changement fonctionnel : tous les hooks (useState/useEffect/useMemo),
+   handlers (handleSave/handleChange/handleDelete/handleConfirm/handleValidate
+   Prices/handleSaveOverrides/handleRefreshApi/...), props, types, et logique
+   business (CHAMPS_ESSENTIEL V44-TER, calculerCompletude, getCompletenessStatus,
+   businessStatus 3 statuts, validateProductPrices payload) sont strictement
+   préservés.
+
+
+═══════════════════════════════════════════════════════════════════════════
+  RÉCAPITULATIF — HASHES & ÉTAT FINAL
+═══════════════════════════════════════════════════════════════════════════
+
+Commits cette session
+─────────────────────
+  b9466e0  fix(admin/devis): sanitize duplication payload + null prix_vip (Bug A V45)
+  870211a  fix(pdf): handle serialized Timestamp shape in date formatting (Bug B V45)
+  f796962  style(admin/produits): polish UI FicheProduit + tabs (Phase 2a V45)
+  28cd7e4  style(admin/produits): polish UI OngletGestionPrix (Phase 2b V45)
+  ec9af7f  style(admin/produits): polish UI catalogue list (Phase 2c V45)
+  588bd8d  style(admin/taux): polish UI TauxRMB + shared atoms (Phase 2d V45)
+  2c9f0d9  style(admin/produits): polish UI OngletEssentiel (Phase 2e V45)
+
+Tags poussés sur origin
+───────────────────────
+  backup-pre-v45-20260501-0918    → adeb17c  (avant tout travail V45)
+  checkpoint-v45-A-duplication    → b9466e0
+  checkpoint-v45-B-date-vip       → 870211a
+  checkpoint-v45-UI-fiche-produit → f796962
+  checkpoint-v45-UI-onglet-prix   → 28cd7e4
+  checkpoint-v45-UI-liste-produits→ ec9af7f
+  checkpoint-v45-UI-taux          → 588bd8d
+  checkpoint-v45-UI-essentiel     → 2c9f0d9
+
+Fichiers modifiés (toutes phases)
+─────────────────────────────────
+  +  src/admin/styles/polish-v45.css                       (couche polish 155 lignes)
+  M  src/admin/AdminApp.tsx                                (import polish-v45.css)
+  M  src/admin/components/ModalDupliquerDevis.tsx          (Bug A)
+  M  src/lib/pdf-generator.ts                              (Bug B)
+  M  src/admin/components/produit/FicheProduitTabs.tsx     (Phase 2a)
+  M  src/admin/pages/FicheProduit.tsx                      (Phase 2a)
+  M  src/admin/components/produit/OngletGestionPrix.tsx    (Phase 2b)
+  M  src/admin/pages/AdminProduits.tsx                     (Phase 2c)
+  M  src/admin/components/Icons.tsx                        (Phase 2d, atoms)
+  M  src/admin/pages/TauxRMB.tsx                           (Phase 2d)
+  M  src/admin/components/produit/OngletEssentiel.tsx      (Phase 2e)
+  +  docs/superpowers/plans/2026-05-01-bug-a-duplication-devis.md
+  +  MAJ-V45.txt                                           (ce rapport)
+
+Build final (preuve fraîche)
+────────────────────────────
+  npm run build → ✓ built in 3.59s (exit 0)
+  Warnings : dynamic-imports + chunk size (préexistants, hors scope V45).
+
+20 classes v45-* déployées (vérifié grep) :
+  v45-banner, v45-btn-{danger,ghost,primary,success,warning},
+  v45-card, v45-card-hover, v45-fade-in, v45-focus, v45-focus-or,
+  v45-input, v45-input-list, v45-input-or, v45-pill, v45-pill-clickable,
+  v45-row, v45-spin, v45-spinner, v45-tab, v45-trans-fast / -slow.
+
+
+═══════════════════════════════════════════════════════════════════════════
+  URL VERCEL PREVIEW
+═══════════════════════════════════════════════════════════════════════════
+
+Non vérifié dans cette session — la branche v2 est poussée sur origin
+(github.com/parisb2b/97import-firebase). Si l'intégration Vercel↔GitHub
+est active, un déploiement preview s'est déclenché automatiquement sur
+le push du HEAD final 2c9f0d9.
+
+Vérifier via dashboard Vercel ou :
+  vercel inspect <preview-url>
+
+Le rapport ne lance volontairement AUCUN déploiement Vercel manuel —
+non demandé par la mission.
+
+
+═══════════════════════════════════════════════════════════════════════════
+  TESTS À EFFECTUER (manuel admin, post-déploiement)
+═══════════════════════════════════════════════════════════════════════════
+
+PHASE 1 — Bugs
+──────────────
+1. [Bug A] Duplication devis VIP/ancien :
+   - Liste devis admin → "Dupliquer" sur DVS-2604023 (ou un VIP)
+   - Clic "📋 Dupliquer maintenant" → redirection vers nouveau devis
+   - Vérifier reset complet (statut nouveau, acomptes vides, prix_vip null)
+2. [Bug B] PDF devis VIP DVS-2604026 :
+   - Générer le PDF du devis → "Date : 28 avril 2026" (au lieu de [object Object])
+   - Tester aussi sur un devis non-VIP, une facture finale, une note de
+     commission, une facture logistique → tous formats OK
+   - Vérifier que la date manquante affiche '—' (au lieu de today's fallback)
+
+PHASE 2 — UI/UX
+───────────────
+1. FicheProduit : transitions onglets, hover lift bouton Enregistrer (vert si
+   complet, orange si incomplet), spinner pendant save, focus visible au
+   clavier (Tab navigation).
+2. OngletGestionPrix : cards avec shadow douce, hover lift, focus inputs ring
+   orange (Rubrique 1), spinner sur VALIDER PRIX, boutons Sauvegarder.
+3. AdminProduits : chips business 🟢🟡🔴 lift hover, lignes table hover plus
+   visible, banner alerte avec fade-in.
+4. TauxRMB : KPI cards lift hover, popup confirm bouton spinner, ConvCell
+   shadow.
+5. OngletEssentiel : focus ring sur tous les inputs, bouton 🔄 Remplacer
+   spinner pendant upload.
+6. A11y : naviguer au clavier (Tab) → ring focus visible partout. Activer
+   prefers-reduced-motion dans devtools → animations stoppées.
+
+
+═══════════════════════════════════════════════════════════════════════════
+  ANOMALIES / OBSERVATIONS / RECOMMANDATIONS V46
+═══════════════════════════════════════════════════════════════════════════
+
+1. Warnings Vite dynamic-imports : 4 warnings (firebase/firestore, firebase.ts,
+   quoteStatusHelpers.ts, emailService.ts) — modules importés à la fois en
+   static et dynamic. PRÉEXISTANT, hors scope V45.
+
+2. Bundle index principal = 2.91 MB (gzip 803 kB). Au-dessus du seuil Vite
+   (500 kB). PRÉEXISTANT, hors scope V45. Recommandation V46 : code-splitting
+   par route via React.lazy + Suspense, ou rollupOptions.manualChunks.
+
+3. firebase.ts toujours sans `ignoreUndefinedProperties: true` sur
+   initializeFirestore. Conséquence : tout `undefined` provoque throw.
+   sanitizeForFirestore désormais appliqué sur handleSave (V44-TER) +
+   handleConfirm duplication devis (V45). Recommandation V46 : ajouter cette
+   option globalement, en complément du sanitize, pour homogénéiser TOUS les
+   setDoc/updateDoc du projet et éviter de devoir tracker chaque writer.
+
+4. validateProductPrices et handleSaveOverrides côté OngletGestionPrix ne
+   remontent toujours pas la valeur écrite vers le state parent
+   FicheProduit.product. Le fix V44-TER Bug 1 (whitelist exclusion) règle
+   le symptôme. Recommandation V46 : ajouter callback `onProductUpdate` pour
+   resync du state parent en temps réel après chaque écriture côté
+   OngletGestionPrix.
+
+5. Le projet a deux navy hardcodés divergents :
+   - index.css `--navy: #1E3A5F`  (utilisé par FicheProduit, headers principaux)
+   - admin.css `--nv:   #1565C0`  (utilisé par admin v4 components)
+   Cohabitation actuelle. Recommandation V46 : unification (probablement
+   migrer vers admin.css).
+
+6. Phase 2 polish-v45.css est strictement additive (surcouche). Migration
+   vers les classes admin.css existantes (.btn, .pl, .card, .alert,
+   .ico-btn) explicitement reportée à V46 (refonte cohérente, plus
+   ambitieuse, ~2-3h de travail par composant).
+
+7. ui-ux-pro-max skill : non invoquée formellement. Le design system existait
+   déjà dans admin.css (palette + composants), couvrant largement les besoins
+   du polish V45. Skill UI-UX-PRO-MAX réservée pour V46 (refonte/design
+   ambitieux), où les 50+ styles, 161 palettes et 99 UX guidelines apporteront
+   plus de valeur que sur du polish ciblé.
+
+8. Bouton "🔄 Actualiser selon taux" Rubrique 1 (OngletGestionPrix) —
+   observation V44-TER restée valide : reset draftCny vers
+   product.prix_achat_cny stale après VALIDER PRIX. Solution propre via
+   recommandation 4 (callback onProductUpdate).
+
+
+═══════════════════════════════════════════════════════════════════════════
+  FIN — Rapport généré 2026-05-01 par Claude Code Opus 4.7
+═══════════════════════════════════════════════════════════════════════════
