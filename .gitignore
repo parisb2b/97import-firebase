@@ -10,8 +10,8 @@
 firebase-admin-sdk.json
 *.serviceaccount.json
 *-firebase-adminsdk-*.json
-# Backups migration v43
-backups/quotes-pre-migration-v43-*.json
+# Backups locaux (jamais versionnés — fichiers de sécurité avant migrations/imports)
+backups/
 # Build
 # Clé privée Firebase Admin — NE JAMAIS COMMITTER
 # Dépendances
