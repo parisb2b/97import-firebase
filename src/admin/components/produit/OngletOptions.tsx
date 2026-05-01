@@ -286,7 +286,7 @@ const dropdownCardStyle: React.CSSProperties = {
 };
 
 const btnPrimaryStyle: React.CSSProperties = {
-  padding: '10px 16px', background: '#1E3A5F',
+  padding: '10px 16px', background: '#1565C0',
   color: '#fff', border: 'none', borderRadius: 6,
   fontSize: 13, fontWeight: 600, cursor: 'pointer',
   fontFamily: 'inherit',

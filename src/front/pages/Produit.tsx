@@ -477,7 +477,7 @@ export default function Produit() {
                   borderBottom: i < dt.length - 1 ? '1px solid #E5E7EB' : 'none',
                 }}>
                   <span style={{ fontSize: 13, color: '#6B7280', flex: '0 0 40%', fontWeight: 500 }}>{getLabel(d)}</span>
-                  <span style={{ fontSize: 13, color: '#1E3A5F', flex: 1, fontWeight: 600 }}>{d.valeur}</span>
+                  <span style={{ fontSize: 13, color: '#1565C0', flex: 1, fontWeight: 600 }}>{d.valeur}</span>
                 </div>
               ))}
             </div>

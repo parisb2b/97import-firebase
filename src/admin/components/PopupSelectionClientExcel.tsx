@@ -130,7 +130,7 @@ export default function PopupSelectionClientExcel({ ctnId, onClose, onSelect }: 
         width: '90%', maxWidth: 500,
         boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
       }}>
-        <h2 style={{ margin: '0 0 24px 0', fontSize: 20, fontWeight: 700, color: '#1E3A5F' }}>
+        <h2 style={{ margin: '0 0 24px 0', fontSize: 20, fontWeight: 700, color: '#1565C0' }}>
           Sélectionner un client
         </h2>
 

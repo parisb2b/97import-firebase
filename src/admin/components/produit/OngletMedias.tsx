@@ -233,7 +233,7 @@ export default function OngletMedias({ product, onChange }: Props) {
                 href={d.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                style={{ color: '#1E3A5F', textDecoration: 'none', fontWeight: 500 }}
+                style={{ color: '#1565C0', textDecoration: 'none', fontWeight: 500 }}
               >
                 {d.nom}
               </a>
@@ -337,7 +337,7 @@ function Card({ title, subtitle, children }: any) {
       background: '#fff', border: '1px solid #E5E7EB',
       borderRadius: 16, padding: 24, marginBottom: 16,
     }}>
-      <h3 style={{ margin: '0 0 6px', fontSize: 16, fontWeight: 600, color: '#1E3A5F' }}>{title}</h3>
+      <h3 style={{ margin: '0 0 6px', fontSize: 16, fontWeight: 600, color: '#1565C0' }}>{title}</h3>
       {subtitle && <p style={{ fontSize: 13, color: '#6B7280', margin: '0 0 16px' }}>{subtitle}</p>}
       {children}
     </div>

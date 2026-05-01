@@ -188,7 +188,7 @@ export default function DetailListeAchat() {
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: 24 }}>
         <div>
-          <h1 style={{ fontSize: 28, fontWeight: 700, color: '#1E3A5F', margin: 0 }}>
+          <h1 style={{ fontSize: 28, fontWeight: 700, color: '#1565C0', margin: 0 }}>
             {la.numero}
           </h1>
           <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginTop: 8 }}>
@@ -223,7 +223,7 @@ export default function DetailListeAchat() {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 20 }}>
           <div>
             <label style={labelStyle}>Numéro</label>
-            <div style={{ fontSize: 15, fontWeight: 600, color: '#1E3A5F' }}>{la.numero}</div>
+            <div style={{ fontSize: 15, fontWeight: 600, color: '#1565C0' }}>{la.numero}</div>
           </div>
           <div>
             <label style={labelStyle}>Date création</label>
@@ -264,7 +264,7 @@ export default function DetailListeAchat() {
               {lignes.map((l) => (
                 <tr key={l.id} style={{ borderBottom: '1px solid #F3F4F6' }}>
                   <td style={tdStyle}>
-                    <strong style={{ color: '#1E3A5F' }}>{l.ref}</strong>
+                    <strong style={{ color: '#1565C0' }}>{l.ref}</strong>
                     {l.est_composant_kit && (
                       <div style={{ fontSize: 10, color: '#D97706', marginTop: 2 }}>
                         🔧 de {l.kit_parent}
@@ -579,7 +579,7 @@ function ModalAjoutProduits({ existingRefs, onAdd, onClose }: ModalAjoutProduits
         maxWidth: 900, width: '95%', maxHeight: '85vh',
         display: 'flex', flexDirection: 'column', overflow: 'hidden',
       }}>
-        <h2 style={{ fontSize: 20, fontWeight: 700, color: '#1E3A5F', margin: 0, marginBottom: 6 }}>
+        <h2 style={{ fontSize: 20, fontWeight: 700, color: '#1565C0', margin: 0, marginBottom: 6 }}>
           Ajouter des produits
         </h2>
         <p style={{ fontSize: 13, color: '#6B7280', marginTop: 0, marginBottom: 16 }}>
@@ -729,7 +729,7 @@ const cardStyle: React.CSSProperties = {
   padding: 24, marginBottom: 20,
 };
 const sectionTitleStyle: React.CSSProperties = {
-  fontSize: 16, fontWeight: 600, color: '#1E3A5F', marginTop: 0, marginBottom: 20,
+  fontSize: 16, fontWeight: 600, color: '#1565C0', marginTop: 0, marginBottom: 20,
 };
 const labelStyle: React.CSSProperties = {
   display: 'block', fontSize: 12, color: '#6B7280', marginBottom: 6,

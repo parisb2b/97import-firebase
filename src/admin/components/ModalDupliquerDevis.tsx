@@ -105,7 +105,7 @@ export default function ModalDupliquerDevis({
         }}
       >
         <div style={{ fontSize: 32, textAlign: 'center', marginBottom: 16 }}>📋</div>
-        <h2 style={{ margin: 0, marginBottom: 12, color: '#1E3A5F', textAlign: 'center' }}>
+        <h2 style={{ margin: 0, marginBottom: 12, color: '#1565C0', textAlign: 'center' }}>
           Dupliquer ce devis
         </h2>
 
@@ -149,7 +149,7 @@ export default function ModalDupliquerDevis({
             onClick={handleConfirm}
             disabled={duplicating}
             style={{
-              padding: '10px 24px', background: '#1E3A5F', color: '#fff',
+              padding: '10px 24px', background: '#1565C0', color: '#fff',
               border: 'none', borderRadius: 6, fontSize: 13, fontWeight: 600,
               cursor: duplicating ? 'not-allowed' : 'pointer',
               fontFamily: 'inherit',

@@ -48,7 +48,7 @@ export default function AcomptesEncaisser() {
   return (
     <div style={{ padding: 20 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-        <h1 style={{ fontSize: 22, fontWeight: 700, color: '#1E3A5F', margin: 0 }}>
+        <h1 style={{ fontSize: 22, fontWeight: 700, color: '#1565C0', margin: 0 }}>
           💰 Acomptes à encaisser
         </h1>
         <div style={{ fontSize: 14, color: '#6B7280' }}>
@@ -70,7 +70,7 @@ export default function AcomptesEncaisser() {
               fontSize: 12,
               fontWeight: 600,
               fontFamily: 'inherit',
-              background: filtreStatut === s ? '#1E3A5F' : '#E5E7EB',
+              background: filtreStatut === s ? '#1565C0' : '#E5E7EB',
               color: filtreStatut === s ? '#fff' : '#374151',
             }}
           >
@@ -145,7 +145,7 @@ export default function AcomptesEncaisser() {
                         onClick={() => navigate(`/admin/devis/${q.id}`)}
                         style={{
                           padding: '6px 12px',
-                          background: '#1E3A5F',
+                          background: '#1565C0',
                           color: '#fff',
                           border: 'none',
                           borderRadius: 6,

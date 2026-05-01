@@ -112,7 +112,7 @@ export default function DropdownPorts({ type, value, onChange, label, required }
             fontSize: 13,
             fontWeight: 600,
             cursor: 'pointer',
-            color: '#1E3A5F',
+            color: '#1565C0',
             whiteSpace: 'nowrap',
           }}
           title="Ajouter un nouveau port"
@@ -129,7 +129,7 @@ export default function DropdownPorts({ type, value, onChange, label, required }
           alignItems: 'center', justifyContent: 'center', zIndex: 1000,
         }}>
           <div style={{ background: '#fff', borderRadius: 24, padding: 32, maxWidth: 480, width: '90%' }}>
-            <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 6, color: '#1E3A5F' }}>
+            <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 6, color: '#1565C0' }}>
               Ajouter un port de {type === 'chargement' ? 'chargement' : 'destination'}
             </h2>
             <p style={{ fontSize: 13, color: '#6B7280', marginBottom: 20 }}>

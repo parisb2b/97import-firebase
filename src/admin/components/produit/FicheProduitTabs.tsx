@@ -34,7 +34,7 @@ function TabButton({ children, active, onClick, required, count, total, locked, 
       style={{
         background: 'transparent', border: 'none', padding: '12px 24px',
         fontSize: 14, cursor: locked ? 'not-allowed' : 'pointer',
-        color: active ? '#1E3A5F' : locked ? '#9CA3AF' : '#6B7280',
+        color: active ? '#1565C0' : locked ? '#9CA3AF' : '#6B7280',
         fontWeight: active ? 600 : 500,
         display: 'flex', alignItems: 'center', gap: 8,
         position: 'relative', whiteSpace: 'nowrap', opacity: locked ? 0.5 : 1,

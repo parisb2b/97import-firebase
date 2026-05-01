@@ -185,7 +185,7 @@ export default function DetailConteneur() {
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: 24 }}>
         <div>
-          <h1 style={{ fontSize: 28, fontWeight: 700, color: '#1E3A5F', margin: 0 }}>
+          <h1 style={{ fontSize: 28, fontWeight: 700, color: '#1565C0', margin: 0 }}>
             {conteneur.numero}
           </h1>
           <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginTop: 8 }}>
@@ -464,7 +464,7 @@ const cardStyle: React.CSSProperties = {
   padding: 24, marginBottom: 20,
 };
 const sectionTitleStyle: React.CSSProperties = {
-  fontSize: 16, fontWeight: 600, color: '#1E3A5F', marginTop: 0, marginBottom: 20,
+  fontSize: 16, fontWeight: 600, color: '#1565C0', marginTop: 0, marginBottom: 20,
 };
 const labelStyle: React.CSSProperties = {
   display: 'block', fontSize: 12, color: '#6B7280', marginBottom: 6,

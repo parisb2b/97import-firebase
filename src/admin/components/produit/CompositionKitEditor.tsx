@@ -104,7 +104,7 @@ export default function CompositionKitEditor({ composition, onChange }: Props) {
                   onMouseEnter={e => (e.currentTarget.style.background = '#FFF7ED')}
                   onMouseLeave={e => (e.currentTarget.style.background = '#fff')}>
                   <div>
-                    <code style={{ fontSize: 12, color: '#1E3A5F' }}>{p.reference}</code>
+                    <code style={{ fontSize: 12, color: '#1565C0' }}>{p.reference}</code>
                     <div style={{ fontSize: 13 }}>{p.nom_fr}</div>
                   </div>
                   <button style={{ background: '#EA580C', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: 8, fontSize: 12, cursor: 'pointer' }}>+ Ajouter</button>

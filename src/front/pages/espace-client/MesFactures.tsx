@@ -256,7 +256,7 @@ function ModalFacture({ f, onClose }: { f: FactureLigne, onClose: () => void }) 
       background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000,
     }}>
       <div style={{ background: '#fff', borderRadius: 24, padding: 32, maxWidth: 480, width: '90%' }}>
-        <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 20, color: '#1E3A5F' }}>
+        <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 20, color: '#1565C0' }}>
           Détail de la facture
         </h2>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12, fontSize: 14 }}>

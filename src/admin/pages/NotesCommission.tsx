@@ -184,7 +184,7 @@ export default function NotesCommission() {
         message: {
           subject: `Nouvelle note de commission ${c.numero}`,
           html: `
-          <h2 style="color:#1E3A5F">Nouvelle commission disponible</h2>
+          <h2 style="color:#1565C0">Nouvelle commission disponible</h2>
           <p>Bonjour ${c.partenaire_nom},</p>
           <p>Une nouvelle note de commission est disponible dans votre espace partenaire :</p>
           <ul>
@@ -251,7 +251,7 @@ export default function NotesCommission() {
         marginBottom: 20,
       }}>
         <div>
-          <h1 style={{ margin: 0, fontSize: 24, fontWeight: 700, color: '#1E3A5F' }}>
+          <h1 style={{ margin: 0, fontSize: 24, fontWeight: 700, color: '#1565C0' }}>
             Notes de Commission
           </h1>
           <p style={{ margin: '4px 0 0', fontSize: 14, color: '#6B7280' }}>

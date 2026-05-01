@@ -87,7 +87,7 @@ export default function ModalDupliquerProduit({ produit, onClose, onSuccess }: P
     <div onClick={onClose} style={overlayStyle}>
       <div onClick={e => e.stopPropagation()} style={modalStyle}>
         <div style={headerStyle}>
-          <h2 style={{ margin: 0, fontSize: 18, color: '#1E3A5F' }}>
+          <h2 style={{ margin: 0, fontSize: 18, color: '#1565C0' }}>
             📋 Dupliquer ce produit
           </h2>
           <button onClick={onClose} style={closeBtnStyle}>×</button>
@@ -266,7 +266,7 @@ const erreurStyle: React.CSSProperties = {
 };
 
 const btnPrimaryStyle: React.CSSProperties = {
-  padding: '10px 20px', background: '#1E3A5F',
+  padding: '10px 20px', background: '#1565C0',
   color: '#fff', border: 'none', borderRadius: 6,
   fontSize: 14, fontWeight: 600, cursor: 'pointer',
   fontFamily: 'inherit',

@@ -145,7 +145,7 @@ export default function AdminProduits() {
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24 }}>
         <div>
-          <h1 style={{ fontSize: 24, fontWeight: 700, color: '#1E3A5F', margin: 0 }}>Produits</h1>
+          <h1 style={{ fontSize: 24, fontWeight: 700, color: '#1565C0', margin: 0 }}>Produits</h1>
           <p style={{ color: '#6B7280', fontSize: 14, margin: '4px 0 0' }}>
             Gestion du catalogue — {sorted.length === stats.total
               ? `${stats.total} produit${stats.total > 1 ? 's' : ''} au total`
@@ -502,4 +502,4 @@ function StatCard({ label, value, bg, color, border }: any) {
 const selectStyle: React.CSSProperties = { minWidth: 180, padding: '10px 14px', border: '1px solid #E5E7EB', borderRadius: 10, fontSize: 14, background: '#fff', fontFamily: 'inherit', color: '#111827' };
 const thStyle: React.CSSProperties = { padding: '12px 16px', textAlign: 'left', fontWeight: 600, color: '#6B7280', fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.3, cursor: 'pointer', userSelect: 'none' };
 const tdStyle: React.CSSProperties = { padding: '14px 16px', verticalAlign: 'middle' };
-const refCodeStyle: React.CSSProperties = { fontFamily: 'SF Mono, Monaco, Menlo, monospace', fontSize: 12, background: '#F3F4F6', padding: '2px 6px', borderRadius: 4, color: '#1E3A5F' };
+const refCodeStyle: React.CSSProperties = { fontFamily: 'SF Mono, Monaco, Menlo, monospace', fontSize: 12, background: '#F3F4F6', padding: '2px 6px', borderRadius: 4, color: '#1565C0' };

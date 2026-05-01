@@ -232,7 +232,7 @@ export default function Catalogue() {
           ) : (
             productsBySection.map((section) => (
               <section key={section.prefix} style={{ marginTop: 32 }}>
-                <h2 style={{ fontSize: 20, fontWeight: 700, color: '#1E3A5F', marginBottom: 14, display: 'flex', alignItems: 'baseline', gap: 10 }}>
+                <h2 style={{ fontSize: 20, fontWeight: 700, color: '#1565C0', marginBottom: 14, display: 'flex', alignItems: 'baseline', gap: 10 }}>
                   {section.titre}
                   <span style={{ fontSize: 13, fontWeight: 400, color: '#6B7280' }}>
                     ({section.products.length} produit{section.products.length > 1 ? 's' : ''})

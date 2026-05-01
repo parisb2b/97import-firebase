@@ -156,7 +156,7 @@ export default function CaracteristiquesEditor({ value, onChange }: Props) {
 }
 
 const subTitleStyle: React.CSSProperties = {
-  fontSize: 13, fontWeight: 700, color: '#1E3A5F', marginBottom: 4, textTransform: 'uppercase', letterSpacing: 0.4,
+  fontSize: 13, fontWeight: 700, color: '#1565C0', marginBottom: 4, textTransform: 'uppercase', letterSpacing: 0.4,
 };
 const hintStyle: React.CSSProperties = { fontSize: 12, color: '#6B7280', margin: '0 0 10px' };
 const codeStyle: React.CSSProperties = {

@@ -365,7 +365,7 @@ export default function TauxRMB() {
           {conversions6.map((c, i) => (
             <div key={i} className="v45-card" style={{ padding: 10, background: '#F9FAFB', border: '1px solid #E5E7EB', borderRadius: 8, textAlign: 'center' }}>
               <div style={{ fontSize: 12, color: '#6B7280' }}>{c.from}</div>
-              <div style={{ fontSize: 16, fontWeight: 700, color: '#1E3A5F', marginTop: 2 }}>{c.to}</div>
+              <div style={{ fontSize: 16, fontWeight: 700, color: '#1565C0', marginTop: 2 }}>{c.to}</div>
             </div>
           ))}
         </div>
@@ -388,7 +388,7 @@ function ConvCell({ label, value, active }: { label: string; value: string; acti
       textAlign: 'center',
     }}>
       <div style={{ fontSize: 11, color: '#6B7280' }}>{label}</div>
-      <div style={{ fontSize: 18, fontWeight: 700, color: '#1E3A5F', marginTop: 2 }}>{value}</div>
+      <div style={{ fontSize: 18, fontWeight: 700, color: '#1565C0', marginTop: 2 }}>{value}</div>
     </div>
   );
 }

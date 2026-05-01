@@ -479,7 +479,7 @@ export default function OngletGestionPrix({ productId, product }: Props) {
           {conversions6.map((c, i) => (
             <div key={i} style={{ padding: 10, background: '#F9FAFB', border: '1px solid #E5E7EB', borderRadius: 8, textAlign: 'center' }}>
               <div style={{ fontSize: 12, color: '#6B7280' }}>{c.from}</div>
-              <div style={{ fontSize: 16, fontWeight: 700, color: '#1E3A5F', marginTop: 2 }}>{c.to}</div>
+              <div style={{ fontSize: 16, fontWeight: 700, color: '#1565C0', marginTop: 2 }}>{c.to}</div>
             </div>
           ))}
         </div>
@@ -493,7 +493,7 @@ export default function OngletGestionPrix({ productId, product }: Props) {
 function Card({ title, subtitle, children }: { title: string; subtitle?: string; children: React.ReactNode }) {
   return (
     <div className="v45-card v45-card-hover" style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 12, padding: 18 }}>
-      <h3 style={{ margin: '0 0 4px', fontSize: 15, fontWeight: 700, color: '#1E3A5F' }}>{title}</h3>
+      <h3 style={{ margin: '0 0 4px', fontSize: 15, fontWeight: 700, color: '#1565C0' }}>{title}</h3>
       {subtitle && <p style={{ fontSize: 12, color: '#6B7280', margin: '0 0 14px' }}>{subtitle}</p>}
       {children}
     </div>
@@ -585,7 +585,7 @@ function ConvCell({ label, value, active }: { label: string; value: string; acti
       textAlign: 'center',
     }}>
       <div style={{ fontSize: 11, color: '#6B7280' }}>{label}</div>
-      <div style={{ fontSize: 16, fontWeight: 700, color: '#1E3A5F', marginTop: 2 }}>{value}</div>
+      <div style={{ fontSize: 16, fontWeight: 700, color: '#1565C0', marginTop: 2 }}>{value}</div>
     </div>
   );
 }

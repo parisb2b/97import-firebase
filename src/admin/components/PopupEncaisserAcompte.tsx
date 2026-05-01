@@ -156,7 +156,7 @@ export default function PopupEncaisserAcompte({ devis, onClose, onSuccess }: Pro
     return (
       <div style={overlayStyle} onClick={onClose}>
         <div style={modalStyle} onClick={e => e.stopPropagation()}>
-          <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 16, color: '#1E3A5F' }}>
+          <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 16, color: '#1565C0' }}>
             Aucun acompte déclaré
           </h2>
           <p style={{ fontSize: 14, color: '#6B7280', marginBottom: 20 }}>
@@ -354,7 +354,7 @@ export default function PopupEncaisserAcompte({ devis, onClose, onSuccess }: Pro
   return (
     <div style={overlayStyle} onClick={onClose}>
       <div style={modalStyle} onClick={e => e.stopPropagation()}>
-        <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 8, color: '#1E3A5F' }}>
+        <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 8, color: '#1565C0' }}>
           Encaisser un acompte
         </h2>
         <p style={{ fontSize: 13, color: '#6B7280', marginBottom: 6 }}>

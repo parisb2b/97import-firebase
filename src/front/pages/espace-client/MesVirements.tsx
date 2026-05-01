@@ -273,7 +273,7 @@ function ModalVirement({ v, onClose }: { v: any, onClose: () => void }) {
         background: '#fff', borderRadius: 24, padding: 32,
         maxWidth: 480, width: '90%',
       }}>
-        <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 20, color: '#1E3A5F' }}>
+        <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 20, color: '#1565C0' }}>
           Détail du virement
         </h2>
 

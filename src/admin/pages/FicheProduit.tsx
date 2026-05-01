@@ -293,7 +293,7 @@ export default function FicheProduit() {
         </Link>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div>
-            <h1 style={{ fontSize: 24, fontWeight: 700, color: '#1E3A5F', margin: 0 }}>
+            <h1 style={{ fontSize: 24, fontWeight: 700, color: '#1565C0', margin: 0 }}>
               {isCreation ? 'Nouveau produit' : product.nom_fr || product.reference}
             </h1>
             {!isCreation && (

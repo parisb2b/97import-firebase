@@ -223,7 +223,7 @@ export default function ModalNouvelleCommission({ onClose, onSuccess }: Props) {
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
         }}>
           <div>
-            <h2 style={{ margin: 0, fontSize: 18, color: '#1E3A5F' }}>
+            <h2 style={{ margin: 0, fontSize: 18, color: '#1565C0' }}>
               Nouvelle Note de Commission
             </h2>
             <p style={{ margin: '4px 0 0', fontSize: 13, color: '#6B7280' }}>
@@ -287,7 +287,7 @@ export default function ModalNouvelleCommission({ onClose, onSuccess }: Props) {
                     >
                       <div style={{
                         width: 40, height: 40, borderRadius: 8,
-                        background: '#1E3A5F', color: '#fff',
+                        background: '#1565C0', color: '#fff',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         fontWeight: 700, fontSize: 14,
                       }}>{p.code}</div>
@@ -395,7 +395,7 @@ export default function ModalNouvelleCommission({ onClose, onSuccess }: Props) {
                                 <code style={{
                                   fontSize: 11, background: '#F3F4F6',
                                   padding: '2px 6px', borderRadius: 4,
-                                  color: '#1E3A5F',
+                                  color: '#1565C0',
                                 }}>
                                   {d.numero || d.id}
                                 </code>

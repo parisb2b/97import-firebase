@@ -61,7 +61,7 @@ export default function PopupVerserAcompte({
     <div onClick={onClose} style={overlayStyle}>
       <div onClick={e => e.stopPropagation()} style={modalStyle}>
         <div style={headerStyle}>
-          <h2 style={{ margin: 0, fontSize: 18, color: '#1E3A5F' }}>💰 {title}</h2>
+          <h2 style={{ margin: 0, fontSize: 18, color: '#1565C0' }}>💰 {title}</h2>
           <button onClick={onClose} style={closeBtnStyle}>×</button>
         </div>
 

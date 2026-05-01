@@ -104,7 +104,7 @@ export default function ListeListesAchat() {
     <div style={{ padding: 32 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
         <div>
-          <h1 style={{ fontSize: 24, fontWeight: 700, color: '#1E3A5F', margin: 0 }}>
+          <h1 style={{ fontSize: 24, fontWeight: 700, color: '#1565C0', margin: 0 }}>
             Listes d'achat
           </h1>
           <p style={{ color: '#6B7280', fontSize: 14, margin: '4px 0 0 0' }}>
@@ -189,7 +189,7 @@ export default function ListeListesAchat() {
                   <tr key={l.id} style={{ borderBottom: '1px solid #F3F4F6', cursor: 'pointer' }}
                     onClick={() => setLocation(`/admin/listes-achat/${l.id}`)}>
                     <td style={tdStyle}>
-                      <strong style={{ color: '#1E3A5F' }}>{l.numero}</strong>
+                      <strong style={{ color: '#1565C0' }}>{l.numero}</strong>
                     </td>
                     <td style={tdStyle}>{dateCreation}</td>
                     <td style={tdStyle}>

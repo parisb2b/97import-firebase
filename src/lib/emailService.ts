@@ -148,7 +148,7 @@ function baseTemplate(options: {
           <!-- Titre -->
           <tr>
             <td style="padding:32px 40px 0 40px;">
-              <h2 style="margin:0;color:#1E3A5F;font-size:20px;font-weight:700;">${title}</h2>
+              <h2 style="margin:0;color:#1565C0;font-size:20px;font-weight:700;">${title}</h2>
             </td>
           </tr>
 
@@ -237,7 +237,7 @@ export async function notifyDevisCree(devis: any): Promise<void> {
     intro: `Bonjour ${clientNom},<br><br>Nous avons bien reçu votre demande. Votre devis <strong>${devis.numero}</strong> est maintenant disponible dans votre espace client.`,
     body: `
       <div style="background:#F9FAFB;border-radius:12px;padding:20px;margin-top:12px;">
-        <p style="margin:0 0 12px 0;color:#1E3A5F;font-weight:600;">Récapitulatif :</p>
+        <p style="margin:0 0 12px 0;color:#1565C0;font-weight:600;">Récapitulatif :</p>
         <ul style="margin:0;padding-left:20px;color:#374151;">${produitsList}</ul>
         <hr style="border:none;border-top:1px solid #E5E7EB;margin:16px 0;">
         <p style="margin:0;color:#1565C0;font-size:18px;font-weight:700;">Total HT : ${formatEur(totalHt)}</p>
@@ -410,7 +410,7 @@ export async function notifyDevisVipEnvoye(devis: any, partenaireName?: string):
         subject: `[97import] Devis VIP envoyé au client — ${devis.numero}`,
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <h2 style="color: #1E3A5F;">Devis VIP envoyé au client</h2>
+            <h2 style="color: #1565C0;">Devis VIP envoyé au client</h2>
             <p>Le partenaire ${partenaireName || '—'} a négocié et envoyé le devis VIP.</p>
 
             <div style="padding: 16px; background: #F3F4F6; border-radius: 8px; margin: 20px 0;">
@@ -975,7 +975,7 @@ export async function envoyerEmailCommissionPartenaire(params: {
 
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-      <div style="background: linear-gradient(135deg, #1E3A5F 0%, #3B82F6 100%); padding: 32px; text-align: center; color: #fff;">
+      <div style="background: linear-gradient(135deg, #1565C0 0%, #3B82F6 100%); padding: 32px; text-align: center; color: #fff;">
         <div style="font-size: 48px;">💰</div>
         <h1 style="margin: 8px 0 0;">Nouvelle commission</h1>
       </div>

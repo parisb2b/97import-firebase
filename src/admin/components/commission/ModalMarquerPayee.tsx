@@ -64,7 +64,7 @@ export default function ModalMarquerPayee({ commission, onClose, onSuccess }: Pr
         }}
       >
         <div style={{ padding: 20, borderBottom: '1px solid #E5E7EB' }}>
-          <h2 style={{ margin: 0, fontSize: 18, color: '#1E3A5F' }}>
+          <h2 style={{ margin: 0, fontSize: 18, color: '#1565C0' }}>
             Marquer comme payée
           </h2>
           <p style={{ margin: '4px 0 0', fontSize: 13, color: '#6B7280' }}>

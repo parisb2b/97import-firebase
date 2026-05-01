@@ -68,7 +68,7 @@ export default function NouvelleListeAchat() {
         </Link>
       </div>
 
-      <h1 style={{ fontSize: 24, fontWeight: 700, color: '#1E3A5F', marginBottom: 4 }}>
+      <h1 style={{ fontSize: 24, fontWeight: 700, color: '#1565C0', marginBottom: 4 }}>
         Nouvelle liste d'achat
       </h1>
       <p style={{ color: '#6B7280', fontSize: 14, marginBottom: 32 }}>
@@ -140,7 +140,7 @@ const cardStyle: React.CSSProperties = {
   marginBottom: 20,
 };
 const sectionTitleStyle: React.CSSProperties = {
-  fontSize: 16, fontWeight: 600, color: '#1E3A5F', marginTop: 0, marginBottom: 20,
+  fontSize: 16, fontWeight: 600, color: '#1565C0', marginTop: 0, marginBottom: 20,
 };
 const labelStyle: React.CSSProperties = {
   display: 'block', fontSize: 12, color: '#6B7280', marginBottom: 6,
