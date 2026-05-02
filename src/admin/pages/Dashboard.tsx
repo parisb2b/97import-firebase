@@ -70,10 +70,28 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState('');
 
+  // V50-BIS Checkpoint D — diagnostic systematic-debugging :
+  // Avant V50-BIS, loadData wrappait 5 queries Firestore dans un seul
+  // try/catch global. Si UNE seule queries throw (collection inexistante,
+  // index manquant pour `where in`, RBAC), tout le dashboard cassait avec
+  // banniere "Erreur lors du chargement du tableau de bord".
+  //
+  // Apres V50-BIS : chaque section devient un helper independant,
+  // toutes lancees en Promise.allSettled. Echec local = log console +
+  // fallback (KPI "—", liste vide, demo data). Banniere globale n'apparait
+  // que si TOUTES les sections echouent (ultime degraded mode).
+
   useEffect(() => {
     const loadData = async () => {
-      try {
-        // Load ALL quotes
+      // ──────────────────────────────────────────────────────────
+      // Helpers granulaires — chacun gere sa propre partie de state
+      // ──────────────────────────────────────────────────────────
+      type QuotesPartial = {
+        devisTotal: number; devisEnAttente: number; devisVip: number;
+        caEncaisse: number; soldeRestant: number;
+        recents: RecentDevis[];
+      };
+      const loadQuotesStats = async (): Promise<QuotesPartial> => {
         const allQuotesSnap = await getDocs(collection(db, 'quotes'));
         const allQuotes = allQuotesSnap.docs.map((d) => ({ id: d.id, ...d.data() })) as any[];
 
@@ -81,9 +99,6 @@ export default function Dashboard() {
         const devisEnAttente = allQuotes.filter((q) => q.statut === 'nouveau' || q.statut === 'envoye').length;
         const devisVip = allQuotes.filter((q) => q.is_vip || q.statut === 'vip_envoye').length;
 
-        // CA encaisse: sum of acomptes where encaisse === true (v43 P3-COMPLET format)
-        // v43-E3.1 : la ligne "if (q.total_encaisse) caEncaisse += q.total_encaisse"
-        // créait un double-comptage avec la boucle ci-dessus (signalé Opus 4.7 + Grok).
         let caEncaisse = 0;
         allQuotes.forEach((q) => {
           if (q.acomptes && Array.isArray(q.acomptes)) {
@@ -93,27 +108,42 @@ export default function Dashboard() {
           }
         });
 
-        // Solde restant
         const totalHtAll = allQuotes.reduce((sum, q) => sum + (q.total_ht || 0), 0);
         const soldeRestant = totalHtAll - caEncaisse;
 
-        // Load commissions from BOTH collections
+        // 5 most recent devis sorted by createdAt
+        const sorted = [...allQuotes].sort((a, b) => {
+          const ta = a.createdAt?.toMillis?.() || a.createdAt?.seconds * 1000 || 0;
+          const tb = b.createdAt?.toMillis?.() || b.createdAt?.seconds * 1000 || 0;
+          return tb - ta;
+        });
+        return {
+          devisTotal, devisEnAttente, devisVip,
+          caEncaisse, soldeRestant,
+          recents: sorted.slice(0, 5) as RecentDevis[],
+        };
+      };
+
+      type CommissionsPartial = {
+        commissionsDues: number;
+        commissionsPartenaires: number;
+        list: Commission[];
+      };
+      const loadCommissionsStats = async (): Promise<CommissionsPartial> => {
         const [commSnap, notesCommSnap] = await Promise.all([
           getDocs(collection(db, 'commissions')).catch(() => null),
           getDocs(collection(db, 'notes_commission')).catch(() => null),
         ]);
-
         let commissionsDues = 0;
         const partenaireSet = new Set<string>();
-        const commList: Commission[] = [];
-
+        const list: Commission[] = [];
         if (commSnap) {
           commSnap.docs.forEach((d) => {
             const data = d.data();
             if (data.statut === 'due') {
               commissionsDues += (data.montant || 0);
               if (data.partenaire_code) partenaireSet.add(data.partenaire_code);
-              commList.push({ id: d.id, ...data } as Commission);
+              list.push({ id: d.id, ...data } as Commission);
             }
           });
         }
@@ -123,56 +153,102 @@ export default function Dashboard() {
             if (data.statut === 'due') {
               commissionsDues += (data.montant || 0);
               if (data.partenaire_code) partenaireSet.add(data.partenaire_code);
-              commList.push({ id: d.id, ...data } as Commission);
+              list.push({ id: d.id, ...data } as Commission);
             }
           });
         }
-        setCommissions(commList.slice(0, 5));
+        return { commissionsDues, commissionsPartenaires: partenaireSet.size, list };
+      };
 
-        // Load SAV urgents
+      const loadSavCount = async (): Promise<number> => {
         const savSnap = await getDocs(
           query(collection(db, 'sav'), where('statut', '==', 'nouveau'))
         );
+        return savSnap.size;
+      };
 
-        // Load active containers
+      const loadConteneurs = async (): Promise<Conteneur[]> => {
         const contQuery = query(
           collection(db, 'containers'),
           where('statut', 'in', ['préparation', 'chargé', 'parti']),
           limit(3)
         );
         const contSnap = await getDocs(contQuery);
-        const contData = contSnap.docs.map((d) => ({
-          id: d.id,
-          ...d.data(),
-        })) as Conteneur[];
-        setConteneurs(contData);
+        return contSnap.docs.map((d) => ({ id: d.id, ...d.data() })) as Conteneur[];
+      };
 
-        // 5 most recent devis sorted by createdAt
-        const sorted = [...allQuotes].sort((a, b) => {
-          const ta = a.createdAt?.toMillis?.() || a.createdAt?.seconds * 1000 || 0;
-          const tb = b.createdAt?.toMillis?.() || b.createdAt?.seconds * 1000 || 0;
-          return tb - ta;
-        });
-        setRecentDevis(sorted.slice(0, 5) as RecentDevis[]);
+      // ──────────────────────────────────────────────────────────
+      // Promise.allSettled : echecs granulaires non bloquants
+      // ──────────────────────────────────────────────────────────
+      const [quotesRes, commissionsRes, savRes, contRes] = await Promise.allSettled([
+        loadQuotesStats(),
+        loadCommissionsStats(),
+        loadSavCount(),
+        loadConteneurs(),
+      ]);
 
-        setStats({
-          devisTotal,
-          devisEnAttente,
-          devisVip,
-          devisStd: devisEnAttente - devisVip,
-          caEncaisse,
-          soldeRestant,
-          commissionsDues,
-          commissionsPartenaires: partenaireSet.size,
-          savUrgents: savSnap.size,
-        });
-
-        setLoading(false);
-      } catch (err) {
-        console.error('Error loading dashboard:', err);
-        setErrorMsg('Erreur lors du chargement du tableau de bord');
-        setLoading(false);
+      // Quotes : section cle (CA, KPI principaux)
+      let quotesPartial: QuotesPartial = {
+        devisTotal: 0, devisEnAttente: 0, devisVip: 0,
+        caEncaisse: 0, soldeRestant: 0, recents: [],
+      };
+      if (quotesRes.status === 'fulfilled') {
+        quotesPartial = quotesRes.value;
+        setRecentDevis(quotesRes.value.recents);
+      } else {
+        console.warn('[Dashboard] loadQuotesStats failed:', quotesRes.reason?.message);
       }
+
+      let commissionsPartial: CommissionsPartial = {
+        commissionsDues: 0, commissionsPartenaires: 0, list: [],
+      };
+      if (commissionsRes.status === 'fulfilled') {
+        commissionsPartial = commissionsRes.value;
+        setCommissions(commissionsRes.value.list.slice(0, 5));
+      } else {
+        console.warn('[Dashboard] loadCommissionsStats failed:', commissionsRes.reason?.message);
+      }
+
+      let savCount = 0;
+      if (savRes.status === 'fulfilled') {
+        savCount = savRes.value;
+      } else {
+        console.warn('[Dashboard] loadSavCount failed (collection sav inexistante ou rules ?):',
+          savRes.reason?.message);
+      }
+
+      if (contRes.status === 'fulfilled') {
+        setConteneurs(contRes.value);
+      } else {
+        console.warn('[Dashboard] loadConteneurs failed (collection containers ou index manquant ?):',
+          contRes.reason?.message);
+        setConteneurs([]);
+      }
+
+      setStats({
+        devisTotal: quotesPartial.devisTotal,
+        devisEnAttente: quotesPartial.devisEnAttente,
+        devisVip: quotesPartial.devisVip,
+        devisStd: quotesPartial.devisEnAttente - quotesPartial.devisVip,
+        caEncaisse: quotesPartial.caEncaisse,
+        soldeRestant: quotesPartial.soldeRestant,
+        commissionsDues: commissionsPartial.commissionsDues,
+        commissionsPartenaires: commissionsPartial.commissionsPartenaires,
+        savUrgents: savCount,
+      });
+
+      // Banniere globale UNIQUEMENT si TOUTES les sections principales ont echoue.
+      // (Mode degrade extreme — ex: pas de connexion BD du tout.)
+      const allFailed =
+        quotesRes.status === 'rejected' &&
+        commissionsRes.status === 'rejected' &&
+        savRes.status === 'rejected' &&
+        contRes.status === 'rejected';
+      if (allFailed) {
+        setErrorMsg('Erreur lors du chargement du tableau de bord');
+      }
+
+      setLoading(false);
     };
 
     loadData();
