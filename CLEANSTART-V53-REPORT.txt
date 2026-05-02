@@ -1,0 +1,108 @@
+CLEANSTART V53 REPORT
+Date: 2026-05-02T13:34:48.978Z
+Project: importok-6ef77
+Archive: archive-before-cleanstart-v53.zip
+Archive SHA256: 6932bee55de40cb31cd2f8aeb84fb75b69e6e2315939837e337e53541e015c9a
+
+KEEP counts before:
+{
+  "users": 9,
+  "clients": 6,
+  "partners": 3,
+  "products": 127,
+  "categories": 5,
+  "ports": 11,
+  "admin_params": 4,
+  "tarifs_logistiques": 3,
+  "counters": 14
+}
+
+ARCHIVE-ONLY counts before:
+{
+  "profiles": 9,
+  "mail": 254,
+  "logs": 10
+}
+
+PURGE counts before:
+{
+  "quotes": 21,
+  "commissions": 2,
+  "factures": 0,
+  "invoices": 0,
+  "logistics_invoices": 0,
+  "conteneurs": 0,
+  "containers": 0,
+  "notes_commission": 0,
+  "listes_achat": 0,
+  "sav": 0,
+  "contacts": 0,
+  "stock": 0,
+  "price_history": 6
+}
+
+Deleted counts:
+{
+  "quotes": 21,
+  "commissions": 2,
+  "factures": 0,
+  "invoices": 0,
+  "logistics_invoices": 0,
+  "conteneurs": 0,
+  "containers": 0,
+  "notes_commission": 0,
+  "listes_achat": 0,
+  "sav": 0,
+  "contacts": 0,
+  "stock": 0,
+  "price_history": 6
+}
+
+Post-purge counts:
+{
+  "purge": {
+    "quotes": 0,
+    "commissions": 0,
+    "factures": 0,
+    "invoices": 0,
+    "logistics_invoices": 0,
+    "conteneurs": 0,
+    "containers": 0,
+    "notes_commission": 0,
+    "listes_achat": 0,
+    "sav": 0,
+    "contacts": 0,
+    "stock": 0,
+    "price_history": 0
+  },
+  "keep": {
+    "users": 9,
+    "clients": 6,
+    "partners": 3,
+    "products": 127,
+    "categories": 5,
+    "ports": 11,
+    "admin_params": 4,
+    "tarifs_logistiques": 3,
+    "counters": 16
+  },
+  "archiveOnly": {
+    "profiles": 9,
+    "mail": 254,
+    "logs": 10
+  }
+}
+
+Counters reset:
+[
+  "DVS",
+  "FA",
+  "FF",
+  "FL",
+  "FM",
+  "NC",
+  "BL",
+  "CTN",
+  "LA",
+  "SAV"
+]

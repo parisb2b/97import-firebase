@@ -1,0 +1,230 @@
+MAJ-V53-CODEXX — Clean Start Business Data 97IMPORT
+Date : 2026-05-02 15:36:05 CEST
+Projet Firebase : importok-6ef77
+Branche : v2
+
+1. Résumé exécutif
+
+Clean Start Business Data V53 exécuté via script contrôlé.
+Le script a créé une archive JSON + ZIP avant suppression, vérifié le projet Firebase, protégé les collections KEEP, purgé uniquement les collections documentaires ciblées et reset les compteurs documentaires attendus.
+
+Aucun deploy Firebase n'a été exécuté.
+Aucun secret n'a été affiché, copié, zippé ou commité.
+
+2. HEAD / tags
+
+HEAD avant rapport final : c56e92c
+Tag backup : backup-pre-v53-codexx-20260502-1519
+Tags checkpoints :
+- checkpoint-v53-codexx-0-gitignore
+- checkpoint-v53-codexx-A-clients-source
+- checkpoint-v53-codexx-B-script
+
+3. Fichiers modifiés pendant la mission
+
+- .gitignore
+- src/front/pages/Inscription.tsx
+- src/front/pages/Profil.tsx
+- src/admin/pages/Clients.tsx
+- src/admin/pages/DetailClient.tsx
+- scripts/clean-start-business-data-v53.cjs
+- CLEANSTART-V53-REPORT.txt
+- MAJ-V53-CODEXX.txt
+
+4. Changements code
+
+- Ajout des exclusions Clean Start V53 dans .gitignore.
+- Bascule des accès applicatifs clients de profiles vers clients.
+- Création du script scripts/clean-start-business-data-v53.cjs avec 3 modes :
+  - --dry-run
+  - --archive-only
+  - --execute --confirm-clean-start
+- Garde-fous script :
+  - PROJECT_ID hardcodé importok-6ef77
+  - vérification serviceAccount.project_id
+  - refus si users.size === 0
+  - refus si KEEP apparaît dans PURGE
+  - refus si KEEP apparaît dans ARCHIVE-ONLY
+  - refus --execute sans --confirm-clean-start
+  - refus --execute sans archive ZIP préalable
+  - archive JSON + ZIP + SHA256 avant suppression
+  - purge limitée aux collections PURGE
+  - profiles/mail/logs en archive-only
+  - reset limité aux compteurs DVS/FA/FF/FL/FM/NC/BL/CTN/LA/SAV
+  - vérification post-purge
+
+5. Collections KEEP
+
+Counts avant execute :
+- users : 9
+- clients : 6
+- partners : 3
+- products : 127
+- categories : 5
+- ports : 11
+- admin_params : 4
+- tarifs_logistiques : 3
+- counters : 14
+
+Counts après execute :
+- users : 9
+- clients : 6
+- partners : 3
+- products : 127
+- categories : 5
+- ports : 11
+- admin_params : 4
+- tarifs_logistiques : 3
+- counters : 16
+
+Note counters : 10 compteurs documentaires ont été reset/initialisés avec seq=0, archive_reference et archive_sha256. Aucune collection KEEP n'a été purgée.
+
+6. Collections ARCHIVE-ONLY
+
+Counts avant et après execute :
+- profiles : 9
+- mail : 254
+- logs : 10
+
+Ces collections ont été archivées mais non supprimées.
+
+7. Collections PURGE
+
+Avant execute :
+- quotes : 21
+- commissions : 2
+- factures : 0
+- invoices : 0
+- logistics_invoices : 0
+- conteneurs : 0
+- containers : 0
+- notes_commission : 0
+- listes_achat : 0
+- sav : 0
+- contacts : 0
+- stock : 0
+- price_history : 6
+
+Après execute :
+- quotes : 0
+- commissions : 0
+- factures : 0
+- invoices : 0
+- logistics_invoices : 0
+- conteneurs : 0
+- containers : 0
+- notes_commission : 0
+- listes_achat : 0
+- sav : 0
+- contacts : 0
+- stock : 0
+- price_history : 0
+
+8. Archive
+
+Archive ZIP : archive-before-cleanstart-v53.zip
+SHA256 : 6932bee55de40cb31cd2f8aeb84fb75b69e6e2315939837e337e53541e015c9a
+Validation SHA256 : OK
+
+Contenu ZIP vérifié :
+- manifest.json
+- profiles.json
+- mail.json
+- logs.json
+- quotes.json
+- commissions.json
+- factures.json
+- invoices.json
+- logistics_invoices.json
+- conteneurs.json
+- containers.json
+- notes_commission.json
+- listes_achat.json
+- sav.json
+- contacts.json
+- stock.json
+- price_history.json
+
+Copie hors-machine : non vérifiée par Codex. À faire manuellement par Michel si nécessaire.
+
+9. Tests exécutés
+
+- git branch --show-current
+- git status --short
+- npm run build
+- grep profiles obligatoires Phase 2
+- node -c scripts/clean-start-business-data-v53.cjs
+- node scripts/clean-start-business-data-v53.cjs --execute
+  Résultat attendu : ABORT sans --confirm-clean-start
+- node scripts/clean-start-business-data-v53.cjs --execute --confirm-clean-start
+  Résultat attendu avant archive : ABORT ZIP absent
+- node scripts/clean-start-business-data-v53.cjs --dry-run
+- node scripts/clean-start-business-data-v53.cjs --archive-only
+- shasum -a 256 -c archive-before-cleanstart-v53.zip.sha256
+- unzip -l archive-before-cleanstart-v53.zip
+- node scripts/clean-start-business-data-v53.cjs --execute --confirm-clean-start
+- node scripts/clean-start-business-data-v53.cjs --dry-run post-execute
+- vérification ciblée des compteurs documentaires
+- npm run build final
+
+10. Résultat build
+
+npm run build : OK.
+Avertissements Vite restants :
+- imports dynamiques/statiques mélangés sur firebase.ts, quoteStatusHelpers.ts, emailService.ts
+- chunks > 800 kB
+
+11. Validation Vercel v2 à faire
+
+Front :
+https://97import-firebase-git-v2-parisb2bs-projects.vercel.app/
+
+Admin :
+https://97import-firebase-git-v2-parisb2bs-projects.vercel.app/admin
+
+Tests manuels recommandés :
+- login admin parisb2b@gmail.com
+- dashboard admin charge sans erreur majeure
+- /admin/clients affiche les clients
+- /admin/partenaires affiche les partenaires
+- /admin/produits affiche le catalogue
+- /admin/devis vide
+- /admin/factures vide
+- création d'un devis test possible
+- nouveau numéro devis cohérent après reset DVS
+- login client test
+- profil client lisible depuis clients/
+- espace client : Mes devis vide
+
+12. Commandes Firebase
+
+Aucun deploy Firebase exécuté.
+
+Si un déploiement rules est nécessaire plus tard, commande manuelle uniquement :
+firebase deploy --only firestore:rules --project=importok-6ef77
+
+13. Risques restants
+
+- Le script a reset/initialisé des compteurs documentaires. Le nombre total de documents counters est passé de 14 à 16, car certains compteurs documentaires attendus n'existaient pas avant le reset.
+- Les tests Vercel manuels ne sont pas exécutés par Codex.
+- La copie hors-machine du ZIP n'a pas été vérifiée par Codex.
+- Les avertissements de chunking Vite restent à traiter en V54/V55.
+- ESLint reste à corriger séparément si la configuration ESLint 9 est toujours absente.
+
+14. Rollback plan
+
+Avant restauration, ne pas relancer --execute.
+Conserver :
+- archive-before-cleanstart-v53.zip
+- archive-before-cleanstart-v53.zip.sha256
+- CLEANSTART-V53-REPORT.txt
+
+Rollback données :
+- préparer un script restore-from-archive-v53.cjs séparé
+- relire manifest.json dans l'archive
+- restaurer uniquement les collections documentaires purgées
+- ne jamais restaurer manuellement sans script contrôlé
+
+Rollback code :
+- revenir au tag backup-pre-v53-codexx-20260502-1519 si nécessaire
+- ne pas modifier main
