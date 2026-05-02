@@ -44,7 +44,10 @@ export default function AdminProduits() {
   const [actifFilter, setActifFilter] = useState(savedFilters.actif || 'TOUS');
 
   const [sortCol, setSortCol] = useState<SortColumn>('reference');
-  const [sortDir, setSortDir] = useState<SortDir>('asc');
+  // V49 Checkpoint G — convention "plus récent en haut" sur toutes les listes
+  // admin (audit V48-BIS — règle N6). 9 listes/10 conformes ; AdminProduits
+  // était la seule en 'asc' par défaut.
+  const [sortDir, setSortDir] = useState<SortDir>('desc');
 
   // V44-BIS FEAT 8 — filtre business 3 statuts (parallèle au filtre complétude existant)
   const [businessFilter, setBusinessFilter] = useState<CompletenessStatus | 'TOUS'>('TOUS');
