@@ -487,3 +487,24 @@ Actions :
 
 Firebase deploy : non execute.
 Prochaines actions V65 : corriger condition userRole dans Produit.tsx, deployer rules.
+
+## V65 — Diagnostic création devis + activation logs
+
+Date : 2026-05-03 00:15
+Mission : diagnostic création devis, activation journalisation, inventaire bugs.
+Commit : 410644a
+Tag : v65-diagnostic-devis
+
+Actions :
+- Ajout logInfo/logError dans handleCreateQuote (Panier.tsx)
+- Script test-create-devis-v65.cjs : transaction Admin SDK OK
+- Deux formats compteurs découverts : counters/DVS (seq) et counters/DVS_2605 (valeur)
+- BUGS-CORRIGES-V65.txt : 18 bugs documentes, 3 restants
+- LogService analyse : fonctionnel, Logs.tsx utilise adminDb (OK)
+
+Bugs restants :
+- V64-BUG-01 : bouton "Ajouter au panier" masque (Produit.tsx:328)
+- V65-BUG-01 : creation devis UI echoue (probablement rules non deployees)
+- V65-BUG-02 : /admin/logs vide
+
+Prochaine action V66 : deployer rules Firestore, corriger Produit.tsx bouton panier.
