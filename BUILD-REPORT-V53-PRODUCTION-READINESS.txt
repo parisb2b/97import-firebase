@@ -1,0 +1,60 @@
+═══════════════════════════════════════════════════════════════
+  BUILD REPORT — V53-PRODUCTION-READINESS (CP E)
+═══════════════════════════════════════════════════════════════
+
+Date          : 2026-05-02 (V53-PRODUCTION-READINESS)
+Branche       : v2
+HEAD          : 4a40563 (post CP D — scripts hardened)
+Commande      : npm run build
+Outil         : Vite v6.4.2
+Node          : v20.20.0
+Resultat      : ✅ BUILD VERT (exit 0)
+Duree         : 3.19s
+Warnings      : 4 (non bloquants)
+
+─── BUNDLE SIZES ──────────────────────────────────────────────────
+
+  dist/index.html                          0.82 kB │ gzip   0.41 kB
+  dist/assets/index-DyDu9W2e.css         146.09 kB │ gzip  24.84 kB
+  dist/assets/generateInvoiceFinale*.js    4.04 kB │ gzip   1.58 kB
+  dist/assets/ui-vendor*.js               57.53 kB │ gzip  19.27 kB
+  dist/assets/index.es*.js               159.64 kB │ gzip  53.54 kB
+  dist/assets/pdf-vendor*.js             617.91 kB │ gzip 185.98 kB
+  dist/assets/firebase-vendor*.js        652.66 kB │ gzip 154.07 kB
+  dist/assets/index-mN7GUuF8.js          871.28 kB │ gzip 228.86 kB
+  dist/assets/excel-vendor*.js           939.99 kB │ gzip 271.19 kB
+
+─── WARNINGS ──────────────────────────────────────────────────────
+
+  W1 — Chunk size > 800 kB (non bloquant, V46 split deja effectue)
+       index-mN7GUuF8.js : 871 kB
+       excel-vendor      : 939 kB
+       Origine : V46 a deja code-split firebase/pdf/excel/dnd-kit
+       Reduction estimee : -70% vs pre-V46
+
+  W2-W4 — Dynamic vs static import inconsistency :
+       - src/lib/firebase.ts : dynamiquement importe par 4 modules
+         et statiquement par ~80 fichiers
+       - src/lib/quoteStatusHelpers.ts : meme situation (6 fichiers)
+       - src/lib/emailService.ts : meme situation (6 fichiers)
+
+       Impact runtime : NUL (Vite resout statiquement quand
+       les deux coexistent — l'import dynamique est ignore).
+
+       Action V53 : aucune (warning historique, ne bloque pas).
+       Action V54+ : standardiser en static-only ou wrap les
+       quelques dynamic imports legitimes.
+
+─── CONCLUSION ────────────────────────────────────────────────────
+
+✅ Build production-ready :
+  - 0 erreur TypeScript
+  - 0 erreur compilation
+  - 4 warnings non bloquants (historiques)
+  - Duree < 5s (cible 3.5s post V46 — atteinte)
+  - Total gzip : ~940 kB (acceptable pour app B2B avec
+    PDF/Excel/Firebase embedded)
+
+Le repo est buildable en production sans modification.
+
+═══════════════════════════════════════════════════════════════
