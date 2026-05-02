@@ -15,11 +15,11 @@ test.describe('Parcours Client', () => {
     await expect(page.locator('h1')).toBeVisible();
   });
 
-  test('C03 — Panier : recap et total affiches correctement (BUG-03)', async ({ page }) => {
+  test('C03 — Panier : page panier chargee, police lisible (BUG-03)', async ({ page }) => {
     await page.goto('/panier');
-    // La page panier doit au moins charger sans erreur
-    await expect(page.locator('text=Votre panier')).toBeVisible();
-    // Verifier qu'aucun texte tronque n'est present (police V62)
+    // La page panier doit charger (panier vide = message attendu)
+    await expect(page.getByText('Votre panier est vide').first()).toBeVisible();
+    // Verifier la police (demande V62: au moins 14px)
     const bodyFontSize = await page.evaluate(() =>
       window.getComputedStyle(document.body).fontSize
     );

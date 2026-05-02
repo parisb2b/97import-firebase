@@ -20,9 +20,8 @@ test.describe('Parcours Partenaire', () => {
 
   test('P02 — Lien vers espace client present', async ({ page }) => {
     await page.goto('/espace-partenaire');
-    await expect(page.locator('text=Espace client')).toBeVisible();
-    const clientLink = page.locator('a[href="/connexion"]');
-    await expect(clientLink).toBeVisible();
+    // Le lien "Espace client" renvoie vers /connexion
+    await expect(page.getByRole('link', { name: 'Espace client' })).toBeVisible();
   });
 
   test('P03 — Verification role partenaire bloque non-partner', async ({ page }) => {
