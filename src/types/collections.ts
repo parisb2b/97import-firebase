@@ -245,3 +245,18 @@ export interface Quote {
   createdAt: FirestoreTimestamp;
   updatedAt?: FirestoreTimestamp;
 }
+
+// ──────────────────────────────────────────────────────────────────────
+//  Adresses (V62 — adresse livraison distincte)
+// ──────────────────────────────────────────────────────────────────────
+
+export interface Adresse {
+  rue: string;
+  code_postal: string;
+  ville: string;
+  pays: string;
+}
+
+export interface AdresseLivraison extends Adresse {
+  identique_facturation: boolean;
+}

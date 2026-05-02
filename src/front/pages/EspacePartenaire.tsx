@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { useLocation, Redirect } from 'wouter';
-import { onAuthStateChanged } from 'firebase/auth';
+import { useLocation } from 'wouter';
+import { onAuthStateChanged, signInWithEmailAndPassword } from 'firebase/auth';
 import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
 import { clientAuth, db } from '../../lib/firebase';
 
@@ -26,6 +26,9 @@ export default function EspacePartenaire() {
   const [profile, setProfile] = useState<any>(null);
   const [partnerCode, setPartnerCode] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loginEmail, setLoginEmail] = useState('');
+  const [loginPwd, setLoginPwd] = useState('');
+  const [loginErr, setLoginErr] = useState('');
   const [, navigate] = useLocation();
 
   useEffect(() => {
@@ -38,14 +41,22 @@ export default function EspacePartenaire() {
         const p = snap.exists() ? snap.data() : null;
         setProfile(p);
 
-        // v44 — try nouvelle convention (id = uid), puis fallback ancien schéma (userId field)
+        // V44 : résolution du code partenaire en cascade
+        // 1. /partners/{uid} (nouvelle convention)
         const partnerDocSnap = await getDoc(doc(db, 'partners', u.uid));
         if (partnerDocSnap.exists()) {
           setPartnerCode(partnerDocSnap.data().code);
         } else {
+          // 2. /partners where userId == uid (ancien schéma)
           const pSnap = await getDocs(query(collection(db, 'partners'), where('userId', '==', u.uid)));
           if (!pSnap.empty) {
             setPartnerCode(pSnap.docs[0].data().code);
+          } else if (u.email) {
+            // 3. V62 fallback : /partners where email == user email
+            const pEmailSnap = await getDocs(query(collection(db, 'partners'), where('email', '==', u.email)));
+            if (!pEmailSnap.empty) {
+              setPartnerCode(pEmailSnap.docs[0].data().code);
+            }
           }
         }
       } catch (err) {
@@ -56,8 +67,52 @@ export default function EspacePartenaire() {
     return () => unsub();
   }, []);
 
+  const handlePartnerLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoginErr('');
+    try {
+      const cred = await signInWithEmailAndPassword(clientAuth, loginEmail, loginPwd);
+      // Vérifier que l'utilisateur a le rôle partenaire
+      const snap = await getDoc(doc(db, 'users', cred.user.uid));
+      const p = snap.exists() ? snap.data() : null;
+      if (!p || p.role !== 'partner') {
+        setLoginErr('Ce compte n\'est pas un compte partenaire. Veuillez utiliser l\'espace client.');
+        await clientAuth.signOut();
+        return;
+      }
+    } catch (err: any) {
+      setLoginErr(err.message || 'Erreur de connexion');
+    }
+  };
+
   if (loading) return <div style={{ padding: 60, textAlign: 'center', color: '#6B7280' }}>Chargement...</div>;
-  if (!user) return <Redirect to="/connexion" />;
+  if (!user) {
+    return (
+      <div style={{ minHeight: 'calc(100vh - 64px)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#F0F4F8' }}>
+        <div style={{ width: 400, padding: 40, background: 'white', borderRadius: 16, boxShadow: '0 4px 24px rgba(0,0,0,0.08)' }}>
+          <div style={{ textAlign: 'center', marginBottom: 24 }}>
+            <div style={{ fontSize: 40, marginBottom: 8 }}>🤝</div>
+            <h1 style={{ fontSize: 22, fontWeight: 800, color: '#1565C0', marginBottom: 4 }}>Espace Partenaire</h1>
+            <p style={{ fontSize: 13, color: '#6B7280' }}>Connectez-vous pour gérer vos clients et devis</p>
+          </div>
+          <form onSubmit={handlePartnerLogin}>
+            <input autoFocus type="email" placeholder="Email" value={loginEmail} onChange={e => setLoginEmail(e.target.value)} required
+              style={{ width: '100%', padding: 12, borderRadius: 8, border: '1px solid #E5E7EB', fontSize: 14, marginBottom: 12, outline: 'none', boxSizing: 'border-box' }} />
+            <input type="password" placeholder="Mot de passe" value={loginPwd} onChange={e => setLoginPwd(e.target.value)} required
+              style={{ width: '100%', padding: 12, borderRadius: 8, border: '1px solid #E5E7EB', fontSize: 14, marginBottom: 16, outline: 'none', boxSizing: 'border-box' }} />
+            {loginErr && <p style={{ color: '#DC2626', fontSize: 12, marginBottom: 12 }}>{loginErr}</p>}
+            <button type="submit"
+              style={{ width: '100%', padding: '12px 24px', background: '#7C3AED', color: 'white', border: 'none', borderRadius: 8, fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>
+              Se connecter
+            </button>
+          </form>
+          <p style={{ fontSize: 11, color: '#9CA3AF', textAlign: 'center', marginTop: 16 }}>
+            Vous êtes client ? <a href="/connexion" style={{ color: '#1565C0', fontWeight: 600 }}>Espace client</a>
+          </p>
+        </div>
+      </div>
+    );
+  }
   if (!profile) return <div style={{ padding: 60, textAlign: 'center', color: '#6B7280' }}>Chargement du profil...</div>;
 
   const clientTabs = [

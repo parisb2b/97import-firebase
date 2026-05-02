@@ -58,6 +58,16 @@ export default function Panier() {
   const [customQte, setCustomQte] = useState(1);
   const [customDesc, setCustomDesc] = useState('');
   const [customLien, setCustomLien] = useState('');
+  const [clientProfile, setClientProfile] = useState<any>(null);
+
+  // V62 — chargement profil client pour adresse livraison
+  useEffect(() => {
+    const user = clientAuth.currentUser;
+    if (!user) return;
+    getDoc(doc(db, 'users', user.uid)).then(snap => {
+      if (snap.exists()) setClientProfile(snap.data());
+    }).catch(() => {});
+  }, []);
 
   // Popup state
   const [popupStep, setPopupStep] = useState<number | null>(null); // null=closed, 0=partner, 1=acompte, 2=rib
@@ -236,7 +246,7 @@ export default function Panier() {
             {/* ═══ LEFT — Products ═══ */}
             <div>
               {/* Cart items */}
-              <div style={{ background: 'white', borderRadius: 16, boxShadow: '0 2px 12px rgba(0,0,0,0.06)', overflow: 'hidden' }}>
+              <div style={{ background: 'white', borderRadius: 16, boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
                 {cart.map(item => (
                   <div key={item.id} style={{
                     display: 'flex', alignItems: 'center', gap: 16, padding: 16,
@@ -255,9 +265,9 @@ export default function Panier() {
                     </div>
 
                     {/* Info */}
-                    <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ flex: 1, minWidth: 0, overflowWrap: 'break-word' }}>
                       <p style={{ fontSize: 12, color: '#9CA3AF' }}>{item.ref}</p>
-                      <p style={{ fontWeight: 600, color: '#1565C0', fontSize: 14 }}>{item.nom_fr}</p>
+                      <p style={{ fontWeight: 600, color: '#1565C0', fontSize: 14, wordBreak: 'break-word' }}>{item.nom_fr}</p>
                       {item.type === 'custom' && (
                         <p style={{ fontSize: 11, color: '#EA580C', fontWeight: 500 }}>Produit sur mesure</p>
                       )}
@@ -347,6 +357,20 @@ export default function Panier() {
                 <p style={{ fontSize: 11, color: '#9CA3AF', marginTop: 8 }}>
                   {t('cart.horsLivraison')}
                 </p>
+
+                {/* V62 — Adresse de livraison */}
+                {clientProfile?.adresse_livraison && (
+                  <div style={{ marginTop: 16, padding: 12, background: '#F0F4F8', borderRadius: 10, fontSize: 12 }}>
+                    <p style={{ fontWeight: 600, color: '#1565C0', marginBottom: 6 }}>Adresse de livraison</p>
+                    {clientProfile.adresse_livraison.identique_facturation ? (
+                      <p style={{ color: '#4B5563' }}>Identique à l'adresse de facturation</p>
+                    ) : (
+                      <p style={{ color: '#4B5563' }}>
+                        {clientProfile.adresse_livraison.rue}, {clientProfile.adresse_livraison.code_postal} {clientProfile.adresse_livraison.ville}
+                      </p>
+                    )}
+                  </div>
+                )}
 
                 <button onClick={handleOpenPopup} disabled={submitting}
                   style={{ ...btnStyle('#EA580C'), marginTop: 20, opacity: submitting ? 0.5 : 1 }}>

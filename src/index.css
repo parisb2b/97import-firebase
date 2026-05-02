@@ -18,9 +18,14 @@
   --border: #E5E5E5;
 }
 
+html {
+  font-size: 110%; /* V62 — augmente la police globale de 10% */
+}
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 1.05rem;
+  line-height: 1.6;
 }
 
 .tooltip-wrapper {

@@ -65,7 +65,7 @@ export default function MesDevis({ userId, profile }: { userId: string; profile?
   return (
     <div>
       <h1 style={{ fontSize: 22, fontWeight: 800, color: '#1565C0', marginBottom: 4 }}>Mes devis</h1>
-      <p style={{ fontSize: 13, color: '#6B7280', marginBottom: 20 }}>Retrouvez tous vos devis et téléchargez-les en PDF.</p>
+      <p style={{ fontSize: 13, color: '#6B7280', marginBottom: 20 }}>Consultez, filtrez et téléchargez vos documents en PDF.</p>
 
       {/* Barre de recherche */}
       <div style={{ marginBottom: 20 }}>

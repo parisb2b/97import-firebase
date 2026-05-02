@@ -19,6 +19,12 @@ export default function Profil() {
   const [codePostal, setCodePostal] = useState('');
   const [ville, setVille] = useState('');
   const [pays, setPays] = useState('MQ');
+  // V62 — adresse de livraison distincte
+  const [livraisonRue, setLivraisonRue] = useState('');
+  const [livraisonCP, setLivraisonCP] = useState('');
+  const [livraisonVille, setLivraisonVille] = useState('');
+  const [livraisonPays, setLivraisonPays] = useState('MQ');
+  const [identiqueFacturation, setIdentiqueFacturation] = useState(true);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [isIncomplete, setIsIncomplete] = useState(false);
@@ -38,6 +44,13 @@ export default function Profil() {
           setCodePostal(data.codePostal || '');
           setVille(data.ville || '');
           setPays(data.pays || 'MQ');
+          // V62 adresse livraison
+          const al = data.adresse_livraison || {};
+          setLivraisonRue(al.rue || '');
+          setLivraisonCP(al.code_postal || '');
+          setLivraisonVille(al.ville || '');
+          setLivraisonPays(al.pays || 'MQ');
+          setIdentiqueFacturation(al.identique_facturation !== false);
           setIsIncomplete(!data.telephone || !data.adresse);
         } else {
           setEmail(user.email || '');
@@ -60,7 +73,7 @@ export default function Profil() {
     e.preventDefault();
     setSaving(true);
     try {
-      await setDoc(doc(db, 'clients', user.uid), {
+      const commonFields = {
         uid: user.uid,
         email: user.email,
         firstName: prenom,
@@ -71,22 +84,24 @@ export default function Profil() {
         codePostal,
         ville,
         pays,
+        adresse_livraison: identiqueFacturation ? {
+          rue: adresse,
+          code_postal: codePostal,
+          ville,
+          pays,
+          identique_facturation: true,
+        } : {
+          rue: livraisonRue,
+          code_postal: livraisonCP,
+          ville: livraisonVille,
+          pays: livraisonPays,
+          identique_facturation: false,
+        },
         updatedAt: serverTimestamp(),
-      }, { merge: true });
+      };
 
-      await setDoc(doc(db, 'users', user.uid), {
-        uid: user.uid,
-        email: user.email,
-        firstName: prenom,
-        lastName: nom,
-        nom: `${prenom} ${nom}`,
-        telephone,
-        adresse,
-        codePostal,
-        ville,
-        pays,
-        updatedAt: serverTimestamp(),
-      }, { merge: true });
+      await setDoc(doc(db, 'clients', user.uid), commonFields, { merge: true });
+      await setDoc(doc(db, 'users', user.uid), commonFields, { merge: true });
 
       showToast('Profil enregistré avec succès !');
       const userSnap = await getDoc(doc(db, 'users', user.uid));
@@ -178,6 +193,55 @@ export default function Profil() {
               <option value="GF">Guyane</option>
               <option value="FR">France metropolitaine</option>
             </select>
+          </div>
+
+          {/* V62 — Adresse de livraison */}
+          <div style={{ borderTop: '2px solid #E5E7EB', paddingTop: 20, marginBottom: 20 }}>
+            <h2 style={{ fontSize: 16, fontWeight: 700, color: '#1565C0', marginBottom: 12 }}>Adresse de livraison</h2>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16, cursor: 'pointer', fontSize: 13, color: '#4B5563' }}>
+              <input type="checkbox" checked={identiqueFacturation} onChange={e => {
+                setIdentiqueFacturation(e.target.checked);
+                if (e.target.checked) {
+                  setLivraisonRue(adresse);
+                  setLivraisonCP(codePostal);
+                  setLivraisonVille(ville);
+                  setLivraisonPays(pays);
+                }
+              }} style={{ width: 16, height: 16, cursor: 'pointer' }} />
+              Adresse de livraison identique à l'adresse de facturation
+            </label>
+
+            {!identiqueFacturation && (
+              <>
+                <div style={{ marginBottom: 12 }}>
+                  <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 }}>Rue</label>
+                  <input type="text" value={livraisonRue} onChange={e => setLivraisonRue(e.target.value)}
+                    placeholder="Adresse de livraison" style={inputStyle} />
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 }}>Code postal</label>
+                    <input type="text" value={livraisonCP} onChange={e => setLivraisonCP(e.target.value)}
+                      placeholder="97200" style={inputStyle} />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 }}>Ville</label>
+                    <input type="text" value={livraisonVille} onChange={e => setLivraisonVille(e.target.value)}
+                      placeholder="Fort-de-France" style={inputStyle} />
+                  </div>
+                </div>
+                <div style={{ marginBottom: 12 }}>
+                  <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 }}>Pays</label>
+                  <select value={livraisonPays} onChange={e => setLivraisonPays(e.target.value)} style={inputStyle}>
+                    <option value="MQ">Martinique</option>
+                    <option value="GP">Guadeloupe</option>
+                    <option value="RE">Reunion</option>
+                    <option value="GF">Guyane</option>
+                    <option value="FR">France metropolitaine</option>
+                  </select>
+                </div>
+              </>
+            )}
           </div>
 
           <button type="submit" disabled={saving} style={{
