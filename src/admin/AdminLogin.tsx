@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
-import { adminAuth, db } from '../lib/firebase';
+import { adminAuth, adminDb as db } from '../lib/firebase';
 import { useI18n } from '../i18n';
 import { GlobeToggle } from '../components/GlobeToggle';
 import ForgotPasswordModal from './components/ForgotPasswordModal';

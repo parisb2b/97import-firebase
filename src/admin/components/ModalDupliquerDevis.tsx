@@ -4,7 +4,7 @@
 
 import { useState, useRef } from 'react';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
-import { db } from '../../lib/firebase';
+import { adminDb as db } from '../../lib/firebase';
 import { getNextNumber } from '../../lib/counters';
 import { sanitizeForFirestore } from '../../lib/firebaseUtils';
 

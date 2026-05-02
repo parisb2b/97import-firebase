@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { doc, updateDoc, setDoc, collection, query, where, getDocs } from 'firebase/firestore';
-import { db } from '../../lib/firebase';
+import { adminDb as db } from '../../lib/firebase';
 import { sanitizeForFirestore } from '../../lib/firebaseUtils';
 import { logInfo, logError } from '../../lib/logService';
 import { useToast } from '../../front/components/Toast';

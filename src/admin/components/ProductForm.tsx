@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { doc, updateDoc, serverTimestamp } from 'firebase/firestore';
-import { db } from '../../lib/firebase';
+import { adminDb as db } from '../../lib/firebase';
 import { useI18n } from '../../i18n';
 import { OrangeIndicator } from '../../components/OrangeIndicator';
 import { translateText } from '../../lib/deepl';

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { db } from '../../lib/firebase';
+import { adminDb as db } from '../../lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import { InfosClient } from '../../lib/excel-generators/excelTypes';
 import { getInfosClientDevis } from '../../lib/excel-generators/firestoreHelpers';

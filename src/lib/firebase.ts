@@ -28,3 +28,8 @@ export const storage = getStorage(clientApp);
 // Instance ADMIN (back-office — session isolée)
 const adminApp = initializeApp(firebaseConfig, 'admin');
 export const adminAuth = getAuth(adminApp);
+export const adminDb = initializeFirestore(adminApp, {
+  experimentalForceLongPolling: true,
+  ignoreUndefinedProperties: true,
+});
+export const adminStorage = getStorage(adminApp);

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useRoute, useLocation } from 'wouter';
 import { doc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
-import { db } from '../../lib/firebase';
+import { adminDb as db } from '../../lib/firebase';
 import { useI18n } from '../../i18n';
 import { Card, Button } from '../components/Icons';
 

@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useRoute, useLocation, Link } from 'wouter';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
-import { db } from '../../lib/firebase';
+import { adminDb as db } from '../../lib/firebase';
 import { calculerCompletude, CHAMPS_ESSENTIEL, migrerGalerieImages } from '../../lib/productHelpers';
 import { sanitizeForFirestore } from '../../lib/firebaseUtils';
 import FicheProduitTabs, { TabId } from '../components/produit/FicheProduitTabs';

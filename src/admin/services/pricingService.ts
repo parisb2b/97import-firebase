@@ -14,7 +14,7 @@ import {
   serverTimestamp,
   Unsubscribe,
 } from 'firebase/firestore';
-import { db } from '../../lib/firebase';
+import { adminDb as db } from '../../lib/firebase';
 import { sanitizeForFirestore } from '../../lib/firebaseUtils';
 import { clearRatesCache } from '../../lib/currencyHelpers';
 import { clearCoefficientsCache } from '../../lib/coefficientsHelpers';

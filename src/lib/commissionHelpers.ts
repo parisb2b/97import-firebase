@@ -128,15 +128,16 @@ export async function creerCommissionDevis(params: {
     return { ok: true, skipped: true, reason: 'already_generated' };
   }
 
-  const { db } = await import('./firebase');
+  const { db, adminAuth, adminDb } = await import('./firebase');
   const { doc, setDoc, updateDoc, serverTimestamp } = await import('firebase/firestore');
+  const firestoreDb = adminAuth.currentUser ? adminDb : db;
   const devisId = devis.id || devis.numero;
 
   // Règle ADMIN : skip si pas de partenaire ou ADMIN
   if (!devis.partenaire_code || devis.partenaire_code === 'ADMIN' || devis.partenaire_code === 'admin') {
     console.log('[V43-E3.2] partenaire_code ADMIN ou absent — skip commission');
     try {
-      await updateDoc(doc(db, 'quotes', devisId), {
+      await updateDoc(doc(firestoreDb, 'quotes', devisId), {
         commission_generated: true,
         commission_skipped_reason: 'ADMIN',
       });
@@ -157,7 +158,7 @@ export async function creerCommissionDevis(params: {
   if (calc.total <= 0.01) {
     console.log('[V43-E3.2] Commission ≤ 0€ pour', devis.numero, '— skip avec marqueur');
     try {
-      await updateDoc(doc(db, 'quotes', devisId), {
+      await updateDoc(doc(firestoreDb, 'quotes', devisId), {
         commission_generated: true,
         commission_skipped_reason: 'zero_or_negative',
       });
@@ -194,8 +195,8 @@ export async function creerCommissionDevis(params: {
   };
 
   try {
-    await setDoc(doc(db, 'commissions', numeroNC), commissionDoc);
-    await updateDoc(doc(db, 'quotes', devisId), {
+    await setDoc(doc(firestoreDb, 'commissions', numeroNC), commissionDoc);
+    await updateDoc(doc(firestoreDb, 'quotes', devisId), {
       commission_generated: true,
       commission_numero: numeroNC,
       commission_total: calc.total,

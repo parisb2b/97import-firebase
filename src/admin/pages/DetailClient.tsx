@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useRoute, useLocation } from 'wouter';
 import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
-import { db } from '../../lib/firebase';
+import { adminDb as db } from '../../lib/firebase';
 import { Card, Button, Pill, InfoRow } from '../components/Icons';
 import PromouvoirPartenaireModal from '../components/PromouvoirPartenaireModal';
 

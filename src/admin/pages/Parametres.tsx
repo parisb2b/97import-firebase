@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import { db } from '../../lib/firebase';
+import { adminDb as db } from '../../lib/firebase';
 import { useI18n } from '../../i18n';
 import { Card, Button } from '../components/Icons';
 import { getCoefficients, setCoefficients, CoefficientsPrix, COEFFICIENTS_DEFAULT } from '../../lib/coefficientsHelpers';

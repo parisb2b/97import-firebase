@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Route, Switch, Link, useLocation } from 'wouter';
 import { onAuthStateChanged, signOut, User } from 'firebase/auth';
 import { doc, getDoc, collection, onSnapshot } from 'firebase/firestore';
-import { adminAuth, db } from '../lib/firebase';
+import { adminAuth, adminDb as db } from '../lib/firebase';
 import { ErrorBoundary } from '../components/ErrorBoundary';
 import AdminLogin from './AdminLogin';
 import './styles/admin.css';

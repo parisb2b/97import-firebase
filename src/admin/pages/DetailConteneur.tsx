@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useRoute, Link } from 'wouter';
 import { doc, getDoc, updateDoc, deleteDoc, serverTimestamp, Timestamp } from 'firebase/firestore';
-import { db } from '../../lib/firebase';
+import { adminDb as db } from '../../lib/firebase';
 import DropdownPorts from '../components/DropdownPorts';
 import PopupSelectionClientExcel from '../components/PopupSelectionClientExcel';
 import { generateBdInvoice } from '../../lib/excel-generators/generateBdInvoice';

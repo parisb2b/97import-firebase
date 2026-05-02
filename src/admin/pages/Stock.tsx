@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { collection, query, orderBy, getDocs, doc, updateDoc } from 'firebase/firestore';
 import { useLocation } from 'wouter';
-import { db } from '../../lib/firebase';
+import { adminDb as db } from '../../lib/firebase';
 import { Card, Kpi, Pill, Button } from '../components/Icons';
 
 interface StockItem {

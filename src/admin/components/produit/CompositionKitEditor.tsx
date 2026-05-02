@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
-import { db } from '../../../lib/firebase';
+import { adminDb as db } from '../../../lib/firebase';
 import SearchInput from '../atoms/SearchInput';
 
 interface Composant { ref: string; qte_par_kit: number; }

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { collection, query, orderBy, getDocs } from 'firebase/firestore';
 import { useLocation } from 'wouter';
-import { db } from '../../lib/firebase';
+import { adminDb as db } from '../../lib/firebase';
 import { Kpi, Card, Button, Pill, IconButton, EyeIcon, EditIcon, ExcelIcon } from '../components/Icons';
 
 interface ListeAchat {

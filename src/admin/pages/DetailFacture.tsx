@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useRoute, useLocation } from 'wouter';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import { db } from '../../lib/firebase';
+import { adminDb as db } from '../../lib/firebase';
 import { Card, Button, Pill, InfoRow, IconButton, FileIcon, DownloadIcon } from '../components/Icons';
 import { generateDevis, generateFactureFinale, downloadPDF } from '../../lib/pdf-generator';
 import { generateFactureAcomptePDF } from '../../lib/generateInvoiceAcompte';

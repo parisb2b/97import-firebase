@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Link, useLocation } from 'wouter';
 import { collection, getDocs, orderBy, query } from 'firebase/firestore';
-import { db } from '../../lib/firebase';
+import { adminDb as db } from '../../lib/firebase';
 import { calculerCompletude, CATEGORIES, StatutCompletude, manqueCodeHs, CHAMPS_ESSENTIEL } from '../../lib/productHelpers';
 import { loadFilters, saveFilters, resetFilters, hasActiveFilters } from '../../lib/filterPersistence';
 import ModalDupliquerProduit from '../components/produit/ModalDupliquerProduit';

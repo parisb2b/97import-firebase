@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useRoute, useLocation } from 'wouter';
 import { doc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
-import { db } from '../../lib/firebase';
+import { adminDb as db } from '../../lib/firebase';
 import { Card, Button, Pill, InfoRow, IconButton, DownloadIcon, SendIcon } from '../components/Icons';
 import { generateNoteCommission, downloadPDF } from '../../lib/pdf-generator';
 import ModalMarquerPayee from '@/admin/components/commission/ModalMarquerPayee';

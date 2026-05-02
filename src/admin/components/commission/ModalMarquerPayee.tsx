@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { doc, updateDoc, serverTimestamp } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { adminDb as db } from '@/lib/firebase';
 
 interface Props {
   commission: any;

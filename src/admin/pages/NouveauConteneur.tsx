@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useLocation, Link } from 'wouter';
 import { collection, doc, setDoc, getDocs, query, where, serverTimestamp, Timestamp } from 'firebase/firestore';
-import { db } from '../../lib/firebase';
+import { adminDb as db } from '../../lib/firebase';
 import { getNextNumber } from '../../lib/counters';
 import DropdownPorts from '../components/DropdownPorts';
 

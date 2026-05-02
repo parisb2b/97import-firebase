@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import { collection, query, where, getDocs, doc, setDoc, serverTimestamp } from 'firebase/firestore';
-import { db } from '../../../lib/firebase';
+import { adminDb as db } from '../../../lib/firebase';
 
 interface Props {
   produit: any; // Le produit à dupliquer

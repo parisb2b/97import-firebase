@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useLocation, useRoute, Link } from 'wouter';
 import { doc, getDoc, updateDoc, collection, getDocs, serverTimestamp } from 'firebase/firestore';
-import { db } from '../../lib/firebase';
+import { adminDb as db } from '../../lib/firebase';
 import { generateBcChine } from '../../lib/excel-generators/generateBcChine';
 import SearchInput from '../components/atoms/SearchInput';
 

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import {
   collection, query, where, getDocs, addDoc, serverTimestamp
 } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { adminDb as db } from '@/lib/firebase';
 import SearchInput from '@/admin/components/atoms/SearchInput';
 import {
   calculateCommission,

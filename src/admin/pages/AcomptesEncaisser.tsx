@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
-import { db } from '../../lib/firebase';
+import { adminDb as db } from '../../lib/firebase';
 import {
   QuoteStatus,
   libelleStatut, couleurStatut,

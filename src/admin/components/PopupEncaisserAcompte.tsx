@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { db, storage } from '../../lib/firebase';
+import { adminDb as db, adminStorage as storage } from '../../lib/firebase';
 import { generateFactureAcomptePDF } from '../../lib/generateInvoiceAcompte';
 import { validerNouveauPaiement, prochainPaiementEstSolde, getNbAcomptesEncaisses, generateNumeroDocument } from '../../lib/quoteStatusHelpers';
 import { notifyAcompteEncaisse } from '../../lib/emailService';

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { collection, query, orderBy, getDocs } from 'firebase/firestore';
 import { Link } from 'wouter';
-import { db } from '../../lib/firebase';
+import { adminDb as db } from '../../lib/firebase';
 import { Card, Kpi, Pill, IconButton, EyeIcon } from '../components/Icons';
 import LoadingState from '../components/atoms/LoadingState';
 

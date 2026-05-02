@@ -279,8 +279,9 @@ export function footerTextPDF(
 export async function generateNumeroDocument(
   type: 'facture_acompte' | 'facture_finale' | 'note_commission'
 ): Promise<string> {
-  const { db } = await import('./firebase');
+  const { db, adminAuth, adminDb } = await import('./firebase');
   const { doc, runTransaction, serverTimestamp } = await import('firebase/firestore');
+  const firestoreDb = adminAuth.currentUser ? adminDb : db;
 
   const now = new Date();
   const aamm = `${String(now.getFullYear()).slice(-2)}${String(now.getMonth() + 1).padStart(2, '0')}`;
@@ -292,9 +293,9 @@ export async function generateNumeroDocument(
   };
   const prefix = prefixMap[type];
   const counterId = `${type}_${aamm}`;
-  const counterRef = doc(db, 'counters', counterId);
+  const counterRef = doc(firestoreDb, 'counters', counterId);
 
-  const numero = await runTransaction(db, async (transaction) => {
+  const numero = await runTransaction(firestoreDb, async (transaction) => {
     const snap = await transaction.get(counterRef);
     const current = snap.exists() ? (snap.data().value || 0) : 0;
     const next = current + 1;

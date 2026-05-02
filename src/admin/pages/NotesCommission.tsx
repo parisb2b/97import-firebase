@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { collection, query, orderBy, getDocs, doc, getDoc, updateDoc, addDoc, serverTimestamp } from 'firebase/firestore';
 import { useLocation } from 'wouter';
-import { db } from '../../lib/firebase';
+import { adminDb as db } from '../../lib/firebase';
 import { Card, Pill, IconButton, Kpi, FileIcon, DownloadIcon, EuroIcon, SendIcon, DollarIcon, EyeIcon } from '../components/Icons';
 import { generateDevis, generateNoteCommission, downloadPDF } from '../../lib/pdf-generator';
 import ModalNouvelleCommission from '@/admin/components/commission/ModalNouvelleCommission';

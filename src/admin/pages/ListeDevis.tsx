@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { collection, query, orderBy, getDocs, doc, getDoc } from 'firebase/firestore';
 import { Link } from 'wouter';
-import { db } from '../../lib/firebase';
+import { adminDb as db } from '../../lib/firebase';
 import { generateDevis, downloadPDF } from '../../lib/pdf-generator';
 import PopupEncaisserAcompte from '../components/PopupEncaisserAcompte';
 import {

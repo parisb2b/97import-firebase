@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { doc, updateDoc } from 'firebase/firestore';
-import { db } from '../../../lib/firebase';
+import { adminDb as db } from '../../../lib/firebase';
 import { sanitizeForFirestore } from '../../../lib/firebaseUtils';
 import { useToast } from '../../../front/components/Toast';
 import { formatDateHeure } from '../../../lib/dateHelpers';
