@@ -3,7 +3,7 @@
     "rules": "firestore.rules"
   },
   "storage": {
-    "bucket": "import2030.firebasestorage.app",
+    "bucket": "importok-6ef77.firebasestorage.app",
     "rules": "storage.rules"
   }
 }
