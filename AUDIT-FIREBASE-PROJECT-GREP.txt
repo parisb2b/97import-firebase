@@ -1,0 +1,173 @@
+firestore.rules://   Projet            : importok-6ef77
+firestore.rules://   Déploiement       : firebase deploy --only firestore:rules --project=importok-6ef77
+firestore.rules://   .firebaserc       : SUPPRIMÉ (contenait "default":"import2030", projet supprimé).
+firestore.rules://                       Décision V50-BIS Michel : forcer --project explicite partout
+firestore.rules:// Déploiement : firebase deploy --only firestore:rules
+MAJ18.TXT:FIREBASE : importok-6ef77 (seul projet actif)
+liste-vercel.txt:| 2 | 97import-firebase | Vercel     | v2      | fc6dcd8 feat: v13 purge + reseed Firestore          | https://97import-firebase-git-v2-parisb2bs-projects.vercel.app | importok-6ef77  | DEVELOPPEMENT ACTIF       |
+liste-vercel.txt:   - Vercel v2    : importok-6ef77 (configure dans Vercel Environment Variables)
+liste-vercel.txt:238d4b8 chore: migrate to new Firebase project importok-6ef77
+RESET--FIREBASE.txt:- Firebase projet : import2030
+RESET--FIREBASE.txt:2. Liste TOUS les fichiers dans le bucket import2030.firebasestorage.app
+MAJALL.TXT:- Config Firebase mise à jour : importok-6ef77 (via env vars)
+MAJALL.TXT:Projet Firebase : importok-6ef77
+DIAGNOSTIC-MS-20-001.md:curl -s "https://firestore.googleapis.com/v1/projects/importok-6ef77/databases/(default)/documents/products?pageSize=300&key=AIzaSyD07lt6roFD8zTbSFivLw2BUVKJVVUf8Lo" \
+DIAGNOSTIC-MS-20-001.md:curl -X DELETE "https://firestore.googleapis.com/v1/projects/importok-6ef77/databases/(default)/documents/products/TntXwKRbgMPL0sXxoFiL?key=AIzaSyD07lt6roFD8zTbSFivLw2BUVKJVVUf8Lo"
+DIAGNOSTIC-MS-20-001.md:curl -s "https://firestore.googleapis.com/v1/projects/importok-6ef77/databases/(default)/documents/products/TntXwKRbgMPL0sXxoFiL?key=AIzaSyD07lt6roFD8zTbSFivLw2BUVKJVVUf8Lo" | grep "code"
+DIAGNOSTIC-MS-20-001.md:curl -s "https://firestore.googleapis.com/v1/projects/importok-6ef77/databases/(default)/documents/products/MS-20-001?key=AIzaSyD07lt6roFD8zTbSFivLw2BUVKJVVUf8Lo" | python3 -c "
+DIAGNOSTIC-MS-20-001.md:curl -s "https://firestore.googleapis.com/v1/projects/importok-6ef77/databases/(default)/documents/products/TntXwKRbgMPL0sXxoFiL?key=AIzaSyD07lt6roFD8zTbSFivLw2BUVKJVVUf8Lo" \
+DIAGNOSTIC-MS-20-001.md:    'https://firestore.googleapis.com/v1/projects/importok-6ef77/databases/(default)/documents/products/MS-20-001?key=AIzaSyD07lt6roFD8zTbSFivLw2BUVKJVVUf8Lo'
+DIAGNOSTIC-MS-20-001.md:curl -X DELETE "https://firestore.googleapis.com/v1/projects/importok-6ef77/databases/(default)/documents/products/TntXwKRbgMPL0sXxoFiL?key=AIzaSyD07lt6roFD8zTbSFivLw2BUVKJVVUf8Lo"
+DIAGNOSTIC-MS-20-001.md:curl -s "https://firestore.googleapis.com/v1/projects/importok-6ef77/databases/(default)/documents/products?pageSize=300&key=AIzaSyD07lt6roFD8zTbSFivLw2BUVKJVVUf8Lo" \
+MAJ32-BIS.TXT:  solaire : https://firebasestorage.googleapis.com/v0/b/importok-6ef77.firebasestorage.app/o/categories%2Fhero-solaire.jpg?alt=media&token=f59ee6ad-f1f2-446d-9f1f-7ee27cdb2fc6
+MAJ32-BIS.TXT:  agricole : https://firebasestorage.googleapis.com/v0/b/importok-6ef77.firebasestorage.app/o/categories%2Fhero-agricole.jpg?alt=media&token=efc9cfba-e31e-4a8f-9a6b-c319602fd301
+MAJ32-BIS.TXT:  divers : https://firebasestorage.googleapis.com/v0/b/importok-6ef77.firebasestorage.app/o/categories%2Fhero-divers.jpg?alt=media&token=835ef890-c326-4782-8260-74d5192da0ab
+CD CDATA-MC-203097IMPORT.txt:Auth Email/Password est activé sur import2030. localhost est autorisé.
+MAJ-V49.txt:2. firebase deploy --only firestore:rules
+MAJ-V49.txt:   firebase deploy --only firestore:rules
+RAPPORT-QA.md:Firebase Storage    import2030.firebasestorage.app  → 57 fichiers uploadés
+RAPPORT-QA.md:Firestore           import2030                       → 20 produits avec URLs Storage
+MAJ22.TXT:  Projet : importok-6ef77
+importProducts-v2.mjs: * Import complet des 20 produits → Firestore import2030
+importProducts-v2.mjs:  storageBucket: 'import2030.firebasestorage.app',
+importProducts-v2.mjs:  return `https://firebasestorage.googleapis.com/v0/b/import2030.firebasestorage.app/o/${enc}?alt=media`
+importProducts-v2.mjs:  console.log('  IMPORT PRODUITS → Firestore import2030')
+RAPPORT-STRUCTURE.md:- ✅ `.env.local` non modifié (Firebase import2030)
+PREFLIGHT-PRODUCTION-READINESS.txt:                     ⚠️ contient encore "import2030" bucket
+PREFLIGHT-PRODUCTION-READINESS.txt:PROJECT_ID         : importok-6ef77 (hardcoded V50-BIS)
+BACKUP-INVENTAIRE.md:- **Projet** : import2030
+AUDIT-CATALOGUE-20260421.TXT:  Firestore : importok-6ef77
+MAJ-V52.txt:Project Firebase    : importok-6ef77
+MAJ-V52.txt:- V50-BIS : drop .firebaserc, force --project, logout sidebar,
+MAJ-V52.txt:- Storage bucket mismatch firebase.json → import2030
+MAJ-V52.txt:- firebase.json:6 declare bucket 'import2030.firebasestorage.app'
+MAJ-V52.txt:- Le projet Firebase import2030 est SUPPRIME depuis V49+
+MAJ-V52.txt:- PROJECT_ID = 'importok-6ef77' hardcode
+MAJ-V52.txt:- ✅ V50-BIS drop .firebaserc + force --project
+MAJ-V48-AUDIT.txt:      possible / pas de versioning / perte au prochain `firebase deploy`.
+MAJ-V48-AUDIT.txt:déployer via `firebase deploy --only firestore:rules`.
+MAJ-V48-AUDIT.txt:3. Déployer : `firebase deploy --only firestore:rules`
+SNAPSHOT_V43.md:1. **🔴 BLOQUANT** : Fournir `firebase-admin-sdk.json` à la racine du repo (ou variable d'env `GOOGLE_APPLICATION_CREDENTIALS`). Le projet Firebase est `importok-6ef77` selon la spec.
+RAPPORT-RESET.md:### Storage (import2030.firebasestorage.app)
+RAPPORT-RESET.md:### Firestore (import2030)
+RAPPORT-RESET.md:→ https://console.firebase.google.com/project/import2030/authentication/providers
+MAJ-V50-BIS.txt:Cible Firebase forcée : importok-6ef77
+MAJ-V50-BIS.txt:Pré-flight V50 avait flagé que `.firebaserc` contenait `"default": "import2030"`
+MAJ-V50-BIS.txt:(projet supprimé) alors que `firebase use` retournait `importok-6ef77`. Risque :
+MAJ-V50-BIS.txt:un futur `firebase deploy` sans `--project` aurait pu viser le mauvais projet
+MAJ-V50-BIS.txt:(ou aucun, si import2030 supprimé).
+MAJ-V50-BIS.txt:   //   Projet            : importok-6ef77
+MAJ-V50-BIS.txt:   //   Déploiement       : firebase deploy --only firestore:rules --project=importok-6ef77
+MAJ-V50-BIS.txt:⚠️ `firebase.json:6` référence encore `import2030.firebasestorage.app` (storage
+MAJ-V50-BIS.txt:⚠️ Reliquats `import2030` / `import2050-59f11` dans docs `.md` historiques
+MAJ-V50-BIS.txt:- `PROJECT_ID = 'importok-6ef77'` hardcoded (.firebaserc supprimé en CP Z)
+MAJ-V50-BIS.txt:- `PROJECT_ID = 'importok-6ef77'` hardcoded
+MAJ-V50-BIS.txt:  21f3798  chore(firebase): drop .firebaserc + force --project=importok-6ef77 (V50-BIS Phase 0 / CP Z)
+MAJ-V50-BIS.txt:⚠️ Toutes les commandes Firebase utilisent `--project=importok-6ef77` explicite
+MAJ-V50-BIS.txt:firebase deploy --only firestore:rules --project=importok-6ef77
+MAJ-V50-BIS.txt:1. **firebase.json:6 référence encore `import2030.firebasestorage.app`**
+MAJ-V50-BIS.txt:   hors retrait .firebaserc. Si projet `import2030` n'existe plus, les
+MAJ-V50-BIS.txt:   - Soit remplacer par `importok-6ef77.firebasestorage.app`
+MAJ-V50-BIS.txt:   - Soit garder si les fichiers Storage `import2030.firebasestorage.app/*`
+MAJ-V50-BIS.txt:   `"default": "import2030"` reste dans l'historique git (pas de filter-repo).
+AUDIT_TECHNIQUE_V2.md:**Projet Firebase** : importok-6ef77
+AGENTS.md:importok-6ef77
+AGENTS.md:--project=importok-6ef77
+AGENTS.md:firebase deploy
+AGENTS.md:firebase deploy --only firestore:rules
+AGENTS.md:firebase use import2030
+AGENTS.md:firebase use
+AGENTS.md:firebase deploy --only firestore:rules --project=importok-6ef77
+AGENTS.md:1. avoir `PROJECT_ID = 'importok-6ef77'`
+AGENTS.md:firebase deploy --only firestore:rules --project=importok-6ef77
+AGENTS.md:import2030
+AGENTS.md:importok-6ef77
+AGENTS.md:`import2030` est interdit.
+AUDIT-SCRIPTS-DESTRUCTIFS-V53.txt:  1. PROJECT_ID = 'importok-6ef77' hardcoded
+MAJ14.TXT:- Production v2 : importok-6ef77 (via Vercel env vars)
+firebase.json:    "bucket": "import2030.firebasestorage.app",
+.env.example:VITE_FIREBASE_PROJECT_ID=importok-6ef77
+v28-prep.md:4. **Firebase** : `importok-6ef77`
+v28-prep.md:  authDomain: "importok-6ef77.firebaseapp.com",
+v28-prep.md:  projectId: "importok-6ef77",
+v28-prep.md:  storageBucket: "importok-6ef77.firebasestorage.app",
+v28-prep.md:  authDomain: "importok-6ef77.firebaseapp.com",
+v28-prep.md:  projectId: "importok-6ef77",
+v28-prep.md:  storageBucket: "importok-6ef77.firebasestorage.app",
+v28-prep.md:  authDomain: "importok-6ef77.firebaseapp.com",
+v28-prep.md:  projectId: "importok-6ef77",
+v28-prep.md:  storageBucket: "importok-6ef77.firebasestorage.app",
+v28-prep.md:const app=initializeApp({apiKey:'AIzaSyD07lt6roFD8zTbSFivLw2BUVKJVVUf8Lo',projectId:'importok-6ef77'});
+MAJ15.TXT:- .env.production : import2050-59f11 → importok-6ef77
+docs/superpowers/plans/2026-05-02-v52-profiles-migration.md:- [ ] **Étape 1.2** : Export Firestore GCS (Michel manuel — `gcloud firestore export gs://importok-6ef77-backups/v53/`)
+docs/superpowers/plans/2026-05-02-v52-profiles-migration.md:  - hardcoded `PROJECT_ID = 'importok-6ef77'`
+docs/superpowers/plans/2026-05-02-v52-profiles-migration.md:- Restauration BD : `gcloud firestore import gs://importok-6ef77-backups/v53/<TIMESTAMP>` (Michel manuel)
+docs/superpowers/plans/2026-05-01-rules-rbac.md:⚠️ **Déploiement** : `firebase deploy --only firestore:rules` à exécuter
+docs/superpowers/plans/2026-05-02-v50-bd-init.md:const PROJECT_ID = 'importok-6ef77';
+audit-v52/AUDIT-COLLECTIONS-DOUBLONS-V52.txt:                       prod (importok-6ef77), puis si vide, la
+audit-v52/AUDIT-STORAGE-BUCKET-V52.txt:firebase.json bucket    : import2030.firebasestorage.app
+audit-v52/AUDIT-STORAGE-BUCKET-V52.txt:                           import2030 supprimé)
+audit-v52/AUDIT-STORAGE-BUCKET-V52.txt:Project Firebase actif  : importok-6ef77
+audit-v52/AUDIT-STORAGE-BUCKET-V52.txt:    le CLI `firebase` pour `firebase deploy --only storage` (règles).
+audit-v52/AUDIT-STORAGE-BUCKET-V52.txt:→ La référence "import2030.firebasestorage.app" dans firebase.json est
+audit-v52/AUDIT-STORAGE-BUCKET-V52.txt:  un **vestige** de l'historique projet (import2030 → importok-6ef77).
+audit-v52/AUDIT-STORAGE-BUCKET-V52.txt:     "bucket": "importok-6ef77.firebasestorage.app",
+audit-v52/AUDIT-STORAGE-BUCKET-V52.txt:   Validation post-correction : `firebase deploy --only storage --project=importok-6ef77`
+audit-v52/AUDIT-STORAGE-BUCKET-V52.txt:   Risque : le bucket import2030.firebasestorage.app peut encore exister
+audit-v52/AUDIT-STORAGE-BUCKET-V52.txt:     bien sur importok-6ef77 et non un orphelin import2030.
+audit-v52/AUDIT-STORAGE-BUCKET-V52.txt:   - Si fichiers Storage anciens pointent sur import2030 → migration
+scripts/init-counters-v50.cjs:// CIBLE FIRESTORE : importok-6ef77 (HARDCODE — ne pas modifier)
+scripts/init-counters-v50.cjs://   Decision V50-BIS : --project explicite forcee partout.
+scripts/init-counters-v50.cjs:const PROJECT_ID = 'importok-6ef77'; // ⚠️ V50-BIS : hardcode
+scripts/audit-acomptes-v52.cjs:// CIBLE FIRESTORE : importok-6ef77 (HARDCODE — ne pas modifier)
+scripts/audit-acomptes-v52.cjs:const PROJECT_ID = 'importok-6ef77'; // ⚠️ V52 : hardcode
+scripts/seed-firestore.js:  projectId: 'importok-6ef77',
+scripts/seed-firestore.js:  databaseURL: 'https://importok-6ef77.firebaseio.com'
+scripts/seed-browser.html:        const PROJECT_ID = 'importok-6ef77';
+audit/01_architecture-technique.md:- `.firebaserc` : projet `import2030`
+audit/01_architecture-technique.md:- `firebase.json` : bucket `import2030.firebasestorage.app`
+audit/01_architecture-technique.md:| `.firebaserc` | Projet `import2030` | Eleve |
+audit/01_architecture-technique.md:5. **P2** — Resoudre l'incoherence des projets Firebase (`import-412d0` vs `import2030`)
+audit/00_resume-global.md:| 6 | 2 projets Firebase differents : `.env` = `import-412d0`, `.firebaserc` = `import2030` | Eleve | P1 |
+scripts/migrate-acomptes-v43.js:  console.error('   → Télécharger depuis https://console.firebase.google.com/project/importok-6ef77/settings/serviceaccounts/adminsdk');
+scripts/migrate-users-to-clients.cjs:// CIBLE FIRESTORE : importok-6ef77 (HARDCODE — garde-fou V50-BIS)
+scripts/migrate-users-to-clients.cjs:const PROJECT_ID = 'importok-6ef77'; // V50-BIS hardcode
+scripts/update-image-urls.mjs:  authDomain: 'importok-6ef77.firebaseapp.com',
+scripts/update-image-urls.mjs:  projectId: 'importok-6ef77',
+scripts/update-image-urls.mjs:  storageBucket: 'importok-6ef77.firebasestorage.app',
+scripts/seed-v2-apply.sh:PROJECT_ID="importok-6ef77"
+scripts/seed-v2-apply.sh:PROJECT_ID = "importok-6ef77"
+scripts/backup-quotes.js:  authDomain: "importok-6ef77.firebaseapp.com",
+scripts/backup-quotes.js:  projectId: "importok-6ef77",
+scripts/backup-quotes.js:  storageBucket: "importok-6ef77.firebasestorage.app",
+scripts/rename-images.mjs:  projectId: "importok-6ef77",
+scripts/rename-images.mjs:  storageBucket: "importok-6ef77.firebasestorage.app",
+audit/06_risques-et-legacy.md:| `.firebaserc` (projects.default) | `import2030` |
+audit/06_risques-et-legacy.md:| `firebase.json` (storage.bucket) | `import2030.firebasestorage.app` |
+audit/06_risques-et-legacy.md:Consequence : l'app se connecte a `import-412d0` (via `.env`) mais `firebase.json` reference `import2030`. Les donnees peuvent etre dans un projet, le storage dans un autre.
+scripts/delete-quotes.mjs:  authDomain: "importok-6ef77.firebaseapp.com",
+scripts/delete-quotes.mjs:  projectId: "importok-6ef77",
+scripts/delete-quotes.mjs:  storageBucket: "importok-6ef77.firebasestorage.app",
+scripts/upload-images.mjs:  authDomain: 'importok-6ef77.firebaseapp.com',
+scripts/upload-images.mjs:  projectId: 'importok-6ef77',
+scripts/upload-images.mjs:  storageBucket: 'importok-6ef77.firebasestorage.app',
+scripts/reset-database.sh:PROJECT_ID="importok-6ef77"
+scripts/seed-options-apply.sh:PROJECT_ID="importok-6ef77"
+scripts/seed-options-apply.sh:PROJECT_ID = "importok-6ef77"
+scripts/fix-ms-20-001.sh:PROJECT_ID="importok-6ef77"
+scripts/upload-images-mini-pelles.js:const STORAGE_BUCKET = 'importok-6ef77.firebasestorage.app';
+scripts/seed-direct.js:const PROJECT_ID = 'importok-6ef77';
+scripts/upload-to-storage.mjs:  authDomain: 'importok-6ef77.firebaseapp.com',
+scripts/upload-to-storage.mjs:  projectId: 'importok-6ef77',
+scripts/upload-to-storage.mjs:  storageBucket: 'importok-6ef77.firebasestorage.app',
+scripts/import-catalogue-v4.mjs:  authDomain: 'importok-6ef77.firebaseapp.com',
+scripts/import-catalogue-v4.mjs:  projectId: 'importok-6ef77',
+scripts/import-catalogue-v4.mjs:  storageBucket: 'importok-6ef77.firebasestorage.app',
+scripts/audit-catalogue.js:  authDomain: "importok-6ef77.firebaseapp.com",
+scripts/audit-catalogue.js:  projectId: "importok-6ef77",
+scripts/audit-catalogue.js:  storageBucket: "importok-6ef77.appspot.com",
+scripts/audit-catalogue.js:  log(`  Firestore : importok-6ef77`);
+prompts/v53.md:Project Firebase    : importok-6ef77
+prompts/v53.md:PROJECT_ID              = 'importok-6ef77'  (hardcoded partout)
+prompts/v53.md:const PROJECT_ID = 'importok-6ef77';
+prompts/v53.md:Project: importok-6ef77

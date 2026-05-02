@@ -1,0 +1,136 @@
+═══════════════════════════════════════════════════════════════
+  AUDIT FIREBASE PROJECT — V53-PRODUCTION-READINESS (CP F)
+═══════════════════════════════════════════════════════════════
+
+Date          : 2026-05-02 (V53-PRODUCTION-READINESS)
+Branche       : v2
+HEAD          : a11709e (post CP E — build report)
+Project actif : importok-6ef77 (V49+ V50-BIS hardcoded)
+Project legacy: import2030 (SUPPRIME depuis V49+)
+Sortie grep   : AUDIT-FIREBASE-PROJECT-GREP.txt (173 lignes)
+
+─── REGLE ──────────────────────────────────────────────────────
+
+`import2030` est interdit en config active (V50-BIS Z drop
+.firebaserc). Toute reference active doit etre signalee
+ou corrigee.
+
+Les rapports historiques (MAJ-V*.txt, RAPPORT-*.md, audit/*)
+contiennent des references legitimes au projet legacy — ne
+pas modifier.
+
+─── REFERENCES ACTIVES DETECTEES ───────────────────────────────
+
+1. firebase.json (bucket Storage)
+   ────────────────────────────────────
+   Ligne 6 : "bucket": "import2030.firebasestorage.app"
+
+   STATUT : ACTIVE en config mais INUTILISEE en runtime.
+
+   Diagnostic V52 CP A (audit-v52/AUDIT-STORAGE-BUCKET-V52.txt) :
+     - Le SDK Web utilise VITE_FIREBASE_STORAGE_BUCKET (env Vercel)
+     - firebase.json bucket s'applique uniquement aux commandes
+       firebase CLI (deploy storage:rules etc.)
+     - Comme V53-PRODUCTION-READINESS n'autorise aucun deploy
+       Firebase, ce vestige n'a aucun effet runtime
+
+   ACTION V53 : flagger uniquement (pas de modification).
+   Le brief explicite : "Ne pas modifier firebase.json
+   automatiquement si cela concerne Storage bucket."
+
+   RECOMMANDATION FUTURE : V54+ corriger en
+     "bucket": "importok-6ef77.firebasestorage.app"
+   apres validation que le bucket actuel sur importok-6ef77
+   est bien fonctionnel.
+
+2. importProducts-v2.mjs (script legacy racine)
+   ────────────────────────────────────
+   Ligne 3 : * Import complet des 20 produits -> Firestore import2030
+   Ligne 17 : PROJECT_ROOT = 'C:/DATA-MC-2030/97IMPORT'  (Windows path)
+   Ligne 25 : storageBucket: 'import2030.firebasestorage.app'
+
+   STATUT : SCRIPT LEGACY V0 — non executable.
+     - Hardcode des paths Windows ('C:/DATA-MC-2030/...')
+     - Pointe vers projet supprime (import2030)
+     - Migration produits one-shot deja effectuee (V0)
+
+   ACTION V53 : flagger uniquement (script orphelin, casse).
+
+   RECOMMANDATION FUTURE : V54+ supprimer ce fichier (cleanup).
+   Hors scope V53.
+
+3. AGENTS.md (creation V53 CP A)
+   ────────────────────────────────────
+   Mentionne `import2030` 3 fois (interdiction explicite).
+   STATUT : LEGITIME (instructions de garde-fou pour Codex).
+
+4. firestore.rules
+   ────────────────────────────────────
+   Ligne contenant "import2030" : COMMENTAIRE historique
+   ("// .firebaserc : SUPPRIMÉ (contenait 'default':'import2030',
+   projet supprimé).")
+   STATUT : LEGITIME (commentaire de tracabilite).
+
+─── REFERENCES HISTORIQUES (RAPPORTS) ──────────────────────────
+
+Fichiers contenant `import2030` qui NE doivent PAS etre modifies :
+  - MAJ-V44-FIX.txt, MAJ-V44-TER.txt, MAJ-V46.txt,
+    MAJ-V49.txt, MAJ-V50-BIS.txt, MAJ-V52.txt
+  - RAPPORT-QA.md, RAPPORT-RESET.md, RAPPORT-STRUCTURE.md
+  - BACKUP-INVENTAIRE.md
+  - audit/01_architecture-technique.md (V44 audit historique)
+  - audit-v52/AUDIT-STORAGE-BUCKET-V52.txt (V52 CP A audit)
+  - PREFLIGHT-PRODUCTION-READINESS.txt (CE meme audit V53)
+  - RESET--FIREBASE.txt, "CD CDATA-MC-203097IMPORT.txt"
+    (procedures historiques)
+
+  Ces fichiers tracent l'historique de la transition
+  import2030 → importok-6ef77 et servent de documentation
+  legale du changement.
+
+─── PROJECT_ID importok-6ef77 — VERIFICATION ────────────────────
+
+Hardcoded dans :
+  - scripts/audit-acomptes-v52.cjs                         ✅
+  - scripts/init-counters-v50.cjs                          ✅
+  - scripts/migrate-users-to-clients.cjs                   ✅
+  - scripts/delete-quotes.mjs (config Web SDK)             ✅
+  - scripts/reset-database.sh (PROJECT_ID + API_KEY)       ✅
+  - .env.example (V53 CP C — VITE_FIREBASE_PROJECT_ID)     ✅
+  - AGENTS.md (V53 CP A — Project ID obligatoire)          ✅
+  - firestore.rules : N/A (rules ne portent pas le project_id)
+  - firebase.json   : N/A (utilise par CLI avec --project=)
+
+Total : 7 fichiers references coherents.
+
+─── COMMANDES `--project=` ──────────────────────────────────────
+
+Aucun script ne fait de `firebase deploy` direct.
+Toute commande firebase CLI dans la doc utilise
+explicitement `--project=importok-6ef77`.
+
+Verifie dans :
+  - AGENTS.md (CP A V53)               ✅
+  - PROMPT-CODEX-PRODUCTION.md (CP H)  → a verifier post-CP H
+  - VERCEL-V2-PRODUCTION-README.md     → a verifier post-CP G
+  - MAJ-V49.txt, MAJ-V50-BIS.txt       (historique)         ✅
+
+─── SYNTHESE ────────────────────────────────────────────────────
+
+✅ Aucune commande Firebase active sans --project explicite.
+✅ Aucun script destructif sans garde-fou (post CP D).
+⚠️ firebase.json contient encore bucket import2030 — DEFERRE V54+
+   (vestige inactif en runtime, modification reportee par
+   prudence — le bucket actuel doit etre verifie avant change).
+⚠️ importProducts-v2.mjs orphelin — DEFERRE V54+ (cleanup).
+✅ AGENTS.md (V53 CP A) interdit explicitement import2030.
+
+─── DECISION ────────────────────────────────────────────────────
+
+GO POUR CP G (suite mission docs-only).
+
+Aucune modification de firebase.json en V53. Aucune suppression
+d'importProducts-v2.mjs en V53. Les deux sont documentes ici
+pour V54+ cleanup mission.
+
+═══════════════════════════════════════════════════════════════
