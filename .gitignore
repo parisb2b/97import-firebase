@@ -70,6 +70,13 @@ archive-before-cleanstart-v*.zip.sha256
 CLEANSTART-V*-REPORT.txt
 cleanstart-v*-*.log
 
+# V53 Clean Start — archives JSON et ZIP NE JAMAIS commit
+ARCHIVE-BEFORE-CLEANSTART-V53/
+archive-before-cleanstart-v53.zip
+archive-before-cleanstart-v53.zip.sha256
+CLEANSTART-V53-REPORT.txt
+.v53-codexx-backup-tag.txt
+
 # Catalogues Excel (binaires, donnees metier sensibles)
 data/*.xlsx
 data/*.xls
