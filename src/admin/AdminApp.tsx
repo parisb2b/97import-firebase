@@ -202,6 +202,18 @@ export default function AdminApp() {
   // Tout user authentifie sans role 'admin' tombe sur ForbiddenPage.
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
 
+  // V50-BIS Checkpoint A — logout admin avec confirmation.
+  const handleAdminLogout = async () => {
+    if (!window.confirm('Se déconnecter ?')) return;
+    try {
+      await signOut(adminAuth);
+      // onAuthStateChanged va detecter setUser(null), AdminApp re-rend <AdminLogin />.
+      // Pas besoin de window.location.href explicite.
+    } catch (err) {
+      console.error('[AdminApp] handleAdminLogout error:', err);
+    }
+  };
+
   // V49 Checkpoint K+L — badges sidebar real-time via onSnapshot.
   // Avant V49 : valeurs hardcoded ('2' SAV, '3' Clients) ne reflechant pas
   // l'etat BD. Apres V49 : compteurs vivants, sans index Firestore requis
@@ -363,6 +375,7 @@ export default function AdminApp() {
         <Clocks />
 
         {/* Navigation sections */}
+        <div style={{ flex: 1, overflowY: 'auto' }}>
         {SIDEBAR_SECTIONS.map((section, sectionIdx) => (
           <div key={sectionIdx}>
             {section.separator && <div className="sb-sep" />}
@@ -397,6 +410,37 @@ export default function AdminApp() {
             })}
           </div>
         ))}
+        </div>
+
+        {/* V50-BIS Checkpoint A — bouton Deconnexion en bas de sidebar.
+            Style coherent V45 (.v45-btn-danger ghost rouge), confirme via
+            window.confirm. signOut(adminAuth) declenche onAuthStateChanged
+            qui ramene a <AdminLogin />. */}
+        <div className="sb-sep" />
+        <button
+          onClick={handleAdminLogout}
+          className="v45-trans-fast v45-focus v45-btn-danger"
+          style={{
+            margin: '12px',
+            padding: '10px 14px',
+            background: 'transparent',
+            color: '#FCA5A5',
+            border: '1.5px solid rgba(252, 165, 165, 0.3)',
+            borderRadius: 10,
+            fontSize: 13,
+            fontWeight: 600,
+            cursor: 'pointer',
+            fontFamily: 'inherit',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 8,
+          }}
+          title="Deconnexion"
+        >
+          <span aria-hidden>🚪</span>
+          <span>Déconnexion</span>
+        </button>
       </div>
 
       {/* Main content */}
