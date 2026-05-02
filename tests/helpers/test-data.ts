@@ -1,20 +1,24 @@
 // Donnees de test reutilisables pour les parcours E2E
-// V62 — valeurs par defaut, surchargeables via variables d'env
+// V63 — comptes de test documentes (mot de passe temporaire : 20262026)
+// Tous les mots de passe seront changes avant publication sur 97import.com
+// Priorite : variables d'environnement > defauts locaux
+
+const TEST_PWD = process.env.TEST_PASSWORD || '';
 
 export const TEST_USERS = {
   client: {
-    email: process.env.TEST_CLIENT_EMAIL || 'michel.chen@example.com',
-    password: process.env.TEST_CLIENT_PASSWORD || '',
-    name: 'Michel Client Test',
+    email: process.env.TEST_CLIENT_EMAIL || 'mc@sasfr.com',
+    password: process.env.TEST_CLIENT_PASSWORD || TEST_PWD,
+    name: 'Michel Chen',
   },
   partner: {
     email: process.env.TEST_PARTNER_EMAIL || 'tt@tartinique.com',
-    password: process.env.TEST_PARTNER_PASSWORD || '',
+    password: process.env.TEST_PARTNER_PASSWORD || TEST_PWD,
     name: 'TT Tartinique',
   },
   admin: {
     email: process.env.TEST_ADMIN_EMAIL || 'parisb2b@gmail.com',
-    password: process.env.TEST_ADMIN_PASSWORD || '',
+    password: process.env.TEST_ADMIN_PASSWORD || TEST_PWD,
   },
 } as const;
 
