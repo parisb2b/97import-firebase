@@ -5,6 +5,7 @@ import { db } from '../../lib/firebase';
 import { Card, Pill, IconButton, Kpi, FileIcon, CardIcon, DollarIcon, DownloadIcon, EuroIcon, EyeIcon } from '../components/Icons';
 import { generateDevis, generateFactureFinale, generateNoteCommission, downloadPDF } from '../../lib/pdf-generator';
 import { generateFactureAcomptePDF } from '../../lib/generateInvoiceAcompte';
+import LoadingState from '../components/atoms/LoadingState';
 
 interface Invoice {
   id: string;
@@ -156,7 +157,7 @@ export default function Factures() {
   const totalReste = totalMontant - totalEncaisse;
 
   if (loading) {
-    return <div style={{ textAlign: 'center', padding: 32 }}>Chargement...</div>;
+    return <LoadingState message="Chargement des factures…" />;
   }
 
   return (

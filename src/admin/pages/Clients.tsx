@@ -3,6 +3,7 @@ import { collection, query, orderBy, getDocs } from 'firebase/firestore';
 import { useLocation } from 'wouter';
 import { db } from '../../lib/firebase';
 import { Card, Kpi, Pill, IconButton, EyeIcon } from '../components/Icons';
+import LoadingState from '../components/atoms/LoadingState';
 
 interface Client {
   id: string;
@@ -40,7 +41,7 @@ export default function Clients() {
   const vips = filtered.filter(c => c.role === 'vip').length;
   const partners = filtered.filter(c => c.role === 'partner').length;
 
-  if (loading) return <div style={{ textAlign: 'center', padding: 32 }}>Chargement...</div>;
+  if (loading) return <LoadingState message="Chargement des clients…" />;
 
   return (
     <>

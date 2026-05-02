@@ -3,6 +3,7 @@ import { collection, query, orderBy, getDocs } from 'firebase/firestore';
 import { Link } from 'wouter';
 import { db } from '../../lib/firebase';
 import { Card, Kpi, Pill, IconButton, EyeIcon } from '../components/Icons';
+import LoadingState from '../components/atoms/LoadingState';
 
 interface SAV {
   id: string;
@@ -68,7 +69,7 @@ export default function SAVListe() {
     }
   };
 
-  if (loading) return <div style={{ textAlign: 'center', padding: 32 }}>Chargement...</div>;
+  if (loading) return <LoadingState message="Chargement des SAV…" />;
 
   return (
     <>

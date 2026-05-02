@@ -3,6 +3,7 @@ import { Link, useLocation } from 'wouter';
 import { collection, getDocs, orderBy, query } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import SearchInput from '../components/atoms/SearchInput';
+import LoadingState from '../components/atoms/LoadingState';
 
 type SortColumn = 'numero' | 'date_creation' | 'statut' | 'nb_lignes' | 'total_cny';
 type SortDirection = 'asc' | 'desc';
@@ -151,7 +152,7 @@ export default function ListeListesAchat() {
       />
 
       {loading ? (
-        <div style={{ padding: 40, textAlign: 'center', color: '#9CA3AF' }}>Chargement...</div>
+        <LoadingState message="Chargement des listes d'achat…" />
       ) : sorted.length === 0 ? (
         <div style={{
           padding: 60, textAlign: 'center', color: '#9CA3AF',

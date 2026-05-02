@@ -3,6 +3,7 @@ import { collection, query, orderBy, getDocs, doc, updateDoc } from 'firebase/fi
 import { useLocation } from 'wouter';
 import { db } from '../../lib/firebase';
 import { Card, Kpi, Pill, Button, IconButton, EyeIcon } from '../components/Icons';
+import LoadingState from '../components/atoms/LoadingState';
 
 interface Partner {
   id: string;
@@ -53,7 +54,7 @@ export default function Partenaires() {
 
   const actifs = partners.filter(p => p.actif).length;
 
-  if (loading) return <div style={{ textAlign: 'center', padding: 32 }}>Chargement...</div>;
+  if (loading) return <LoadingState message="Chargement des partenaires…" />;
 
   return (
     <>

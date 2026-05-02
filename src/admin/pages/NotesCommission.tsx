@@ -6,6 +6,7 @@ import { Card, Pill, IconButton, Kpi, FileIcon, DownloadIcon, EuroIcon, SendIcon
 import { generateDevis, generateNoteCommission, downloadPDF } from '../../lib/pdf-generator';
 import ModalNouvelleCommission from '@/admin/components/commission/ModalNouvelleCommission';
 import ModalMarquerPayee from '@/admin/components/commission/ModalMarquerPayee';
+import LoadingState from '../components/atoms/LoadingState';
 
 interface Commission {
   id: string;
@@ -239,7 +240,7 @@ export default function NotesCommission() {
   }).length;
 
   if (loading) {
-    return <div style={{ textAlign: 'center', padding: 32 }}>Chargement...</div>;
+    return <LoadingState message="Chargement des notes de commission…" />;
   }
 
   return (

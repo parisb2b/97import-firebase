@@ -3,6 +3,7 @@ import { Link, useLocation } from 'wouter';
 import { collection, getDocs, orderBy, query } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import SearchInput from '../components/atoms/SearchInput';
+import LoadingState from '../components/atoms/LoadingState';
 
 type SortColumn = 'numero' | 'type' | 'destination' | 'date_depart_est' | 'statut';
 type SortDirection = 'asc' | 'desc';
@@ -165,7 +166,7 @@ export default function ListeConteneurs() {
       />
 
       {loading ? (
-        <div style={{ padding: 40, textAlign: 'center', color: '#9CA3AF' }}>Chargement...</div>
+        <LoadingState message="Chargement des conteneurs…" />
       ) : sorted.length === 0 ? (
         <div style={{
           padding: 60, textAlign: 'center', color: '#9CA3AF',
