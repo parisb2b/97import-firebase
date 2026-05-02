@@ -1,0 +1,258 @@
+# Codex97MAJ - Journal central permanent 97IMPORT
+
+Date/heure de mise a jour : 2026-05-02 18:35:30 CEST
+Projet : /Users/mactell/97import-firebase
+Branche : v2
+Projet Firebase obligatoire : importok-6ef77
+Mission courante : V56-BIS - creation du journal central permanent
+
+Regle permanente :
+- A chaque prochaine mission Codex sur 97IMPORT, mettre a jour Codex97MAJ.txt.
+- Committer Codex97MAJ.txt avec les changements de la mission.
+- Ne jamais travailler sur main.
+- Ne jamais lancer de Firebase deploy sans validation humaine explicite.
+- Ne jamais lire, afficher, copier, zipper ou committer de secret.
+- Ne jamais supprimer de donnees Firestore sans validation humaine explicite.
+- Ne jamais committer Codexxx.zip, Codexxx/ ni prompts/v53.md.
+
+## Resume V53-CODEXX
+
+V53 Production Readiness a prepare le depot pour un usage Codex en production :
+- creation de AGENTS.md comme reference agent ;
+- renforcement de .gitignore contre secrets, archives et artefacts sensibles ;
+- completion de .env.example sans valeur sensible ;
+- audit des scripts destructifs et ajout de garde-fous sur delete-quotes.mjs et reset-database.sh ;
+- audit du projet Firebase et documentation du vestige import2030 ;
+- documentation de la preview Vercel v2 ;
+- creation du prompt production Codex.
+
+V53-CODEXX Clean Start a ensuite execute un nettoyage controle des donnees documentaires :
+- archive JSON + ZIP creee avant suppression ;
+- PROJECT_ID importok-6ef77 hardcode et verifie ;
+- collections KEEP preservees ;
+- purge limitee aux collections documentaires ciblees ;
+- reset des compteurs documentaires attendus ;
+- aucun deploy Firebase.
+
+V53-CODEXX Publish a publie la preview v2 et ajoute un indicateur de version visible sur l'accueil public.
+Ce badge a ete retire ensuite en V55 car il dupliquait la logique centralisee via Footer et src/lib/version.ts.
+
+## Resume V55
+
+V55 a realise un audit production et des corrections non destructives :
+- suppression du doublon BuildVersionBadge ;
+- conservation de l'affichage version centralise via Footer et src/lib/version.ts ;
+- remplacement de la suppression definitive produit par un archivage actif=false ;
+- verrouillage du champ prix_achat_eur dans l'ancien ProductForm ;
+- verification Vercel front/admin par curl -I : HTTP 200 ;
+- dry-run Firestore V53 execute sans ecriture ni suppression.
+
+Aucun deploy Firebase, aucune suppression Firestore et aucun script destructif n'ont ete executes en V55.
+
+## Resume V56
+
+V56 a corrige la visibilite admin des clients et devis :
+- cause identifiee : adminAuth utilisait l'app Firebase "admin", tandis que les pages admin lisaient Firestore via db sur l'app "client" ;
+- correction : ajout de adminDb et adminStorage dans src/lib/firebase.ts ;
+- bascule des imports Firestore/Storage de src/admin vers adminDb/adminStorage ;
+- adaptation de commissionHelpers et quoteStatusHelpers pour utiliser adminDb quand adminAuth.currentUser existe ;
+- creation d'un audit read-only clients/devis ;
+- creation d'un script de cleanup interenovations avec dry-run par defaut, archive obligatoire et confirmation explicite ;
+- nettoyage execute sur partners/TEST-PART apres archive locale et hash SHA256.
+
+V56 n'a pas modifie firestore.rules ni storage.rules.
+Aucun deploy Firebase n'a ete execute.
+La preview Vercel front/admin a ete verifiee en HTTP 200 dans le rapport V56.
+
+## Commits importants
+
+- 2b01535 docs(agents): ajoute instructions production pour Codex et agents
+- 4a40563 chore(scripts): audit et garde-fous scripts destructifs production
+- 9d5ab76 docs(firebase): audit project id et commandes production
+- 0c57e88 docs(vercel): documente preview v2 et tests production
+- 11cbe69 docs(codex): ajoute prompt production Codex
+- 65cc1c7 docs(v53): rapport production readiness pour Codex
+- c56e92c feat(v53-codexx): add guarded clean-start script
+- c68ec95 docs(v53-codexx): rapport final clean start
+- f9a29e7 chore(front): affiche version de build V53-CODEXX sur accueil
+- c7cfb5b docs(v53-codexx): rapport publication preview
+- f894287 fix(v55): audit production et corrections non destructives
+- 427c342 fix(v56): corrige visibilite admin clients et devis
+- 47c4ca6 docs(v56): rapport admin clients devis
+
+## Tags importants
+
+- backup-pre-v53-production-readiness-20260502-1414
+- v53-production-readiness-final
+- backup-pre-v53-codexx-20260502-1519
+- checkpoint-v53-codexx-0-gitignore
+- checkpoint-v53-codexx-A-clients-source
+- checkpoint-v53-codexx-B-script
+- v53-codexx-final
+- v53-codexx-published
+- v53-codexx-publish-final
+- backup-pre-v55-audit-20260502-1602
+- v55-codex-audit-final
+- backup-pre-v56-admin-quotes-clients-20260502-1713
+- checkpoint-v56-admin-quotes-clients
+- checkpoint-v56-cleanup-interenovations
+- v56-admin-clients-devis-final
+- v56-bis-codex97maj
+
+## Fichiers modifies
+
+Fichiers importants modifies ou crees en V53 Production Readiness :
+- AGENTS.md
+- .gitignore
+- .env.example
+- AUDIT-SCRIPTS-DESTRUCTIFS-V53.txt
+- AUDIT-SCRIPTS-DESTRUCTIFS-GREP.txt
+- AUDIT-FIREBASE-PROJECT-V53.txt
+- AUDIT-FIREBASE-PROJECT-GREP.txt
+- BUILD-REPORT-V53-PRODUCTION-READINESS.txt
+- PREFLIGHT-PRODUCTION-READINESS.txt
+- VERCEL-V2-PRODUCTION-README.md
+- PROMPT-CODEX-PRODUCTION.md
+- scripts/delete-quotes.mjs
+- scripts/reset-database.sh
+- MAJ-V53-PRODUCTION-READINESS.txt
+
+Fichiers importants modifies ou crees en V53-CODEXX :
+- src/front/pages/Inscription.tsx
+- src/front/pages/Profil.tsx
+- src/admin/pages/Clients.tsx
+- src/admin/pages/DetailClient.tsx
+- scripts/clean-start-business-data-v53.cjs
+- CLEANSTART-V53-REPORT.txt
+- MAJ-V53-CODEXX.txt
+- src/components/BuildVersionBadge.tsx
+- src/front/pages/Home.tsx
+- MAJ-V53-CODEXX-PUBLISH.txt
+
+Fichiers importants modifies en V55 :
+- .gitignore
+- src/front/pages/Home.tsx
+- src/components/BuildVersionBadge.tsx
+- src/admin/pages/FicheProduit.tsx
+- src/admin/components/ProductForm.tsx
+- AUDIT-V55-CODEX.txt
+
+Fichiers importants modifies ou crees en V56 :
+- src/lib/firebase.ts
+- src/lib/commissionHelpers.ts
+- src/lib/quoteStatusHelpers.ts
+- src/admin/AdminApp.tsx
+- src/admin/AdminLogin.tsx
+- src/admin/pages et composants utilisant Firestore/Storage
+- scripts/audit-admin-clients-quotes-v56.cjs
+- scripts/cleanup-interenovations-v56.cjs
+- .gitignore
+- MAJ-V56-ADMIN-CLIENTS-DEVIS.txt
+
+Fichiers modifies en V56-BIS :
+- Codex97MAJ.txt
+
+## Bugs corriges
+
+- Les pages admin clients/devis affichaient 0 alors que Firestore contenait des donnees : corrige en V56 via adminDb/adminStorage.
+- La suppression produit definitive dans l'admin a ete remplacee par un archivage non destructif en V55.
+- Le champ EUR legacy des produits n'est plus editable directement dans ProductForm en V55.
+- Le doublon BuildVersionBadge a ete supprime en V55 au profit de la version centralisee.
+- Les scripts delete-quotes.mjs et reset-database.sh ont recu des garde-fous en V53 Production Readiness.
+- Le workflow client a ete bascule de profiles vers clients en V53-CODEXX.
+
+## Bugs restants / points ouverts
+
+- firestore.rules laisse encore counters lisible/inscriptible par tout utilisateur authentifie.
+- firebase.json contient encore le bucket Storage legacy import2030.firebasestorage.app.
+- importProducts-v2.mjs reste un script legacy casse pointant vers import2030 et des chemins Windows.
+- ESLint 9 ne trouve pas de eslint.config.(js|mjs|cjs) : npm run lint est KO selon V55.
+- Warnings Vite persistants : imports dynamiques/statiques melanges sur firebase.ts, quoteStatusHelpers.ts, emailService.ts.
+- Warnings Vite persistants : certains chunks depassent 800 kB apres minification.
+- Les tests manuels navigateur Vercel restent a faire par Michel apres chaque livraison.
+
+## Firebase deploy
+
+Firebase deploy effectue :
+- V53 Production Readiness : non.
+- V53-CODEXX : non.
+- V53-CODEXX Publish : non.
+- V55 : non.
+- V56 : non.
+- V56-BIS : non.
+
+Commande autorisee uniquement apres validation humaine si les rules changent :
+firebase deploy --only firestore:rules --project=importok-6ef77
+
+## Vercel
+
+Preview front :
+https://97import-firebase-git-v2-parisb2bs-projects.vercel.app/
+
+Preview admin :
+https://97import-firebase-git-v2-parisb2bs-projects.vercel.app/admin
+
+Etat :
+- V53-CODEXX : verification manuelle recommandee.
+- V53-CODEXX Publish : front/admin verifies par curl -I, HTTP 200.
+- V55 : front/admin verifies par curl -I, HTTP 200.
+- V56 : front/admin verifies par curl -I, HTTP 200.
+- V56-BIS : non reverifie par reseau ; mission documentation uniquement.
+
+## Risques restants
+
+- Corriger firebase.json vers le bucket importok-6ef77 seulement apres audit Storage explicite.
+- Restreindre counters dans firestore.rules seulement apres validation fonctionnelle complete et validation humaine de deploy.
+- Migrer les scripts legacy destructifs vers Admin SDK avec verification serviceAccount.project_id.
+- Nettoyer importProducts-v2.mjs dans une mission dediee.
+- Corriger la configuration ESLint 9 pour restaurer npm run lint.
+- Standardiser les imports pour reduire les warnings Vite.
+- Evaluer un split de bundle supplementaire si les chunks > 800 kB deviennent un probleme utilisateur.
+
+## Commandes executees pendant V56-BIS
+
+- git status --short
+- git log --oneline -10
+- npm run build
+- git branch --show-current
+- rg --files avec les rapports V53/V55/V56 et Codex97MAJ.txt
+- git tag --list 'v5*' --sort=-creatordate
+- git log --decorate --oneline -20
+- sed -n sur les rapports racine V53/V55/V56
+- date '+%Y-%m-%d %H:%M:%S %Z'
+- git status --short apres creation de Codex97MAJ.txt
+
+Commandes de finalisation V56-BIS :
+- npm run build
+- git status --short
+- git add Codex97MAJ.txt
+- git commit -m "docs(codex): ajoute journal central Codex97MAJ"
+- git push origin v2
+- git tag v56-bis-codex97maj
+- git push origin v56-bis-codex97maj
+
+## Tests effectues pendant V56-BIS
+
+- Build initial : npm run build OK.
+- Build final : npm run build OK.
+- Lecture des rapports racine demandes : OK.
+- Verification branche active : v2.
+- Verification que les artefacts interdits restent non suivis et non stages : Codexxx.zip, Codexxx/, prompts/v53.md.
+
+## Rollback plan
+
+Rollback V56-BIS uniquement :
+- git revert <commit V56-BIS>
+- git push origin v2
+- supprimer le tag distant si necessaire apres validation humaine :
+  git push origin :refs/tags/v56-bis-codex97maj
+
+Aucun rollback Firestore n'est requis pour V56-BIS car la mission ne modifie aucune donnee.
+
+## Prochaine mission recommandee
+
+V57 recommande :
+- corriger la configuration ESLint 9 pour restaurer npm run lint ;
+- traiter ensuite les warnings Vite d'import dynamique/statique ;
+- planifier separement l'audit Storage avant toute correction de firebase.json ;
+- preparer une mission Firestore Rules dediee pour counters, avec tests fonctionnels puis validation humaine avant deploy.
