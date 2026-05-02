@@ -1,0 +1,811 @@
+═══════════════════════════════════════════════════════════════════════════
+  RAPPORT D'AUDIT V48-BIS — 97import-firebase
+═══════════════════════════════════════════════════════════════════════════
+
+Date         : 2026-05-01 19:54 (GMT+2)
+HEAD         : 26f9024  (V46 stable, 7 commits + 7 tags)
+Branche      : v2 (synchro origin)
+Mode         : AUDIT READ-ONLY — aucune modification, aucun commit
+Workflow     : 5 agents Explore parallèles + auto-audit régressions V44-V47
+Plugins      : Superpowers, UI-UX-PRO-MAX, Claude-Mem
+
+
+═══════════════════════════════════════════════════════════════════════════
+  STATISTIQUES
+═══════════════════════════════════════════════════════════════════════════
+
+▸ Fichiers TS/TSX analysés       : 146 (31 073 lignes)
+▸ Agents Explore lancés          : 5 (zones 1-9 en parallèle)
+▸ Bugs détectés total            : 25
+   • 🔴 CRITIQUES (sécurité/business) : 5  ← rotation clés API URGENTE
+   • 🟠 HAUTS                          : 7
+   • 🟡 MOYENS                         : 9
+   • 🟢 BAS                            : 4
+▸ Bugs N1-N7 connus (V47-BIS)    :
+   • CONFIRMÉS  : 2  (N1 prix VIP, N6 tri DESC AdminProduits)
+   • NON CONFIRMÉS : 5  (N2/N3/N4/N5/N7 — déjà fixés ou faux positifs)
+▸ Bugs NOUVEAUX                  : 23
+
+
+═══════════════════════════════════════════════════════════════════════════
+  ⚠️  URGENCE SÉCURITÉ — À TRAITER AVANT TOUT FIX MÉTIER ⚠️
+═══════════════════════════════════════════════════════════════════════════
+
+Trois failles CRITIQUES détectées qui exposent des clés publiquement et
+laissent l'admin sans contrôle de rôle. Ces failles préexistent V46 mais
+n'ont jamais été auditées.
+
+# 1 — `.env.production` TRACKÉ EN GIT 🔴 CRITIQUE
+─────────────────────────────────────────────────
+Vérifié : `git ls-files | grep '^\.env'` → retourne `.env.production`.
+`.gitignore` couvre `.env`, `.env.*.local`, `.env.local` — mais PAS
+`.env.production`. Donc le fichier est dans l'historique du repo public
+sur github.com/parisb2b/97import-firebase.
+
+Contenu (9 lignes) — clés exposées (NON LOGGÉES ICI EN CLAIR) :
+  • `VITE_FIREBASE_*`        — relativement OK (Firebase API key est public-by-design,
+                                la sécurité dépend des Firestore Rules — voir #3)
+  • `VITE_DEEPL_API_KEY`     — 🔴 secret métier exposé (peut polluer traductions)
+  • `VITE_EXCHANGE_KEY`      — 🔴 peut altérer taux affichés
+  • `VITE_RESEND_KEY`        — 🔴 peut envoyer emails sous identité 97import (phishing)
+
+ACTIONS IMMÉDIATES (avant fix V49) :
+  1. Sur GitHub : marquer le repo PRIVÉ si possible (au moins le temps de purger).
+  2. Régénérer toutes les clés DeepL, Resend, Exchange API IMMÉDIATEMENT.
+  3. Purger l'historique git :
+       brew install git-filter-repo
+       git filter-repo --path .env.production --invert-paths
+       git push --force --all  # ⚠ destructif — synchroniser collaborateurs
+  4. Ajouter `.env.production` à `.gitignore`.
+  5. Stocker les vraies clés en Vercel Environment Variables (pas dans le repo).
+
+EFFORT : ~45 min + délai propagation GitHub cache.
+
+
+# 2 — Firestore Rules ABSENTES du repo 🔴 CRITIQUE
+─────────────────────────────────────────────────
+`firebase.json` ne référence QUE `storage.rules`. Aucun `firestore.rules`
+trouvé dans le repo (`find . -name 'firestore.rules'` → vide).
+
+Deux scénarios :
+  (a) Les règles existent uniquement dans Firebase Console → divergence
+      possible / pas de versioning / perte au prochain `firebase deploy`.
+  (b) Les règles sont absentes → Firestore est OUVERT (lecture/écriture
+      par n'importe qui depuis n'importe où). RGPD et data integrity
+      catastrophiques.
+
+À VÉRIFIER MAINTENANT en console Firebase — Firestore → Règles.
+
+Si scénario (b) : tout user (même non auth) peut lire `quotes`, `clients`,
+`partners`, `products`, etc. — accès aux montants devis, emails clients,
+commissions partenaires. Plus grave, écriture libre = vandalisme possible.
+
+ACTION : Créer `firestore.rules` dans le repo + ajouter à `firebase.json`,
+déployer via `firebase deploy --only firestore:rules`.
+
+EFFORT : ~120 min (10 collections × 12 min de règles ciblées).
+
+
+# 3 — Routes /admin sans contrôle de rôle 🔴 CRITIQUE
+─────────────────────────────────────────────────
+Dans `src/admin/AdminApp.tsx:193-235`, la seule vérification est :
+   ```ts
+   if (!user) return <AdminLogin />;
+   ```
+N'importe quel utilisateur Firebase authentifié (créé via formulaire
+inscription client/partenaire) peut accéder à /admin/* en saisissant
+manuellement l'URL. Voir tous les devis, prix, partenaires, commissions.
+
+ACTION : ajouter Custom Claim `role: 'admin'` aux comptes admin Firebase,
+vérifier dans AdminApp via `(await user.getIdTokenResult()).claims.role`.
+Alternative : collection Firestore `admin_users` lue au login.
+
+EFFORT : ~30 min (mais doit suivre #2 ; sans Firestore Rules, le check
+côté client est contournable).
+
+
+# 4 — RGPD : Espace Client filtre par prop, pas par currentUser.uid 🟠 HAUT
+─────────────────────────────────────────────────
+`src/front/pages/espace-client/MesDevis.tsx:8-17` :
+   ```ts
+   export default function MesDevis({ userId }: { userId: string }) {
+     const q = query(collection(db, 'quotes'), where('client_id', '==', userId));
+     ...
+   }
+   ```
+Le composant fait confiance au prop `userId` passé par le parent.
+Sans Firestore Rules (#2), un user peut intercepter l'appel et changer
+l'UID → voir devis d'autrui. RGPD violation.
+
+Idem espace-partenaire : `partnerCode` en prop.
+
+EFFORT : ~30 min — vérifier currentUser.uid à l'intérieur du composant
+ET ajouter règle Firestore correspondante.
+
+
+# 5 — Clés API VITE_* dans le bundle client 🔴 CRITIQUE
+─────────────────────────────────────────────────
+Toutes les `VITE_*` sont injectées en clair dans le bundle JavaScript.
+DeepL, Resend, Exchange ne devraient JAMAIS être en client.
+
+ACTION : déplacer ces 3 services vers des Vercel Functions (`/api/*`).
+Le client appelle `/api/translate`, le serveur tient la clé en secret.
+
+EFFORT : ~3 × 60 min = ~180 min (3 services).
+
+
+═══════════════════════════════════════════════════════════════════════════
+  1. BUGS CRITIQUES BUSINESS 🔴
+═══════════════════════════════════════════════════════════════════════════
+
+# N1 — Prix VIP négocié peut DÉPASSER prix public 🔴 CONFIRMÉ
+─────────────────────────────────────────────────
+Statut spec V47-BIS : déjà signalé, CONFIRMÉ par audit.
+
+Fichier:ligne :
+  `src/front/pages/espace-partenaire/GestionDevisPartner.tsx:94-107` (handleSendVIP)
+  `src/front/pages/espace-partenaire/GestionDevisPartner.tsx:246-250` (UI fallback)
+
+Symptôme :
+  Partenaire saisit `prix_vip_negocie` qui dépasse `prix_unitaire` (prix
+  public). La validation actuelle vérifie SEULEMENT les bornes basées sur
+  `prix_achat * coefficient_min/max`, jamais le cap au prix public.
+
+  Ex : prix_achat=100, prix_unitaire=150, coef_max=2.0 → max=200
+  Partenaire saisit 195 € → accepté (< 200) → client paie 195 € au lieu de 150 €.
+  → Client paie PLUS CHER en VIP qu'en standard. Perte de marge + confiance.
+
+Cause racine (ligne 94-106 actuelle) :
+   ```ts
+   if (prixAchat > 0) {
+     const prixMin = prixAchat * coefs.coefficient_vip_min;
+     const prixMax = prixAchat * coefs.coefficient_vip_max;
+     if (prixNegocie < prixMin) errors.push(...);
+     if (prixNegocie > prixMax) errors.push(...);
+     // ❌ MANQUE : if (prixNegocie > ligne.prix_unitaire) ...
+   }
+   ```
+
+Fix prêt à coder :
+   ```diff
+       if (prixAchat > 0) {
+         const prixMin = prixAchat * coefs.coefficient_vip_min;
+         const prixMax = prixAchat * coefs.coefficient_vip_max;
+   +     const prixPublic = ligne.prix_unitaire ?? 0;
+         if (prixNegocie < prixMin) errors.push(`${ligne.nom_fr} : prix ${prixNegocie}€ < min ${prixMin.toFixed(2)}€`);
+         if (prixNegocie > prixMax) errors.push(`${ligne.nom_fr} : prix ${prixNegocie}€ > max ${prixMax.toFixed(2)}€`);
+   +     if (prixPublic > 0 && prixNegocie > prixPublic + 0.01) {
+   +       errors.push(`${ligne.nom_fr} : prix VIP ${prixNegocie}€ > prix public ${prixPublic}€ — un client VIP ne peut PAS payer plus cher qu'un client standard.`);
+   +       hasError = true;
+   +     }
+       }
+   ```
+
+Et ligne 246-250 (UI helper text fallback du max affiché à l'utilisateur) :
+   ```diff
+   - const prixMax = prixAchat > 0 ? parseFloat((prixAchat * coefs.coefficient_vip_max).toFixed(2)) : (l.prix_unitaire ?? 0);
+   + const prixPublic = l.prix_unitaire ?? 0;
+   + const prixMaxCoef = prixAchat > 0 ? parseFloat((prixAchat * coefs.coefficient_vip_max).toFixed(2)) : prixPublic;
+   + const prixMax = Math.min(prixMaxCoef, prixPublic);  // jamais au-dessus du public
+   ```
+
+Sévérité : 🔴 critique (perte CA + confiance client)
+Effort : 15 min
+Dépendances : aucune
+
+
+# N1-bis — Commission partenaire — pas de cap par cohérence 🟠 HAUT
+─────────────────────────────────────────────────
+Fichier:ligne : `src/lib/commissionHelpers.ts:62-77` (calculerCommissionLigne)
+
+Symptôme :
+  La formule `commission_unitaire = prix_vip - prix_partenaire` est correcte
+  par design. MAIS si N1 laisse passer un prix VIP > public, la commission
+  calculée sur ce prix est mécaniquement excessive → surpaiement partenaire.
+
+Fix : aucun changement requis ICI si N1 est fixé. En defense-in-depth,
+ajouter une garde :
+   ```diff
+       const prix_vip = ligne.prix_vip_negocie ?? ligne.prix_unitaire_final ?? 0;
+       const prix_partenaire = ligne.prix_partenaire ?? 0;
+   +   const prix_unitaire = ligne.prix_unitaire ?? prix_vip;
+       if (prix_vip < prix_partenaire - 0.01) return null;
+   +   if (prix_vip > prix_unitaire + 0.01) {
+   +     console.warn(`[Commission] Anomalie : prix VIP ${prix_vip}€ > public ${prix_unitaire}€ ligne ${ligne.reference}`);
+   +     return null;
+   +   }
+   ```
+
+Sévérité : 🟠 (cap après N1)
+Effort : 5 min
+Dépendances : N1
+
+
+# N1-ter — Devis annulés peuvent ENCORE générer factures 🟠 HAUT
+─────────────────────────────────────────────────
+Fichier:ligne : `src/admin/components/PopupEncaisserAcompte.tsx` (manque check)
+                `src/admin/pages/DetailDevis.tsx:406-413` (select statut → 'annule')
+
+Symptôme :
+  1. Devis statut = 'accepte' avec acomptes déclarés non-encaissés.
+  2. Admin change statut à 'annule'.
+  3. Admin clique "Encaisser cet acompte" → succède + génère facture acompte.
+  → Comptablement incohérent.
+
+Cause racine :
+  - `peutVerserAcompte` (devisHelpers:23) bloque côté client mais
+    `PopupEncaisserAcompte` (admin) ne fait pas le check.
+  - Aucun garde en amont du `setDoc('quotes/{id}/...', invoice)`.
+
+Fix prêt à coder :
+   ```diff
+   // src/admin/components/PopupEncaisserAcompte.tsx (handleConfirm début)
+   + if (devis.statut === 'annule') {
+   +   alert('❌ Devis annulé — encaissement bloqué. Réactivez le devis avant de procéder.');
+   +   return;
+   + }
+   ```
++ Optionnel : warning visuel `DetailDevis.tsx` quand statut === 'annule'.
+
+Sévérité : 🟠
+Effort : 10 min
+Dépendances : aucune
+
+
+# N1-quater — Produits 🔴 BLOQUANT (poids/volume manquants) ajoutables aux devis 🟠 HAUT
+─────────────────────────────────────────────────
+Fichier:ligne : `src/admin/pages/DetailDevis.tsx:419-422` (bouton + Ajouter ligne)
+                `src/admin/utils/productCompleteness.ts:32-49` (statut bloquant)
+
+Symptôme :
+  Produit avec `poids_brut_kg = 0` ou `volume_m3 = 0` reçoit le badge 🔴
+  bloquant en V44-BIS. Mais le bouton "+ Ajouter ligne" en DetailDevis
+  ne filtre pas → admin peut quand même ajouter ce produit. Conséquences :
+  conteneur ne peut pas être facturé (logistique manque), Excel BL casse.
+
+Fix : filtrer dans `handleAddLigne` ou dans le dropdown produits :
+   ```ts
+   const produitsAjoutables = products.filter(p => getCompletenessStatus(p) !== 'bloquant');
+   ```
+Optionnel : afficher un warning sur les bloquants désactivés.
+
+Sévérité : 🟠
+Effort : 20 min
+Dépendances : aucune
+
+
+═══════════════════════════════════════════════════════════════════════════
+  2. BUGS HAUTS 🟠
+═══════════════════════════════════════════════════════════════════════════
+
+# UX1 — Bouton Disabled sans CSS uniforme 🟠
+─────────────────────────────────────────────────
+`src/admin/styles/admin.css` n'a pas de règle globale `.btn:disabled`.
+Chaque composant gère individuellement (cohérence partielle).
+
+Fix admin.css :
+   ```css
+   .btn:disabled, button:disabled {
+     opacity: 0.5;
+     cursor: not-allowed;
+     pointer-events: none;
+   }
+   ```
+Effort : 5 min
+
+
+# UX2 — Loading state texte brut "Chargement..." sans spinner 🟠
+─────────────────────────────────────────────────
+8+ pages affichent uniquement `<div>Chargement...</div>`. Polish-v45.css
+contient déjà `.v45-spinner` (spin animation). À utiliser dans tous les
+loading states de pages liste.
+
+Effort : ~10 min × ~8 pages = 80 min (ou créer composant `<LoadingState />`).
+
+
+# Tri N6 — AdminProduits sortDir initial 'asc' 🟠 CONFIRMÉ
+─────────────────────────────────────────────────
+Fichier:ligne : `src/admin/pages/AdminProduits.tsx:47`
+
+Sur 10 listes admin auditées : 8 conformes DESC, 1 délibérément ASC
+(Partenaires — tri alphabétique par nom = OK), 1 non conforme :
+   ```diff
+   - const [sortDir, setSortDir] = useState<SortDir>('asc');
+   + const [sortDir, setSortDir] = useState<SortDir>('desc');
+   ```
+Effort : 1 min
+
+
+# Limit Firestore manquante sur listes admin 🟠
+─────────────────────────────────────────────────
+`Dashboard.tsx:77`, `ListeDevis.tsx:63`, `Factures.tsx`, `NotesCommission`,
++ 11 autres `getDocs(collection(...))` sans `limit()`. Avec 10k devis :
+   • 10 000 reads / page / utilisateur
+   • Coût Firestore exponentiel
+   • Latence de 5-10s à chaque chargement
+
+Fix :
+   ```diff
+   - const snap = await getDocs(collection(db, 'quotes'));
+   + const snap = await getDocs(query(collection(db, 'quotes'), orderBy('createdAt', 'desc'), limit(100)));
+   ```
+   + bouton "Charger plus" avec `startAfter()` pagination.
+
+Effort : 60 min (15 fichiers × ~4 min)
+Dépendances : aucune (mais fait sens après #2 Firestore Rules)
+
+
+# Tests automatisés ABSENTS 🟠
+─────────────────────────────────────────────────
+0 fichier `*.test.*` ou `*.spec.*` dans le projet. Vitest/Jest/Playwright
+pas configurés. Risque de régression à chaque session V44/V45/V46/V47…
+
+Recommandation : commencer petit. 5 tests Vitest sur les helpers les
+plus critiques :
+  • `validerNouveauPaiement` (V46 Bug D)
+  • `calculerCompletude` (V44-TER Bug 2)
+  • `calculerCommissionLigne` (commission)
+  • `formatDateCourt` (V45 Bug B)
+  • `sanitizeForFirestore` (V44-TER + V45 + V46)
+
+Effort : 90 min (setup Vitest + 5 tests)
+
+
+# 3 secrets API en bundle client (Resend, DeepL, Exchange) 🟠
+─────────────────────────────────────────────────
+Cf. urgence #5. Couvert par l'urgence sécurité.
+
+
+═══════════════════════════════════════════════════════════════════════════
+  3. INCOHÉRENCES UX / PARCOURS 🟡
+═══════════════════════════════════════════════════════════════════════════
+
+# Doublons devis (anti-double-clic absent) 🟡
+─────────────────────────────────────────────────
+Fichier : `src/admin/pages/DetailDevis.tsx:334` + `ModalDupliquerDevis.tsx`
+
+Bouton "📋 Dupliquer" sans `disabled={duplicating}`. Double-clic rapide
+crée 2 devis. Impact : devis comptable doublé, confusion client.
+
+Fix : ajouter état local `duplicating` ou utiliser `useTransition`.
+
+Effort : 5 min
+
+
+# UX5 — Focus states partiels (inputs sans `.v45-focus`) 🟡
+─────────────────────────────────────────────────
+V45 a ajouté `.v45-focus` à beaucoup d'éléments. Mais les pages admin
+qui n'ont pas reçu de polish V45 (Factures, Clients, Partenaires, etc.)
+ont des inputs/boutons sans focus visible clavier → a11y dégradée.
+
+Fix : appliquer `.v45-focus` sur tous les inputs/buttons admin majeurs.
+
+Effort : 30 min
+
+
+# UX6 — Pas de responsive mobile explicite (admin) 🟡
+─────────────────────────────────────────────────
+`AdminProduits.tsx:164` : `gridTemplateColumns: 'repeat(6, 1fr)'`
+sans media query → débordement < 768px. Admin n'est pas censé être
+utilisé en mobile, mais la dégradation actuelle est laide.
+
+Fix : `@media (max-width: 640px) { grid-template-columns: repeat(2, 1fr) !important; }`
+
+Effort : 15 min
+
+
+# Parcours CLIENT — manques mineurs 🟡
+─────────────────────────────────────────────────
+- Pas de bouton "Imprimer devis" depuis espace-client (admin uniquement)
+- Pas de notification in-app (juste email)
+- ContinuerAchats incomplet (renvoie vers Panier)
+
+Effort : ~60 min (cosmétique)
+
+
+# Parcours PARTENAIRE — pas de tableau de bord récap 🟡
+─────────────────────────────────────────────────
+3 onglets fonctionnels (MesClientsPartner, GestionDevisPartner,
+MesCommissionsPartner) mais pas de vue agrégée :
+  • CA total annuel
+  • Commissions totales / payées / en attente
+  • Taux de conversion
+
+Effort : ~3h (nouveau composant)
+
+
+# 8 pages utilisent encore .si-bar legacy (loupe via background-image) 🟡
+─────────────────────────────────────────────────
+V46 Checkpoint F a migré 6 callers vers SearchInput. Restent :
+CatalogueProduits, ListeDevis, Stock, Factures, ListesAchat,
+NotesCommission, SAVListe, Clients.
+
+Le visuel est OK (loupe présente via background-image SVG admin.css:567)
+mais incohérence avec le composant SearchInput. Migration recommandée
+pour unifier sur 1 seul standard.
+
+Effort : 30 min total (8 pages × ~4 min)
+Dépendances : V47
+
+
+═══════════════════════════════════════════════════════════════════════════
+  4. AMÉLIORATIONS RECOMMANDÉES (qualité code) 🟢
+═══════════════════════════════════════════════════════════════════════════
+
+# 162 occurrences `console.*` en production 🟡
+─────────────────────────────────────────────────
+Top 10 fichiers : PopupEncaisserAcompte (17), emailService (12),
+commissionHelpers (12), SignatureDevis (6), DevisCard (6), …
+
+Beaucoup sont des logs métier intentionnels (cascade V43-E3.2).
+Recommandation : utiliser `lib/logService` (déjà existant) avec
+niveau debug/info/warn/error et filtrage en prod.
+
+Effort : 2-3h
+
+
+# 330 occurrences de type `any` 🟡
+─────────────────────────────────────────────────
+Top fichiers : DetailListeAchat (16), OngletDetails (16),
+PopupEncaisserAcompte (15), DevisCard (12), pdf-generator (11)…
+
+Migration progressive vers interfaces typées. Commencer par les modèles
+de données : `Devis`, `Produit`, `Commission`, `Acompte`. Bénéfice IDE
++ détection bugs au compile.
+
+Effort : 6-8 h pour top 5 fichiers
+
+
+# Formatters dupliqués (formatEUR / formatDate / formatMontant) 🟡
+─────────────────────────────────────────────────
+Plusieurs implémentations locales dans pdf-generator, generateInvoiceAcompte,
+generateInvoiceFinale. Centraliser dans `lib/formatters.ts` et importer.
+
+Effort : 2 h
+
+
+# Fonctions @deprecated jamais appelées 🟢
+─────────────────────────────────────────────────
+`commissionHelpers.ts:250` et `:289` portent un commentaire @deprecated.
+Aucun import détecté → dead code à supprimer.
+
+Effort : 30 min (vérifier + delete)
+
+
+# 6 gros fichiers >800 lignes 🟢
+─────────────────────────────────────────────────
+- emailService.ts (1061 lignes) — extraire emailTemplates.ts
+- pdf-generator.ts (892 lignes) — split par type doc (devis/facture/NC)
+- DetailListeAchat.tsx (750) — extraire ModalAjoutProduits
+- DevisCard.tsx (693) — extraire PopupAcompte logic
+- Produit.tsx (682) — extraire galeries
+- OngletGestionPrix.tsx (658) — extraire Rubrique 3-7
+
+Effort : 4-5 h (refactoring sain, zéro logique change)
+
+
+# ESLint v9 config absente 🟡
+─────────────────────────────────────────────────
+`package.json` mentionne `eslint: ^9.17.0` et un script `lint` mais pas
+de `eslint.config.js` à la racine. `npm run lint` échoue probablement.
+
+Effort : 1 h (créer config + lancer + fix automatique des warnings)
+
+
+# Cohérence design system (déjà 95%) 🟢
+─────────────────────────────────────────────────
+- Border-radius : 5 occurrences à 10px (devraient être 12px ou 8px), 1×20px (devrait être 18px)
+- Shadows : 2 cas black-tinted (PopupSelectionClientExcel, PromouvoirPartenaireModal) à passer en navy-tinted
+- Émojis : 2 cas `✓` à remplacer par `✅`
+- Couleurs : 95% mappées sur tokens admin.css. Quelques bleus secondaires
+  (#0369A1, #4F46E5) hors-token — à documenter.
+
+Effort total : 1 h
+
+
+═══════════════════════════════════════════════════════════════════════════
+  5. RÉGRESSIONS V44-V47 — STATUT
+═══════════════════════════════════════════════════════════════════════════
+
+| Fix historique                                | Statut      | Verif |
+|-----------------------------------------------|-------------|-------|
+| V44-TER Bug 1 — whitelist FicheProduit        | ✅ INTACT   | grep `V44-TER Bug 1` ok dans FicheProduit.tsx |
+| V44-TER Bug 2 — CHAMPS_ESSENTIEL=4            | ✅ INTACT   | productHelpers.ts:15-23 |
+| V44-TER Bug 3 — subtitleValidation optimistic | ✅ INTACT   | OngletGestionPrix.tsx:96-109 |
+| V45 Bug A — sanitize ModalDupliquerDevis      | ✅ INTACT   | ligne 9 + 75 |
+| V45 Bug B — formatDateCourt PDF               | ✅ INTACT   | pdf-generator.ts:82-90 |
+| V45 polish-v45.css couche utilitaire          | ✅ INTACT   | importé AdminApp:8 |
+| V46 Checkpoint A — ignoreUndefinedProperties  | ✅ INTACT   | firebase.ts:18-21 |
+| V46 Checkpoint B — code-split (-70%)          | ✅ INTACT   | vite.config.ts manualChunks |
+| V46 Checkpoint C — navy unifié                | ✅ INTACT   | 0 occurrence #1E3A5F |
+| V46 Checkpoint D — validation acomptes        | ✅ INTACT   | quoteStatusHelpers.ts:67-129 |
+| V46 Checkpoint E — onglets différenciés       | ✅ INTACT   | FicheProduitTabs.tsx:31-50 |
+| V46 Checkpoint F — SearchInput composant      | ✅ INTACT   | atoms/SearchInput.tsx + 6 callers |
+
+**Aucune régression détectée.** L'audit confirme la stabilité du HEAD 26f9024.
+
+
+═══════════════════════════════════════════════════════════════════════════
+  6. PROMPT V49 PRÊT À COLLER (à compléter avec rotations clés)
+═══════════════════════════════════════════════════════════════════════════
+
+```markdown
+═══════════════════════════════════════════════════════════════════
+  MISSION V49 — Sécurité urgente + Bugs business + UX cleanup
+═══════════════════════════════════════════════════════════════════
+
+## Mode plugins
+Tu es Claude Code en mode Everything CC.
+Active : Superpowers, UI-UX-PRO-MAX, Claude-Mem.
+Workflow Superpowers obligatoire pour Phase 1 + N1.
+
+## Contexte
+Suite V46 (HEAD 26f9024). Audit V48-BIS a révélé 25 bugs dont
+5 critiques sécurité. V49 = SÉCURITÉ D'ABORD, business ensuite.
+
+⚠️ AVANT DE COMMENCER (HORS CLAUDE CODE) :
+   1. Régénérer DeepL API Key (https://www.deepl.com/account/summary)
+   2. Régénérer Resend API Key (https://resend.com/api-keys)
+   3. Régénérer Exchange Rate API Key (si applicable)
+   4. Stocker les nouvelles clés en Vercel Environment Variables
+   → Sans ces rotations, le repo public expose des clés actives.
+
+## Procédure cleanup git
+```bash
+cd ~/97import-firebase
+git fetch origin && git status
+git log --oneline -5
+git tag backup-pre-v49-$(date +%Y%m%d-%H%M)
+git push origin --tags
+```
+
+═══════════════════════════════════════════════════════════════════
+  PHASE 1 — SÉCURITÉ CRITIQUE
+═══════════════════════════════════════════════════════════════════
+
+### Checkpoint A — Purger .env.production de l'historique git
+
+1. Ajouter `.env.production` au `.gitignore` (ligne après `.env.local`).
+2. `git rm --cached .env.production`
+3. Commit : "chore(security): untrack .env.production"
+4. Vérifier l'historique :
+   ```bash
+   git log --all --pretty=format: --name-only | grep '\.env'
+   ```
+5. Si `.env.production` apparaît : utiliser `git filter-repo` :
+   ```bash
+   brew install git-filter-repo
+   git filter-repo --path .env.production --invert-paths
+   git push --force --all
+   ```
+   ⚠️ Destructif. Synchroniser avec collaborateurs avant.
+
+Tag : `checkpoint-v49-A-secrets-purge`
+
+### Checkpoint B — Créer firestore.rules dans le repo
+
+1. Créer `firestore.rules` avec contrôles UID/role :
+   ```
+   rules_version = '2';
+   service cloud.firestore {
+     match /databases/{db}/documents {
+       function isAuth()  { return request.auth != null; }
+       function isAdmin() { return request.auth.token.role == 'admin'; }
+       function isOwner(uid) { return request.auth.uid == uid; }
+
+       match /quotes/{id} {
+         allow read: if isAdmin() || (isAuth() && resource.data.client_id == request.auth.uid);
+         allow write: if isAdmin();
+       }
+       match /products/{id}    { allow read: if true; allow write: if isAdmin(); }
+       match /clients/{uid}    { allow read, write: if isAdmin() || isOwner(uid); }
+       match /partners/{code}  { allow read: if isAuth(); allow write: if isAdmin(); }
+       match /invoices/{id}    { allow read, write: if isAdmin(); }
+       match /commissions/{id} { allow read, write: if isAdmin(); }
+       match /containers/{id}  { allow read, write: if isAdmin(); }
+       match /admin_params/{p} { allow read: if isAuth(); allow write: if isAdmin(); }
+       // ... compléter pour toutes les collections
+     }
+   }
+   ```
+2. Ajouter à `firebase.json` :
+   ```json
+   "firestore": { "rules": "firestore.rules" }
+   ```
+3. Déployer : `firebase deploy --only firestore:rules`
+4. Tester avec Firebase Rules Playground.
+
+Tag : `checkpoint-v49-B-firestore-rules`
+
+### Checkpoint C — Custom Claim `role: 'admin'`
+
+1. Script Node Admin SDK pour ajouter custom claim aux users admin
+   existants (créer `scripts/grant-admin-role.js`).
+2. Modifier `src/admin/AdminApp.tsx:193-235` :
+   ```ts
+   onAuthStateChanged(adminAuth, async (u) => {
+     setUser(u);
+     if (u) {
+       const tokenResult = await u.getIdTokenResult();
+       setIsAdmin(tokenResult.claims.role === 'admin');
+     }
+     setLoading(false);
+   });
+   if (!user || !isAdmin) return <AdminLogin />;
+   ```
+3. Tester : un user non-admin tentant /admin → redirect vers AdminLogin.
+
+Tag : `checkpoint-v49-C-admin-rolecheck`
+
+### Checkpoint D — RGPD : currentUser.uid dans espace-client / partenaire
+
+Pages à modifier :
+- src/front/pages/espace-client/MesDevis, MesFactures, MesCommandes,
+  MesVirements, SuiviAchats, SAV
+- src/front/pages/espace-partenaire/MesClientsPartner,
+  GestionDevisPartner, MesCommissionsPartner
+
+Pour chacune, à l'intérieur du composant :
+```ts
+const auth = getAuth();
+const userId = auth.currentUser?.uid;
+if (!userId || userId !== propUserId) return <AccessDenied />;
+```
+
+Tag : `checkpoint-v49-D-rgpd-uid-check`
+
+### Checkpoint E — Backend Vercel Functions pour DeepL/Resend/Exchange
+
+Créer `api/translate.ts`, `api/send-email.ts`, `api/exchange-rate.ts`
+(Vercel serverless). Le client appelle ces endpoints, le serveur tient
+la vraie clé en `process.env.DEEPL_API_KEY` (sans VITE_).
+
+Tag : `checkpoint-v49-E-api-secrets`
+
+═══════════════════════════════════════════════════════════════════
+  PHASE 2 — BUGS BUSINESS (suite V46)
+═══════════════════════════════════════════════════════════════════
+
+### Checkpoint F — Bug N1 prix VIP > public (workflow Superpowers complet)
+
+Cf. plan détaillé V48-AUDIT section 1.N1 — fix dans GestionDevisPartner.tsx
+lignes 94-107 + 246-250. + commission cap.
+
+Tag : `checkpoint-v49-F-vip-price-cap`
+
+### Checkpoint G — Devis annulé bloque encaissement + ajout produits 🔴 bloquants
+
+Fix simultanément :
+- Garde dans `PopupEncaisserAcompte.handleConfirm`
+- Filtre dans `DetailDevis.handleAddLigne` (exclut productCompleteness=='bloquant')
+
+Tag : `checkpoint-v49-G-devis-guardrails`
+
+### Checkpoint H — Limit() sur listes admin Firestore
+
+Sur les ~15 callers `getDocs(collection(...))` admin sans limit() :
+ajouter `query(collection, orderBy(createdAt, 'desc'), limit(100))`.
+Implémenter pagination "Charger plus" via `startAfter()` si requis.
+
+Tag : `checkpoint-v49-H-firestore-limit`
+
+═══════════════════════════════════════════════════════════════════
+  PHASE 3 — UX cleanup (suite V46)
+═══════════════════════════════════════════════════════════════════
+
+### Checkpoint I — AdminProduits sortDir 'desc' + .si-bar → SearchInput
+
+- AdminProduits.tsx:47 : 'asc' → 'desc'
+- 8 pages legacy .si-bar → SearchInput
+- bouton Dupliquer devis : disabled state pendant duplicating
+
+Tag : `checkpoint-v49-I-ux-cleanup`
+
+### Checkpoint J — Loading spinner uniforme + focus states
+
+- Composant `<LoadingState />` réutilisable (utilise .v45-spinner)
+- Application sur 8+ pages liste
+- `.v45-focus` sur tous les inputs/boutons admin majeurs
+
+Tag : `checkpoint-v49-J-loading-focus`
+
+═══════════════════════════════════════════════════════════════════
+  RÈGLES NON NÉGOCIABLES
+═══════════════════════════════════════════════════════════════════
+
+✅ Préserver V44-TER + V45 + V46 (12 fixes vérifiés intacts par audit)
+✅ Build npm run build après chaque checkpoint
+✅ Commits granulaires + tag par checkpoint + push v2
+✅ Workflow Superpowers complet pour Checkpoint A (sécurité) et F (N1)
+
+❌ NE PAS toucher au code business hors N1 + devis annulés + 🔴 bloquants
+❌ NE PAS migrer inline-styles → admin.css (V50)
+❌ NE PAS lancer audit BD acomptes (V49-BIS dédié si V46 D fonctionne)
+
+═══════════════════════════════════════════════════════════════════
+  ORDRE D'EXÉCUTION (~5h-6h estimé)
+═══════════════════════════════════════════════════════════════════
+
+1. (HORS Claude Code) Rotation clés DeepL/Resend/Exchange
+2. Cleanup git + tag backup
+3. Checkpoint A — purge .env.production + .gitignore (~15 min)
+4. Checkpoint B — firestore.rules (~120 min)
+5. Checkpoint C — admin role check (~30 min)
+6. Checkpoint D — RGPD UID check (~45 min)
+7. Checkpoint E — Vercel Functions API (~180 min) — peut être V49-BIS
+8. Build + tests sécu
+9. Checkpoint F — Bug N1 prix VIP (~15 min, Superpowers)
+10. Checkpoint G — devis garde-fous (~30 min)
+11. Checkpoint H — Firestore limit() (~60 min)
+12. Checkpoint I — UX cleanup (~30 min)
+13. Checkpoint J — loading + focus (~60 min)
+14. Build final + tests
+15. Rapport MAJ-V49.txt
+
+GO.
+```
+
+
+═══════════════════════════════════════════════════════════════════════════
+  7. RECOMMANDATIONS ROADMAP
+═══════════════════════════════════════════════════════════════════════════
+
+CALENDRIER PROPOSÉ
+──────────────────
+
+J+0 (URGENT — quelques heures hors Claude Code) :
+  ▸ Rotation clés DeepL/Resend/Exchange (sans Claude Code)
+  ▸ V49 Phase 1 Checkpoints A+B+C en priorité absolue
+  ▸ Si possible : marquer le repo PRIVÉ temporairement
+
+J+1 à J+3 :
+  ▸ V49 Phase 1 Checkpoints D+E (RGPD + Vercel Functions API)
+  ▸ V49 Phase 2 Checkpoint F (Bug N1 prix VIP)
+
+J+3 à J+7 :
+  ▸ V49 Phase 2 Checkpoints G+H (devis garde-fous + Firestore limit)
+  ▸ V49 Phase 3 (UX cleanup)
+  ▸ V49-BIS si nécessaire pour Vercel Functions splittées
+
+J+7 à J+14 :
+  ▸ V50 — Code quality (ESLint config, types `any` migration top 5,
+    formatters centralisés, fonctions deprecated supprimées)
+  ▸ V50-BIS — Tests Vitest sur 5 helpers critiques + setup Playwright
+
+J+14 à J+30 :
+  ▸ V51 — Migration inline-styles → admin.css (Reco 5 V45)
+  ▸ V52 — Phase 4 UX catalogue mini-pelles
+  ▸ V53 — Phase 3b DeepL traductions bulk (après backend API #5)
+
+
+PRIORISATION PAR EFFORT × IMPACT
+────────────────────────────────
+
+Quick wins (< 30 min) — IMMÉDIAT :
+  1. Bug N1 prix VIP (15 min, CRITIQUE business)
+  2. Devis annulé garde-fou (10 min)
+  3. AdminProduits sortDir 'desc' (1 min)
+  4. Anti-double-clic Dupliquer devis (5 min)
+  5. .gitignore + git rm .env.production (5 min)
+
+Sprint sécurité (2-4h) — TRÈS HAUTE PRIORITÉ :
+  6. Firestore Rules complètes (~2h)
+  7. Custom claim admin role (30 min)
+  8. RGPD UID checks espace-client/partenaire (45 min)
+  9. Limit() sur listes admin (60 min)
+
+Sprint backend (3h+) — PRIORITÉ moyenne :
+  10. Vercel Functions DeepL/Resend/Exchange
+
+Long terme :
+  11. Tests automatisés (3-5j)
+  12. Types `any` → interfaces (8h)
+  13. console.* → logService (3h)
+  14. Migration .si-bar → SearchInput (30 min)
+
+
+═══════════════════════════════════════════════════════════════════════════
+  FIN — Rapport généré 2026-05-01 19:54 par Claude Code Opus 4.7
+       Audit READ-ONLY — aucune modification, aucun commit
+       5 agents Explore parallèles + auto-audit
+═══════════════════════════════════════════════════════════════════════════

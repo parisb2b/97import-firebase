@@ -1,5 +1,13 @@
 rules_version = '2';
 
+// V50-BIS Checkpoint Z — Cible Firebase explicite.
+//   Projet            : importok-6ef77
+//   Compte admin      : parisb2b@gmail.com
+//   Déploiement       : firebase deploy --only firestore:rules --project=importok-6ef77
+//   .firebaserc       : SUPPRIMÉ (contenait "default":"import2030", projet supprimé).
+//                       Décision V50-BIS Michel : forcer --project explicite partout
+//                       pour éviter dérive silencieuse vers le mauvais projet.
+
 // V49 Checkpoint B — Firestore Rules avec RBAC granulaire.
 //
 // Évolution depuis le patch V49 Checkpoint A (versionnement de l'urgence
