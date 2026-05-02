@@ -14,6 +14,7 @@ import {
   StarIcon,
   EuroIcon,
 } from '../components/Icons';
+import LoadingState from '../components/atoms/LoadingState';
 
 interface Devis {
   id: string;
@@ -147,7 +148,7 @@ export default function ListeDevis() {
   };
 
   if (loading) {
-    return <div style={{ textAlign: 'center', padding: 32 }}>Chargement...</div>;
+    return <LoadingState message="Chargement des devis…" />;
   }
 
   return (

@@ -11,6 +11,7 @@ import {
   EyeIcon,
   Progress,
 } from '../components/Icons';
+import LoadingState from '../components/atoms/LoadingState';
 
 interface Stats {
   devisTotal: number;
@@ -255,7 +256,8 @@ export default function Dashboard() {
   }, []);
 
   if (loading) {
-    return <div style={{ textAlign: 'center', padding: 32 }}>Chargement...</div>;
+    // V50-BIS Checkpoint I — composant LoadingState uniforme.
+    return <LoadingState message="Chargement du tableau de bord…" />;
   }
 
   return (

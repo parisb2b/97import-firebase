@@ -7,6 +7,7 @@ import { loadFilters, saveFilters, resetFilters, hasActiveFilters } from '../../
 import ModalDupliquerProduit from '../components/produit/ModalDupliquerProduit';
 import { getCompletenessStatus, getBadgeConfig, countByStatus, type CompletenessStatus } from '../utils/productCompleteness';
 import SearchInput from '../components/atoms/SearchInput';
+import LoadingState from '../components/atoms/LoadingState';
 
 interface Product {
   id: string;
@@ -303,7 +304,7 @@ export default function AdminProduits() {
 
       {/* Table */}
       {loading ? (
-        <div style={{ padding: 40, textAlign: 'center', color: '#9CA3AF' }}>Chargement...</div>
+        <LoadingState message="Chargement du catalogue…" style={{ padding: 40 }} />
       ) : sorted.length === 0 ? (
         <div style={{ padding: 60, textAlign: 'center', color: '#9CA3AF', background: '#F9FAFB', borderRadius: 16, border: '1px dashed #E5E7EB' }}>
           Aucun produit ne correspond aux filtres
