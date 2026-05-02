@@ -4,6 +4,7 @@ import { Link } from 'wouter';
 import { db } from '../../lib/firebase';
 import { useI18n } from '../../i18n';
 import SearchBar from '../components/SearchBar';
+import { BuildVersionBadge } from '../../components/BuildVersionBadge';
 
 export default function Home() {
   useI18n(); // Keep i18n initialized
@@ -306,6 +307,7 @@ export default function Home() {
           .home-hero-grid { grid-template-columns: 1fr !important; gap: 24px !important; }
         }
       `}</style>
+      <BuildVersionBadge />
     </div>
   );
 }
