@@ -158,9 +158,11 @@ service cloud.firestore {
     }
 
     // Compteurs atomiques (DVS-AAMM-NNN, FA-AAMM-NNN, etc.)
-    // V60 : restreint à admin-only (était isAuth)
+    // V64 : restauré isAuth() — les clients doivent pouvoir incrémenter DVS et SAV
+    // lors de la création de devis et tickets SAV. Le risque (incréments
+    // artificiels) est acceptable : gaps de numérotation sans corruption.
     match /counters/{counterId} {
-      allow read, write: if isAdmin();
+      allow read, write: if isAuth();
     }
 
     // ══════════════════════════════════════════════════════════
