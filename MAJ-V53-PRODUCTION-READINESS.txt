@@ -1,0 +1,417 @@
+═══════════════════════════════════════════════════════════════
+  MAJ-V53-PRODUCTION-READINESS
+  Préparation 97IMPORT pour Codex OpenAI Production
+  Rapport final — 2026-05-02
+═══════════════════════════════════════════════════════════════
+
+═══════════════════════════════════════════════════════════════
+  1. RESUME EXECUTIF
+═══════════════════════════════════════════════════════════════
+
+Mission docs-only de preparation pour Codex OpenAI agent.
+Aucune modification metier, aucune migration BD, aucun deploy
+Firebase. 8 checkpoints autonomes en ~1h30 (estime 3-4h).
+
+Livrables produits :
+  ✅ AGENTS.md (instructions production pour agents)
+  ✅ .gitignore renforce (secrets + archives)
+  ✅ .env.example complete (clés vides + project ID public)
+  ✅ AUDIT-SCRIPTS-DESTRUCTIFS-V53.txt + GREP
+  ✅ delete-quotes.mjs + reset-database.sh : garde-fous
+     dry-run/--execute/--confirm-* ajoutes (non destructifs)
+  ✅ BUILD-REPORT-V53-PRODUCTION-READINESS.txt
+  ✅ AUDIT-FIREBASE-PROJECT-V53.txt + GREP
+  ✅ VERCEL-V2-PRODUCTION-README.md
+  ✅ PROMPT-CODEX-PRODUCTION.md
+  ✅ ce rapport + tag v53-production-readiness-final
+
+═══════════════════════════════════════════════════════════════
+  2. CONTEXTE PROJET
+═══════════════════════════════════════════════════════════════
+
+  Projet              : 97importok-firebase
+  Stack               : React 19 / TS / Vite / Firebase / Vercel
+  Branche             : v2 (jamais main)
+  Project Firebase    : importok-6ef77 (V49+ V50-BIS hardcoded)
+  Compte admin        : parisb2b@gmail.com
+  Mode plugins        : Superpowers / UI-UX-PRO-MAX / Claude-Mem
+  Mode session        : autonome (mission docs-only)
+
+  Vercel preview FRONT :
+    https://97import-firebase-git-v2-parisb2bs-projects.vercel.app/
+
+  Vercel preview ADMIN :
+    https://97import-firebase-git-v2-parisb2bs-projects.vercel.app/admin
+
+═══════════════════════════════════════════════════════════════
+  3. HEAD INITIAL / HEAD FINAL
+═══════════════════════════════════════════════════════════════
+
+  HEAD avant V53-PR : b3db8e8 (V52 final, tag v52-final)
+  HEAD apres CP H   : 11cbe69 (post Codex prompt)
+  HEAD final        : <hash de ce commit CP I>
+
+  Tag backup        : backup-pre-v53-production-readiness-20260502-1414
+  Tag final attendu : v53-production-readiness-final
+
+═══════════════════════════════════════════════════════════════
+  4. TAGS CREES (9 au total)
+═══════════════════════════════════════════════════════════════
+
+  backup-pre-v53-production-readiness-20260502-1414
+  checkpoint-v53-prodreadiness-A-agents
+  checkpoint-v53-prodreadiness-B-gitignore
+  checkpoint-v53-prodreadiness-C-env-example
+  checkpoint-v53-prodreadiness-D-scripts
+  checkpoint-v53-prodreadiness-E-build
+  checkpoint-v53-prodreadiness-F-firebase-project
+  checkpoint-v53-prodreadiness-G-vercel
+  checkpoint-v53-prodreadiness-H-codex-prompt
+  v53-production-readiness-final              (tag final)
+
+═══════════════════════════════════════════════════════════════
+  5. AGENTS.md CREE  (CP A — commit 2b01535)
+═══════════════════════════════════════════════════════════════
+
+  Fichier : AGENTS.md (237 lignes)
+  Contenu : reference pour tout agent (Claude Code, Codex, etc.)
+  travaillant sur le repo en mode production.
+
+  Sections :
+    - Branche : v2 only
+    - Firebase : importok-6ef77 + --project= obligatoire
+    - Vercel : URLs preview
+    - Secrets : liste interdits
+    - Commandes validation : npm run build apres modif
+    - Collections KEEP : users, clients, partners, products, etc.
+    - Collections documentaires : quotes, factures, mail, logs, ...
+    - Scripts destructifs : 8 garde-fous obligatoires
+    - Pricing : CNY source de verite
+    - Firestore Rules : pas de modif sans validation
+    - Storage : import2030 interdit
+    - Rapports : MAJ-VXX.txt obligatoire
+    - Mode production Codex : modifications via PR/diff reviewable
+
+═══════════════════════════════════════════════════════════════
+  6. .gitignore VERIFIE  (CP B — commit 1caac2b)
+═══════════════════════════════════════════════════════════════
+
+  Fichier : .gitignore (90 lignes apres renforcement)
+
+  Patterns ajoutes/renforces :
+    - serviceAccountKey.json + variantes
+    - *admin-sdk*.json (catch-all SDK files)
+    - audit-gpt-97import* (V51 artefacts)
+    - ARCHIVE-BEFORE-CLEANSTART-V*/ (V53 Clean Start futur)
+    - archive-before-cleanstart-v*.zip (+ .sha256)
+    - CLEANSTART-V*-REPORT.txt
+    - cleanstart-v*-*.log
+    - .v53-production-readiness-backup-tag.txt
+
+  Verification securite :
+    `git ls-files | grep -E '(^|/)\.env' | grep -v '\.env\.example$'`
+    -> ONLY .env.example tracked (OK)
+
+  Aucun secret tracke en git.
+
+═══════════════════════════════════════════════════════════════
+  7. .env.example VERIFIE  (CP C — commit cf28a71)
+═══════════════════════════════════════════════════════════════
+
+  Fichier : .env.example (33 lignes)
+  Ajouts V53 :
+    - VITE_FIREBASE_PROJECT_ID=importok-6ef77 (valeur publique)
+    - VITE_APP_ENV=development
+    - VITE_APP_VERSION=v0.43.3
+
+  Verification :
+    `grep -E "AIza|sk-|ghp_|firebase-admin|PRIVATE KEY" .env.example`
+    -> ✅ aucun secret detecte
+
+═══════════════════════════════════════════════════════════════
+  8. SCRIPTS DESTRUCTIFS AUDITES  (CP D — commit 4a40563)
+═══════════════════════════════════════════════════════════════
+
+  Audit : AUDIT-SCRIPTS-DESTRUCTIFS-V53.txt (~150 lignes)
+          AUDIT-SCRIPTS-DESTRUCTIFS-GREP.txt (~150 lignes)
+
+  Categorisation :
+
+  CAT 1 — Conformes (gold standard V50-BIS / V52) :
+    audit-acomptes-v52.cjs, init-counters-v50.cjs,
+    migrate-users-to-clients.cjs
+
+  CAT 2 — Destructifs SANS garde-fou (CORRIGES en V53 CP D) :
+    delete-quotes.mjs : ajout --execute + --confirm-delete-all-quotes
+    reset-database.sh : ajout EXECUTE_FLAG + --confirm-reset-database
+
+  CAT 3 — Read-only legacy (pas de garde-fou requis) :
+    audit-catalogue, backup-quotes, check-firestore,
+    export-catalogue-excel, export-products-json
+
+  CAT 4 — Ecritures legitimes non destructives :
+    set-admin-role, migrate-acomptes-v43, migrate-admin-params,
+    migrate-product-prices, import-catalogue-minipelles,
+    translate-products, upload-images-mini-pelles, seed-*
+
+  CAT 5 — Hygiene secrets (NON BLOQUANT) :
+    Cle Firebase Web (AIza...) hardcoded dans 2 scripts
+    "publique par design" — Firestore rules RBAC V49 protegent
+    l'acces aux donnees. Action V54+ : migrer vers Admin SDK.
+
+  Modifications V53 :
+    scripts/delete-quotes.mjs       : +25 lignes (header + guards)
+    scripts/reset-database.sh       : +30 lignes (flags conditional)
+
+  AUCUNE logique metier modifiee.
+
+═══════════════════════════════════════════════════════════════
+  9. BUILD VERIFIE  (CP E — commit a11709e)
+═══════════════════════════════════════════════════════════════
+
+  Rapport : BUILD-REPORT-V53-PRODUCTION-READINESS.txt
+  Build   : ✅ vert (Vite 6.4.2, exit 0)
+  Duree   : 3.19s (cible < 5s)
+  Total gzip : ~940 kB
+
+  Bundle breakdown :
+    excel-vendor    939 kB / gzip 271 kB
+    index           871 kB / gzip 229 kB
+    firebase-vendor 653 kB / gzip 154 kB
+    pdf-vendor      618 kB / gzip 186 kB
+    ui-vendor        58 kB / gzip  19 kB
+    css             146 kB / gzip  25 kB
+
+  Warnings (4 non bloquants, historiques) :
+    - chunk size > 800kB (V46 split deja effectue)
+    - dynamic vs static import inconsistency sur firebase.ts,
+      quoteStatusHelpers.ts, emailService.ts (impact runtime nul)
+
+═══════════════════════════════════════════════════════════════
+  10. FIREBASE PROJECT AUDITE  (CP F — commit 9d5ab76)
+═══════════════════════════════════════════════════════════════
+
+  Rapport : AUDIT-FIREBASE-PROJECT-V53.txt
+  Grep    : AUDIT-FIREBASE-PROJECT-GREP.txt (173 lignes)
+
+  References ACTIVES `import2030` detectees :
+    1. firebase.json:6 bucket "import2030.firebasestorage.app"
+       STATUT : config inactive en runtime (V52 CP A confirme)
+       ACTION V53 : flagger uniquement (interdiction modif
+       firebase.json sans audit specifique).
+       ACTION V54+ : corriger en importok-6ef77 apres validation.
+
+    2. importProducts-v2.mjs (script V0 legacy)
+       STATUT : casse (Windows paths + projet supprime)
+       ACTION V53 : flagger uniquement.
+       ACTION V54+ : supprimer dans cleanup mission.
+
+  References LEGITIMES (non touchees) :
+    - AGENTS.md (interdiction explicite)
+    - firestore.rules (commentaire historique)
+    - Rapports MAJ-V*.txt, RAPPORT-*.md, audit/* (historique)
+
+  PROJECT_ID hardcoded coherent dans 7 fichiers actifs.
+  Aucune commande firebase CLI active sans --project= explicite.
+
+═══════════════════════════════════════════════════════════════
+  11. VERCEL V2 DOCUMENTE  (CP G — commit 0c57e88)
+═══════════════════════════════════════════════════════════════
+
+  Fichier : VERCEL-V2-PRODUCTION-README.md (47 lignes)
+
+  Contenu :
+    - URLs front + admin preview
+    - Branche v2
+    - Tests manuels obligatoires post-PR (9 etapes)
+    - Variables Vercel attendues (VITE_FIREBASE_*)
+    - Regle "ne jamais stocker valeurs dans repo sauf .env.example"
+
+═══════════════════════════════════════════════════════════════
+  12. PROMPT CODEX PRODUCTION CREE  (CP H — commit 11cbe69)
+═══════════════════════════════════════════════════════════════
+
+  Fichier : PROMPT-CODEX-PRODUCTION.md (118 lignes)
+
+  Contenu :
+    - Branche v2 only
+    - Firebase importok-6ef77 + --project= obligatoire
+    - Secrets interdits (.env.*, firebase-admin-sdk, tokens)
+    - Pre/post modification commands
+    - Regles metier pricing CNY
+    - Collections KEEP
+    - Interdictions (suppression, deploy auto, main, secrets)
+    - Livrable attendu (5 elements obligatoires)
+    - Slot "[COLLER ICI MISSION]" pour Codex
+
+═══════════════════════════════════════════════════════════════
+  13. FICHIERS MODIFIES (TOTAL V53-PRODUCTION-READINESS)
+═══════════════════════════════════════════════════════════════
+
+  Nouveaux fichiers :
+    AGENTS.md                                       237 l.
+    AUDIT-SCRIPTS-DESTRUCTIFS-V53.txt              ~150 l.
+    AUDIT-SCRIPTS-DESTRUCTIFS-GREP.txt             ~150 l.
+    AUDIT-FIREBASE-PROJECT-V53.txt                 ~140 l.
+    AUDIT-FIREBASE-PROJECT-GREP.txt                ~173 l.
+    BUILD-REPORT-V53-PRODUCTION-READINESS.txt       60 l.
+    PREFLIGHT-PRODUCTION-READINESS.txt              ~60 l.
+    VERCEL-V2-PRODUCTION-README.md                  47 l.
+    PROMPT-CODEX-PRODUCTION.md                     118 l.
+    MAJ-V53-PRODUCTION-READINESS.txt              (ce fichier)
+
+  Fichiers modifies :
+    .gitignore                                      +56/-27 l.
+    .env.example                                    +6/-1 l.
+    scripts/delete-quotes.mjs                       +25 l. (guards)
+    scripts/reset-database.sh                       +30 l. (guards)
+
+═══════════════════════════════════════════════════════════════
+  14. COMMANDES EXECUTEES
+═══════════════════════════════════════════════════════════════
+
+  git tag <backup>                                  Phase 1
+  npm run build (apres chaque CP code)              CP A,B,C,D,E,F,G,H
+  git add / commit / tag / push (par CP)            CP A-H
+  grep secrets (.env, admin-sdk, etc.)              CP B
+  grep secrets (.env.example)                       CP C
+  grep destructifs scripts                          CP D
+  syntax check delete-quotes.mjs / reset-database.sh CP D
+  grep import2030 + importok-6ef77                  CP F
+  git ls-files / git check-ignore                   CP B,F
+
+  AUCUNE commande Firebase deploy.
+  AUCUNE commande --execute sur script destructif.
+  AUCUNE modification de firestore.rules.
+  AUCUNE modification de firebase.json (vestige import2030
+  bucket conserve par prudence — defere V54+).
+
+═══════════════════════════════════════════════════════════════
+  15. TESTS EFFECTUES
+═══════════════════════════════════════════════════════════════
+
+  - Build vert apres chaque CP (8 builds, tous exit 0, < 5s)
+  - Syntax check delete-quotes.mjs (node -c) : OK
+  - Syntax check reset-database.sh (bash -n) : OK
+  - Pattern match .gitignore (git check-ignore) :
+      ARCHIVE-BEFORE-CLEANSTART-V53/test.json : ignored ✅
+      archive-before-cleanstart-v53.zip      : ignored ✅
+      firebase-admin-sdk.json                : ignored ✅
+      .env.production                        : ignored ✅
+  - .env.example secret scan : 0 secret detecte ✅
+  - 0 secret tracke en git ✅
+  - 0 commit destructive ✅
+
+═══════════════════════════════════════════════════════════════
+  16. RISQUES RESTANTS
+═══════════════════════════════════════════════════════════════
+
+  R1 — firebase.json contient encore "import2030" bucket
+       Severite : moyenne
+       Impact   : aucun en runtime (env Vercel utilisee)
+       Action   : V54+ corriger apres audit du bucket actuel
+                  importok-6ef77 (verifier que les uploads
+                  Storage fonctionnent bien sur ce bucket)
+
+  R2 — importProducts-v2.mjs (script legacy V0 casse)
+       Severite : tres faible
+       Impact   : aucun (script non executable, paths Windows)
+       Action   : V54+ supprimer en cleanup mission
+
+  R3 — Cle Firebase Web hardcoded dans 2 scripts shell
+       Severite : tres faible
+       Impact   : "publique par design" + Firestore rules RBAC V49
+       Action   : V54+ migrer scripts vers Admin SDK pattern V50-BIS
+
+  R4 — 4 warnings Vite (chunk > 800 kB, dynamic vs static)
+       Severite : tres faible
+       Impact   : aucun (build vert, runtime OK)
+       Action   : V54+ standardiser imports static-only
+
+  R5 — V52 CP G plan migration profiles (2026-05-02-v52-profiles-
+       migration.md) reste dans docs/superpowers/plans/ comme
+       plan alternative.
+       Severite : aucune
+       Impact   : aucun (plan obsolete par strategie Clean Start
+                  V53.md / V53-PRODUCTION-READINESS qui est
+                  un autre angle d'attaque)
+       Action   : marquer SUPERSEDED si Clean Start V53 (autre
+                  mission) est lancee.
+
+═══════════════════════════════════════════════════════════════
+  17. ACTIONS MANUELLES RECOMMANDEES
+═══════════════════════════════════════════════════════════════
+
+  Pour Michel apres push V53-PRODUCTION-READINESS :
+
+  17.1 — Verifier deploy Vercel preview v2
+         https://97import-firebase-git-v2-parisb2bs-projects.vercel.app/
+
+  17.2 — Tester le 9-step manual checklist
+         (cf VERCEL-V2-PRODUCTION-README.md)
+
+  17.3 — Lancer Codex avec PROMPT-CODEX-PRODUCTION.md
+         coller le prompt + ajouter la mission specifique
+         dans le slot "[COLLER ICI MISSION]"
+
+  17.4 — Pour les futures missions Codex :
+         - Coller le prompt + mission dans Codex
+         - Codex propose un PR sur branche v2
+         - Michel review + merge si OK
+         - Tester sur Vercel preview avant merge main
+
+  AUCUNE action Firebase manuelle requise pour V53-PR.
+  AUCUNE rotation de cle.
+
+═══════════════════════════════════════════════════════════════
+  18. PLAN DE ROLLBACK
+═══════════════════════════════════════════════════════════════
+
+  Si bug ou regression post V53-PR :
+
+  Code :
+    git reset --hard backup-pre-v53-production-readiness-20260502-1414
+    git push origin v2 --force-with-lease   # avec accord Michel
+
+  Rollback partiel (1 CP) :
+    git revert <hash>
+    git push origin v2
+
+  Restauration BD : NON NECESSAIRE
+    V53-PR est code-only, aucune modification Firestore.
+
+  Vercel : redeploy automatique sur push v2.
+
+═══════════════════════════════════════════════════════════════
+  19. PROCHAINE MISSION RECOMMANDEE : CODEX V54
+═══════════════════════════════════════════════════════════════
+
+  Le repo est pret pour Codex en mode production.
+
+  Suggestions de missions Codex V54+ :
+
+  V54-A : Cleanup vestiges import2030
+          - Corriger firebase.json bucket
+          - Supprimer importProducts-v2.mjs
+          - Migrer scripts shell vers Admin SDK
+
+  V54-B : Helpers CRUD CTN/LA/NC/SAV
+          - Creer lib/repositories/ pour chaque collection
+          - Tests unitaires
+
+  V54-C : Standardiser imports
+          - Static-only pour firebase.ts, quoteStatusHelpers,
+            emailService (resoudre les 4 warnings Vite)
+
+  V54-D : Migration profiles vers clients (si choisie)
+          - Reprendre plan docs/superpowers/plans/2026-05-02-
+            v52-profiles-migration.md (V52 CP G)
+          - Adaptation : utiliser le nouveau workflow Codex
+            avec PR review
+
+  Toute mission Codex doit utiliser PROMPT-CODEX-PRODUCTION.md
+  comme prefixe + AGENTS.md comme reference de regles.
+
+═══════════════════════════════════════════════════════════════
+  FIN MISSION V53-PRODUCTION-READINESS
+═══════════════════════════════════════════════════════════════
