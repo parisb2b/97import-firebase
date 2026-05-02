@@ -116,6 +116,8 @@ export default function Produit() {
   const nextMedia = () => setSelectedMediaIndex(i => i < medias.length - 1 ? i + 1 : 0);
 
   const handleAddToCart = () => {
+    // V65 : rediriger vers /connexion si non connecte
+    if (!_user) { window.location.href = '/connexion'; return; }
     const refFinale = selectedRef || product.reference || product.id;
     const produitAAjouter = displayedProduct || product;
 
@@ -324,10 +326,9 @@ export default function Produit() {
             />
           )}
 
-          {/* Action buttons */}
-          {userRole && (
-            <div style={{ display: 'flex', gap: 12, marginBottom: 12 }}>
-              <button onClick={handleAddToCart} style={{
+          {/* Action buttons — V65: bouton visible meme sans userRole, redirige si non connecte */}
+          <div style={{ display: 'flex', gap: 12, marginBottom: 12 }}>
+            <button onClick={handleAddToCart} style={{
                 flex: 1, padding: '14px 24px', background: `linear-gradient(135deg, ${B}, #1E88E5)`,
                 color: '#fff', border: 'none', borderRadius: 12, fontSize: 15, fontWeight: 700,
                 cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
@@ -343,7 +344,6 @@ export default function Produit() {
                 </button>
               </Link>
             </div>
-          )}
 
           {/* Price mention */}
           <p style={{ fontSize: 11, color: '#94A3B8', textAlign: 'center', marginTop: 4, marginBottom: 8 }}>
