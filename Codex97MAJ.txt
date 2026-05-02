@@ -1,10 +1,10 @@
 # Codex97MAJ - Journal central permanent 97IMPORT
 
-Date/heure de mise a jour : 2026-05-02 21:25:00 CEST
+Date/heure de mise a jour : 2026-05-02 21:38:00 CEST
 Projet : /Users/mactell/97import-firebase
 Branche : v2
 Projet Firebase obligatoire : importok-6ef77
-Mission courante : V60 — audit complet et corrections non destructives
+Mission courante : V61 — correction bucket Storage
 
 Regle permanente :
 - A chaque prochaine mission Codex sur 97IMPORT, mettre a jour Codex97MAJ.txt.
@@ -388,14 +388,40 @@ Donnees Firestore : aucune suppression, aucune migration, aucune ecriture.
 - Scripts legacy : tous proteges ou neutralises
 
 ### Risques restants
-- firebase.json contient toujours le bucket Storage legacy import2030.firebasestorage.app
 - Chunk exceljs-vendor > 800 kB
-- Bucket Storage a verifier en console Firebase avant migration
+- Bucket Storage corrige en V61
 
 ### Tags crees
 - backup-pre-v60-20260502-2117
+- v60-stabilisation-final
 
 ### Prochaine mission recommandee (V61)
-- Verifier le bucket Storage actif dans Firebase Console
-- Migrer le bucket import2030 → importok-6ef77 si necessaire
+- ~~Verifier le bucket Storage actif dans Firebase Console~~ (fait)
+- ~~Migrer le bucket import2030 → importok-6ef77~~ (fait en V61)
 - Analyser code-splitting pour exceljs-vendor
+
+## V61 — Correction bucket Storage
+
+Date/heure : 2026-05-02 21:38 CEST
+Mission : correction configuration Storage apres confirmation console Firebase.
+Commit : efa5e5a
+Tag : v61-storage-fix
+
+### Actions
+- firebase.json : bucket import2030 → importok-6ef77.firebasestorage.app
+- storage.rules : write restreint a role == 'admin' (etait request.auth != null)
+- .env.example : VITE_FIREBASE_STORAGE_BUCKET renseigne
+- src/lib/firebase.ts : verifie, utilise deja variable d'env (pas de hardcode)
+
+### Firebase deploy
+Non execute. Pret pour deploy manuel si necessaire :
+  firebase deploy --only storage --project=importok-6ef77
+
+### Tags crees
+- backup-pre-v61-20260502-2138
+- v61-storage-fix
+
+### Prochaine mission recommandee (V62)
+- Deploiement storage rules (sur validation humaine)
+- Analyser code-splitting pour exceljs-vendor (939 kB)
+- Verifier que les uploads media fonctionnent avec le nouveau bucket
