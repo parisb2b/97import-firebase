@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Route, Switch, Link, useLocation } from 'wouter';
 import { onAuthStateChanged, signOut, User } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, collection, onSnapshot } from 'firebase/firestore';
 import { adminAuth, db } from '../lib/firebase';
 import { ErrorBoundary } from '../components/ErrorBoundary';
 import AdminLogin from './AdminLogin';
@@ -74,7 +74,10 @@ const SIDEBAR_SECTIONS: SidebarSection[] = [
       { path: '/admin/listes-achat', label: "Listes d'achat", icon: '🛒' },
       { path: '/admin/conteneurs', label: 'Conteneurs', icon: '📦' },
       { path: '/admin/stock', label: 'Stock', icon: '📦' },
-      { path: '/admin/sav', label: 'SAV', icon: '🔧', badge: 2 },
+      // V49 Checkpoint K — badge dynamique calcule via onSnapshot collection 'sav'
+      // (filtre client-side : statut ouvert/en_cours, non archive). Avant V49 :
+      // valeur '2' hardcodee qui ne reflechait pas la realite BD.
+      { path: '/admin/sav', label: 'SAV', icon: '🔧' },
     ],
   },
   {
@@ -194,6 +197,30 @@ export default function AdminApp() {
   // request.auth.token.role === 'admin' (set par scripts/set-admin-role.cjs).
   // Tout user authentifie sans role 'admin' tombe sur ForbiddenPage.
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
+
+  // V49 Checkpoint K+L — badges sidebar real-time via onSnapshot.
+  // Avant V49 : valeurs hardcoded ('2' SAV, '3' Clients) ne reflechant pas
+  // l'etat BD. Apres V49 : compteurs vivants, sans index Firestore requis
+  // (filtrage client-side). Si key absente du map, fallback a item.badge
+  // statique (compatibilite avec d'eventuelles entrees non instrumentees).
+  const [dynamicBadges, setDynamicBadges] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    // V49 Checkpoint K — badge SAV : nb d'enregistrements ouverts ou en cours,
+    // hors archives. Filtrage client-side pour eviter les index composites.
+    const unsubSav = onSnapshot(collection(db, 'sav'), (snap) => {
+      const ouverts = snap.docs.filter((d) => {
+        const data = d.data() as any;
+        const statut = data.statut;
+        const archive = data.archive === true;
+        return !archive && (statut === 'ouvert' || statut === 'en_cours' || statut === 'nouveau');
+      });
+      setDynamicBadges((prev) => ({ ...prev, '/admin/sav': ouverts.length }));
+    }, (err) => {
+      console.warn('[AdminApp badge SAV] snapshot error:', err.message);
+    });
+    return () => unsubSav();
+  }, []);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(adminAuth, async (u) => {
@@ -335,7 +362,16 @@ export default function AdminApp() {
                     <div className="si-l">
                       {item.icon} {item.label}
                     </div>
-                    {item.badge && <span className="sb-bdg">{item.badge}</span>}
+                    {/* V49 Checkpoint K+L — badge dynamique si key presente
+                        dans dynamicBadges (real-time), sinon fallback statique
+                        item.badge (presence non instrumentee par V49). */}
+                    {(() => {
+                      const dyn = dynamicBadges[item.path];
+                      const value = dyn !== undefined ? dyn : item.badge;
+                      return value !== undefined && value !== null && value > 0
+                        ? <span className="sb-bdg">{value}</span>
+                        : null;
+                    })()}
                     {item.badgeValue && (
                       <span className="sb-bdg am">{rmbRate.toFixed(2)}</span>
                     )}
