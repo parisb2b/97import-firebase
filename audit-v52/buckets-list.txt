@@ -1,0 +1,1 @@
+Error: storage:buckets:list is not a Firebase command

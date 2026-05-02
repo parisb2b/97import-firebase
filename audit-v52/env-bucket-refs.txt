@@ -1,0 +1,3 @@
+src/vite-env.d.ts:7:  readonly VITE_FIREBASE_STORAGE_BUCKET: string
+src/lib/firebase.ts:10:  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+.env.example:17:VITE_FIREBASE_STORAGE_BUCKET=
