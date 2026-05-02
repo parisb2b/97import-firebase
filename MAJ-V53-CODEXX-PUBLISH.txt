@@ -1,0 +1,92 @@
+MAJ-V53-CODEXX-PUBLISH — Publication preview v2
+Date : 2026-05-02
+Projet : 97importok-firebase
+Branche : v2
+
+1. Résumé
+
+Publication de la mise à jour V53-CODEXX final vers la preview Vercel v2.
+Ajout d'un indicateur visible en bas de la page d'accueil publique pour identifier immédiatement la version testée.
+
+Texte affiché :
+v0.43.3 · 02/05/2026 15:40 · c68ec95
+
+2. Commits
+
+Commit initial :
+c68ec95 docs(v53-codexx): rapport final clean start
+
+Commit publication front :
+f9a29e7 chore(front): affiche version de build V53-CODEXX sur accueil
+
+3. Fichiers modifiés
+
+- src/components/BuildVersionBadge.tsx
+- src/front/pages/Home.tsx
+- MAJ-V53-CODEXX-PUBLISH.txt
+
+4. Changements effectués
+
+- Création du composant BuildVersionBadge.
+- Ajout du badge en bas de la page d'accueil publique.
+- Aucun changement admin.
+- Aucun changement Firebase.
+- Aucun secret lu, affiché ou commité.
+
+5. Build
+
+Commande exécutée :
+npm run build
+
+Résultat :
+OK
+
+Avertissements Vite restants :
+- imports dynamiques/statiques mélangés sur firebase.ts, quoteStatusHelpers.ts, emailService.ts
+- chunks supérieurs à 800 kB
+
+6. Push et tags
+
+Push preview :
+git push origin v2
+
+Tag publication :
+v53-codexx-published
+
+Tag final rapport :
+v53-codexx-publish-final
+
+7. Firebase
+
+Aucun deploy Firebase nécessaire pour cette mission : seules les sources front ont changé.
+Ni firestore.rules, ni storage.rules, ni firebase.json, ni functions/ n'ont été modifiés dans le commit de publication.
+
+Commande Firebase éventuelle à lancer manuellement seulement si une future mission modifie les règles :
+firebase deploy --only firestore:rules --project=importok-6ef77
+
+8. Vérification Vercel
+
+FRONT :
+https://97import-firebase-git-v2-parisb2bs-projects.vercel.app/
+Résultat curl -I : HTTP/2 200
+
+ADMIN :
+https://97import-firebase-git-v2-parisb2bs-projects.vercel.app/admin
+Résultat curl -I : HTTP/2 200
+
+9. Instructions Michel
+
+Tester :
+- ouvrir la preview FRONT
+- vérifier en bas de l'accueil la présence du texte :
+  v0.43.3 · 02/05/2026 15:40 · c68ec95
+- ouvrir la preview ADMIN
+- vérifier le login admin
+- vérifier dashboard, clients, partenaires, catalogue produits
+- vérifier que les anciennes collections documentaires purgées sont bien vides côté workflows attendus
+
+10. Risques restants
+
+- Le badge est statique et devra être mis à jour lors des prochaines publications.
+- Les tests visuels complets Vercel restent à faire manuellement dans le navigateur.
+- Les avertissements de bundle Vite restent à traiter dans une mission qualité séparée.
