@@ -4,6 +4,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { adminAuth, db } from '../lib/firebase';
 import { useI18n } from '../i18n';
 import { GlobeToggle } from '../components/GlobeToggle';
+import ForgotPasswordModal from './components/ForgotPasswordModal';
 
 export default function AdminLogin() {
   const { t } = useI18n();
@@ -11,6 +12,8 @@ export default function AdminLogin() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  // V50-BIS Checkpoint B — modal mot de passe oublie.
+  const [showForgotModal, setShowForgotModal] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -85,9 +88,28 @@ export default function AdminLogin() {
             >
               {loading ? t('loading') : t('admin.login.submit')}
             </button>
+
+            {/* V50-BIS Checkpoint B — lien Mot de passe oublie */}
+            <div className="text-center pt-2">
+              <button
+                type="button"
+                onClick={() => setShowForgotModal(true)}
+                className="text-sm text-[#1565C0] hover:underline focus:outline-none focus:underline"
+                style={{ background: 'transparent', border: 'none', padding: 4, cursor: 'pointer' }}
+              >
+                Mot de passe oublié ?
+              </button>
+            </div>
           </form>
         </div>
       </div>
+
+      {/* V50-BIS Checkpoint B — Modal reset password */}
+      <ForgotPasswordModal
+        isOpen={showForgotModal}
+        onClose={() => setShowForgotModal(false)}
+        defaultEmail={email}
+      />
     </div>
   );
 }
