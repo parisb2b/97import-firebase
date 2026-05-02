@@ -1,0 +1,59 @@
+# MAJ-V65.txt — Rapport de mission V65
+
+Date : 03/05/2026 00:15 CEST
+Agent : DeepSeek Code V4 PRO
+Branche : v2
+Projet : importok-6ef77
+
+## Résumé
+
+Mission de diagnostic de la création de devis, activation de la journalisation, et inventaire complet des bugs corrigés depuis V60.
+
+## Objectif 1 — Activation logs ✅
+
+### Analyse
+- `src/lib/logService.ts` : fonctionnel, écrit via `db` client dans `collection(db, 'logs')`
+- `src/admin/pages/Logs.tsx` : utilise correctement `adminDb`, lit `collection(adminDb, 'logs')`
+- Règles Firestore : `match /logs/{logId} { allow read: if isAdmin(); allow write: if isAuth(); }` — OK
+
+### Correction
+- Ajout de `logInfo`/`logError` dans `handleCreateQuote` (Panier.tsx)
+- Logs avant/après création devis, logs d'erreur détaillés
+
+## Objectif 2 — Diagnostic création devis ✅
+
+### Test Admin SDK
+- Script `scripts/test-create-devis-v65.cjs` créé et exécuté
+- Transaction test : ✅ OK (création + compteur + nettoyage)
+- La logique fonctionne côté serveur
+
+### Découvertes
+- Deux formats de compteurs coexistent :
+  - `counters/DVS` : `{seq: 0}` — format legacy
+  - `counters/DVS_2605` : `{valeur: 6}` — format utilisé par `getNextNumber()`
+- Le flux Admin SDK fonctionne → le problème est côté client (rules ou auth)
+
+### Cause probable
+- Les règles Firestore DÉPLOYÉES en console Firebase ne correspondent pas au fichier local
+- V60 a changé localement mais n'a jamais été déployé
+- Recommandation : `firebase deploy --only firestore:rules --project=importok-6ef77`
+
+## Objectif 3 — BUGS-CORRIGES-V65.txt ✅
+
+Fichier `BUGS-CORRIGES-V65.txt` créé avec :
+- 18 bugs documentés (8 critiques, 3 moyens, 7 bas)
+- 3 bugs restants non corrigés
+- Structure : ID, sévérité, fichier, symptôme, cause, correction, test
+
+## Fichiers modifiés/créés
+- `src/front/pages/Panier.tsx` — logs ajoutés dans handleCreateQuote
+- `scripts/test-create-devis-v65.cjs` — test Admin SDK (nouveau)
+- `BUGS-CORRIGES-V65.txt` — inventaire bugs (nouveau)
+- `MAJ-V65.txt` — ce rapport (nouveau)
+- `Codex97MAJ.txt` — journal mis à jour
+
+## Recommandations V66
+1. Déployer les règles Firestore : `firebase deploy --only firestore:rules --project=importok-6ef77`
+2. Corriger Produit.tsx:328 — afficher bouton "Ajouter au panier" sans attendre userRole
+3. Re-tester la création de devis après déploiement
+4. Vérifier /admin/logs après création de devis

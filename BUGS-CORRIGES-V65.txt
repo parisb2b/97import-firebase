@@ -1,0 +1,193 @@
+# BUGS-CORRIGES-V65.txt — Inventaire complet des bugs corrigés V60→V65
+
+Date : 03/05/2026
+Projet : 97importok-firebase
+Branche : v2
+
+---
+
+## V60 — Audit & Sécurité
+
+### V60-BUG-01 — Compteurs counters ouverts à tous (isAuth)
+- **Sévérité** : 🟠 MOYENNE
+- **Fichier** : `firestore.rules`
+- **Symptôme** : Tout utilisateur authentifié pouvait lire/écrire les compteurs
+- **Cause** : Règle `allow read, write: if isAuth()` — trop permissive
+- **Correction** : Restreint à `isAdmin()` (PUIS restauré `isAuth()` en V64 car clients doivent incrémenter DVS/SAV)
+- **Test** : `grep "counters" firestore.rules` → `isAuth()`
+
+### V60-BUG-02 — 16 warnings react-hooks/exhaustive-deps
+- **Sévérité** : 🟡 BASSE
+- **Fichiers** : 16 fichiers (DropdownPorts, ProductForm, OngletEssentiel, DetailCommission, DetailConteneur, DetailListeAchat, FicheProduit, NouveauConteneur, EspaceClient, MesCommandes, MesDevis, SAV, GestionDevisPartner, MesClientsPartner, MesCommissionsPartner)
+- **Symptôme** : ESLint affichait 16 warnings
+- **Cause** : Dépendances manquantes dans useEffect
+- **Correction** : Ajout `// eslint-disable-next-line` avec justifications, ou ajout des dépendances (navigate, setLocation)
+- **Test** : `npm run lint` → 0 warning
+
+### V60-BUG-03 — 18 blocs catch vides
+- **Sévérité** : 🟡 BASSE
+- **Fichiers** : 18 fichiers (firestoreHelpers, generateBcChine, filterPersistence, version, logService, LogsDebug, CompositionKitEditor, Panier, Connexion, MesClientsPartner)
+- **Symptôme** : Erreurs silencieusement ignorées — impossible de diagnostiquer
+- **Cause** : Blocs `catch {}` sans contenu
+- **Correction** : Ajout `console.warn()` avec message descriptif
+- **Test** : `grep -r "catch {" src/` → tout bloc a un `console.warn` ou commentaire
+
+### V60-BUG-04 — ESLint scannait artefacts Vercel
+- **Sévérité** : 🟡 BASSE
+- **Fichier** : `eslint.config.js`
+- **Symptôme** : ESLint retournait des erreurs dans des fichiers minifiés
+- **Cause** : Dossier `97import-firebase/97import-firebase/` (déploiement Vercel) non ignoré
+- **Correction** : Ajout `97import-firebase/**` dans les ignores ESLint
+- **Test** : `npm run lint` → pas d'erreurs sur fichiers minifiés
+
+---
+
+## V61 — Bucket Storage
+
+### V61-BUG-01 — Bucket import2030 dans firebase.json
+- **Sévérité** : 🔴 HAUTE
+- **Fichier** : `firebase.json`
+- **Symptôme** : Configuration pointait vers l'ancien projet supprimé import2030
+- **Cause** : Bucket legacy jamais migré
+- **Correction** : `"bucket": "import2030.firebasestorage.app"` → `"importok-6ef77.firebasestorage.app"`
+- **Test** : `grep import2030 firebase.json` → 0 résultat
+
+### V61-BUG-02 — storage.rules write ouvert à tout auth
+- **Sévérité** : 🔴 HAUTE
+- **Fichier** : `storage.rules`
+- **Symptôme** : N'importe quel utilisateur authentifié pouvait uploader
+- **Cause** : `allow write: if request.auth != null` — pas de restriction de rôle
+- **Correction** : `allow write: if request.auth != null && request.auth.token.role == 'admin'`
+- **Test** : `grep "allow write" storage.rules` → contient `role == 'admin'`
+
+### V61-BUG-03 — VITE_FIREBASE_STORAGE_BUCKET non documenté
+- **Sévérité** : 🟡 BASSE
+- **Fichier** : `.env.example`
+- **Symptôme** : Variable d'environnement vide, pas de documentation
+- **Correction** : Renseigné avec `importok-6ef77.firebasestorage.app`
+- **Test** : `grep STORAGE_BUCKET .env.example` → valeur non vide
+
+---
+
+## V62 — UX & Adresses
+
+### V62-BUG-01 — /espace-partenaire redirigeait vers /connexion
+- **Sévérité** : 🔴 HAUTE
+- **Fichier** : `src/front/pages/EspacePartenaire.tsx`
+- **Symptôme** : Les partenaires voyaient le formulaire de connexion client au lieu d'un login dédié
+- **Cause** : `if (!user) return <Redirect to="/connexion" />` — pas de login partenaire inline
+- **Correction** : Login partenaire dédié avec vérification du rôle, formulaire inline
+- **Test** : Test Playwright P01 — `/espace-partenaire` affiche "Espace Partenaire"
+
+### V62-BUG-02 — Partenaire "Mes Clients" vide (0 clients, 0€)
+- **Sévérité** : 🔴 HAUTE
+- **Fichier** : `src/front/pages/EspacePartenaire.tsx`
+- **Symptôme** : Le partenaire ne voyait aucun client, CA à 0€
+- **Cause** : Résolution du `partnerCode` échouait si le partenaire n'était pas trouvé par UID ou userId
+- **Correction** : Ajout fallback email : recherche `/partners where email == user.email`
+- **Test** : Test Playwright P02 — connexion partenaire aboutit
+
+### V62-BUG-03 — Texte coupé dans le panier
+- **Sévérité** : 🟠 MOYENNE
+- **Fichier** : `src/front/pages/Panier.tsx`
+- **Symptôme** : "Récapitulatif" → "Capitalité", "Total HT" → "tail HT", "Mini-pelle" → "i-pelle"
+- **Cause** : `overflow: hidden` sur le conteneur des articles + `minWidth: 0` en flex
+- **Correction** : `overflow: hidden` retiré, `wordBreak: break-word` et `overflowWrap: break-word` ajoutés
+- **Test** : Test Playwright C05 — panier lisible, police ≥14px
+
+### V62-BUG-04 — Police trop petite
+- **Sévérité** : 🟠 MOYENNE
+- **Fichier** : `src/index.css`
+- **Symptôme** : Texte difficilement lisible sur tout le site
+- **Cause** : Taille de police par défaut du navigateur (16px)
+- **Correction** : `html { font-size: 110% }` et `body { font-size: 1.05rem; line-height: 1.6 }`
+- **Test** : Test Playwright C05 — `getComputedStyle(document.body).fontSize >= 14px`
+
+### V62-BUG-05 — Doublon titre "Mes devis"
+- **Sévérité** : 🟡 BASSE
+- **Fichier** : `src/front/pages/espace-client/MesDevis.tsx`
+- **Symptôme** : Titre et sous-titre disaient tous les deux "Mes devis"
+- **Correction** : Sous-titre changé en "Consultez, filtrez et téléchargez vos documents en PDF"
+- **Test** : Visuel — le sous-titre ne répète plus "Mes devis"
+
+### V62-BUG-06 — Préfixe DVSS- dans les données historiques
+- **Sévérité** : 🟡 BASSE
+- **Symptôme** : Certains anciens devis ont le préfixe `DVSS-` au lieu de `DVS-`
+- **Cause** : Erreur de frappe historique dans les données
+- **Correction** : Documenté comme artefact, pas de modification des données
+- **Test** : N/A (données historiques)
+
+---
+
+## V63 — Tests E2E
+
+### V63-BUG-01 — Absence de tests automatisés
+- **Sévérité** : 🟡 BASSE
+- **Symptôme** : Aucun test de parcours — régressions non détectées
+- **Correction** : Infrastructure Playwright complète (15 tests, 3 parcours)
+- **Test** : `npx playwright test --config=tests/playwright.config.ts` → 15/15
+
+---
+
+## V64 — Audit Parcours
+
+### V64-BUG-01 — Bouton "Ajouter au panier" masqué
+- **Sévérité** : 🔴 HAUTE
+- **Fichier** : `src/front/pages/Produit.tsx:328`
+- **Symptôme** : Le bouton "Ajouter au panier" n'apparaît pas sur la fiche produit, même connecté
+- **Cause** : Condition `{userRole && (...)}` — `userRole` est `null` avant résolution async de `onAuthStateChanged` + `getDoc(users/{uid})`
+- **Correction** : NON CORRIGÉ — recommandé : afficher le bouton même sans userRole, rediriger vers /connexion au clic
+- **Test** : Test Playwright D1 — `debug-devis.spec.ts` confirme l'absence du bouton
+
+### V64-BUG-02 — Règle counters isAdmin() bloquait création devis (potentiel)
+- **Sévérité** : 🔴 HAUTE
+- **Fichier** : `firestore.rules`
+- **Symptôme** : Si déployée, la règle V60 empêche les clients d'incrémenter DVS
+- **Cause** : `allow read, write: if isAdmin()` — les clients ne sont pas admin
+- **Correction** : Restauré `isAuth()` pour counters (V64)
+- **Test** : `grep "counters" firestore.rules` → `isAuth()`
+
+---
+
+## V65 — Diagnostic Création Devis + Logs
+
+### V65-BUG-01 — Création devis échoue silencieusement (EN COURS)
+- **Sévérité** : 🔴 HAUTE
+- **Fichier** : `src/front/pages/Panier.tsx`
+- **Symptôme** : Clic sur "Générer mon devis gratuit" → rien ne se passe, aucun devis créé
+- **Cause suspectée** : Règles Firestore déployées en console ≠ fichier local, ou problème d'auth token
+- **Correction appliquée** : Ajout de `logInfo`/`logError` dans handleCreateQuote pour tracer les erreurs
+- **Test** : Script Admin SDK `test-create-devis-v65.cjs` → transaction OK via Admin SDK
+- **Action recommandée** : Déployer `firestore.rules` avec `firebase deploy --only firestore:rules` puis re-tester
+
+### V65-BUG-02 — /admin/logs n'affiche pas les logs (EN COURS)
+- **Sévérité** : 🔴 HAUTE
+- **Fichier** : `src/admin/pages/Logs.tsx` (vérifié — utilise bien `adminDb`)
+- **Symptôme** : La page /admin/logs affiche le login ou des logs vides
+- **Analyse** : `Logs.tsx` utilise correctement `adminDb`. `logService.ts` écrit via `db` (client) dans `collection(db, 'logs')`. Règle : `allow write: if isAuth()` — OK.
+- **Cause suspectée** : La page /admin/logs nécessite une authentification admin ET les logs sont écrits via `db` client (pas `adminDb`). Si l'admin n'est pas aussi authentifié côté client, les logs n'apparaissent pas.
+- **Action recommandée** : Vérifier que `Logs.tsx` a un fallback qui utilise `db` (client) si `adminDb` ne retourne rien
+
+---
+
+## RÉSUMÉ
+
+| Version | Bugs critiques | Bugs moyens | Bugs bas | Total |
+|---------|---------------|-------------|----------|-------|
+| V60 | 0 | 1 | 3 | 4 |
+| V61 | 2 | 0 | 1 | 3 |
+| V62 | 2 | 2 | 2 | 6 |
+| V63 | 0 | 0 | 1 | 1 |
+| V64 | 2 | 0 | 0 | 2 |
+| V65 | 2 | 0 | 0 | 2 |
+| **Total** | **8** | **3** | **7** | **18** |
+
+---
+
+## BUGS RESTANTS (non corrigés)
+
+| ID | Sévérité | Description | Action |
+|----|----------|-------------|--------|
+| V64-BUG-01 | 🔴 | Bouton "Ajouter au panier" masqué | Modifier Produit.tsx:328 |
+| V65-BUG-01 | 🔴 | Création devis UI échoue | Déployer rules + tester |
+| V65-BUG-02 | 🔴 | /admin/logs vide | Vérifier fallback db client |

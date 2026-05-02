@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'wouter';
 import { clientAuth, db } from '../../lib/firebase';
+import { logError, logInfo, logWarn } from '../../lib/logService';
 import { doc, setDoc, getDoc, serverTimestamp, collection, query, where, getDocs } from 'firebase/firestore';
 import { getNextNumber } from '../../lib/counters';
 import { useI18n } from '../../i18n';
@@ -133,10 +134,12 @@ export default function Panier() {
   // ─── Create quote ───
   const handleCreateQuote = async () => {
     const user = clientAuth.currentUser;
-    if (!user) return;
+    if (!user) { logWarn('Panier', 'Tentative création devis sans auth'); return; }
     setSubmitting(true);
+    logInfo('Panier', 'Début création devis', { items: cart.length, partner: selectedPartner });
     try {
       const numero = await getNextNumber('DVS');
+      logInfo('Panier', 'Numéro devis obtenu', { numero });
       const devisId = numero.replace(/[^a-zA-Z0-9]/g, '-');
       const lignes = cart.map(item => {
         const prix_partenaire = item.prix * 0.7;
@@ -191,6 +194,7 @@ export default function Panier() {
       };
 
       await setDoc(doc(db, 'quotes', devisId), sanitizeForFirestore(devisData));
+      logInfo('Panier', 'Devis créé avec succès', { devisId, numero, total_ht: total });
 
       // Notification email
       try {
@@ -205,8 +209,9 @@ export default function Panier() {
       setPopupStep(null);
       showToast('Devis ' + numero + ' créé avec succès !');
       setLocation('/espace-client');
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error creating quote:', err);
+      logError('Panier', 'Échec création devis', { error: err?.message, code: err?.code });
       showToast('Erreur lors de la création du devis', 'error');
     } finally {
       setSubmitting(false);
