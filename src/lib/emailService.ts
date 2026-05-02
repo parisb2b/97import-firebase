@@ -926,8 +926,6 @@ export async function envoyerEmailFactureFinale(params: {
   pdfUrl: string;
 }): Promise<void> {
   void _logEmailService('email-service', 'envoyerEmailFactureFinale', { devisNumero: params.devisNumero, factureFinaleNumero: params.factureFinaleNumero });
-  const { db } = await import('./firebase');
-  const { collection, addDoc, serverTimestamp } = await import('firebase/firestore');
 
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -970,8 +968,6 @@ export async function envoyerEmailCommissionPartenaire(params: {
   whatsappLink?: string;
 }): Promise<void> {
   void _logEmailService('email-service', 'envoyerEmailCommissionPartenaire', { devisNumero: params.devisNumero, noteCommissionNumero: params.noteCommissionNumero, montantCommission: params.montantCommission });
-  const { db } = await import('./firebase');
-  const { collection, addDoc, serverTimestamp } = await import('firebase/firestore');
 
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">

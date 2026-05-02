@@ -87,6 +87,7 @@ data/*.csv
 .v53-production-readiness-backup-tag.txt
 .v55-backup-tag.txt
 .v56-admin-quotes-clients-backup-tag.txt
+.v57-quality-backup-tag.txt
 
 # Archives locales de nettoyage V56 contenant des donnees personnelles
 ARCHIVE-INTERENOVATIONS-V56/

@@ -1,6 +1,9 @@
 // src/lib/quoteStatusHelpers.ts
 // Helpers pour la gestion des statuts devis + calculs paiements (13 statuts complets)
 
+import { doc, runTransaction, serverTimestamp } from 'firebase/firestore';
+import { adminAuth, adminDb, db } from './firebase';
+
 export type QuoteStatus =
   | 'nouveau'
   | 'en_negociation_partenaire'
@@ -279,8 +282,6 @@ export function footerTextPDF(
 export async function generateNumeroDocument(
   type: 'facture_acompte' | 'facture_finale' | 'note_commission'
 ): Promise<string> {
-  const { db, adminAuth, adminDb } = await import('./firebase');
-  const { doc, runTransaction, serverTimestamp } = await import('firebase/firestore');
   const firestoreDb = adminAuth.currentUser ? adminDb : db;
 
   const now = new Date();

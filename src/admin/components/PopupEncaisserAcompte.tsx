@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { doc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, doc, getDocs, query, serverTimestamp, updateDoc, where } from 'firebase/firestore';
 import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { adminDb as db, adminStorage as storage } from '../../lib/firebase';
 import { generateFactureAcomptePDF } from '../../lib/generateInvoiceAcompte';
 import { validerNouveauPaiement, prochainPaiementEstSolde, getNbAcomptesEncaisses, generateNumeroDocument } from '../../lib/quoteStatusHelpers';
-import { notifyAcompteEncaisse } from '../../lib/emailService';
+import { envoyerEmailCommissionPartenaire, envoyerEmailFactureFinale, notifyAcompteEncaisse, notifyCommandeFerme } from '../../lib/emailService';
 import { creerCommissionDevis } from '../../lib/commissionHelpers';
 import { logError, logWarn } from '../../lib/logService';
 import { sanitizeForFirestore } from '../../lib/firebaseUtils';
@@ -22,7 +22,6 @@ async function traiterCascadeSoldePaye(devis: any): Promise<void> {
   let factureFinaleNumero: string | null = null;
   let factureFinalePdfUrl: string | null = null;
   try {
-    const { generateNumeroDocument } = await import('../../lib/quoteStatusHelpers');
     factureFinaleNumero = await generateNumeroDocument('facture_finale');
 
     try {
@@ -74,7 +73,6 @@ async function traiterCascadeSoldePaye(devis: any): Promise<void> {
 
     if (commissionResult.ok && !commissionResult.skipped && commissionResult.numeroNC) {
       try {
-        const { collection, query, where, getDocs } = await import('firebase/firestore');
         const partnersQuery = query(
           collection(db, 'partners'),
           where('code', '==', devis.partenaire_code)
@@ -90,7 +88,6 @@ async function traiterCascadeSoldePaye(devis: any): Promise<void> {
             logWarn('cascade-e3.2-email', 'Partenaire sans email valide', { partenaire_code: devis.partenaire_code, devisNumero: devis.numero });
             // Pas d'envoi email mais cascade continue
           } else {
-            const { envoyerEmailCommissionPartenaire } = await import('../../lib/emailService');
             await envoyerEmailCommissionPartenaire({
               partenaireEmail: partner.email,
               partenaireNom: `${partner.prenom || ''} ${partner.nom || ''}`.trim() || partner.code || 'Partenaire',
@@ -118,7 +115,6 @@ async function traiterCascadeSoldePaye(devis: any): Promise<void> {
   // ÉTAPE 3 : Email client facture finale
   if (factureFinaleNumero) {
     try {
-      const { envoyerEmailFactureFinale } = await import('../../lib/emailService');
       await envoyerEmailFactureFinale({
         clientEmail: devis.client_email,
         clientNom: devis.client_nom || 'Client',
@@ -300,7 +296,6 @@ export default function PopupEncaisserAcompte({ devis, onClose, onSuccess }: Pro
       // v43-E3.1 : email best-effort si transition vers commande_ferme
       if (nouveauStatut === 'commande_ferme' && devis.statut !== 'commande_ferme') {
         try {
-          const { notifyCommandeFerme } = await import('../../lib/emailService');
           await notifyCommandeFerme({
             clientEmail: devis.client_email,
             clientNom: devis.client_nom || 'Client',

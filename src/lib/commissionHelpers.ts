@@ -1,7 +1,9 @@
 // src/lib/commissionHelpers.ts
 // Calcul de commission par ligne + génération note de commission (NC)
 
-import { QuoteLine } from './quoteStatusHelpers';
+import { doc, serverTimestamp, setDoc, updateDoc } from 'firebase/firestore';
+import { adminAuth, adminDb, db } from './firebase';
+import { generateNumeroDocument, type QuoteLine } from './quoteStatusHelpers';
 import { logError, logInfo } from './logService';
 
 export interface CommissionLigne {
@@ -128,8 +130,6 @@ export async function creerCommissionDevis(params: {
     return { ok: true, skipped: true, reason: 'already_generated' };
   }
 
-  const { db, adminAuth, adminDb } = await import('./firebase');
-  const { doc, setDoc, updateDoc, serverTimestamp } = await import('firebase/firestore');
   const firestoreDb = adminAuth.currentUser ? adminDb : db;
   const devisId = devis.id || devis.numero;
 
@@ -169,7 +169,6 @@ export async function creerCommissionDevis(params: {
   }
 
   // Génération numéro NC-AAMM-NNN
-  const { generateNumeroDocument } = await import('./quoteStatusHelpers');
   let numeroNC: string;
   try {
     numeroNC = await generateNumeroDocument('note_commission');

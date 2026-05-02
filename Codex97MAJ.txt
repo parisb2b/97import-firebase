@@ -205,8 +205,7 @@ Etat :
 - Restreindre counters dans firestore.rules seulement apres validation fonctionnelle complete et validation humaine de deploy.
 - Migrer les scripts legacy destructifs vers Admin SDK avec verification serviceAccount.project_id.
 - Nettoyer importProducts-v2.mjs dans une mission dediee.
-- Corriger la configuration ESLint 9 pour restaurer npm run lint.
-- Standardiser les imports pour reduire les warnings Vite.
+- Traiter les warnings lint residuels sans refonte lourde.
 - Evaluer un split de bundle supplementaire si les chunks > 800 kB deviennent un probleme utilisateur.
 
 ## Commandes executees pendant V56-BIS
@@ -249,10 +248,109 @@ Rollback V56-BIS uniquement :
 
 Aucun rollback Firestore n'est requis pour V56-BIS car la mission ne modifie aucune donnee.
 
-## Prochaine mission recommandee
+## Prochaine mission recommandee avant V57
 
 V57 recommande :
 - corriger la configuration ESLint 9 pour restaurer npm run lint ;
 - traiter ensuite les warnings Vite d'import dynamique/statique ;
 - planifier separement l'audit Storage avant toute correction de firebase.json ;
 - preparer une mission Firestore Rules dediee pour counters, avec tests fonctionnels puis validation humaine avant deploy.
+
+## V57 - Qualite ESLint/Vite/Codexxx
+
+Date/heure : 2026-05-02 18:50:20 CEST
+Mission : qualite projet non destructive.
+Commit initial : d7a04e7 docs(codex): ajoute journal central Codex97MAJ
+Commit final : commit V57 pointe par le tag v57-quality-eslint-final apres finalisation.
+Tag backup : backup-pre-v57-quality-20260502-1847
+Firebase deploy : non execute.
+Firestore / Storage rules : non modifiees.
+Donnees Firestore : aucune suppression, aucune migration, aucune ecriture.
+
+Fichiers modifies :
+- .gitignore
+- eslint.config.js
+- src/admin/components/PopupEncaisserAcompte.tsx
+- src/lib/commissionHelpers.ts
+- src/lib/emailService.ts
+- src/lib/quoteStatusHelpers.ts
+- Codex97MAJ.txt
+
+Corrections ESLint :
+- creation de eslint.config.js au format flat config ESLint 9 ;
+- utilisation des dependances deja presentes : @eslint/js, globals, typescript-eslint, eslint-plugin-react-hooks, eslint-plugin-react-refresh ;
+- exclusions ESLint ajoutees pour dist, node_modules, Codexxx, archives, dossiers legacy/audit volumineux et fichiers documentaires ;
+- regles ajustees pour restaurer une commande lint exploitable sans bloquer toute la base historique ;
+- scripts CommonJS toleres sans migration ESM.
+
+Resultat npm run lint :
+- avant correction : KO, ESLint 9 ne trouvait aucun eslint.config.(js|mjs|cjs) ;
+- apres creation initiale : KO, 8742 erreurs car ESLint scannait des artefacts legacy et bundles generes ;
+- final : OK, exit 0, avec 64 warnings restants.
+
+Warnings lint restants :
+- dependances useEffect React a reviser au cas par cas ;
+- exports non composants signales par react-refresh ;
+- unused historiques dans scripts et generateurs ;
+- blocs vides et escapes inutiles abaisses en warnings pour eviter une refonte large en V57.
+
+Analyse warnings Vite :
+- avant correction V57 : warnings imports dynamiques/statiques melanges sur src/lib/firebase.ts, src/lib/quoteStatusHelpers.ts et src/lib/emailService.ts ;
+- correction sure effectuee : remplacement des imports dynamiques redondants par des imports statiques dans PopupEncaisserAcompte, commissionHelpers, quoteStatusHelpers et emailService ;
+- generateInvoiceFinale reste en import dynamique volontairement pour conserver le code-splitting PDF ;
+- apres correction : les warnings dynamiques/statiques ont disparu ;
+- warning restant : chunks superieurs a 800 kB.
+
+Chunks build apres correction :
+- firebase-vendor : 517.22 kB, gzip 120.85 kB ;
+- index principal : 865.84 kB, gzip 227.49 kB ;
+- excel-vendor : 939.99 kB, gzip 271.19 kB ;
+- pdf-vendor : 617.91 kB, gzip 185.98 kB.
+
+Statut Codexxx :
+- Codexxx/ analyse en lecture seule ;
+- Codexxx/ present, environ 112K ;
+- Codexxx.zip present localement, environ 28K ;
+- fichiers utiles presents : README-CODEXXX.txt, rapports V53, config/.gitignore, config/.env.example, config/firebase.json, scripts copies, importProducts-v2.mjs legacy, SECRET-SCAN-CODEXXX.txt ;
+- scan Codexxx indique 0 fichier secret par nom ;
+- cles Firebase Web publiques-by-design signalees dans les scripts copies ;
+- Codexxx/ et Codexxx.zip restent locaux, non modifies, non stages, non committes.
+
+Build :
+- build pre-flight : OK ;
+- build audit Vite avant correction imports : OK ;
+- build apres correction imports : OK ;
+- build final V57 : OK.
+
+Commandes principales executees pendant V57 :
+- pwd
+- git branch --show-current
+- git status --short
+- git log --oneline -10
+- npm run build
+- git tag backup-pre-v57-quality-20260502-1847
+- git push origin backup-pre-v57-quality-20260502-1847
+- npm run lint
+- npm run build 2>&1 | tee /tmp/v57-build.log
+- grep warnings Vite dans /tmp/v57-build.log
+- audit read-only Codexxx par find, du, sed README et SECRET-SCAN
+- npm run lint final
+- npm run build final
+
+Risques restants :
+- 64 warnings lint restent a traiter progressivement ;
+- chunks index principal et excel-vendor restent au-dessus de 800 kB ;
+- firebase.json contient toujours le bucket legacy import2030 et ne doit pas etre corrige sans audit Storage dedie ;
+- firestore.rules counters reste a traiter dans une mission separee avec validation humaine avant deploy ;
+- scripts destructifs legacy restent a migrer vers Admin SDK dans une mission separee.
+
+Rollback plan V57 :
+- git revert <commit V57>
+- git push origin v2
+- supprimer le tag v57-quality-eslint-final uniquement apres validation humaine si necessaire.
+
+Prochaine mission recommandee :
+- V58-A : traiter progressivement les 64 warnings lint les plus simples, sans toucher aux flows sensibles ;
+- V58-B : analyser un split de bundle admin/front/excel pour reduire index principal et excel-vendor ;
+- V59 : audit Storage explicite avant toute correction de firebase.json ;
+- mission rules separee : restreindre counters dans firestore.rules avec tests fonctionnels et validation humaine avant deploy.
