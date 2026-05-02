@@ -12,9 +12,9 @@ export const TEST_USERS = {
     name: 'Michel Chen',
   },
   partner: {
-    email: process.env.TEST_PARTNER_EMAIL || 'tt@tartinique.com',
+    email: process.env.TEST_PARTNER_EMAIL || '97importcom@gmail.com',
     password: process.env.TEST_PARTNER_PASSWORD || TEST_PWD,
-    name: 'TT Tartinique',
+    name: '97importcom',
   },
   admin: {
     email: process.env.TEST_ADMIN_EMAIL || 'parisb2b@gmail.com',

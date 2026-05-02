@@ -31,7 +31,7 @@ setup('authenticate partenaire', async ({ page }) => {
   const pwd = process.env.TEST_PARTNER_PASSWORD;
   if (!email || !pwd) { console.log('⏭️  Partenaire: pas de credentials, skip'); return; }
 
-  await page.goto(`${BASE_URL}/espace-partenaire`);
+  await page.goto(`${BASE_URL}/connexion`);
   await page.fill('input[type="email"]', email);
   await page.fill('input[type="password"]', pwd);
   await page.click('button[type="submit"]');
