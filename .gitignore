@@ -88,6 +88,15 @@ data/*.csv
 .v55-backup-tag.txt
 .v56-admin-quotes-clients-backup-tag.txt
 .v57-quality-backup-tag.txt
+.v58-ultra-backup-tag.txt
+
+# Scripts de lancement locaux (contient variables d'environnement)
+claude-deepseek-v4.sh
 
 # Archives locales de nettoyage V56 contenant des donnees personnelles
 ARCHIVE-INTERENOVATIONS-V56/
+
+# Tests E2E Playwright (V62)
+playwright-report/
+test-results/
+tests/fixtures/*.storageState.json

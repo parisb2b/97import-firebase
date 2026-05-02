@@ -1,0 +1,53 @@
+name: E2E Tests — Parcours 97IMPORT
+
+on:
+  push:
+    branches: [v2]
+  pull_request:
+    branches: [v2]
+
+jobs:
+  test-parcours:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        role: [client, partenaire, admin]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright
+        run: npx playwright install --with-deps chromium
+
+      - name: Run tests ${{ matrix.role }}
+        env:
+          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
+          TEST_CLIENT_EMAIL: ${{ secrets.TEST_CLIENT_EMAIL }}
+          TEST_CLIENT_PASSWORD: ${{ secrets.TEST_CLIENT_PASSWORD }}
+          TEST_PARTNER_EMAIL: ${{ secrets.TEST_PARTNER_EMAIL }}
+          TEST_PARTNER_PASSWORD: ${{ secrets.TEST_PARTNER_PASSWORD }}
+          TEST_ADMIN_EMAIL: ${{ secrets.TEST_ADMIN_EMAIL }}
+          TEST_ADMIN_PASSWORD: ${{ secrets.TEST_ADMIN_PASSWORD }}
+        run: npx playwright test tests/specs/parcours-${{ matrix.role }}.spec.ts
+
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rapport-${{ matrix.role }}
+          path: playwright-report/
+
+  check-merge:
+    needs: test-parcours
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Verification pre-merge
+        run: echo "✅ Tous les parcours sont verts — merge autorise"
