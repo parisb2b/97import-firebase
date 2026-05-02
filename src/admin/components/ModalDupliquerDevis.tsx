@@ -2,7 +2,7 @@
 // MISSION-V43-E3.1 — Modal de duplication d'un devis existant.
 // Crée un nouveau devis avec statut 'nouveau' + acomptes vides + numéro DVS régénéré.
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { getNextNumber } from '../../lib/counters';
@@ -20,10 +20,18 @@ export default function ModalDupliquerDevis({
 }: ModalDupliquerDevisProps) {
   const [duplicating, setDuplicating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // V49 Checkpoint H — defense en profondeur contre double-click tres rapide.
+  // Le `disabled={duplicating}` cote bouton n'est pas suffisant si l'utilisateur
+  // click 2x avant que React n'ait propage le re-render — la fonction handleConfirm
+  // peut etre appelee 2x simultanement avec stale closure (duplicating === false).
+  // useRef contourne le probleme : la valeur est lue/ecrite synchroniquement.
+  const duplicatingRef = useRef(false);
 
   if (!isOpen) return null;
 
   const handleConfirm = async () => {
+    if (duplicatingRef.current) return;
+    duplicatingRef.current = true;
     setDuplicating(true);
     setError(null);
 
@@ -83,6 +91,7 @@ export default function ModalDupliquerDevis({
       setError(err.message || 'Erreur lors de la duplication');
     } finally {
       setDuplicating(false);
+      duplicatingRef.current = false;
     }
   };
 
