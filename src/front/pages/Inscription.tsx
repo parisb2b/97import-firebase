@@ -42,7 +42,7 @@ export default function Inscription() {
         createdAt: serverTimestamp(),
       };
       await setDoc(doc(db, 'users', cred.user.uid), profileData);
-      await setDoc(doc(db, 'profiles', cred.user.uid), profileData);
+      await setDoc(doc(db, 'clients', cred.user.uid), profileData);
 
       showToast('Compte créé avec succès !');
       setLocation('/profil');
@@ -60,8 +60,8 @@ export default function Inscription() {
       const provider = new GoogleAuthProvider();
       const cred = await signInWithPopup(clientAuth, provider);
 
-      // Create profile if first time (merge: don't overwrite existing role)
-      await setDoc(doc(db, 'profiles', cred.user.uid), {
+      // Create client profile if first time (merge: don't overwrite existing role)
+      await setDoc(doc(db, 'clients', cred.user.uid), {
         uid: cred.user.uid,
         email: cred.user.email,
         nom: cred.user.displayName || '',

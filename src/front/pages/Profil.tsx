@@ -27,7 +27,7 @@ export default function Profil() {
     if (!user) return;
     const load = async () => {
       try {
-        const snap = await getDoc(doc(db, 'profiles', user.uid));
+        const snap = await getDoc(doc(db, 'clients', user.uid));
         const data = snap.data();
         if (data) {
           setNom(data.lastName || data.nom || user.displayName?.split(' ').slice(1).join(' ') || '');
@@ -60,7 +60,7 @@ export default function Profil() {
     e.preventDefault();
     setSaving(true);
     try {
-      await setDoc(doc(db, 'profiles', user.uid), {
+      await setDoc(doc(db, 'clients', user.uid), {
         uid: user.uid,
         email: user.email,
         firstName: prenom,

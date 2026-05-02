@@ -16,8 +16,8 @@ export default function DetailClient() {
   useEffect(() => {
     const load = async () => {
       if (!params?.id) return;
-      // Try profiles first, then users
-      let snap = await getDoc(doc(db, 'profiles', params.id));
+      // clients is the application source of truth; users remains a RBAC/Auth fallback.
+      let snap = await getDoc(doc(db, 'clients', params.id));
       if (!snap.exists()) snap = await getDoc(doc(db, 'users', params.id));
       if (snap.exists()) setClient({ id: snap.id, ...snap.data() });
 

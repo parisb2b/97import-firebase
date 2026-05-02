@@ -22,7 +22,7 @@ export default function Clients() {
   useEffect(() => {
     const load = async () => {
       try {
-        const q = query(collection(db, 'profiles'), orderBy('createdAt', 'desc'));
+        const q = query(collection(db, 'clients'), orderBy('createdAt', 'desc'));
         const snap = await getDocs(q);
         setClients(snap.docs.map((d) => ({ id: d.id, ...d.data() } as Client)));
       } catch (err) {
