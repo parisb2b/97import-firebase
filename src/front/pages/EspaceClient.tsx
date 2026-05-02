@@ -37,7 +37,7 @@ export default function EspaceClient() {
       setLoading(false);
     });
     return () => unsub();
-  }, []);
+  }, [navigate]);
 
   if (loading) return <div style={{ padding: 60, textAlign: 'center', color: '#6B7280' }}>Chargement...</div>;
   if (!user) return <Redirect to="/connexion" />;

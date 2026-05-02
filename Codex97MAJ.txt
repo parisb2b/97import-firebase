@@ -1,10 +1,10 @@
 # Codex97MAJ - Journal central permanent 97IMPORT
 
-Date/heure de mise a jour : 2026-05-02 18:35:30 CEST
+Date/heure de mise a jour : 2026-05-02 21:25:00 CEST
 Projet : /Users/mactell/97import-firebase
 Branche : v2
 Projet Firebase obligatoire : importok-6ef77
-Mission courante : V56-BIS - creation du journal central permanent
+Mission courante : V60 — audit complet et corrections non destructives
 
 Regle permanente :
 - A chaque prochaine mission Codex sur 97IMPORT, mettre a jour Codex97MAJ.txt.
@@ -354,3 +354,48 @@ Prochaine mission recommandee :
 - V58-B : analyser un split de bundle admin/front/excel pour reduire index principal et excel-vendor ;
 - V59 : audit Storage explicite avant toute correction de firebase.json ;
 - mission rules separee : restreindre counters dans firestore.rules avec tests fonctionnels et validation humaine avant deploy.
+
+## V60 — Audit complet et corrections non destructives
+
+Date/heure : 2026-05-02 21:02–21:25 CEST
+Mission : audit read-only + corrections non destructives (securite, lint, scripts, rules, catch).
+Tag backup : backup-pre-v60-20260502-2117
+Firebase deploy : non execute.
+Firestore / Storage rules : firestore.rules counters corrige (isAdmin), storage.rules non modifie.
+Donnees Firestore : aucune suppression, aucune migration, aucune ecriture.
+
+### Corrections appliquees
+- firestore.rules : counters restreint de isAuth() a isAdmin()
+- eslint.config.js : 97import-firebase/** ajoute aux ignores (artefact Vercel imbrique)
+- 16 warnings react-hooks/exhaustive-deps resolus (0 restants)
+- 18 blocs catch vides nettoyes avec console.warn
+- AUDIT-STORAGE-V60.txt cree (documentation bucket import2030)
+
+### Fichiers modifies
+- eslint.config.js
+- firestore.rules
+- 16 fichiers lint (react-hooks/exhaustive-deps)
+- 18 fichiers catch (console.warn)
+- AUDIT-STORAGE-V60.txt (nouveau)
+- MAJ-V60.txt (nouveau)
+- Codex97MAJ.txt
+
+### Resultats
+- npm run lint : OK, exit 0, 0 warning, 0 erreur
+- npm run build : OK
+- Vercel front/admin : HTTP 200
+- adminDb/adminStorage : 0 regression, 100% des fichiers admin utilisent adminDb
+- Scripts legacy : tous proteges ou neutralises
+
+### Risques restants
+- firebase.json contient toujours le bucket Storage legacy import2030.firebasestorage.app
+- Chunk exceljs-vendor > 800 kB
+- Bucket Storage a verifier en console Firebase avant migration
+
+### Tags crees
+- backup-pre-v60-20260502-2117
+
+### Prochaine mission recommandee (V61)
+- Verifier le bucket Storage actif dans Firebase Console
+- Migrer le bucket import2030 → importok-6ef77 si necessaire
+- Analyser code-splitting pour exceljs-vendor

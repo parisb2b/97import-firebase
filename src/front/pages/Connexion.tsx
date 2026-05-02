@@ -31,6 +31,7 @@ export default function Connexion() {
         setLocation('/espace-client');
       }
     } catch {
+      console.warn('Connexion: échec redirection post-login, fallback /');
       setLocation('/');
     }
   };

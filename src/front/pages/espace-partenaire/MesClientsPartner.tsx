@@ -66,7 +66,9 @@ export default function MesClientsPartner({ partnerCode }: { partnerCode: string
           try {
             const userSnap = await getDoc(doc(db, 'users', cid));
             if (userSnap.exists()) profileData = userSnap.data();
-          } catch {}
+          } catch {
+            console.warn('MesClientsPartner: échec chargement profil', cid);
+          }
 
           const sorted = devs.sort((a: any, b: any) =>
             (b.createdAt?.toMillis?.() || 0) - (a.createdAt?.toMillis?.() || 0)
@@ -102,7 +104,8 @@ export default function MesClientsPartner({ partnerCode }: { partnerCode: string
       }
     };
     load();
-  }, [partnerCode]);
+  // showToast défini via hook — ajout risquerait boucle si non memoizé
+  }, [partnerCode]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const filtered = clients.filter(c => {
     if (!search) return true;

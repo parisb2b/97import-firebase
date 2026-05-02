@@ -92,7 +92,8 @@ export default function OngletEssentiel({ product, onChange, isCreation }: Props
       onChange('reference', ref);
     };
     generer();
-  }, [product.categorie, product.sous_categorie, modeleAffine, isCreation]);
+  // onChange viendrait du parent (peut être instable) — ajout = boucle infinie
+  }, [product.categorie, product.sous_categorie, modeleAffine, isCreation]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <>

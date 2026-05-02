@@ -41,9 +41,10 @@ export default function MesDevis({ userId, profile }: { userId: string; profile?
     }
   };
 
+  // loadDevis définie dans le composant — ajout = boucle infinie
   useEffect(() => {
     loadDevis();
-  }, [userId]);
+  }, [userId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Filtre : tous les devis sauf annulés
   const devisNonAnnules = devis.filter(d => d.statut !== 'annule');

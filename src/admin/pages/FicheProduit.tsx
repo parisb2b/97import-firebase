@@ -68,7 +68,7 @@ export default function FicheProduit() {
       }
     };
     loadProduct();
-  }, [isCreation, params?.ref]);
+  }, [isCreation, params?.ref, setLocation]);
 
   const handleChange = (field: string, value: any) => {
     setProduct((prev: any) => ({ ...prev, [field]: value }));

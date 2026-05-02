@@ -155,7 +155,9 @@ export default function Panier() {
       try {
         const userSnap = await getDoc(doc(db, 'users', user.uid));
         if (userSnap.exists()) userProfile = userSnap.data();
-      } catch {}
+      } catch {
+        console.warn('Panier: échec chargement profil client');
+      }
 
       const devisData = {
         numero,

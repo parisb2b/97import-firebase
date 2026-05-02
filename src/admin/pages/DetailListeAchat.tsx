@@ -2,7 +2,6 @@ import { useState, useEffect, useMemo } from 'react';
 import { useLocation, useRoute, Link } from 'wouter';
 import { doc, getDoc, updateDoc, collection, getDocs, serverTimestamp } from 'firebase/firestore';
 import { adminDb as db } from '../../lib/firebase';
-import { generateBcChine } from '../../lib/excel-generators/generateBcChine';
 import SearchInput from '../components/atoms/SearchInput';
 
 export default function DetailListeAchat() {
@@ -19,10 +18,11 @@ export default function DetailListeAchat() {
   const [lignes, setLignes] = useState<any[]>([]);
   const [notes, setNotes] = useState('');
 
+  // loadLa/loadConteneurs définies dans le composant — ajout = boucle infinie
   useEffect(() => {
     if (params?.id) loadLa(params.id);
     loadConteneurs();
-  }, [params?.id]);
+  }, [params?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadLa = async (id: string) => {
     setLoading(true);
@@ -135,6 +135,7 @@ export default function DetailListeAchat() {
     if (!la) return;
     setGeneratingExcel(true);
     try {
+      const { generateBcChine } = await import('../../lib/excel-generators/generateBcChine');
       await generateBcChine(la.id);
     } catch (err: any) {
       alert('Erreur génération Excel: ' + err.message);

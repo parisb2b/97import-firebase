@@ -10,7 +10,9 @@ export async function getTauxRmb(): Promise<number> {
       const val = snap.data()?.valeur;
       if (typeof val === 'number' && val > 0) return val;
     }
-  } catch (_) {}
+  } catch {
+    console.warn('getTauxRmb: échec lecture Firestore, fallback 7.82');
+  }
   return 7.82; // Fallback si document absent
 }
 
@@ -43,7 +45,8 @@ export async function enrichirLigne(ligne: LigneProduit): Promise<LigneProduit> 
       poids_net_kg:     pick(ligne.poids_net_kg,     p.poids_net_kg ?? p.poids_net ?? p.poids_kg),
       poids_brut_kg:    pick(ligne.poids_brut_kg,    p.poids_brut_kg ?? p.poids_brut),
     };
-  } catch (_) {
+  } catch {
+    console.warn('enrichirLigne: échec enrichissement', ligne.reference);
     return ligne;
   }
 }
@@ -64,7 +67,8 @@ export async function getInfosClientDevis(devisId: string): Promise<InfosClient 
       email:     d.client_email     ?? d.email_client     ?? '',
       telephone: d.client_telephone ?? d.telephone_client ?? '',
     };
-  } catch (_) {
+  } catch {
+    console.warn('getInfosClientDevis: échec lecture devis', devisId);
     return null;
   }
 }

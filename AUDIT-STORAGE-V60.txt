@@ -1,0 +1,37 @@
+=== AUDIT STORAGE V60 — 02/05/2026 21:02 ===
+
+## firebase.json (ligne 5-7)
+{
+  "storage": {
+    "bucket": "import2030.firebasestorage.app",
+    "rules": "storage.rules"
+  }
+}
+
+→ Le bucket configuré est "import2030.firebasestorage.app"
+→ Cette référence à import2030 est ACTIVE dans la config
+
+## storage.rules
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Lecture publique — médias produits accessibles sans auth
+    match /{allPaths=**} {
+      allow read: if true;
+    }
+    // Écriture sécurisée — utilisateurs authentifiés uniquement
+    match /{allPaths=**} {
+      allow write: if request.auth != null;
+    }
+  }
+}
+
+→ Lecture : ouverte à tous (if true)
+→ Écriture : tout utilisateur authentifié (request.auth != null)
+→ Les scripts admin utilisent firebase-admin SDK (bypass des règles)
+
+## Recommandation
+Ne pas modifier sans avoir confirmé le bucket actif via console Firebase.
+Vérifier dans Firebase Console > Storage quel bucket est réellement utilisé.
+Si le bucket import2030 est encore actif, planifier une migration vers importok-6ef77.
+Prochaine mission : V61 (audit Storage Firebase Console + migration bucket si nécessaire).

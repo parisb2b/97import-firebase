@@ -100,7 +100,8 @@ export default function ProductForm({
         handleChange('dimensions.volume_m3', Math.round(volume * 100) / 100);
       }
     }
-  }, [data.dimensions?.l, data.dimensions?.L, data.dimensions?.h]);
+  // handleChange et data.dimensions causeraient des boucles (mise à jour de data dans l'effet)
+  }, [data.dimensions?.l, data.dimensions?.L, data.dimensions?.h]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>

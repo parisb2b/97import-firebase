@@ -39,6 +39,7 @@ export function formatBuildDate(iso: string = BUILD_ISO): string {
 
     return `${datePart} ${timePart}`;
   } catch {
+    console.warn('getBuildDisplay: échec formatage date, fallback dev');
     return 'dev';
   }
 }

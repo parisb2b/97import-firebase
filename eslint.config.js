@@ -13,6 +13,7 @@ export default tseslint.config(
       'HTML-2030/**',
       'SAVE2026/**',
       'Codexxx/**',
+      '97import-firebase/**',
       'MIGRATION_PACKAGE_FINAL/**',
       'majall/**',
       '1MAJALL/**',

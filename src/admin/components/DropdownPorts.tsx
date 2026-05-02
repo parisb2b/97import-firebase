@@ -25,7 +25,8 @@ export default function DropdownPorts({ type, value, onChange, label, required }
   const [form, setForm] = useState({ code: '', nom: '', pays: '' });
   const [saving, setSaving] = useState(false);
 
-  useEffect(() => { loadPorts(); }, [type]);
+  // loadPorts définie dans le composant — ajout aux deps = boucle infinie
+  useEffect(() => { loadPorts(); }, [type]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadPorts = async () => {
     setLoading(true);

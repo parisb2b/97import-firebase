@@ -4,11 +4,7 @@ import { doc, getDoc, updateDoc, deleteDoc, serverTimestamp, Timestamp } from 'f
 import { adminDb as db } from '../../lib/firebase';
 import DropdownPorts from '../components/DropdownPorts';
 import PopupSelectionClientExcel from '../components/PopupSelectionClientExcel';
-import { generateBdInvoice } from '../../lib/excel-generators/generateBdInvoice';
-import { generateBdPackingList } from '../../lib/excel-generators/generateBdPackingList';
-import { generateBdMaritime } from '../../lib/excel-generators/generateBdMaritime';
-import { generateBeExport } from '../../lib/excel-generators/generateBeExport';
-import { downloadExcel, InfosClient } from '../../lib/excel-generators/excelTypes';
+import { downloadExcel, type InfosClient } from '../../lib/excel-generators/excelTypes';
 
 const STATUTS = [
   { value: 'preparation', label: 'En préparation', color: '#1565C0' },
@@ -37,9 +33,10 @@ export default function DetailConteneur() {
   const [currentGenerator, setCurrentGenerator] = useState<'invoice' | 'packing' | 'maritime' | 'export' | null>(null);
   const [generatingExcel, setGeneratingExcel] = useState(false);
 
+  // loadConteneur définie dans le composant — ajout = boucle infinie
   useEffect(() => {
     if (params?.id) loadConteneur(params.id);
-  }, [params?.id]);
+  }, [params?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadConteneur = async (id: string) => {
     setLoading(true);
@@ -135,22 +132,30 @@ export default function DetailConteneur() {
       const date = new Date().toISOString().slice(0, 10);
 
       switch (currentGenerator) {
-        case 'invoice':
+        case 'invoice': {
+          const { generateBdInvoice } = await import('../../lib/excel-generators/generateBdInvoice');
           buffer = await generateBdInvoice(conteneur.id, clientNom, infosClient);
           filename = `BD-INVOICE_${conteneur.numero}_${clientNom}_${date}.xlsx`;
           break;
-        case 'packing':
+        }
+        case 'packing': {
+          const { generateBdPackingList } = await import('../../lib/excel-generators/generateBdPackingList');
           buffer = await generateBdPackingList(conteneur.id, clientNom, infosClient);
           filename = `BD-PACKINGLIST_${conteneur.numero}_${clientNom}_${date}.xlsx`;
           break;
-        case 'maritime':
+        }
+        case 'maritime': {
+          const { generateBdMaritime } = await import('../../lib/excel-generators/generateBdMaritime');
           buffer = await generateBdMaritime(conteneur.id, clientNom, infosClient);
           filename = `BD-MARITIME_${conteneur.numero}_${clientNom}_${date}.xlsx`;
           break;
-        case 'export':
+        }
+        case 'export': {
+          const { generateBeExport } = await import('../../lib/excel-generators/generateBeExport');
           buffer = await generateBeExport(conteneur.id, clientNom);
           filename = `BE-EXPORT_${conteneur.numero}_${clientNom}_${date}.xlsx`;
           break;
+        }
         default:
           throw new Error('Générateur inconnu');
       }

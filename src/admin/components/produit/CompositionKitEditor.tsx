@@ -22,7 +22,9 @@ export default function CompositionKitEditor({ composition, onChange }: Props) {
         try {
           const snap = await getDoc(doc(db, 'products', c.ref));
           if (snap.exists()) names[c.ref] = snap.data().nom_fr || c.ref;
-        } catch (_) {}
+        } catch {
+          console.warn('CompositionKit: échec chargement composant', c.ref);
+        }
       }
       setComposantNames(names);
     };
@@ -40,7 +42,10 @@ export default function CompositionKitEditor({ composition, onChange }: Props) {
         p.nom_fr?.toLowerCase().includes(term.toLowerCase())
       ).slice(0, 10);
       setSearchResults(results);
-    } catch (_) {}
+    } catch {
+      console.warn('CompositionKit: échec recherche produits');
+      setSearchResults([]);
+    }
   };
 
   const handleAdd = (product: any) => {

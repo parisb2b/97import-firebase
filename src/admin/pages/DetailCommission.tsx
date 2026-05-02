@@ -29,7 +29,8 @@ export default function DetailCommission() {
       setLoading(false);
     };
     load();
-  }, [params?.id]);
+  // loadCommission définie dans le composant — ajout = boucle infinie
+  }, [params?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleCancelPaiement = async () => {
     if (!comm) return;

@@ -64,7 +64,8 @@ export default function GestionDevisPartner({ partnerCode }: { partnerCode: stri
     }
   };
 
-  useEffect(() => { loadDevis(); }, [partnerCode]);
+  // loadDevis définie dans le composant — ajout = boucle infinie
+  useEffect(() => { loadDevis(); }, [partnerCode]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     getCoefficients().then(setCoefs);
@@ -193,7 +194,7 @@ export default function GestionDevisPartner({ partnerCode }: { partnerCode: stri
       const quoteSnap = await getDoc(doc(db, 'quotes', d.id));
       if (!quoteSnap.exists()) return;
       downloadPDF(generateDevis(quoteSnap.data(), emetteur), `${d.numero}.pdf`);
-    } catch (err) {
+    } catch {
       showToast('Erreur PDF', 'error');
     }
   };

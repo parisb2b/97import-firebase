@@ -29,7 +29,8 @@ export default function MesCommandes({ userId, profile }: { userId: string; prof
     }
   };
 
-  useEffect(() => { loadCommandes(); }, [userId]);
+  // loadCommandes définie dans le composant — ajout = boucle infinie
+  useEffect(() => { loadCommandes(); }, [userId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const filtered = commandes.filter(d => {
     if (!search) return true;

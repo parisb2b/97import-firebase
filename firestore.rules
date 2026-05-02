@@ -158,8 +158,9 @@ service cloud.firestore {
     }
 
     // Compteurs atomiques (DVS-AAMM-NNN, FA-AAMM-NNN, etc.)
+    // V60 : restreint à admin-only (était isAuth)
     match /counters/{counterId} {
-      allow read, write: if isAuth();
+      allow read, write: if isAdmin();
     }
 
     // ══════════════════════════════════════════════════════════

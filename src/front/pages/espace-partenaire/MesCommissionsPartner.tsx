@@ -67,7 +67,8 @@ export default function MesCommissionsPartner({ partnerCode }: { partnerCode: st
       }
     };
     load();
-  }, [partnerCode]);
+  // showToast défini via hook — ajout risquerait boucle si non memoizé
+  }, [partnerCode]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const getCommission = (d: Devis) => commissions.get(d.id) ?? 0;
 

@@ -91,6 +91,7 @@ export default function LogsDebug() {
       const d = ts?.toDate?.() ?? (typeof ts === 'string' ? new Date(ts) : null);
       return d ? d.toLocaleString('fr-FR', { timeZone: 'Europe/Paris' }) : '—';
     } catch {
+      console.warn('formatDate: échec parsing date');
       return '—';
     }
   };

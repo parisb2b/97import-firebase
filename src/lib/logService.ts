@@ -89,6 +89,7 @@ function getCurrentUser(): { user_id: string | null; user_email: string | null; 
     }
     return { user_id: null, user_email: null, user_role: 'anonymous' };
   } catch {
+    console.warn('getUserContext: échec lecture auth state');
     return { user_id: null, user_email: null, user_role: 'anonymous' };
   }
 }
@@ -148,7 +149,6 @@ async function writeLog(entry: LogEntry): Promise<void> {
     await addDoc(collection(db, 'logs'), docPayload);
   } catch (err) {
     // Fallback : on n'écrit pas en boucle dans Firestore — juste console
-    // eslint-disable-next-line no-console
     console.error('[logService] write failed:', err, entry);
   } finally {
     isLogging = false;

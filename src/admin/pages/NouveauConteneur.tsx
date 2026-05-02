@@ -52,7 +52,8 @@ export default function NouveauConteneur() {
       }
     };
     loadTarifs();
-  }, [form.destination]);
+  // form.tarif_logistique_ref modifié dans l'effet — ajout = boucle infinie
+  }, [form.destination]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Pré-sélectionner port destination selon destination pays
   useEffect(() => {
@@ -66,7 +67,8 @@ export default function NouveauConteneur() {
     if (portMap[form.destination] && !form.port_destination) {
       setForm(f => ({ ...f, port_destination: portMap[form.destination] }));
     }
-  }, [form.destination]);
+  // form.port_destination modifié dans l'effet — ajout = boucle infinie
+  }, [form.destination]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSubmit = async () => {
     // Validation

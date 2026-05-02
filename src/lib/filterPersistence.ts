@@ -26,6 +26,7 @@ export function loadFilters(): CatalogueFilters {
     if (!raw) return {};
     return JSON.parse(raw);
   } catch {
+    console.warn('loadFilters: échec lecture localStorage');
     return {};
   }
 }
@@ -33,7 +34,9 @@ export function loadFilters(): CatalogueFilters {
 export function resetFilters(): void {
   try {
     localStorage.removeItem(STORAGE_KEY);
-  } catch {}
+  } catch {
+    console.warn('resetFilters: échec suppression localStorage');
+  }
 }
 
 /**

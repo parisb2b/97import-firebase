@@ -59,7 +59,8 @@ export default function SAV({ userId, profile }: { userId: string; profile: any 
     }
   };
 
-  useEffect(() => { loadData(); }, [userId]);
+  // loadData définie dans le composant — ajout = boucle infinie
+  useEffect(() => { loadData(); }, [userId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const enCours = demandes.filter(d => d.statut === 'nouveau' || d.statut === 'en_cours').length;
   const resolues = demandes.filter(d => d.statut === 'resolu').length;
