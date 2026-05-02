@@ -1,0 +1,269 @@
+# MAJ V56 — ADMIN CLIENTS / DEVIS
+
+Date : 02/05/2026
+Branche : v2
+Firebase Project ID : importok-6ef77
+
+## 1. Résumé du problème
+
+Après V55 :
+- l'espace client affichait le devis DVS-2605006 ;
+- l'admin affichait Clients (0) et Tous les devis (0) ;
+- Firestore contenait pourtant des données clients et devis.
+
+Objectif V56 :
+- rendre visibles les clients et devis dans l'admin ;
+- conserver l'accès client à ses devis ;
+- nettoyer les doublons/profils liés à interenovations@gmail.com ;
+- ne pas supprimer de données protégées ;
+- ne pas déployer Firebase Hosting.
+
+## 2. Cause réelle trouvée
+
+Cause principale :
+- l'admin utilisait adminAuth, initialisé sur l'app Firebase nommée "admin" ;
+- mais les pages admin lisaient Firestore via db, initialisé sur l'app Firebase "client" ;
+- les requêtes Firestore admin ne portaient donc pas le token adminAuth attendu par les rules ;
+- les pages admin tombaient en erreur de lecture puis affichaient 0.
+
+Correction :
+- ajout de adminDb et adminStorage dans src/lib/firebase.ts ;
+- bascule des imports Firestore/Storage de src/admin vers adminDb/adminStorage ;
+- adaptation des helpers commissionHelpers et quoteStatusHelpers pour utiliser adminDb quand adminAuth.currentUser existe.
+
+## 3. Fichiers modifiés
+
+Code Firebase :
+- src/lib/firebase.ts
+- src/lib/commissionHelpers.ts
+- src/lib/quoteStatusHelpers.ts
+
+Code admin :
+- src/admin/AdminApp.tsx
+- src/admin/AdminLogin.tsx
+- pages et composants src/admin utilisant Firestore
+
+Scripts :
+- scripts/audit-admin-clients-quotes-v56.cjs
+- scripts/cleanup-interenovations-v56.cjs
+
+Configuration :
+- .gitignore
+
+Rapport :
+- MAJ-V56-ADMIN-CLIENTS-DEVIS.txt
+
+## 4. Scripts créés
+
+### scripts/audit-admin-clients-quotes-v56.cjs
+
+Mode :
+- read-only strict ;
+- --dry-run obligatoire.
+
+Garde-fous :
+- PROJECT_ID hardcodé : importok-6ef77 ;
+- vérification serviceAccount.project_id ;
+- aucune écriture ;
+- aucune suppression ;
+- aucun secret affiché.
+
+### scripts/cleanup-interenovations-v56.cjs
+
+Mode :
+- dry-run par défaut ;
+- execute uniquement avec --execute --confirm-interenovations-cleanup.
+
+Garde-fous :
+- PROJECT_ID hardcodé : importok-6ef77 ;
+- vérification serviceAccount.project_id ;
+- cible unique : interenovations@gmail.com ;
+- recherche limitée à clients, profiles, partners, users ;
+- STOP si rôle admin ;
+- archive JSON préalable ;
+- hash SHA256 de l'archive.
+
+## 5. Données Firestore auditées
+
+Audit read-only avant cleanup :
+- users: 9
+- clients: 6
+- profiles: 9
+- partners: 3
+- quotes: 1
+- counters: 16
+
+Devis détecté :
+- DVS-2605006
+- total_ht arrondi : 73702
+- champ de rattachement : client_id
+- client_id pointe vers un document clients existant
+- statut : en_negociation_partenaire
+
+Audit read-only après cleanup :
+- users: 9
+- clients: 6
+- profiles: 9
+- partners: 2
+- quotes: 1
+- counters: 16
+- interenovations@gmail.com : aucun document restant trouvé dans users/clients/profiles/partners
+
+## 6. Nettoyage interenovations@gmail.com
+
+Dry-run :
+- document trouvé : partners/TEST-PART
+- rôle : null
+- aucun rôle admin
+
+Execute :
+- archive créée localement :
+  ARCHIVE-INTERENOVATIONS-V56/interenovations.json
+- hash créé :
+  ARCHIVE-INTERENOVATIONS-V56/interenovations.json.sha256
+- vérification hash :
+  OK
+- document supprimé :
+  partners/TEST-PART
+
+Archives :
+- non committées ;
+- ignorées via .gitignore ;
+- contiennent des données personnelles, restent locales.
+
+## 7. Règles Firebase
+
+firestore.rules :
+- non modifié.
+
+storage.rules :
+- non modifié.
+
+Firebase deploy :
+- aucun deploy Firebase exécuté.
+
+Commande non nécessaire en V56, car aucune rule n'a été modifiée.
+
+## 8. Commandes exécutées
+
+Préflight :
+- pwd
+- git branch --show-current
+- git status --short
+- git log --oneline -10
+- npm run build
+
+Backup :
+- git tag backup-pre-v56-admin-quotes-clients-20260502-1713
+- git push origin backup-pre-v56-admin-quotes-clients-20260502-1713
+
+Audit / cleanup :
+- node -c scripts/audit-admin-clients-quotes-v56.cjs
+- node -c scripts/cleanup-interenovations-v56.cjs
+- node scripts/audit-admin-clients-quotes-v56.cjs --dry-run
+- node scripts/cleanup-interenovations-v56.cjs --dry-run
+- node scripts/cleanup-interenovations-v56.cjs --execute --confirm-interenovations-cleanup
+- shasum -a 256 -c ARCHIVE-INTERENOVATIONS-V56/interenovations.json.sha256
+- node scripts/audit-admin-clients-quotes-v56.cjs --dry-run
+
+Validation :
+- npm run build
+- git diff --stat
+- git status --short
+- curl -I https://97import-firebase-git-v2-parisb2bs-projects.vercel.app/
+- curl -I https://97import-firebase-git-v2-parisb2bs-projects.vercel.app/admin
+
+Git :
+- git commit -m "fix(v56): corrige visibilité admin clients et devis"
+- git push origin v2
+- git tag checkpoint-v56-admin-quotes-clients
+- git push origin checkpoint-v56-admin-quotes-clients
+- git tag checkpoint-v56-cleanup-interenovations
+- git push origin checkpoint-v56-cleanup-interenovations
+
+## 9. Résultat build
+
+npm run build :
+- OK
+
+Warnings persistants :
+- imports dynamiques et statiques mélangés sur certains modules ;
+- chunks Vite supérieurs à 800 kB.
+
+Ces warnings ne bloquent pas le build.
+
+## 10. Résultat Vercel
+
+FRONT :
+- HTTP 200
+- https://97import-firebase-git-v2-parisb2bs-projects.vercel.app/
+
+ADMIN :
+- HTTP 200
+- https://97import-firebase-git-v2-parisb2bs-projects.vercel.app/admin
+
+## 11. Commits et tags
+
+Commit fonctionnel :
+- 427c342 fix(v56): corrige visibilité admin clients et devis
+
+Tags :
+- backup-pre-v56-admin-quotes-clients-20260502-1713
+- checkpoint-v56-admin-quotes-clients
+- checkpoint-v56-cleanup-interenovations
+
+## 12. Tests à faire par Michel
+
+1. Ouvrir /admin/clients.
+   Attendu : les 6 clients apparaissent.
+
+2. Ouvrir /admin/devis.
+   Attendu : le devis DVS-2605006 apparaît.
+
+3. Ouvrir le détail DVS-2605006.
+   Attendu : le devis s'ouvre côté admin.
+
+4. Ouvrir /espace-client avec le client concerné.
+   Attendu : le devis reste visible côté client.
+
+5. Créer un nouveau devis côté client.
+   Attendu : création OK, numérotation OK, devis visible côté client et admin.
+
+6. Vérifier que les produits restent présents.
+   Attendu : aucun produit supprimé.
+
+## 13. Risques restants
+
+1. firestore.rules contient encore counters ouvert à tout utilisateur authentifié.
+   V56 n'a pas modifié les rules pour éviter de casser la création de devis sans test fonctionnel complet.
+
+2. firebase.json contient encore un bucket import2030.
+   V56 n'a pas modifié Storage ni firebase.json, conformément à l'audit préalable requis.
+
+3. ESLint reste non opérationnel avec ESLint 9 sans eslint.config.*.
+   Build OK, mais lint à corriger dans une mission qualité.
+
+4. Certains helpers src/lib restent partagés entre front et admin.
+   Les chemins critiques clients/devis admin ont été corrigés via adminDb.
+
+5. L'archive interenovations contient des données personnelles.
+   Elle est ignorée par Git et ne doit pas être commitée.
+
+## 14. Rollback plan
+
+Rollback code :
+- revenir au tag backup-pre-v56-admin-quotes-clients-20260502-1713 ;
+- ou revert du commit 427c342.
+
+Rollback cleanup interenovations :
+- restaurer manuellement partners/TEST-PART depuis ARCHIVE-INTERENOVATIONS-V56/interenovations.json si nécessaire.
+
+## 15. Statut final
+
+GO pour validation Vercel preview v2.
+
+NO GO pour :
+- Firebase Hosting deploy ;
+- Firebase rules deploy automatique ;
+- suppression de collections protégées ;
+- suppression Auth user interenovations sans mission séparée explicite.
