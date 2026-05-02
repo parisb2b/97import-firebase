@@ -1,0 +1,229 @@
+═══════════════════════════════════════════════════════════════
+  V52 — CHECKPOINT D
+  AUDIT DOUBLONS COLLECTIONS FIRESTORE (READ-ONLY)
+═══════════════════════════════════════════════════════════════
+
+Date          : 2026-05-02 (post V50-BIS, V51-AUDIT)
+Branche       : v2
+HEAD          : ee2cf4c (CP C V52)
+Mode          : audit code (grep src/) — pas d'introspection BD live
+Decision      : aucune migration BD en V52, plan documente pour V53
+
+═══════════════════════════════════════════════════════════════
+  CONTEXTE
+═══════════════════════════════════════════════════════════════
+
+L'audit V51 (rapports/firestore-data) a remonte 26 collections
+inventoriees : 14 actives + 12 vides. Plusieurs paires/triplets
+suspects ont ete signales :
+
+  1. factures vs invoices vs logistics_invoices
+  2. containers vs conteneurs            (TRAITE en CP C V52)
+  3. users vs profiles vs clients
+  4. acomptes (array dans quote) vs acomptes (sub-collection)
+
+CP C V52 a normalise (2) au niveau code (4 references migrees).
+CP D V52 documente l'etat de (1), (3), (4) sans modifier.
+
+═══════════════════════════════════════════════════════════════
+  1. FACTURES vs INVOICES vs LOGISTICS_INVOICES
+═══════════════════════════════════════════════════════════════
+
+  factures             : N'EXISTE PAS comme collection Firestore.
+                         Le mot "factures" apparait uniquement
+                         comme label UI ("Mes factures",
+                         "label: 'Factures'") dans 6 fichiers
+                         front (EspaceClient, EspacePartenaire,
+                         MonCompte, MesFactures, DevisCard).
+                         Aucun collection(db, 'factures') ni
+                         doc(db, 'factures', ...) en src/.
+
+  invoices             : Collection ADMIN principale des factures
+                         de devis (FA, FF — finale, et acomptes).
+                         Reads :
+                           - admin/pages/Factures.tsx:46    (liste)
+                           - admin/pages/DetailFacture.tsx:19
+                         Writes :
+                           - admin/pages/Factures.tsx:138 (statut)
+                           - admin/pages/DetailFacture.tsx:31
+
+  logistics_invoices   : Collection ADMIN des factures FM (frais
+                         maritimes) liees a un conteneur.
+                         Reads :
+                           - admin/pages/FraisLogistique.tsx:76
+                           - admin/pages/DetailFraisLogistique:17
+
+  Verdict : PAS de doublon.
+            "factures" = label UI (i18n FR friendly).
+            "invoices" = data admin (FA/FF/acomptes par devis).
+            "logistics_invoices" = data admin (FM par conteneur).
+
+  Recommandation : aucune action.
+                   Pour V53, envisager renommage interne
+                   logistics_invoices -> frais_logistique pour
+                   coherence FR (faible priorite, gros impact
+                   migration). Ne pas faire avant V55+.
+
+═══════════════════════════════════════════════════════════════
+  2. CONTAINERS vs CONTENEURS  (TRAITE en CP C V52)
+═══════════════════════════════════════════════════════════════
+
+  Etat post-CP C : 0 reference 'containers' restante en src/.
+  Toutes les pages/services pointent maintenant vers 'conteneurs'.
+
+  Collection Firestore 'containers' en prod :
+                         - statut suppose : LEGACY/VIDE
+                         - peut etre verifiee via console Firebase
+                           ou script audit a lancer manuellement
+                         - aucun script ne l'utilise plus en V52
+
+  Recommandation V53 : lancer un script READ-ONLY pour confirmer
+                       que la collection 'containers' est vide en
+                       prod (importok-6ef77), puis si vide, la
+                       supprimer manuellement via console.
+
+═══════════════════════════════════════════════════════════════
+  3. USERS vs PROFILES vs CLIENTS
+═══════════════════════════════════════════════════════════════
+
+  users      : Collection HISTORIQUE — schema Auth Firebase
+               etendu (uid, email, role, displayName, adresses,
+               createdAt, partenaire_code optionnel).
+               Lectures (10+ refs) :
+                 - admin/AdminLogin.tsx:26 (auth check)
+                 - front/pages/Connexion.tsx:18
+                 - front/components/Header.tsx:130
+                 - front/pages/EspaceClient.tsx:30
+                 - front/pages/EspacePartenaire.tsx:37
+                 - front/pages/Catalogue.tsx:86
+                 - front/pages/Produit.tsx:44
+                 - front/pages/Panier.tsx:156
+                 - front/pages/Profil.tsx:77,92
+                 - admin/pages/DetailDevis.tsx:133
+                 - admin/pages/DetailClient.tsx:21 (fallback)
+                 - admin/components/PromouvoirPartenaireModal:66
+                 - front/pages/espace-client/MesInfos.tsx:21
+                 - front/pages/espace-client/MesAdresses.tsx:31
+                 - front/pages/espace-partenaire/MesClientsPartner:67
+                 - front/pages/Inscription.tsx:44,70
+               Ecritures :
+                 - admin/components/PromouvoirPartenaireModal:66
+                 - front/pages/Inscription.tsx:44,70
+                 - front/pages/Profil.tsx:77
+                 - front/pages/espace-client/MesInfos.tsx:21
+                 - front/pages/espace-client/MesAdresses.tsx:31
+
+  profiles   : Collection MIROIR de users — meme uid, meme schema
+               approximatif. Origine inconnue (probablement
+               historique migration v0.x).
+               Lectures :
+                 - admin/pages/Clients.tsx:24 (LISTE !)
+                 - admin/pages/DetailClient.tsx:20 (try first)
+                 - front/pages/Profil.tsx:30 (try first)
+               Ecritures :
+                 - front/pages/Inscription.tsx:45,64 (double-write)
+                 - front/pages/Profil.tsx:63 (sync vers profiles)
+
+  clients    : Collection NOUVELLE (V49 V50-BIS init-counters
+               + migrate-users-to-clients.cjs).
+               Lectures :
+                 - admin/AdminApp.tsx:241 (badge sidebar count)
+               Ecritures : aucune en src/ — script de migration
+               uniquement (scripts/migrate-users-to-clients.cjs).
+
+  Verdict : DOUBLON CONFIRME entre users et profiles.
+            La page admin Clients.tsx liste profiles (ligne 24)
+            mais le badge sidebar AdminApp compte clients
+            (ligne 241). Ces deux collections peuvent etre
+            desynchronisees.
+            Inscription.tsx fait un double-write (users +
+            profiles), donc tout nouvel inscrit existe en double.
+
+  Risques :
+    - Edition de profil : Profil.tsx ecrit dans BOTH users
+      et profiles, donc reste coherent SI le user est passe
+      par cette page.
+    - Edition adresse : MesAdresses ecrit UNIQUEMENT dans
+      users. profiles devient stale.
+    - Edition infos : MesInfos ecrit UNIQUEMENT dans users.
+      profiles devient stale.
+    - Promotion partenaire : PromouvoirPartenaireModal ecrit
+      UNIQUEMENT dans users. profiles ne sait pas que le user
+      est devenu partenaire.
+
+  Recommandation V53 : voir CP G — plan formel migration
+                       profiles -> clients, deprecation users
+                       (cf docs/superpowers/plans/2026-05-02-
+                       v52-profiles-migration.md).
+
+═══════════════════════════════════════════════════════════════
+  4. ACOMPTES — ARRAY vs SUB-COLLECTION
+═══════════════════════════════════════════════════════════════
+
+  Schema actuel : array d'acomptes embedded dans le document
+                  quote (champ `acomptes: [{ montant, date,
+                  type, ... }]` + `total_encaisse` cache).
+
+  Avantages array :
+    - 1 read = quote + tous ses acomptes
+    - Atomicite native (transaction Firestore)
+    - PopupEncaisserAcompte / quoteStatusHelpers exploitent
+      directement raw.acomptes
+    - Numerotation acomptes simple (index 0, 1, 2)
+
+  Inconvenients array :
+    - Limite 1 MB par document (theorique, mais en pratique
+      max 3 acomptes par devis donc impossible a saturer)
+    - Pas de query cross-devis sur acomptes (dashboard CA
+      doit iterer tous les devis)
+
+  Verdict : PAS de doublon constate.
+            Aucune sub-collection acomptes detectee en src/.
+            Le pattern array est volontaire et stable depuis
+            V44-V46.
+
+  Recommandation : MAINTENIR le schema array. Migration
+                   sub-collection serait un projet majeur (V60+)
+                   et ne resout aucun probleme actuel.
+
+  Action V52 : CP H va creer un script READ-ONLY
+               (audit-acomptes-v52.cjs) qui parcourt quotes,
+               compte les acomptes, valide la coherence
+               total_encaisse vs sum(acomptes[].montant) et
+               liste les desync. Le script ne sera PAS execute
+               en V52. Michel le lancera apres V52 en --dry-run.
+
+═══════════════════════════════════════════════════════════════
+  RESUME ACTIONS V52 vs V53+
+═══════════════════════════════════════════════════════════════
+
+  V52 (cette mission) :
+    [x] CP C — normaliser containers -> conteneurs (FAIT)
+    [x] CP D — documenter doublons (CE RAPPORT)
+    [x] CP G — plan formel migration profiles (PROCHAIN)
+    [x] CP H — script audit acomptes READ-ONLY (PROCHAIN)
+
+  V53 (mission suivante, sur instruction Michel) :
+    [ ] script audit-collections-orphelines (READ-ONLY)
+        confirmer que 'containers' est vide en prod
+    [ ] Migration profiles -> clients (cf plan CP G)
+    [ ] Deprecation users (apres clients consolidation)
+
+  V55+ (long-terme) :
+    [ ] Renommage logistics_invoices -> frais_logistique
+        (faible priorite, gros impact)
+
+═══════════════════════════════════════════════════════════════
+  GARDE-FOUS
+═══════════════════════════════════════════════════════════════
+
+  - Aucune migration BD en V52 (audit only).
+  - Le rapport ci-dessus est base sur le code (grep src/), pas
+    sur introspection BD live.
+  - Pour confirmer le statut LEGACY/VIDE de 'containers' et
+    'profiles' en prod, executer un script READ-ONLY apres V52
+    (Michel decidera).
+  - Le script audit-acomptes-v52.cjs (CP H) sera cree mais
+    NON EXECUTE en V52.
+
+═══════════════════════════════════════════════════════════════
