@@ -6,7 +6,9 @@ import { Timestamp } from 'firebase/firestore';
 
 type DateInput = Date | Timestamp | string | number | null | undefined;
 
-function toDate(input: DateInput): Date | null {
+// V50-BIS Checkpoint C — exporte (etait privee). Utile pour les tris
+// cross-format (Firestore Timestamp, {_seconds, _nanoseconds}, ISO, epoch).
+export function toDate(input: DateInput): Date | null {
   if (!input) return null;
 
   // Firestore Timestamp ou objet { _seconds, _nanoseconds }

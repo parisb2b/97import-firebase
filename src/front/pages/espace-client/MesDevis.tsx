@@ -1,8 +1,18 @@
 import { useState, useEffect } from 'react';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
+import { toDate } from '../../../lib/dateHelpers';
 import { useToast } from '../../components/Toast';
 import DevisCard from './DevisCard';
+
+// V50-BIS Checkpoint C — extracteur robuste de date pour tri.
+// Couvre createdAt (camelCase), created_at (snake_case legacy), et
+// toutes les shapes : Firestore Timestamp, {_seconds, _nanoseconds},
+// ISO string, epoch ms, Date.
+function getDevisTimestamp(d: any): number {
+  const date = toDate(d?.createdAt) || toDate(d?.created_at) || toDate(d?.date_creation);
+  return date ? date.getTime() : 0;
+}
 
 
 export default function MesDevis({ userId, profile }: { userId: string; profile?: any }) {
@@ -16,9 +26,12 @@ export default function MesDevis({ userId, profile }: { userId: string; profile?
     try {
       const q = query(collection(db, 'quotes'), where('client_id', '==', userId));
       const snap = await getDocs(q);
+      // V50-BIS Checkpoint C — tri DESC robuste : utilise toDate qui couvre
+      // toutes les shapes (Timestamp, {_seconds}, ISO, epoch). Fallback
+      // createdAt → created_at → date_creation pour compat docs anciens.
       const list = snap.docs
         .map(d => ({ id: d.id, ...d.data() } as any))
-        .sort((a: any, b: any) => (b.createdAt?.toMillis?.() || b.createdAt?.seconds * 1000 || 0) - (a.createdAt?.toMillis?.() || a.createdAt?.seconds * 1000 || 0));
+        .sort((a: any, b: any) => getDevisTimestamp(b) - getDevisTimestamp(a));
       setDevis(list);
     } catch (err) {
       console.error('Error loading devis:', err);
