@@ -168,8 +168,22 @@ export default function PopupEncaisserAcompte({ devis, onClose, onSuccess }: Pro
     );
   }
 
+  // V49 Checkpoint F — devis annulé / rejeté ne peut PAS encaisser d'acompte.
+  // Audit V48-BIS bug : PopupEncaisserAcompte ne checkait pas le statut, donc
+  // un admin pouvait basculer un devis en 'annule' puis encaisser un acompte
+  // déclaré, créant des incohérences comptables (facture acompte sur devis
+  // annulé). On bloque les statuts 'annule' et 'rejete'.
+  const STATUTS_BLOQUES_ENCAISSEMENT = ['annule', 'rejete'] as const;
+  const isDevisBloque = STATUTS_BLOQUES_ENCAISSEMENT.includes(devis.statut as any);
+
   const confirmer = async () => {
     if (selectedIndex === null) return;
+
+    if (isDevisBloque) {
+      setError(`Encaissement bloqué : devis ${devis.statut}. Réactivez le devis avant d'encaisser un acompte.`);
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
@@ -360,6 +374,27 @@ export default function PopupEncaisserAcompte({ devis, onClose, onSuccess }: Pro
         <p style={{ fontSize: 13, color: '#6B7280', marginBottom: 6 }}>
           Devis : <strong>{devis.numero}</strong>
         </p>
+
+        {/* V49 Checkpoint F — bandeau bloquant si devis annulé / rejeté */}
+        {isDevisBloque && (
+          <div style={{
+            padding: '12px 14px', marginBottom: 16,
+            background: '#FEE2E2', border: '1px solid #FCA5A5',
+            borderRadius: 8, color: '#991B1B', fontSize: 13,
+            display: 'flex', alignItems: 'flex-start', gap: 10,
+          }}>
+            <span style={{ fontSize: 18 }} aria-hidden>🚫</span>
+            <div>
+              <strong>Encaissement impossible — devis {devis.statut}.</strong>
+              <div style={{ marginTop: 4, opacity: 0.9 }}>
+                Pour encaisser un acompte sur ce devis, restaurez d'abord son statut
+                (côté détail devis, sélecteur de statut). Tant qu'il reste en {devis.statut},
+                aucun encaissement ne peut être effectué.
+              </div>
+            </div>
+          </div>
+        )}
+
         <p style={{ fontSize: 13, color: '#6B7280', marginBottom: 20 }}>
           Sélectionnez l'acompte reçu en banque :
         </p>
@@ -403,13 +438,13 @@ export default function PopupEncaisserAcompte({ devis, onClose, onSuccess }: Pro
         <div style={{ display: 'flex', gap: 12, marginTop: 24 }}>
           <button
             onClick={confirmer}
-            disabled={selectedIndex === null || loading}
+            disabled={selectedIndex === null || loading || isDevisBloque}
             style={{
               flex: 1, padding: 14,
-              background: (selectedIndex === null || loading) ? '#D3D1C7' : '#1565C0',
+              background: (selectedIndex === null || loading || isDevisBloque) ? '#D3D1C7' : '#1565C0',
               color: '#fff', border: 'none', borderRadius: 12,
               fontSize: 14, fontWeight: 600,
-              cursor: (selectedIndex === null || loading) ? 'not-allowed' : 'pointer',
+              cursor: (selectedIndex === null || loading || isDevisBloque) ? 'not-allowed' : 'pointer',
             }}>
             {loading ? 'Encaissement...' : 'Encaisser cet acompte'}
           </button>
