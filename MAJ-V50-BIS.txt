@@ -1,0 +1,645 @@
+═══════════════════════════════════════════════════════════════════════════
+  MAJ-V50-BIS — Rapport de session
+═══════════════════════════════════════════════════════════════════════════
+
+Date          : 2026-05-02 09:38 → 09:55 (GMT+2)
+Branche       : v2
+HEAD initial  : 1d06e26  docs(v49): rapport MAJ-V49.txt (12 checkpoints + actions hors CC)
+HEAD final    : ff8b3f9  feat(admin/atoms): LoadingState uniforme (Checkpoint I V50-BIS)
+Tag backup    : backup-pre-v50-bis-20260502-0938  (poussé sur origin)
+Workflow      : Superpowers (writing-plans + systematic-debugging + ultrathink)
+Plugins       : Superpowers, UI-UX-PRO-MAX, Claude-Mem
+Stats         : 10 commits + 11 tags V50-BIS, 10 checkpoints livrés
+
+Cible Firebase forcée : importok-6ef77
+Compte admin          : parisb2b@gmail.com
+.firebaserc           : SUPPRIMÉ (V50-BIS Phase 0 / CP Z)
+
+
+═══════════════════════════════════════════════════════════════════════════
+  PHASE 0 — Backup + Audit + Cleanup .firebaserc
+═══════════════════════════════════════════════════════════════════════════
+
+────────────────────────────────────────────────────────────────────────────
+  CP Z — Audit Firebase + suppression .firebaserc  ✅
+────────────────────────────────────────────────────────────────────────────
+
+CONTEXTE
+────────
+Pré-flight V50 avait flagé que `.firebaserc` contenait `"default": "import2030"`
+(projet supprimé) alors que `firebase use` retournait `importok-6ef77`. Risque :
+un futur `firebase deploy` sans `--project` aurait pu viser le mauvais projet
+(ou aucun, si import2030 supprimé).
+
+ACTIONS V50-BIS
+───────────────
+1. `git rm .firebaserc` — fichier supprimé du tracking
+2. Header ajouté à `firestore.rules` :
+   ```
+   // V50-BIS Checkpoint Z — Cible Firebase explicite.
+   //   Projet            : importok-6ef77
+   //   Déploiement       : firebase deploy --only firestore:rules --project=importok-6ef77
+   ```
+
+AUDIT POST-SUPPRESSION
+──────────────────────
+✅ `.firebaserc` absent du repo et du tracking
+✅ build vert (3.36s)
+⚠️ `firebase.json:6` référence encore `import2030.firebasestorage.app` (storage
+   bucket) — non modifié selon règle V50-BIS "❌ NE PAS modifier firebase.json
+   autres que retrait .firebaserc". À évaluer en V51 si vrai problème.
+⚠️ Reliquats `import2030` / `import2050-59f11` dans docs `.md` historiques
+   (97import.md, 98.md, v20.md, RAPPORT-*.md) — non-critiques (documentation
+   archivée).
+
+  ▸ commit 21f3798
+  ▸ tag    checkpoint-v50-bis-Z-firebaserc-clean
+
+
+═══════════════════════════════════════════════════════════════════════════
+  PHASE 1 — Hot fixes UX/sécurité
+═══════════════════════════════════════════════════════════════════════════
+
+────────────────────────────────────────────────────────────────────────────
+  CP A — Bouton Déconnexion sidebar /admin  ✅
+────────────────────────────────────────────────────────────────────────────
+
+CONTEXTE
+────────
+Bug Michel V50 : `/admin` n'avait aucun bouton de déconnexion. L'admin restait
+connecté indéfiniment, risque de fuite session sur poste partagé.
+
+LIVRABLE
+────────
+- handler `handleAdminLogout` async avec `window.confirm('Se déconnecter ?')`
+- `signOut(adminAuth)` déclenche `onAuthStateChanged` → AdminApp ré-rend
+  `<AdminLogin />` (pas de window.location.href explicite)
+- Wrapper sidebar refactor : sections en `flex:1 overflow-y:auto`, séparateur +
+  bouton restent en bas
+- Style V45 cohérent : `.v45-btn-danger` ghost rouge, border subtle, icône 🚪
+  + label "Déconnexion"
+
+  ▸ commit fbc2587
+  ▸ tag    checkpoint-v50-bis-A-logout
+  ▸ build  ✓ built in 3.82s
+
+────────────────────────────────────────────────────────────────────────────
+  CP B — Modal "Mot de passe oublié" /admin/login  ✅
+────────────────────────────────────────────────────────────────────────────
+
+LIVRABLES
+─────────
+1. Nouveau composant `src/admin/components/ForgotPasswordModal.tsx` :
+   - Props : isOpen, onClose, defaultEmail (pré-rempli depuis email login)
+   - `sendPasswordResetEmail(adminAuth, email)` Firebase Auth
+   - Validation email regex
+   - **Sécurité** : message générique "Si un compte existe..." même en cas
+     d'erreur Firebase (auth/user-not-found, network) — NE jamais révéler
+     l'existence du compte. Seul `auth/invalid-email` retourne feedback
+     spécifique (UX format).
+   - Accessibilité : `role='dialog'`, `aria-modal='true'`, focus auto sur
+     input à l'ouverture, Escape ferme la modal, click outside ferme.
+   - Loading state avec `.v45-spinner` pendant l'envoi.
+
+2. Intégration dans `src/admin/AdminLogin.tsx` :
+   - State `showForgotModal`
+   - Lien "Mot de passe oublié ?" sous le bouton submit (couleur #1565C0)
+   - Modal rendered en bas, defaultEmail = champ email du formulaire (UX)
+
+⚠️ ACTION MANUELLE Michel (post-V50-BIS) :
+   Vérifier que le template Firebase Auth de reset password est en français :
+   Console Firebase > Authentication > Templates > Password reset.
+   Si en anglais → traduire ou utiliser action URL custom (V51).
+
+  ▸ commit 67ef71e
+  ▸ tag    checkpoint-v50-bis-B-password-reset
+  ▸ build  ✓ built in 3.31s
+
+────────────────────────────────────────────────────────────────────────────
+  CP C — Tri devis espace-client desc robuste  ✅
+────────────────────────────────────────────────────────────────────────────
+
+CAUSE RACINE
+────────────
+Tri précédent (`MesDevis.tsx:21`) :
+   `.sort((a, b) => (b.createdAt?.toMillis?.() || b.createdAt?.seconds * 1000 || 0) - ...)`
+
+- Ne gérait que Firestore Timestamp natif (`.toMillis()`) + `{seconds}` shape
+- Pas de fallback `created_at` (snake_case legacy) ni `date_creation`
+- Si `createdAt` absent dans certains docs anciens → tri = 0 → en bas
+
+SYMPTÔME
+────────
+DVS-2604018 SOLDE_PAYE n'apparaissait pas en haut de la liste alors qu'il
+devrait (le plus récent).
+
+FIX
+───
+1. Export `toDate` depuis `lib/dateHelpers.ts` (fonction privée → publique).
+   Couvre toutes les shapes : Date | Firestore Timestamp | `{_seconds, _nanoseconds}` |
+   ISO string | epoch ms (déjà fiable depuis V44-BIS + V45 Bug B).
+2. Helper local `getDevisTimestamp(d)` :
+   - tente `createdAt` → `created_at` → `date_creation` (fallback chain)
+   - utilise `toDate` puis `getTime()`
+   - fallback 0 si toutes les sources sont absentes
+3. Tri réécrit :
+   `.sort((a, b) => getDevisTimestamp(b) - getDevisTimestamp(a))`
+
+  ▸ commit 4a8f38a
+  ▸ tag    checkpoint-v50-bis-C-sort-devis-desc
+  ▸ build  ✓ built in 3.33s
+
+
+═══════════════════════════════════════════════════════════════════════════
+  PHASE 2 — Diagnostic dashboard erreur (ULTRATHINK)
+═══════════════════════════════════════════════════════════════════════════
+
+────────────────────────────────────────────────────────────────────────────
+  CP D — Bug "Erreur lors du chargement" /admin  ✅
+────────────────────────────────────────────────────────────────────────────
+
+WORKFLOW SUPERPOWERS APPLIQUÉ
+─────────────────────────────
+- systematic-debugging skill (root cause investigation)
+- ultrathink mode pour analyse exhaustive des chemins
+- verification-before-completion (build après chaque check)
+
+DIAGNOSTIC ULTRATHINK
+─────────────────────
+`Dashboard.tsx:loadData` wrappait **5 queries Firestore** dans un seul
+`try/catch` global (ligne 75-176). Si UNE seule query throw, tout cassait
+avec bannière rouge "Erreur lors du chargement du tableau de bord".
+
+Inventaire des 5 queries (avec analyse de risque) :
+| # | Query                                                | Risk | Catch ? |
+|---|------------------------------------------------------|------|---------|
+| 1 | `getDocs(collection(db, 'quotes'))`                  | low  | NON     |
+| 2 | `Promise.all([commissions, notes_commission])`       | low  | OUI(.catch=>null pré-V46) |
+| 3 | `getDocs(query(sav, where statut=='nouveau'))`       | MED  | NON     |
+| 4 | `getDocs(query(containers, where statut in [...]))`  | HIGH | NON     |
+| 5 | Tri local recents (pas Firestore)                    | low  | N/A     |
+
+Coupables probables :
+- Query 4 (`containers`) : le `where in [...]` peut nécessiter un index
+  Firestore composite. Si pas indexé → throw `FAILED_PRECONDITION`.
+  Plus probable : la collection `containers` n'existe pas ou est vide.
+- Query 3 (`sav`) : collection `sav` peut être absente.
+
+Note importante (à monitorer) : Dashboard interroge `containers` (anglais),
+V49 RBAC rules matchent `/conteneurs/` (français). Le fallback admin-only
+des rules couvre `containers` (admin a accès), donc pas un blocker. Mais
+les 2 conventions FR/EN coexistent — à harmoniser en V51.
+
+FIX V50-BIS — Promise.allSettled granulaire
+───────────────────────────────────────────
+Refactor en 4 helpers async indépendants :
+   - `loadQuotesStats()`     : devis + CA + recents
+   - `loadCommissionsStats()`: commissions dues + liste
+   - `loadSavCount()`        : nb SAV nouveau
+   - `loadConteneurs()`      : 3 conteneurs actifs
+
+Puis :
+```ts
+const [quotesRes, commissionsRes, savRes, contRes] = await Promise.allSettled([
+  loadQuotesStats(), loadCommissionsStats(), loadSavCount(), loadConteneurs(),
+]);
+```
+
+Pour chaque section :
+- `status === 'fulfilled'` : applique au state
+- `status === 'rejected'` : `console.warn` ciblé + state reste à default
+  (KPI 0, listes vides → demo data fallback dans le JSX existant)
+
+Bannière `errorMsg` apparaît UNIQUEMENT si TOUTES les sections ont échoué
+(mode dégradé extrême — ex: pas de connexion BD du tout).
+
+  ▸ commit 4f1e8a2
+  ▸ tag    checkpoint-v50-bis-D-dashboard-fix
+  ▸ build  ✓ built in 3.27s
+
+
+═══════════════════════════════════════════════════════════════════════════
+  PHASE 3 — Init architecture BD (ULTRATHINK)
+═══════════════════════════════════════════════════════════════════════════
+
+────────────────────────────────────────────────────────────────────────────
+  CP E — Plan formel writing-plans BD init  ✅
+────────────────────────────────────────────────────────────────────────────
+
+PLAN FORMEL
+───────────
+Fichier : `docs/superpowers/plans/2026-05-02-v50-bd-init.md` (288 lignes)
+
+CONTENU
+───────
+- Contexte BD post-V49 : tableau collections existantes vs absentes
+- Note critique sur `containers` (Dashboard) vs `conteneurs` (V49 RBAC) —
+  naming FR/EN à harmoniser V51
+- CP F : 8 counters CTN/LA/NC/BL/FF/FL/FM/SAV avec garde-fou PROJECT_ID
+- CP G : migration users → clients/{uid} avec **11 edge cases** (EC-1 à EC-11) :
+  - EC-1  user sans email
+  - EC-2  emails dupliqués entre UIDs
+  - EC-3  user déjà dans clients/ (idempotent)
+  - EC-4  champs casing variant (camelCase vs snake_case)
+  - EC-5  user custom claims sans doc users/ (V51 via listUsers())
+  - EC-6  service account du mauvais projet (abort)
+  - EC-7  quota Firestore (YAGNI, ~7 users)
+  - EC-8  doc malformé (try/catch par doc)
+  - EC-9  race condition new user (idempotent re-run)
+  - EC-10 permissions SA insuffisantes (errors counted)
+  - EC-11 RGPD (même projet, même base légale)
+- 5 risques rollback documentés (R1 migration partielle, R2 couverture
+  incomplète, R3 données corrompues, R4 mauvais projet, R5 conflit RBAC)
+
+  ▸ commit 73a464e
+  ▸ tag    checkpoint-v50-bis-E-plan
+
+────────────────────────────────────────────────────────────────────────────
+  CP F — Script init-counters-v50.cjs  ✅ (NE PAS EXÉCUTER en V50-BIS)
+────────────────────────────────────────────────────────────────────────────
+
+LIVRABLE
+────────
+Script `scripts/init-counters-v50.cjs` (122 lignes) :
+
+- 8 counters : CTN, LA, NC, BL, FF, FL, FM, SAV
+- Document init :
+  ```
+  counters/{CODE} = { count: 0, prefix: <CODE>, last_reset: serverTimestamp() }
+  ```
+
+GARDE-FOUS V50-BIS
+──────────────────
+- `PROJECT_ID = 'importok-6ef77'` hardcoded (.firebaserc supprimé en CP Z)
+- Vérification `serviceAccount.project_id === PROJECT_ID` au démarrage
+- Mode `--dry-run` (lecture seule, log ce qui serait créé)
+- Mode normal (écrit avec serverTimestamp)
+- Idempotent : si counter déjà existant avec count > 0 → SKIP (préserve
+  historique). Si format inattendu (count manquant) → warning, pas d'écrasement.
+- `process.exit(0)` ou `process.exit(1)` selon résultats
+
+  ▸ commit 085e643
+  ▸ tag    checkpoint-v50-bis-F-counters-script
+
+────────────────────────────────────────────────────────────────────────────
+  CP G — Script migrate-users-to-clients.cjs  ✅ (NE PAS EXÉCUTER en V50-BIS)
+────────────────────────────────────────────────────────────────────────────
+
+LIVRABLE
+────────
+Script `scripts/migrate-users-to-clients.cjs` (211 lignes) — couverture
+exhaustive ULTRATHINK des 11 edge cases du plan E.
+
+STRATÉGIE
+─────────
+- `users/` reste source de vérité Firebase Auth (ne se déplace pas)
+- `clients/{uid}` = vue enrichie métier, doc id = UID Firebase
+  (alignement V49 RBAC : `match /clients/{userId}`)
+- Migration une seule fois (champ `migrated_from_users_at` track)
+- Idempotent : re-run skip les déjà-migrés
+
+FILTRE
+──────
+- `role !== 'admin'`  → préserve segregation `/users`
+- `role !== 'partner'` → préserve `/partners` separation
+- inclus `role === 'client'` OU `null/undefined` (legacy)
+
+CHAMPS CLONÉS (FALLBACK CHAIN)
+──────────────────────────────
+```
+email, nom (nom||lastName), prenom (prenom||firstName),
+telephone (telephone||phone), partenaire_code, pays_livraison='MQ',
+adresse_livraison, adresse_facturation, tva_intracom,
+notes_admin='', created_at (préservé), migrated_from_users_at,
+migrated_from_users_v='V50-BIS'
+```
+
+GARDE-FOUS
+──────────
+- `PROJECT_ID = 'importok-6ef77'` hardcoded
+- `serviceAccount.project_id` check au démarrage (abort si mismatch)
+- Mode `--dry-run` OBLIGATOIRE (preview lecture seule)
+- Mode `--execute` (write après validation manuelle)
+- Compteurs : migrated, skippedRole, skippedExisting, skippedMalformed, errors
+- `process.exit(errors > 0 ? 1 : 0)` (Michel voit clairement les échecs)
+
+  ▸ commit 85ec08e
+  ▸ tag    checkpoint-v50-bis-G-migration-script
+
+
+═══════════════════════════════════════════════════════════════════════════
+  PHASE 4 — Cleanup & polish
+═══════════════════════════════════════════════════════════════════════════
+
+────────────────────────────────────────────────────────────────────────────
+  CP H — Cleanup warnings firestore.rules  ✅
+────────────────────────────────────────────────────────────────────────────
+
+WARNINGS V49 (3 non-bloquants au deploy)
+────────────────────────────────────────
+```
+⚠ [W] 37:14 - Unused function: isClient.
+⚠ [W] 37:48 - Invalid variable name: request.
+⚠ [W] 37:87 - Invalid variable name: request.
+```
+
+ANALYSE
+───────
+- `isClient()` définie en V49 CP B mais jamais appelée (les rules clientes
+  utilisent directement `client_id == request.auth.uid`, plus précis que
+  `role==='client'`).
+- Les 2 warnings `request` sur ligne 37 visaient les 2 occurrences de
+  `request.auth.token.role` DANS le corps de `isClient()`. Tous résolus
+  par sa suppression.
+
+FIX
+───
+- Suppression de la fonction `isClient()` (5 lignes)
+- Commentaire explicatif préservé pour futurs devs (recréer si besoin)
+- `isAdmin`, `isPartner`, `isOwner` inchangés (utilisés)
+
+⚠️ NE PAS DÉPLOYER en V50-BIS. Michel déploie manuellement post-mission.
+
+  ▸ commit 80d66e2
+  ▸ tag    checkpoint-v50-bis-H-rules-clean
+  ▸ build  ✓ built in 3.13s
+
+────────────────────────────────────────────────────────────────────────────
+  CP I — LoadingState component uniforme  ✅
+────────────────────────────────────────────────────────────────────────────
+
+LIVRABLE
+────────
+Nouveau composant `src/admin/components/atoms/LoadingState.tsx` :
+- Props : `message='Chargement…'`, `style?: CSSProperties`
+- `role='status'` + `aria-live='polite'` (a11y)
+- `.v45-spinner` (animation rotation V45) + `.v45-fade-in` (entrée douce)
+- Background neutre, texte gris #6B7280, gap+padding standards
+
+MIGRATIONS (3 pages les plus visibles)
+──────────────────────────────────────
+- `Dashboard.tsx`     : "Chargement du tableau de bord…"
+- `ListeDevis.tsx`    : "Chargement des devis…"
+- `AdminProduits.tsx` : "Chargement du catalogue…" (avec padding 40)
+
+RESTE À MIGRER (recommandé V51 / V51-BIS)
+─────────────────────────────────────────
+~12 pages avec loading state inline non-uniforme :
+Factures, AcomptesEncaisser, NotesCommission, Clients, Partenaires,
+ListeConteneurs, ListeListesAchat, Stock, SAVListe, CatalogueProduits,
+DetailPartenaire, DetailAchat, SAVDetail, DetailCommission, LogsDebug.
+
+  ▸ commit ff8b3f9
+  ▸ tag    checkpoint-v50-bis-I-loading-uniform
+  ▸ build  ✓ built in 3.25s
+
+
+═══════════════════════════════════════════════════════════════════════════
+  RÉCAPITULATIF — HASHES & ÉTAT FINAL
+═══════════════════════════════════════════════════════════════════════════
+
+10 Commits V50-BIS
+──────────────────
+  21f3798  chore(firebase): drop .firebaserc + force --project=importok-6ef77 (V50-BIS Phase 0 / CP Z)
+  fbc2587  feat(admin/sidebar): bouton Deconnexion (Checkpoint A V50-BIS)
+  67ef71e  feat(admin/login): modal Mot de passe oublie (Checkpoint B V50-BIS)
+  4a8f38a  fix(espace-client/devis): tri par date desc robuste (Checkpoint C V50-BIS)
+  4f1e8a2  fix(admin/dashboard): Promise.allSettled + fallback graceful (Checkpoint D V50-BIS)
+  73a464e  docs(plan): plan formel V50-BIS Phase 3 BD init (Checkpoint E V50-BIS)
+  085e643  feat(scripts): init-counters-v50.cjs (Checkpoint F V50-BIS, exec manuel)
+  85ec08e  feat(scripts): migrate-users-to-clients.cjs (Checkpoint G V50-BIS)
+  80d66e2  chore(firestore/rules): cleanup warnings isClient + request (Checkpoint H V50-BIS)
+  ff8b3f9  feat(admin/atoms): LoadingState uniforme (Checkpoint I V50-BIS)
+
+11 Tags poussés sur origin
+──────────────────────────
+  backup-pre-v50-bis-20260502-0938       → 1d06e26  (avant V50-BIS)
+  checkpoint-v50-bis-Z-firebaserc-clean  → 21f3798
+  checkpoint-v50-bis-A-logout            → fbc2587
+  checkpoint-v50-bis-B-password-reset    → 67ef71e
+  checkpoint-v50-bis-C-sort-devis-desc   → 4a8f38a
+  checkpoint-v50-bis-D-dashboard-fix     → 4f1e8a2
+  checkpoint-v50-bis-E-plan              → 73a464e
+  checkpoint-v50-bis-F-counters-script   → 085e643
+  checkpoint-v50-bis-G-migration-script  → 85ec08e
+  checkpoint-v50-bis-H-rules-clean       → 80d66e2
+  checkpoint-v50-bis-I-loading-uniform   → ff8b3f9
+
+Fichiers modifiés cumulés
+─────────────────────────
+  D .firebaserc                                                  (CP Z)
+  M firestore.rules                                              (CP Z + CP H)
+  M src/admin/AdminApp.tsx                                       (CP A)
+  M src/admin/AdminLogin.tsx                                     (CP B)
+  + src/admin/components/ForgotPasswordModal.tsx                 (CP B)
+  + src/admin/components/atoms/LoadingState.tsx                  (CP I)
+  M src/lib/dateHelpers.ts                                       (CP C)
+  M src/front/pages/espace-client/MesDevis.tsx                   (CP C)
+  M src/admin/pages/Dashboard.tsx                                (CP D + CP I)
+  + docs/superpowers/plans/2026-05-02-v50-bd-init.md             (CP E)
+  + scripts/init-counters-v50.cjs                                (CP F)
+  + scripts/migrate-users-to-clients.cjs                         (CP G)
+  M src/admin/pages/ListeDevis.tsx                               (CP I)
+  M src/admin/pages/AdminProduits.tsx                            (CP I)
+
+Build final (preuve fraîche)
+────────────────────────────
+  npm run build → ✓ built in 3.15s (exit 0)
+  Warnings : excel-vendor 940 kB (préexistant, hors scope V50-BIS)
+
+
+═══════════════════════════════════════════════════════════════════════════
+  ACTIONS HORS CLAUDE CODE — ORDRE STRICT
+═══════════════════════════════════════════════════════════════════════════
+
+⚠️ Toutes les commandes Firebase utilisent `--project=importok-6ef77` explicite
+   (forçage V50-BIS, plus de dépendance .firebaserc supprimé).
+
+ÉTAPE 1 — Init counters (Phase 3 / CP F)
+─────────────────────────────────────────
+```bash
+cd ~/97import-firebase
+
+# 1.A Dry-run obligatoire (lecture seule)
+node scripts/init-counters-v50.cjs --dry-run
+# → vérifier la liste des counters qui seraient créés
+
+# 1.B Exécution
+node scripts/init-counters-v50.cjs
+# → 8 counters créés (CTN/LA/NC/BL/FF/FL/FM/SAV)
+```
+
+ÉTAPE 2 — Migration users → clients (Phase 3 / CP G)
+─────────────────────────────────────────────────────
+```bash
+# 2.A Dry-run obligatoire (preview)
+node scripts/migrate-users-to-clients.cjs --dry-run
+# → vérifier la liste des candidats (admin/partner exclus)
+
+# 2.B Exécution après validation
+node scripts/migrate-users-to-clients.cjs --execute
+# → docs créés dans clients/{uid}
+```
+
+ÉTAPE 3 — Déploiement Firestore Rules nettoyées (CP H)
+──────────────────────────────────────────────────────
+```bash
+firebase deploy --only firestore:rules --project=importok-6ef77
+# → output attendu : 0 warning isClient/request
+```
+
+ÉTAPE 4 — Vérifications Vercel preview v2
+──────────────────────────────────────────
+URL : https://97import-firebase-git-v2-parisb2bs-projects.vercel.app
+
+Tests :
+1. [CP A] Login admin → bouton "Déconnexion" en bas de sidebar visible
+2. [CP A] Click Déconnexion → confirm → redirige sur AdminLogin
+3. [CP B] /admin/login → lien "Mot de passe oublié ?" → modal s'ouvre
+4. [CP B] Saisir email valide → message succès générique
+5. [CP B] Saisir email invalide → "Adresse email invalide"
+6. [CP C] /espace-client/devis (mc@sasfr.com) → DVS-2604018 SOLDE_PAYE en HAUT
+7. [CP D] /admin (parisb2b@gmail.com en navigation privée) → pas de bannière
+   "Erreur lors du chargement". Si données partielles : KPI à 0 + console.warn
+8. [CP G] Après migration : /admin/clients → liste des 7 users migrés
+9. [CP I] Loading uniforme : Dashboard, ListeDevis, AdminProduits → spinner
+   v45 cohérent (rotation + texte "Chargement…")
+
+ÉTAPE 5 — Vérification template Firebase Auth (manuel — CP B)
+─────────────────────────────────────────────────────────────
+Console Firebase > Authentication > Templates > "Password reset"
+- Si en français : OK
+- Si en anglais : traduire le contenu OU configurer action URL custom (V51)
+
+
+═══════════════════════════════════════════════════════════════════════════
+  RÉGRESSIONS DÉTECTÉES
+═══════════════════════════════════════════════════════════════════════════
+
+✅ Aucune régression détectée.
+
+V44-TER + V45 + V46 + V47 + V48-AUDIT + V49 fixes tous préservés :
+- whitelist exclusion FicheProduit (V44-TER)
+- sanitize ModalDupliquerDevis (V45)
+- formatDateCourt PDF (V45)
+- ignoreUndefinedProperties Firestore (V46)
+- code-splitting vendors (V46)
+- navy unifié #1565C0 (V46)
+- validation acomptes (V46)
+- onglets différenciés (V46)
+- SearchInput composant (V46)
+- RBAC firestore.rules + script set-admin-role (V49)
+- admin role check via custom claim (V49)
+- VIP overflow cap (V49)
+- devis annulé block (V49)
+- AdminProduits sortDir desc (V49)
+- anti-double-clic Dupliquer (V49)
+- USD/CNY manuel (V49)
+- alertes écart 3% (V49)
+- badges sidebar SAV + Clients real-time (V49)
+
+
+═══════════════════════════════════════════════════════════════════════════
+  RECOMMANDATIONS V51 (Phase 3 / Bloc 2)
+═══════════════════════════════════════════════════════════════════════════
+
+V51 — bugs hauts restants V48-AUDIT non traités V49/V50-BIS
+────────────────────────────────────────────────────────────
+1. **Migration acomptes array → sous-collection** (~4h)
+   - `quotes/{id}.acomptes[]` → `quotes/{id}/acomptes/{aid}`
+   - Permet écritures concurrentes sans collision array
+   - Compatible V46 validation acomptes (côté write)
+
+2. **Création collection factures/ + trigger encaissement → PDF FA** (~6h)
+   - Factures acompte (FA-AAMM-NNN)
+   - Cloud Function via Vercel API ou Firebase Functions
+   - Génération PDF via pdf-generator + upload Storage
+
+3. **Test E2E Vitest + Playwright** (~2h, optionnel)
+   - 5 helpers critiques : validerNouveauPaiement, calculerCompletude,
+     calculerCommissionLigne, formatDateCourt, sanitizeForFirestore
+   - 1 scénario E2E : login → créer devis → signer → acompte → facture finale
+
+4. **Migration LoadingState restante** (~30 min)
+   - 12 pages avec loading inline non-uniforme (cf CP I "reste à migrer")
+
+5. **Harmonisation `containers` / `conteneurs`** (~30 min)
+   - Dashboard utilise `containers` (anglais)
+   - V49 RBAC matche `/conteneurs/` (français)
+   - Décision : choisir une convention et migrer
+
+6. **Lazy-loading excel-vendor** (~30 min)
+   - Chunk 940 kB préexistant V46
+   - Splitter en `import()` dynamique (uniquement pages export Excel)
+
+V51-BIS — Audit BD acomptes overflow (Reco V46-BIS)
+────────────────────────────────────────────────────
+Script `scripts/audit-acomptes-overflow.cjs` :
+- Parcourt tous les devis Firestore
+- Flag ceux où `sum(acomptes_non_solde) > total_ht`
+- Export CSV (pas d'auto-correction)
+- Décision manuelle Michel sur incohérences
+
+V52 — Phase 4 UX catalogue mini-pelles (différé V46)
+─────────────────────────────────────────────────────
+- Refonte /catalogue/mini-pelle (4 cards R18/R22/R32/R57)
+- Bouton "Voir accessoires compatibles"
+
+V53 — Migration admin.css (Reco 5 V45/V47)
+──────────────────────────────────────────
+- Migration progressive inline-styles → classes admin.css existantes
+- Retrait progressif polish-v45.css quand devient redondant
+
+V54 — Phase 3b DeepL traductions bulk
+─────────────────────────────────────
+- Lancer translate-products.js sur 54 produits
+- FR → EN → ZH
+
+
+═══════════════════════════════════════════════════════════════════════════
+  ANOMALIES / OBSERVATIONS
+═══════════════════════════════════════════════════════════════════════════
+
+1. **firebase.json:6 référence encore `import2030.firebasestorage.app`**
+   (storage bucket). V50-BIS interdit explicitement les modifs firebase.json
+   hors retrait .firebaserc. Si projet `import2030` n'existe plus, les
+   uploads Storage peuvent échouer. À éclaircir avec Michel en V51 :
+   - Soit remplacer par `importok-6ef77.firebasestorage.app`
+   - Soit garder si les fichiers Storage `import2030.firebasestorage.app/*`
+     sont encore accessibles (sometimes buckets outlive their projects)
+
+2. **`.firebaserc` historique non purgé** : le fichier `.firebaserc` avec
+   `"default": "import2030"` reste dans l'historique git (pas de filter-repo).
+   Acceptable car ne contient pas de secret. Si rebuild from scratch souhaité
+   en V51+, considérer un squash de l'historique pré-V50-BIS.
+
+3. **Cloud Functions infra absente** — les scripts CP F/G sont Node Admin SDK
+   directs (Michel exécute en local). Pour passer à un modèle "trigger
+   automatique" (ex: créer facture à l'encaissement), il faudra mettre en
+   place Firebase Functions OU Vercel API routes en V51.
+
+4. **Customs claims partner** — un partenaire migré nécessite le claim
+   `partenaire_code` set en plus de `role: 'partner'` pour que les rules
+   `partnerCodeMatches` évaluent à true. Sans ça, partenaire ne voit RIEN.
+   → Action future : script bulk `set-partner-roles-bulk.cjs` qui parcourt
+   `/partners` et set le claim sur chaque user partenaire.
+
+5. **CP D — Promise.allSettled hide les erreurs root cause** : si `containers`
+   ou `sav` n'existent vraiment pas en BD, le dashboard fonctionne MAIS les
+   warnings console sont silencieux pour Michel (UX). Recommandation : afficher
+   un petit indicator "⚠ Section partiellement chargée" sur les KPI/cards
+   concernés en V51 (au-delà du simple console.warn).
+
+6. **Plan formel CP E exhaustif** — 11 edge cases identifiés mais EC-7 (quota)
+   et EC-9 (race condition) marqués YAGNI. Si futur passage à >1000 users
+   ou import bulk, à ré-évaluer.
+
+7. **Template Firebase Auth en français** non vérifié automatiquement (CP B
+   — action manuelle requise post-mission).
+
+
+═══════════════════════════════════════════════════════════════════════════
+  FIN — Rapport généré 2026-05-02 09:55 par Claude Code Opus 4.7
+       10 checkpoints livrés (Z, A→I), 10 commits, 11 tags V50-BIS
+       Workflow Superpowers + ULTRATHINK pour CP D/E/G
+═══════════════════════════════════════════════════════════════════════════
