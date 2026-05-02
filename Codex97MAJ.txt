@@ -1,10 +1,10 @@
 # Codex97MAJ - Journal central permanent 97IMPORT
 
-Date/heure de mise a jour : 2026-05-02 21:38:00 CEST
+Date/heure de mise a jour : 2026-05-02 22:20:00 CEST
 Projet : /Users/mactell/97import-firebase
 Branche : v2
 Projet Firebase obligatoire : importok-6ef77
-Mission courante : V61 — correction bucket Storage
+Mission courante : V62 — corrections UX, parcours et adresses
 
 Regle permanente :
 - A chaque prochaine mission Codex sur 97IMPORT, mettre a jour Codex97MAJ.txt.
@@ -422,6 +422,38 @@ Non execute. Pret pour deploy manuel si necessaire :
 - v61-storage-fix
 
 ### Prochaine mission recommandee (V62)
-- Deploiement storage rules (sur validation humaine)
-- Analyser code-splitting pour exceljs-vendor (939 kB)
-- Verifier que les uploads media fonctionnent avec le nouveau bucket
+- ~~Deploiement storage rules~~ (fait en V61)
+- ~~Analyser code-splitting pour exceljs-vendor~~ (en attente)
+- ~~Verifier que les uploads media fonctionnent avec le nouveau bucket~~ (en attente)
+
+## V62 — Corrections UX, parcours et adresses
+
+Date/heure : 2026-05-02 22:00–22:20 CEST
+Mission : correction bugs UX, routage partenaire, police, adresse livraison.
+Commit : c18da19
+Tag : v62-ux-fix
+
+### Actions
+- CP A (BUG-01) : Login partenaire dedie dans EspacePartenaire (plus de redirection /connexion)
+- CP B (BUG-02) : Fallback email ajoute a la resolution du partnerCode
+- CP C (BUG-03) : overflow:hidden retire du panier, wordBreak ajoute
+- CP D : Police globale +10% dans src/index.css (html font-size: 110%)
+- CP E (BUG-05) : Sous-titre Mes devis deduplique
+- CP F (BUG-06) : DVSS- note comme artefact historique (pas de modif donnees)
+- CP G : Types Adresse / AdresseLivraison dans src/types/collections.ts
+- CP H : Formulaire adresse livraison dans Profil.tsx (checkbox + champs conditionnels)
+- CP I : Affichage adresse livraison dans Panier.tsx avant generation devis
+- V62BIS : Script diagnostic post-V53 cree (scripts/diagnostic-post-v53.cjs)
+
+### Firebase deploy
+Non execute.
+
+### Tags crees
+- backup-pre-v62-20260502-2210
+- v62-ux-fix
+
+### Prochaine mission recommandee (V63)
+- Lancer le diagnostic post-V53 : node scripts/diagnostic-post-v53.cjs
+- Deployer storage rules sur validation humaine
+- Analyser et deployer firestore rules counters
+- Script de test parcours client/partenaire/admin
