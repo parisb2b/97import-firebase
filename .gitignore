@@ -1,51 +1,80 @@
+# ─────────────────────────────────────────────────────────
+#  97IMPORT — .gitignore (renforce V53-PRODUCTION-READINESS)
+# ─────────────────────────────────────────────────────────
 
-.DS_Store
-# V49 Checkpoint D — bloque tous les .env* sauf .env.example (template public).
-# Avant V49 : .env.production etait tracked en git car la regle ne le couvrait pas.
-.env*
-!.env.example
-.vite
-*-service-account.json
-*.log
-# Service Account Firebase (NE JAMAIS COMMITER)
-firebase-admin-sdk.json
-*.serviceaccount.json
-*-firebase-adminsdk-*.json
-# Backups locaux (jamais versionnés — fichiers de sécurité avant migrations/imports)
-backups/
-# Build
-# Clé privée Firebase Admin — NE JAMAIS COMMITTER
-# Dépendances
-# Logs
 # OS
-# Variables d'environnement — NE JAMAIS COMMITTER
-build/
+.DS_Store
+Thumbs.db
+
+# Dependencies
+node_modules/
+node_modules
+
+# Build output
 dist
 dist/
-node_modules
-node_modules/
+build/
+.vite
+
+# Logs
+*.log
 npm-debug.log*
+
+# Environment — NE JAMAIS COMMITTER
+# V49 Checkpoint D — bloque tous les .env* sauf .env.example (template public).
+# Avant V49 : .env.production etait tracked en git car la regle ne le couvrait pas.
+.env
+.env.*
+!.env.example
+
+# Firebase / service accounts — NE JAMAIS COMMITTER
+firebase-admin-sdk.json
+serviceAccountKey.json
 service-account.json
-Thumbs.db
-.vercel
+*-service-account.json
+*service-account*.json
+*-firebase-adminsdk-*.json
+*admin-sdk*.json
+*.serviceaccount.json
 scripts/serviceAccountKey.json
+
+# Vercel
+.vercel
+
+# Backups locaux (jamais versionnes — fichiers de securite avant migrations/imports)
+backups/
+backup-products-*.json
 
 # Scripts temporaires audit/nettoyage
 scripts/nettoyage-catalogue.js
 RAPPORT-NETTOYAGE-*.TXT
-backup-products-*.json
 
-# Audit partenaires
+# Audit partenaires (legacy)
 scripts/audit-partenaires.js
 AUDIT-PARTENAIRES-*.md
 AUDIT-SYSTEME-PARTENAIRES-*.md
 
-# Fichiers d'extraction temporaires (pour analyse externe Gemini)
+# Fichiers d'extraction temporaires (analyse externe Gemini/GPT)
 EXTRACT-COMPLET-*.md
 FULL_PROJECT_SNAPSHOT_*.md
 
-# Catalogues Excel (binaires, données métier sensibles)
+# V51-AUDIT artefacts (extraction Claude Code → ChatGPT/Claude IA)
+audit-gpt-97import/
+audit-gpt-97import*.zip
+audit-gpt-97import*/
+
+# V53 Clean Start archives (NEVER commit — preuve comptable locale uniquement)
+ARCHIVE-BEFORE-CLEANSTART-V*/
+archive-before-cleanstart-v*.zip
+archive-before-cleanstart-v*.zip.sha256
+CLEANSTART-V*-REPORT.txt
+cleanstart-v*-*.log
+
+# Catalogues Excel (binaires, donnees metier sensibles)
 data/*.xlsx
 data/*.xls
 data/*.csv
 !data/.gitkeep
+
+# V53-PRODUCTION-READINESS internal markers
+.v53-production-readiness-backup-tag.txt
