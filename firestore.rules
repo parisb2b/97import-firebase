@@ -41,8 +41,12 @@ service cloud.firestore {
     function isAuth()    { return request.auth != null; }
     function isAdmin()   { return isAuth() && request.auth.token.role == 'admin'; }
     function isPartner() { return isAuth() && request.auth.token.role == 'partner'; }
-    // isClient = role == 'client' OU role == null (comptes existants pré-migration)
-    function isClient()  { return isAuth() && (request.auth.token.role == 'client' || request.auth.token.role == null); }
+    // V50-BIS Checkpoint H — isClient() supprimée (fonction non utilisée
+    // → 3 warnings au deploy V49). Les rules client utilisent directement
+    // `isAuth() && resource.data.client_id == request.auth.uid` (UID-keyed)
+    // ce qui est plus precis que role==='client'. Si un futur RBAC requiert
+    // un check role 'client' explicite, recreer la fonction ici avec
+    // les call sites correspondants.
     function isOwner(id) { return isAuth() && request.auth.uid == id; }
     function partnerCodeMatches(code) {
       return isPartner() && request.auth.token.partenaire_code == code;
