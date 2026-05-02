@@ -1,8 +1,39 @@
 #!/bin/bash
 # scripts/reset-database.sh
 # MIGRATION-1: Backup + suppression quotes + reset counters
+#
+# V53-PRODUCTION-READINESS — garde-fous ajoutes (CP D) :
+#   - Mode dry-run par defaut (backup uniquement, pas de DELETE)
+#   - --execute requis pour activer les DELETE
+#   - --confirm-reset-database requis en plus de --execute
+#
+# Usage :
+#   ./scripts/reset-database.sh                                      # dry-run (backup only)
+#   ./scripts/reset-database.sh --execute --confirm-reset-database   # destructif
 
 set -e
+
+# ═══ V53 garde-fou ═══
+EXECUTE_FLAG=""
+CONFIRM_FLAG=""
+for arg in "$@"; do
+  case "$arg" in
+    --execute) EXECUTE_FLAG="1" ;;
+    --confirm-reset-database) CONFIRM_FLAG="1" ;;
+  esac
+done
+
+if [ -n "$EXECUTE_FLAG" ] && [ -z "$CONFIRM_FLAG" ]; then
+  echo "❌ ABORT : --confirm-reset-database requis avec --execute."
+  echo "   Pour proteger contre les exécutions accidentelles."
+  exit 1
+fi
+
+if [ -z "$EXECUTE_FLAG" ]; then
+  echo "🔒 V53-PRODUCTION-READINESS — MODE DRY-RUN (backup only, aucune suppression)."
+  echo "   Pour reellement supprimer : ./scripts/reset-database.sh --execute --confirm-reset-database"
+  echo ""
+fi
 
 PROJECT_ID="importok-6ef77"
 API_KEY="AIzaSyD07lt6roFD8zTbSFivLw2BUVKJVVUf8Lo"
@@ -41,10 +72,16 @@ for doc in data.get('documents', []):
     name = doc.get('name', '')
     print(name)
 "); do
-  curl -s -X DELETE "${doc_path}?key=${API_KEY}" > /dev/null
+  if [ -n "$EXECUTE_FLAG" ]; then
+    curl -s -X DELETE "${doc_path}?key=${API_KEY}" > /dev/null
+  fi
   DELETED_COUNT=$((DELETED_COUNT + 1))
 done
-echo "   ✅ $DELETED_COUNT quotes supprimés"
+if [ -n "$EXECUTE_FLAG" ]; then
+  echo "   ✅ $DELETED_COUNT quotes supprimés"
+else
+  echo "   [DRY-RUN] $DELETED_COUNT quotes seraient supprimés"
+fi
 
 # ═══ 4. DELETE COUNTERS DVS_* et FA_* ═══
 echo "🗑️  [4/5] Reset counters DVS_* et FA_*..."
@@ -59,10 +96,16 @@ for doc in data.get('documents', []):
     if doc_id.startswith('DVS_') or doc_id.startswith('FA_'):
         print(name)
 "); do
-  curl -s -X DELETE "${doc_path}?key=${API_KEY}" > /dev/null
+  if [ -n "$EXECUTE_FLAG" ]; then
+    curl -s -X DELETE "${doc_path}?key=${API_KEY}" > /dev/null
+  fi
   COUNTERS_DELETED=$((COUNTERS_DELETED + 1))
 done
-echo "   ✅ $COUNTERS_DELETED compteurs supprimés"
+if [ -n "$EXECUTE_FLAG" ]; then
+  echo "   ✅ $COUNTERS_DELETED compteurs supprimés"
+else
+  echo "   [DRY-RUN] $COUNTERS_DELETED compteurs seraient supprimés"
+fi
 
 # ═══ 5. RAPPORT FINAL ═══
 echo ""

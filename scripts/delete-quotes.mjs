@@ -1,8 +1,28 @@
 // scripts/delete-quotes.mjs
 // Suppression de tous les documents de la collection quotes + reset counters
+//
+// V53-PRODUCTION-READINESS — garde-fous ajoutes (CP D) :
+//   - Mode dry-run par defaut (aucune ecriture)
+//   - --execute requis pour activer la suppression
+//   - --confirm-delete-all-quotes requis en plus de --execute
+//
+// Usage :
+//   node scripts/delete-quotes.mjs                                       # dry-run (counts seulement)
+//   node scripts/delete-quotes.mjs --execute --confirm-delete-all-quotes # destructif
 
 import { initializeApp } from 'firebase/app';
 import { getFirestore, collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
+
+// ─── V53 garde-fou ─────────────────────────────────────────────────
+const args = process.argv.slice(2);
+const isExecute = args.includes('--execute');
+const isConfirm = args.includes('--confirm-delete-all-quotes');
+
+if (isExecute && !isConfirm) {
+  console.error('❌ ABORT : --confirm-delete-all-quotes requis avec --execute.');
+  console.error('   Pour proteger contre les exécutions accidentelles.');
+  process.exit(1);
+}
 
 const firebaseConfig = {
   apiKey: "AIzaSyD07lt6roFD8zTbSFivLw2BUVKJVVUf8Lo",
@@ -21,6 +41,12 @@ async function deleteAllQuotes() {
 
   const quotesSnap = await getDocs(collection(db, 'quotes'));
   let deleted = 0;
+
+  if (!isExecute) {
+    console.log(`   [DRY-RUN] ${quotesSnap.size} quotes detectes — AUCUNE suppression.`);
+    console.log('   Pour supprimer reellement : --execute --confirm-delete-all-quotes');
+    return 0;
+  }
 
   for (const docSnap of quotesSnap.docs) {
     await deleteDoc(doc(db, 'quotes', docSnap.id));
@@ -43,13 +69,18 @@ async function deleteCounters() {
   for (const docSnap of countersSnap.docs) {
     const id = docSnap.id;
     if (id.startsWith('DVS_') || id.startsWith('FA_') || id.startsWith('FA-AC_')) {
+      if (!isExecute) {
+        console.log(`   [DRY-RUN] counters/${id} serait supprime`);
+        deleted++;
+        continue;
+      }
       await deleteDoc(doc(db, 'counters', id));
       deleted++;
       console.log(`   - Supprimé: counters/${id}`);
     }
   }
 
-  console.log(`   ✅ ${deleted} compteurs supprimés`);
+  console.log(`   ${isExecute ? '✅' : '[DRY-RUN]'} ${deleted} compteurs ${isExecute ? 'supprimés' : 'cibles'}`);
   return deleted;
 }
 

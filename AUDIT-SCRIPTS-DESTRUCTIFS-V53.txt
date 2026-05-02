@@ -1,0 +1,149 @@
+═══════════════════════════════════════════════════════════════
+  AUDIT SCRIPTS DESTRUCTIFS — V53-PRODUCTION-READINESS (CP D)
+═══════════════════════════════════════════════════════════════
+
+Date         : 2026-05-02 (V53-PRODUCTION-READINESS)
+Branche      : v2
+HEAD         : cf28a71 (post CP C)
+Mode         : audit + ajout garde-fous non fonctionnels
+Scripts vus  : 23 fichiers dans scripts/ (cjs/js/ts/sh/mjs)
+
+─── METHODOLOGIE ────────────────────────────────────────────────
+
+Critères de protection attendus :
+  1. PROJECT_ID = 'importok-6ef77' hardcoded
+  2. serviceAccount.project_id check (admin SDK uniquement)
+  3. Mode dry-run par defaut
+  4. Flag --execute requis pour ecriture
+  5. Flag --confirm-* requis pour destructif
+  6. Garde-fou whitelist KEEP collections
+  7. Archive avant suppression (selon contexte)
+
+Greps croises :
+  - delete / deleteDoc / recursiveDelete : suppression docs
+  - batch.commit                          : ecritures groupees
+  - update / updateDoc / set / setDoc     : ecritures
+  - --execute / --dry-run / confirm       : flags protection
+
+Sortie grep complete : AUDIT-SCRIPTS-DESTRUCTIFS-GREP.txt (150 lignes)
+
+─── RESUME PAR CATEGORIE ────────────────────────────────────────
+
+CATEGORIE 1 — Scripts conformes V50-BIS / V52 (gold standard)
+═══════════════════════════════════════════════════════════════
+
+  scripts/audit-acomptes-v52.cjs
+    PID + SA + DRY + execute reject + lecture only      ✅
+    READ-ONLY absolu, --execute REJETE
+    Cree V52 CP H, modele de reference
+
+  scripts/init-counters-v50.cjs
+    PID + SA + DRY + execute par defaut absent          ✅
+    Mode --dry-run obligatoire avant execute
+    Cree V50-BIS CP F, idempotent
+
+  scripts/migrate-users-to-clients.cjs
+    PID + SA + DRY + execute                             ✅
+    Cree V50-BIS CP G
+
+CATEGORIE 2 — Scripts destructifs SANS garde-fou (corriges V53 CP D)
+═══════════════════════════════════════════════════════════════
+
+  scripts/delete-quotes.mjs
+    AVANT : aucune protection — execution immediate de
+            deleteAllQuotes() + deleteCounters()
+    APRES : --execute par defaut absent (dry-run)
+            --confirm-delete-all-quotes requis avec --execute
+            Sans flags : compte les docs sans supprimer
+    Note  : config Firebase Web (apiKey publique) — non secret
+            mais hygiene a ameliorer (cf categorie 5)
+
+  scripts/reset-database.sh
+    AVANT : execution immediate des DELETE via curl
+    APRES : EXECUTE_FLAG / CONFIRM_FLAG en bash
+            Sans --execute : backup uniquement, pas de DELETE
+            --execute --confirm-reset-database pour destructif
+    Note  : meme config Firebase Web hardcoded
+
+CATEGORIE 3 — Scripts read-only legacy (pas de garde-fou requis)
+═══════════════════════════════════════════════════════════════
+
+  scripts/audit-catalogue.js               READ-ONLY (audit)
+  scripts/backup-quotes.js                 READ-ONLY (export)
+  scripts/check-firestore.js               READ-ONLY (check)
+  scripts/export-catalogue-excel.ts        READ-ONLY (export)
+  scripts/export-products-json.ts          READ-ONLY (export)
+
+CATEGORIE 4 — Scripts d'ecriture legitimes (write but not destructive)
+═══════════════════════════════════════════════════════════════
+
+  scripts/set-admin-role.cjs               custom claims (non destructif)
+  scripts/migrate-acomptes-v43.js          dry-run present, execute optionnel
+  scripts/migrate-admin-params.js          dry-run present
+  scripts/migrate-product-prices.js        dry-run present
+  scripts/import-catalogue-minipelles.js   dry-run present
+  scripts/translate-products.js            dry-run present
+  scripts/upload-images-mini-pelles.js     dry-run present
+  scripts/seed-direct.js                   seeding (non destructif sur existant)
+  scripts/seed-firestore.js                seeding
+  scripts/seed-products.js                 seeding
+  scripts/seed-users.js                    seeding
+  scripts/repair-97importcom.js            repair script (limite scope)
+
+CATEGORIE 5 — Hygiene secrets (NON BLOQUANT — note V53)
+═══════════════════════════════════════════════════════════════
+
+  scripts/delete-quotes.mjs:8
+  scripts/reset-database.sh:8
+    Contiennent la cle Firebase Web (AIza...) hardcoded.
+
+  STATUT : "publique par design" Firebase (cf docs Firebase
+           Authentication / Firestore client SDK).
+           Les regles Firestore RBAC (V49) protegent l'acces
+           aux donnees, pas la cle elle-meme.
+
+  ACTION V53 : aucune. Cette cle n'est pas un secret au sens
+               strict. Le bon controle est :
+                 - Firestore rules RBAC strictes (V49 ✅)
+                 - quotas Firebase / restriction par domaine
+                 - rate limiting (Cloud Armor / app side)
+
+  RECOMMANDATION FUTURE : centraliser la config Firebase
+  client dans une seule lib (deja fait pour src/lib/firebase.ts
+  via env), et faire les scripts shell en Admin SDK plutot
+  qu'en Web SDK (delete-quotes.mjs / reset-database.sh).
+
+─── COLLECTIONS KEEP — VERIFICATION SCRIPTS ──────────────────────
+
+Aucun script tracked ne supprime une collection KEEP :
+  users, clients, partners, products, categories, ports,
+  admin_params, tarifs_logistiques, counters
+
+  delete-quotes.mjs touche counters/{DVS_*, FA_*, FA-AC_*}
+    → c'est un sous-set documentaire des counters (devis +
+      factures acomptes). Le reset des counters business est
+      legitime (pre-clean-start). Les counters init-counters-v50
+      (CTN, LA, NC, BL, FF, FL, FM, SAV) ne sont pas touches.
+
+─── MODIFICATIONS APPORTEES (CP D) ──────────────────────────────
+
+  scripts/delete-quotes.mjs       : +25 lignes (header + guards)
+  scripts/reset-database.sh       : +30 lignes (flags + conditional)
+
+  Aucune logique metier modifiee — uniquement protections
+  d'execution.
+
+─── ACTIONS FUTURES RECOMMANDEES ─────────────────────────────────
+
+  V54+ :
+  - Migrer delete-quotes.mjs vers Admin SDK (firebase-admin)
+    avec garde-fou serviceAccount.project_id (pattern V50-BIS)
+  - Idem reset-database.sh : remplacer curl par admin.firestore()
+  - Centraliser un helper guards.js avec parseArgs() commun
+  - Ajouter un .npmrc pour bloquer npm install --save sans review
+
+  Hors scope V53-PRODUCTION-READINESS.
+
+═══════════════════════════════════════════════════════════════
+  FIN AUDIT CP D
+═══════════════════════════════════════════════════════════════

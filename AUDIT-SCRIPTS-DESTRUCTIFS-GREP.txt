@@ -1,0 +1,150 @@
+scripts/migrate-admin-params.js:  await coefRef.set(coefAfter, { merge: true });
+scripts/migrate-admin-params.js:  await globalRef.set(globalAfter, { merge: true });
+scripts/migrate-admin-params.js:    await pricingRef.set(pricingAfter, { merge: true });
+scripts/migrate-acomptes-v43.js://   node scripts/migrate-acomptes-v43.js --dry-run     # simulation (par défaut conseillé)
+scripts/migrate-acomptes-v43.js:const DRY_RUN = process.argv.includes('--dry-run');
+scripts/migrate-acomptes-v43.js:  const wasEncaisse = legacy.statut === 'encaisse' || legacy.statut === 'confirme';
+scripts/migrate-acomptes-v43.js:    const encaisseCount = before.filter(a => a.statut === 'encaisse' || a.statut === 'confirme').length;
+scripts/migrate-acomptes-v43.js:      .filter(a => a.statut === 'encaisse' || a.statut === 'confirme')
+scripts/migrate-acomptes-v43.js:      await db.collection('quotes').doc(item.id).update({
+scripts/migrate-acomptes-v43.js:    ? '✅ Dry-run terminé. Lancer sans --dry-run pour appliquer.'
+scripts/repair-97importcom.js:    await admin.auth().updateUser(UID, { password: NEW_PASSWORD });
+scripts/repair-97importcom.js:  await db.collection('users').doc(UID).set({ role: 'partner' }, { merge: true });
+scripts/repair-97importcom.js:  await db.collection('partners').doc(UID).set({
+scripts/repair-97importcom.js:    await db.collection('partners').doc(ANCIEN_DOC_ID).delete();
+scripts/migrate-users-to-clients.cjs://   node scripts/migrate-users-to-clients.cjs --dry-run    # OBLIGATOIRE en premier
+scripts/migrate-users-to-clients.cjs://   node scripts/migrate-users-to-clients.cjs --execute    # apres validation
+scripts/migrate-users-to-clients.cjs:const dryRun = process.argv.includes('--dry-run');
+scripts/migrate-users-to-clients.cjs:const execute = process.argv.includes('--execute');
+scripts/migrate-users-to-clients.cjs:  console.error('❌ Precisez --dry-run (lecture seule) ou --execute (ecriture).');
+scripts/migrate-users-to-clients.cjs:  console.error('  node scripts/migrate-users-to-clients.cjs --dry-run');
+scripts/migrate-users-to-clients.cjs:  console.error('  node scripts/migrate-users-to-clients.cjs --execute');
+scripts/migrate-users-to-clients.cjs:        await clientRef.set(clientData);
+scripts/migrate-users-to-clients.cjs:    console.log('💡 Pour appliquer reellement, relancer avec --execute :');
+scripts/migrate-users-to-clients.cjs:    console.log('   node scripts/migrate-users-to-clients.cjs --execute');
+scripts/audit-acomptes-v52.cjs://   node scripts/audit-acomptes-v52.cjs --dry-run   # OBLIGATOIRE
+scripts/audit-acomptes-v52.cjs://   - Pas de mode --execute. Le script ne peut PAS ecrire en BD.
+scripts/audit-acomptes-v52.cjs://   - Garde-fou : le script appelle process.exit(1) si --execute
+scripts/audit-acomptes-v52.cjs:if (process.argv.includes('--execute')) {
+scripts/audit-acomptes-v52.cjs:  console.error('   Mode --execute est INTERDIT. Utiliser --dry-run uniquement.');
+scripts/audit-acomptes-v52.cjs:if (!process.argv.includes('--dry-run')) {
+scripts/audit-acomptes-v52.cjs:  console.error('❌ ABORT : flag --dry-run requis (READ-ONLY only).');
+scripts/audit-acomptes-v52.cjs:  console.error('   Usage : node scripts/audit-acomptes-v52.cjs --dry-run');
+scripts/audit-acomptes-v52.cjs:  console.log(`   Mode    : --dry-run (jamais d'ecriture)`);
+scripts/audit-acomptes-v52.cjs:  lines.push(`Mode          : --dry-run`);
+scripts/init-counters-v50.cjs://   node scripts/init-counters-v50.cjs --dry-run   # OBLIGATOIRE en premier
+scripts/init-counters-v50.cjs:const dryRun = process.argv.includes('--dry-run');
+scripts/init-counters-v50.cjs:        await ref.set({
+scripts/init-counters-v50.cjs:    console.log('💡 Pour appliquer reellement, relancer sans --dry-run :');
+scripts/seed-firestore.js:  global: { taux_rmb_eur: 7.82, taux_rmb_updated: now, taux_majoration_user: 2.0, taux_majoration_partner: 1.2, acompte_pct_defaut: 30, delai_validite_devis: 30 },
+scripts/seed-firestore.js:    await db.collection('admin_params').doc(key).set(data);
+scripts/seed-firestore.js:    await db.collection('profiles').doc(c.id).set(c);
+scripts/seed-firestore.js:    await db.collection('products').doc(p.id).set(p);
+scripts/seed-firestore.js:    await db.collection('quotes').doc(q.id).set(q);
+scripts/seed-firestore.js:    await db.collection('invoices').doc(inv.id).set(inv);
+scripts/seed-firestore.js:    await db.collection('containers').doc(c.id).set(c);
+scripts/seed-firestore.js:    await db.collection('commissions').doc(c.id).set(c);
+scripts/seed-firestore.js:    await db.collection('sav').doc(s.id).set(s);
+scripts/seed-firestore.js:    await db.collection('stock').doc(s.id).set(s);
+scripts/seed-firestore.js:    await db.collection('partners').doc(p.id).set(p);
+scripts/upload-images-mini-pelles.js:// puis update Firestore image_principale avec URLs HTTPS.
+scripts/upload-images-mini-pelles.js:const updateStats = { updated: 0, unchanged: 0, no_family: 0, no_url: 0 };
+scripts/upload-images-mini-pelles.js:    updateStats.no_family++;
+scripts/upload-images-mini-pelles.js:    updateStats.no_url++;
+scripts/upload-images-mini-pelles.js:    updateStats.unchanged++;
+scripts/upload-images-mini-pelles.js:  updateStats.updated++;
+scripts/upload-images-mini-pelles.js:console.log(`  Updated   : ${updateStats.updated}`);
+scripts/upload-images-mini-pelles.js:console.log(`  Unchanged : ${updateStats.unchanged}`);
+scripts/upload-images-mini-pelles.js:console.log(`  No family : ${updateStats.no_family}`);
+scripts/upload-images-mini-pelles.js:console.log(`  No URL    : ${updateStats.no_url}`);
+scripts/upload-images-mini-pelles.js:  console.log('🧪 DRY-RUN terminé. Ajouter --apply pour upload + update Firestore.');
+scripts/upload-images-mini-pelles.js:const backupPath = path.join(BACKUP_DIR, `images-pre-update-${stamp}.json`);
+scripts/upload-images-mini-pelles.js:    await db.collection('products').doc(w.ref).set(
+scripts/upload-images-mini-pelles.js:      { image_principale: w.after, updated_at: ts },
+scripts/upload-images-mini-pelles.js:    console.error(`❌ Erreur update ${w.ref} :`, err.message);
+scripts/seed-products.js:      await db.collection('products').doc(id).set({
+scripts/seed-products.js:        updatedAt: new Date(),
+scripts/seed-products.js:    await db.collection('admin_params').doc('global').set({
+scripts/seed-products.js:      taux_rmb_updated: new Date(),
+scripts/seed-products.js:    await db.collection('admin_params').doc('emetteur').set({
+scripts/seed-products.js:      await db.collection('partners').doc(p.code).set({
+scripts/translate-products.js:  params.set('source_lang', 'FR');
+scripts/translate-products.js:  params.set('target_lang', target); // 'EN' ou 'ZH'
+scripts/translate-products.js:  const update = {};
+scripts/translate-products.js:    if (slot.fieldEn && enSimple[i]) update[slot.fieldEn] = enSimple[i];
+scripts/translate-products.js:    if (slot.fieldZh && zhSimple[i]) update[slot.fieldZh] = zhSimple[i];
+scripts/translate-products.js:  if (needsCaracUpdate) update.caracteristiques = cMig;
+scripts/translate-products.js:  if (Object.keys(update).length > 0) writes.push({ ref, before: d, update });
+scripts/translate-products.js:const backupPath = path.join(BACKUP_DIR, `translate-pre-update-${stamp}.json`);
+scripts/translate-products.js:    await db.collection('products').doc(w.ref).set(
+scripts/translate-products.js:      { ...w.update, updated_at: ts },
+scripts/import-catalogue-minipelles.js://   - Mode update : merge — préserve les champs existants si Excel a vide
+scripts/import-catalogue-minipelles.js:  // Construction de l'update : préserver l'existant si Excel vide
+scripts/import-catalogue-minipelles.js:  const update = {};
+scripts/import-catalogue-minipelles.js:    update[k] = v;
+scripts/import-catalogue-minipelles.js:    update.caracteristiques = caracteristiques;
+scripts/import-catalogue-minipelles.js:    update.image_principale = '';
+scripts/import-catalogue-minipelles.js:  const action = !exists ? 'CRÉER' : Object.keys(update).length > 0 ? 'MAJ' : 'INCHANGÉ';
+scripts/import-catalogue-minipelles.js:    const champsCount = Object.keys(update).length;
+scripts/import-catalogue-minipelles.js:    const champs = Object.keys(update).slice(0, 6).join(', ');
+scripts/import-catalogue-minipelles.js:    writes.push({ reference, exists, before: existing, update });
+scripts/import-catalogue-minipelles.js:    if (w.reference.endsWith('-001') && w.update.caracteristiques) {
+scripts/import-catalogue-minipelles.js:      parents[groupe] = w.update.caracteristiques;
+scripts/import-catalogue-minipelles.js:    const c = w.update.caracteristiques;
+scripts/import-catalogue-minipelles.js:      w.update.caracteristiques = JSON.parse(JSON.stringify(parent));
+scripts/import-catalogue-minipelles.js:    await db.collection('products').doc(w.reference).set(
+scripts/import-catalogue-minipelles.js:      sanitizeForFirestore({ ...w.update, updated_at: ts }),
+scripts/update-firestore-images.ts:// Usage : npx tsx scripts/update-firestore-images.ts
+scripts/update-firestore-images.ts:import { getFirestore, doc, updateDoc } from 'firebase/firestore';
+scripts/update-firestore-images.ts:async function updateImages() {
+scripts/update-firestore-images.ts:  let updated = 0;
+scripts/update-firestore-images.ts:      await updateDoc(doc(db, 'products', productId), { images });
+scripts/update-firestore-images.ts:      updated++;
+scripts/update-firestore-images.ts:  console.log(`\n📊 Résultat: ${updated} mis à jour, ${skipped} erreurs`);
+scripts/update-firestore-images.ts:updateImages().catch(console.error).finally(() => process.exit(0));
+scripts/seed-users.js:        await auth.deleteUser(existing.uid);
+scripts/seed-users.js:      await db.collection('profiles').doc(created.uid).set({
+scripts/seed-direct.js:async function deleteDoc(token, collection, docId) {
+scripts/seed-direct.js:async function setDoc(token, collection, docId, data) {
+scripts/seed-direct.js:    await deleteDoc(token, collection, docId);
+scripts/seed-direct.js:  await setDoc(token, 'admin_params', 'global', {
+scripts/seed-direct.js:  await setDoc(token, 'admin_params', 'emetteur', {
+scripts/seed-direct.js:  for (const c of clients) await setDoc(token, 'profiles', c.id, { ...c, createdAt: NOW });
+scripts/seed-direct.js:  for (const p of products) await setDoc(token, 'products', p.id, { ...p, createdAt: NOW });
+scripts/seed-direct.js:  for (const p of partners) await setDoc(token, 'partners', p.id, { ...p, createdAt: NOW });
+scripts/seed-direct.js:  for (const q of quotes) await setDoc(token, 'quotes', q.id, { ...q, createdAt: NOW });
+scripts/seed-direct.js:  for (const inv of invoices) await setDoc(token, 'invoices', inv.id, { ...inv, createdAt: NOW });
+scripts/seed-direct.js:  for (const c of containers) await setDoc(token, 'containers', c.id, { ...c, createdAt: NOW });
+scripts/seed-direct.js:  for (const c of commissions) await setDoc(token, 'commissions', c.id, { ...c, createdAt: NOW });
+scripts/seed-direct.js:  for (const s of savTickets) await setDoc(token, 'sav', s.id, { ...s, createdAt: NOW });
+scripts/seed-direct.js:  for (const s of stockItems) await setDoc(token, 'stock', s.id, { ...s, createdAt: NOW });
+scripts/migrate-product-prices.js:  const stats = { total: 0, updated: 0, skipped: 0, errors: 0 };
+scripts/migrate-product-prices.js:    const update = {
+scripts/migrate-product-prices.js:    stats.updated++;
+scripts/migrate-product-prices.js:      update,
+scripts/migrate-product-prices.js:    console.log(`🔁 ${ref.padEnd(18)} ${(d.nom_fr || '?').substring(0, 35).padEnd(35)} ${source_base.padEnd(15)} CNY=${update.prix_achat_cny} → EUR=${update.prix_achat_eur} → public=${update.prix_public}`);
+scripts/migrate-product-prices.js:  console.log(`  Updated   : ${stats.updated}`);
+scripts/migrate-product-prices.js:      await docRef.set(
+scripts/migrate-product-prices.js:          ...w.update,
+scripts/migrate-product-prices.js:          updated_at: admin.firestore.FieldValue.serverTimestamp(),
+scripts/migrate-product-prices.js:          ...w.update,
+scripts/audit-partenaires.js:    delete example.password;
+scripts/audit-partenaires.js:    delete example.passwordHash;
+scripts/nettoyage-catalogue.js://   node scripts/nettoyage-catalogue.js --execute    # EXÉCUTION RÉELLE
+scripts/nettoyage-catalogue.js:  setDoc, deleteDoc, updateDoc, writeBatch,
+scripts/nettoyage-catalogue.js:const DRY_RUN = !process.argv.includes('--execute');
+scripts/nettoyage-catalogue.js:    log('   Pour exécuter réellement : node scripts/nettoyage-catalogue.js --execute');
+scripts/nettoyage-catalogue.js:      await deleteDoc(doc(db, 'products', docId));
+scripts/nettoyage-catalogue.js:          await deleteDoc(doc(db, 'products', aSupp.__docId));
+scripts/nettoyage-catalogue.js:        await updateDoc(doc(db, 'products', p.__docId), {
+scripts/nettoyage-catalogue.js:          updated_at: serverTimestamp(),
+scripts/nettoyage-catalogue.js:      await updateDoc(doc(db, 'products', p.__docId), {
+scripts/nettoyage-catalogue.js:        updated_at: serverTimestamp(),
+scripts/nettoyage-catalogue.js:      await updateDoc(doc(db, 'products', r22_001.__docId), {
+scripts/nettoyage-catalogue.js:        updated_at: serverTimestamp(),
+scripts/nettoyage-catalogue.js:      await setDoc(doc(db, 'products', fixation.reference), {
+scripts/nettoyage-catalogue.js:        updated_at: serverTimestamp(),
+scripts/nettoyage-catalogue.js:        await deleteDoc(doc(db, 'products', p.__docId));
+scripts/nettoyage-catalogue.js:      await setDoc(doc(db, 'products', kit.reference), {
+scripts/nettoyage-catalogue.js:        updated_at: serverTimestamp(),
+scripts/nettoyage-catalogue.js:    log('      node scripts/nettoyage-catalogue.js --execute');
