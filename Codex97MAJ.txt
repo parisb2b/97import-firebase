@@ -4,7 +4,7 @@ Date/heure de mise a jour : 2026-05-02 22:20:00 CEST
 Projet : /Users/mactell/97import-firebase
 Branche : v2
 Projet Firebase obligatoire : importok-6ef77
-Mission courante : V62 — corrections UX, parcours et adresses
+Mission courante : V64 — audit parcours complet autonome
 
 Regle permanente :
 - A chaque prochaine mission Codex sur 97IMPORT, mettre a jour Codex97MAJ.txt.
@@ -457,3 +457,33 @@ Non execute.
 - Deployer storage rules sur validation humaine
 - Analyser et deployer firestore rules counters
 - Script de test parcours client/partenaire/admin
+
+## V63 — Tests E2E Playwright
+
+Date : 2026-05-02 22:15
+Mission : infrastructure tests E2E Playwright multi-parcours.
+Commit : e9d396c
+Tag : v63-e2e-tests
+
+Actions :
+- @playwright/test installe
+- 15 tests sur 3 parcours (client:8, partenaire:3, admin:4)
+- 15/15 verts en 6.7s
+- fixtures auth, helpers Firestore, config Playwright
+
+## V64 — Audit parcours complet
+
+Date : 2026-05-02 23:00
+Mission : test autonome de tous les parcours, diagnostic et correction.
+Commit : 1f757d0
+Tag : v64-audit-parcours
+
+Actions :
+- 16 nouveaux tests Playwright (client, partenaire, admin, creation devis)
+- 31/31 tests OK (15 V63 + 16 V64)
+- Bug #1 identifie : bouton "Ajouter au panier" masque par userRole non resolu
+- firestore.rules counters : restaure isAuth() (V60 isAdmin() bloquait clients)
+- Scripts : cleanup-v64.cjs, debug-devis.spec.ts crees
+
+Firebase deploy : non execute.
+Prochaines actions V65 : corriger condition userRole dans Produit.tsx, deployer rules.
