@@ -132,21 +132,22 @@ export default function TauxRMB() {
     }
   }, [showToast]);
 
-  const handleApplyApiRates = useCallback(async () => {
-    if (!apiRates) return;
-    setSavingRates(true);
-    try {
-      await updateGlobalRates(
-        { eur_usd: apiRates.eur_usd, eur_cny: apiRates.eur_cny, usd_cny: apiRates.usd_cny },
-        apiRates.source,
-      );
-      showToast('Taux API appliqués comme taux 97IMPORT', 'success');
-    } catch (err: any) {
-      showToast(`Erreur : ${err.message}`, 'error');
-    } finally {
-      setSavingRates(false);
-    }
-  }, [apiRates, showToast]);
+  // V49 Checkpoint J — handleApplyApiRates SUPPRIME : on ne veut plus
+  // ecraser les taux 97IMPORT (Rubrique 3) avec ceux du marche (Rubrique 5)
+  // automatiquement. A la place, alerte visuelle ci-dessous quand l'ecart
+  // depasse 3% — l'admin decide manuellement de modifier la Rubrique 3.
+
+  // V49 Checkpoint J — Calcul ecart entre taux 97IMPORT (state `rates`) et
+  // les taux marche (apiRates). Renvoie un % signe (+ si API > 97IMPORT).
+  const SEUIL_ALERTE_PCT = 3;
+  const calculateEcartPct = (tauxApi: number, taux97IMPORT: number) => {
+    if (!taux97IMPORT || taux97IMPORT <= 0) return 0;
+    return ((tauxApi - taux97IMPORT) / taux97IMPORT) * 100;
+  };
+  const ecartEurUsd = apiRates ? calculateEcartPct(apiRates.eur_usd, rates.eur_usd) : 0;
+  const ecartEurCny = apiRates ? calculateEcartPct(apiRates.eur_cny, rates.eur_cny) : 0;
+  const ecartUsdCny = apiRates ? calculateEcartPct(apiRates.usd_cny, rates.usd_cny) : 0;
+  const hasAlerte = (ecart: number) => Math.abs(ecart) > SEUIL_ALERTE_PCT;
 
   const handleSaveMultipliers = useCallback(async () => {
     setSavingMult(true);
@@ -312,7 +313,65 @@ export default function TauxRMB() {
             <input className="fi" readOnly value={apiRates ? apiRates.usd_cny.toFixed(4) : '—'} style={{ background: '#F3F4F6' }} />
           </div>
         </div>
-        <div style={{ padding: '0 16px 16px', display: 'flex', gap: 8, alignItems: 'center' }}>
+        {/* V49 Checkpoint J — alertes auto si ecart > 3% vs taux 97IMPORT.
+            Le bouton "Appliquer comme taux 97IMPORT" a ete SUPPRIME :
+            l'admin doit modifier manuellement la Rubrique 3 si necessaire. */}
+        {apiRates && (hasAlerte(ecartEurUsd) || hasAlerte(ecartEurCny) || hasAlerte(ecartUsdCny)) && (
+          <div style={{ padding: '0 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {hasAlerte(ecartEurUsd) && (
+              <div style={{
+                padding: '12px 16px', background: '#FEF3C7',
+                borderLeft: '4px solid #F59E0B', borderRadius: 8,
+                color: '#92400E', fontSize: 13, lineHeight: 1.5,
+              }}>
+                <div style={{ fontWeight: 700, marginBottom: 4 }}>
+                  🚨 Écart important : EUR/USD
+                </div>
+                <div style={{ fontSize: 12, fontFamily: 'monospace' }}>
+                  Marché (API) : <strong>{apiRates.eur_usd.toFixed(4)}</strong> · 97IMPORT : <strong>{rates.eur_usd.toFixed(4)}</strong> · Écart : <strong>{ecartEurUsd > 0 ? '+' : ''}{ecartEurUsd.toFixed(2)}%</strong>
+                </div>
+                <div style={{ fontSize: 12, opacity: 0.85, marginTop: 4 }}>
+                  L'écart dépasse {SEUIL_ALERTE_PCT}%. Vérifiez si vous devez ajuster le taux dans la Rubrique 3.
+                </div>
+              </div>
+            )}
+            {hasAlerte(ecartEurCny) && (
+              <div style={{
+                padding: '12px 16px', background: '#FEF3C7',
+                borderLeft: '4px solid #F59E0B', borderRadius: 8,
+                color: '#92400E', fontSize: 13, lineHeight: 1.5,
+              }}>
+                <div style={{ fontWeight: 700, marginBottom: 4 }}>
+                  🚨 Écart important : EUR/CNY
+                </div>
+                <div style={{ fontSize: 12, fontFamily: 'monospace' }}>
+                  Marché (API) : <strong>{apiRates.eur_cny.toFixed(4)}</strong> · 97IMPORT : <strong>{rates.eur_cny.toFixed(4)}</strong> · Écart : <strong>{ecartEurCny > 0 ? '+' : ''}{ecartEurCny.toFixed(2)}%</strong>
+                </div>
+                <div style={{ fontSize: 12, opacity: 0.85, marginTop: 4 }}>
+                  L'écart dépasse {SEUIL_ALERTE_PCT}%. Vérifiez si vous devez ajuster le taux dans la Rubrique 3.
+                </div>
+              </div>
+            )}
+            {hasAlerte(ecartUsdCny) && (
+              <div style={{
+                padding: '12px 16px', background: '#FEF3C7',
+                borderLeft: '4px solid #F59E0B', borderRadius: 8,
+                color: '#92400E', fontSize: 13, lineHeight: 1.5,
+              }}>
+                <div style={{ fontWeight: 700, marginBottom: 4 }}>
+                  🚨 Écart important : USD/CNY
+                </div>
+                <div style={{ fontSize: 12, fontFamily: 'monospace' }}>
+                  Marché (API) : <strong>{apiRates.usd_cny.toFixed(4)}</strong> · 97IMPORT : <strong>{rates.usd_cny.toFixed(4)}</strong> · Écart : <strong>{ecartUsdCny > 0 ? '+' : ''}{ecartUsdCny.toFixed(2)}%</strong>
+                </div>
+                <div style={{ fontSize: 12, opacity: 0.85, marginTop: 4 }}>
+                  L'écart dépasse {SEUIL_ALERTE_PCT}%. Vérifiez si vous devez ajuster le taux dans la Rubrique 3.
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+        <div style={{ padding: '12px 16px 16px', display: 'flex', gap: 8, alignItems: 'center' }}>
           <button
             onClick={handleRefreshApi}
             disabled={refreshingApi}
@@ -326,11 +385,6 @@ export default function TauxRMB() {
             {refreshingApi && <span className="v45-spinner" aria-hidden />}
             {refreshingApi ? 'Refresh…' : '🔄 Refresh manuel'}
           </button>
-          {apiRates && (
-            <Button variant="s" onClick={handleApplyApiRates} disabled={savingRates}>
-              {savingRates ? 'Application…' : '✅ Appliquer comme taux 97IMPORT'}
-            </Button>
-          )}
         </div>
       </Card>
 
