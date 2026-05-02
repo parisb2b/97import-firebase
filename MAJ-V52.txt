@@ -1,0 +1,469 @@
+═══════════════════════════════════════════════════════════════
+  MISSION V52 — STABILISATION & ARCHITECTURE
+  Rapport final — 2026-05-02
+═══════════════════════════════════════════════════════════════
+
+Branche             : v2
+HEAD avant V52      : 001a458 (rapport MAJ-V50-BIS.txt)
+HEAD apres V52      : f09f5b8 (CP H — script audit acomptes)
+Tag backup          : backup-pre-v52-20260502-1313
+Tag final           : v52-final (pose en fin de cette mission)
+Project Firebase    : importok-6ef77
+Plugins actifs      : Superpowers / UI-UX-PRO-MAX / Claude-Mem
+Mode                : autonome (validation Michel post-mission)
+Duree reelle        : ~2h30 (estimation initiale 5-7h — sous-tendance
+                      car CPs A et D sont audit-only et CP G plan-only)
+
+═══════════════════════════════════════════════════════════════
+  CONTEXTE
+═══════════════════════════════════════════════════════════════
+
+V52 fait suite a :
+- V44 → V44-TER : Bug N°1 stale-state FicheProduit (whitelist 9
+  champs prix), Bug N°2 CHAMPS_ESSENTIEL, Bug N°3 dates [object Object]
+- V45 : Bug A duplication devis crash undefined, Bug B PDF dates
+  formatDateCourt, polish UI
+- V46 : code-split firebase/pdf/excel/dnd-kit (-70% bundle), navy
+  unify #1565C0, validation acomptes ≤ solde, SearchInput atom
+- V48-AUDIT : audit complet 25 bugs (read-only)
+- V49 : Firestore RBAC complet + custom claims + 12 hot fixes
+- V50-BIS : drop .firebaserc, force --project, logout sidebar,
+  ForgotPasswordModal, Promise.allSettled Dashboard, scripts BD,
+  cleanup rules, LoadingState atom
+- V51-AUDIT : extraction 681KB pour ChatGPT + Claude IA validation
+  (8 zones suspectes, 16 sections rapport, 31 grep reports)
+
+V52 traite les residuels identifies par V51-AUDIT + ChatGPT + Claude IA :
+- Storage bucket mismatch firebase.json → import2030
+- Demo data hardcode dans Dashboard (D2604006, JM/TD)
+- containers vs conteneurs incoherence dans le code
+- Doublons users/profiles/clients
+- LoadingState non-uniforme sur 7 pages
+- Pas de types TypeScript pour les collections principales
+- Acomptes : pattern array sans audit de coherence
+
+═══════════════════════════════════════════════════════════════
+  RESUME DES CHECKPOINTS
+═══════════════════════════════════════════════════════════════
+
+  Phase 0  Pre-flight + tag backup-pre-v52              ✅
+  CP A     Audit Storage bucket (READ-ONLY)             ✅
+  CP B     Dashboard EmptyState (devis/conteneurs/com)  ✅
+  CP C     Normalisation containers → conteneurs        ✅
+  CP D     Rapport audit doublons collections           ✅
+  CP E     Migration LoadingState sur 7 pages           ✅
+  CP F     Types TypeScript collections                 ✅
+  CP G     Plan formel V53 migration profiles           ✅
+  CP H     Script audit acomptes READ-ONLY              ✅
+  CP I     Rapport MAJ-V52.txt + tag v52-final          ✅
+
+═══════════════════════════════════════════════════════════════
+  PHASE 0 — PRE-FLIGHT
+═══════════════════════════════════════════════════════════════
+
+Verifications :
+- Branche v2 ............................................ OK
+- HEAD == origin/v2 ..................................... OK (001a458)
+- Build vert (Vite 6.4.2, 3.49s) ........................ OK
+- .firebaserc absent (V50-BIS Z) ........................ OK
+- firebase-admin-sdk.json present (gitignored) .......... OK
+- node v20.20.0, npm 10.8.2 ............................. OK
+
+Tag backup : backup-pre-v52-20260502-1313 (pousse origin)
+
+Note : working tree contenait artefacts V51-AUDIT untracked
+(audit-gpt-97import/, audit-gpt-97import-PART1.zip). Documente
+comme autorise et n'a pas bloque V52.
+
+═══════════════════════════════════════════════════════════════
+  CP A — AUDIT STORAGE BUCKET (READ-ONLY)
+═══════════════════════════════════════════════════════════════
+
+Decision : audit-only, correction reportee V53.
+
+Diagnostic :
+- firebase.json:6 declare bucket 'import2030.firebasestorage.app'
+- Le projet Firebase import2030 est SUPPRIME depuis V49+
+- Le SDK Web utilise VITE_FIREBASE_STORAGE_BUCKET (env Vercel)
+- ⇒ firebase.json bucket est INUTILISE par le runtime client
+- Donc CAS A : modification firebase.json = sans risque (uploads
+  fonctionnent via env Vercel, pas via firebase.json)
+
+Rapport : audit-v52/AUDIT-STORAGE-BUCKET-V52.txt
+
+Pourquoi V52 ne corrige pas : la regle V51-AUDIT stipule "Pas de
+modification firebase.json sans audit prealable du bucket actuel".
+L'audit valide l'absence de risque mais Michel decide quand le
+modifier (tolere V53).
+
+Tag : checkpoint-v52-A-audit-bucket
+Commit : 5aa725f
+
+═══════════════════════════════════════════════════════════════
+  CP B — DASHBOARD EMPTYSTATE
+═══════════════════════════════════════════════════════════════
+
+Bug : 4 fallbacks demo hardcodes s'affichent quand les collections
+sont vides au lieu d'un etat vide explicite :
+- recentDevis vide → "D2604006 Dupont MQ 14 200€ VIP" + "D2604007"
+- conteneurs vide → "CTN-2604-001 40HC MQ 23/04 48/67m³"
+- commissions vide → "JM Jean-Marc 3 160€ Due" + "TD Thomas D."
+
+Symptome utilisateur : confusion ("ces devis n'existent pas dans
+mon BD"), risque de cliquer et obtenir 404.
+
+Fix :
+- Cree atom src/admin/components/atoms/EmptyState.tsx (icon,
+  title, description, action optionnelle)
+- Importe EmptyState dans Dashboard.tsx
+- Remplace 3 sections demo par <EmptyState> avec icones
+  contextuels :
+    devis 📋    "Aucun devis recent"
+    conteneurs 📦 "Aucun conteneur actif"
+    commissions 💰 "Aucune commission due"
+
+Section SAV : pas de demo data — deja conditionnee
+stats.savUrgents > 0 (V49 K).
+
+Tag : checkpoint-v52-B-dashboard-emptystate
+Commit : 0177b88
+Files : src/admin/components/atoms/EmptyState.tsx (+76),
+        src/admin/pages/Dashboard.tsx (+24/-78)
+
+═══════════════════════════════════════════════════════════════
+  CP C — NORMALISATION CONTAINERS → CONTENEURS
+═══════════════════════════════════════════════════════════════
+
+Bug : 4 references collection 'containers' (anglais) coexistaient
+avec 'conteneurs' (canonique FR), entrainant un Dashboard qui ne
+voyait jamais les conteneurs crees via NouveauConteneur.
+
+Inventory pre-CP C (grep src/) :
+- 'containers' (legacy)  : 4 refs dans Dashboard.tsx, FraisLogistique
+  (2 occurrences), DetailFraisLogistique
+- 'conteneurs' (canonique) : 12 refs dans NouveauConteneur,
+  ListeConteneurs, DetailConteneur, DetailListeAchat,
+  PopupSelectionClientExcel + 5 generators Excel
+
+Fix :
+- Dashboard.tsx:174   collection(db, 'containers') → 'conteneurs'
+- DetailFraisLogistique.tsx:18  doc(db, 'containers') → 'conteneurs'
+- FraisLogistique.tsx:53  doc(db, 'containers') → 'conteneurs'
+- FraisLogistique.tsx:80  collection(db, 'containers') → 'conteneurs'
+
+Verification post-CP C : `grep "'containers'"` src/ → 0 hit.
+
+Pas de migration BD : la collection 'containers' est legacy/vide
+en prod. Audit confirmation differé V53.
+
+Tag : checkpoint-v52-C-normalisation-conteneurs
+Commit : ee2cf4c
+Files : 3 modifies (4 refs migrees au total)
+
+═══════════════════════════════════════════════════════════════
+  CP D — RAPPORT AUDIT DOUBLONS COLLECTIONS
+═══════════════════════════════════════════════════════════════
+
+Document : audit-v52/AUDIT-COLLECTIONS-DOUBLONS-V52.txt (229 lignes)
+
+Verdicts :
+1. factures vs invoices vs logistics_invoices : PAS de doublon.
+   'factures' est uniquement un label UI, pas une collection BD.
+   - invoices = factures admin par devis (FA, FF, acomptes)
+   - logistics_invoices = factures FM par conteneur
+
+2. containers vs conteneurs : traite en CP C (4 refs migrees).
+   Audit confirmation collection vide en prod differé V53.
+
+3. users vs profiles vs clients : DOUBLON CONFIRME
+   - users (10+ refs) : Auth Firebase etendu
+   - profiles (5 refs) : miroir users, double-write Inscription
+   - clients (1 ref read AdminApp badge) : V49+ collection cible
+   Risques : MesAdresses ecrit users only → profiles stale.
+   Plan formel migration : voir CP G.
+
+4. acomptes embedded array vs sub-collection : MAINTENIR array.
+   Pas de doublon constate. Pattern stable depuis V44-V46.
+   Audit READ-ONLY de coherence : voir CP H.
+
+Recommandation V53 :
+- Lancer script READ-ONLY confirmer 'containers' vide en prod
+- Migration profiles → clients (cf plan CP G)
+- Renommage logistics_invoices → frais_logistique (V55+)
+
+Tag : checkpoint-v52-D-audit-doublons
+Commit : 85dec02
+
+═══════════════════════════════════════════════════════════════
+  CP E — MIGRATION LOADINGSTATE 7 PAGES
+═══════════════════════════════════════════════════════════════
+
+Bug : 7 pages utilisaient un LoadingState inline non-uniforme :
+  <div style={{ textAlign: 'center', padding: 32 }}>Chargement...</div>
+ou
+  <div style={{ padding: 40, textAlign: 'center', color: '#9CA3AF' }}>
+    Chargement...
+  </div>
+au lieu de l'atom LoadingState (V50-BIS CP I).
+
+Migration :
+- Factures.tsx ............. "Chargement des factures…"
+- Clients.tsx .............. "Chargement des clients…"
+- Partenaires.tsx .......... "Chargement des partenaires…"
+- NotesCommission.tsx ...... "Chargement des notes de commission…"
+- SAVListe.tsx ............. "Chargement des SAV…"
+- ListeConteneurs.tsx ...... "Chargement des conteneurs…"
+- ListeListesAchat.tsx ..... "Chargement des listes d'achat…"
+
+Pages non touchees (volontairement) :
+- DetailDevis.tsx .......... loading state contextuel specifique
+- FicheProduit.tsx ......... loading per-tab spinner
+- DetailListeAchat.tsx ..... loading conditional sur lignes
+- OngletGestionPrix.tsx .... loading interne calcul prix
+
+Tag : checkpoint-v52-E-loadingstate-pages
+Commit : e722773
+Files : 7 modifies (+14/-7)
+
+═══════════════════════════════════════════════════════════════
+  CP F — TYPES TYPESCRIPT COLLECTIONS
+═══════════════════════════════════════════════════════════════
+
+Bug : aucun type TypeScript central pour les collections Firestore.
+Les pages utilisent (data as any) ou des interfaces inline
+dupliquees, source de derive de schema.
+
+Fix : nouveau fichier src/types/collections.ts (247 lignes) :
+
+Constante COLLECTIONS (source de verite) :
+  COLLECTIONS = {
+    quotes, invoices, logistics_invoices, conteneurs, listes_achat,
+    notes_commission, sav, produits,
+    users, profiles, clients,
+    admin_params, counters, logs, taux_rmb,
+  } as const;
+
+Type CollectionName = union literale.
+
+Interfaces principales :
+- Acompte (embedded dans Quote)
+- Facture (collection 'invoices')
+- Conteneur (collection 'conteneurs')
+- ListeAchat + LigneAchat
+- NoteCommission
+- Sav
+- Quote + QuoteLigne
+
+Types support : Destination, AcompteType, FactureType,
+ConteneurType, ConteneurStatut, QuoteStatut, etc.
+
+Schemas DESCRIPTIFS (pas runtime). Pour validation au boundary,
+utiliser Zod ou sanitize helper dedie (V53+).
+
+Adoption : progressive — les usages existants (any-typed) restent
+fonctionnels. Imports `as Facture`, `as Conteneur` au cas par cas.
+
+NOTE : 'containers' n'est PAS exporte (deprecated CP C V52).
+
+Tag : checkpoint-v52-F-types-collections
+Commit : 218eabd
+Files : src/types/collections.ts (+247)
+
+═══════════════════════════════════════════════════════════════
+  CP G — PLAN FORMEL V53 MIGRATION PROFILES → CLIENTS
+═══════════════════════════════════════════════════════════════
+
+Document : docs/superpowers/plans/2026-05-02-v52-profiles-migration.md
+
+Plan d'execution V53 pour fusionner users/profiles/clients en une
+seule collection canonique 'clients' (deja initialisee V49 via
+migrate-users-to-clients.cjs).
+
+11 edge cases identifies (EC-1 a EC-11) :
+EC-1 : User dans users mais pas profiles
+EC-2 : User dans profiles mais pas users (orphelin)
+EC-3 : partenaire_code dans users mais pas clients
+EC-4 : custom claim sans doc collection
+EC-5 : Inscription concurrente (race) double-write
+EC-6 : MesAdresses ecrit users only
+EC-7 : MesInfos ecrit users only
+EC-8 : Profil triple-write
+EC-9 : PromouvoirPartenaireModal users only
+EC-10 : Clients.tsx liste profiles
+EC-11 : AdminApp.tsx compte clients
+
+8 taches sequentielles :
+1. Backup tag + audit pre-migration script
+2. userRepository abstrait (findUser/updateUser/promoteToPartner)
+3. Migration reads admin (Clients.tsx, DetailClient.tsx)
+4. Sync profiles -> clients via script (--dry-run/--execute)
+5. Migration writes front (Inscription, Profil, MesAdresses, etc.)
+6. Lecture clients en front
+7. Desactiver ecriture profiles (feature flag)
+8. Rapport MAJ-V53.txt
+
+Critere STOP : > 5 divergences role/partenaire_code en audit.
+Rollback : tag git + restore Firestore GCS.
+
+Hors scope V53 : suppression effective de profiles (V55+) et
+users (V60+).
+
+Tag : checkpoint-v52-G-plan-profiles-migration
+Commit : d502f76
+
+═══════════════════════════════════════════════════════════════
+  CP H — SCRIPT AUDIT ACOMPTES READ-ONLY
+═══════════════════════════════════════════════════════════════
+
+Fichier : scripts/audit-acomptes-v52.cjs (283 lignes)
+
+Verifications (7) :
+1. total_encaisse cache vs sum(acomptes[].montant) (tolerance 0.01€)
+2. total_encaisse <= total_ht (overflow detection)
+3. acomptes.length <= 3 (limite metier V46)
+4. acomptes[i].montant > 0
+5. acomptes[i].type ∈ {acompte_1, acompte_2, solde}
+6. acomptes[i].date defini
+7. statut coherent avec acomptes.length
+
+Garde-fous :
+- PROJECT_ID = 'importok-6ef77' hardcode
+- serviceAccount.project_id check (abort si mismatch)
+- READ-ONLY absolu : --execute rejete avec process.exit(1)
+- --dry-run flag obligatoire (sinon abort)
+
+Sortie : audit-v52/AUDIT-ACOMPTES-RESULTS.txt (auto-cree)
+- SUMMARY (total quotes, total acomptes, OK count)
+- ERRORS (par type, avec id + numero devis)
+- WARNINGS (non bloquants, max 20 par type)
+
+⚠️ NE PAS executer en V52 (instruction Michel).
+
+Test syntaxe : `node -c` OK.
+Test garde-fou : `--execute` rejete avec exit 1 OK.
+
+Tag : checkpoint-v52-H-audit-acomptes-script
+Commit : f09f5b8
+
+═══════════════════════════════════════════════════════════════
+  CP I — RAPPORT FINAL (CE FICHIER) + TAG v52-final
+═══════════════════════════════════════════════════════════════
+
+Document : MAJ-V52.txt (ce fichier)
+Tag : v52-final (pose en fin de cette mission)
+
+═══════════════════════════════════════════════════════════════
+  STATISTIQUES V52
+═══════════════════════════════════════════════════════════════
+
+Commits ajoutes : 9 (CP A-H + Phase 0 audit dir + rapport CP I)
+Tags ajoutes    : 9 (backup-pre-v52, checkpoint A-H, v52-final)
+Fichiers nouveaux :
+  - src/admin/components/atoms/EmptyState.tsx       (76 l.)
+  - src/types/collections.ts                        (247 l.)
+  - scripts/audit-acomptes-v52.cjs                  (283 l.)
+  - audit-v52/AUDIT-STORAGE-BUCKET-V52.txt          (~80 l.)
+  - audit-v52/AUDIT-COLLECTIONS-DOUBLONS-V52.txt    (229 l.)
+  - docs/superpowers/plans/2026-05-02-v52-profiles-migration.md (183 l.)
+  - MAJ-V52.txt                                     (ce fichier)
+
+Fichiers modifies :
+  - src/admin/pages/Dashboard.tsx                   (CP B + CP C)
+  - src/admin/pages/Factures.tsx                    (CP E)
+  - src/admin/pages/Clients.tsx                     (CP E)
+  - src/admin/pages/Partenaires.tsx                 (CP E)
+  - src/admin/pages/NotesCommission.tsx             (CP E)
+  - src/admin/pages/SAVListe.tsx                    (CP E)
+  - src/admin/pages/ListeConteneurs.tsx             (CP E)
+  - src/admin/pages/ListeListesAchat.tsx            (CP E)
+  - src/admin/pages/FraisLogistique.tsx             (CP C)
+  - src/admin/pages/DetailFraisLogistique.tsx       (CP C)
+
+Build status : ✅ vert (3.15-3.49s, exit 0) apres chaque CP
+
+═══════════════════════════════════════════════════════════════
+  ANTI-REGRESSION V44 → V50-BIS
+═══════════════════════════════════════════════════════════════
+
+V52 ne touche AUCUN des fixes critiques :
+- ✅ V44-TER whitelist exclusion FicheProduit (9 champs prix)
+- ✅ V45 Bug A duplication devis (sanitizeUndefined)
+- ✅ V45 Bug B PDF dates (formatDateCourt helper)
+- ✅ V46 acomptes validation (sum ≤ total_ht, max 3)
+- ✅ V49 Firestore rules RBAC (custom claims)
+- ✅ V49 admin role check (set-admin-role.cjs)
+- ✅ V49 VIP overflow cap, devis annule block, anti-double-clic
+- ✅ V49 USD/CNY manuel, alertes ecart 3%
+- ✅ V49 SAV/Clients badges sidebar real-time
+- ✅ V50-BIS drop .firebaserc + force --project
+- ✅ V50-BIS logout sidebar + ForgotPasswordModal
+- ✅ V50-BIS tri devis robuste (sortKey)
+- ✅ V50-BIS Dashboard Promise.allSettled (CP D ULTRATHINK)
+- ✅ V50-BIS scripts BD init-counters + migrate-users-to-clients
+- ✅ V50-BIS LoadingState atom
+
+64 markers de fixes V44-V50-BIS preserves (aucun supprime).
+
+═══════════════════════════════════════════════════════════════
+  ACTIONS HORS CLAUDE CODE (POUR MICHEL)
+═══════════════════════════════════════════════════════════════
+
+V52 ne necessite AUCUNE action Firebase manuelle. Tout est code-only.
+
+Optionnel — apres push V52 :
+1. Verifier deploy Vercel preview v2 OK
+   https://97import-firebase-git-v2-parisb2b.vercel.app/admin
+
+2. Test manuel Dashboard :
+   - Si BD vide → voir EmptyState 📋 📦 💰 (pas de demo data)
+   - Si BD avec donnees → voir conteneurs reels (CP C effectif)
+
+3. Test manuel pages avec LoadingState (CP E) :
+   - /admin/factures, /admin/clients, /admin/partenaires
+   - /admin/commissions, /admin/sav
+   - /admin/conteneurs, /admin/listes-achat
+
+4. Lancer audit acomptes READ-ONLY (CP H) si souhait :
+   node scripts/audit-acomptes-v52.cjs --dry-run
+   → genere audit-v52/AUDIT-ACOMPTES-RESULTS.txt
+
+Aucune commande Firebase deploy en V52 (rules + indexes inchanges).
+Aucune commande gcloud en V52.
+Aucune rotation cle API (mode gratuit, V49 CP D).
+
+═══════════════════════════════════════════════════════════════
+  ROLLBACK PLAN
+═══════════════════════════════════════════════════════════════
+
+Si bug majeur post-V52 sur Vercel preview :
+1. git reset --hard backup-pre-v52-20260502-1313
+2. git push origin v2 --force-with-lease (avec accord Michel)
+3. Vercel redeploy automatique sur push v2
+
+Rollback partiel (1 CP) :
+- git revert <commit-hash> du CP fautif
+- exemple CP B : git revert 0177b88
+- push origin v2
+
+Restauration BD : NON NECESSAIRE (V52 = code-only, aucune
+modification Firestore).
+
+═══════════════════════════════════════════════════════════════
+  PROCHAINE MISSION : V53
+═══════════════════════════════════════════════════════════════
+
+Cf docs/superpowers/plans/2026-05-02-v52-profiles-migration.md
+pour le plan detaille V53 (migration profiles → clients).
+
+Pre-requis V53 :
+- V52 mergé sur v2 ✅
+- Backup tag backup-pre-v53-YYYYMMDD-HHMM
+- Audit Firestore GCS (Michel manuel)
+- Audit acomptes V52 lance et resultat OK
+
+Estimation V53 : 8-12h autonome (8 taches sequentielles avec
+script BD --dry-run/--execute).
+
+═══════════════════════════════════════════════════════════════
+  FIN MISSION V52
+═══════════════════════════════════════════════════════════════
