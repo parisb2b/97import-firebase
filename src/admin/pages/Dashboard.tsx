@@ -12,6 +12,7 @@ import {
   Progress,
 } from '../components/Icons';
 import LoadingState from '../components/atoms/LoadingState';
+import EmptyState from '../components/atoms/EmptyState';
 
 interface Stats {
   devisTotal: number;
@@ -310,37 +311,15 @@ export default function Dashboard() {
               </thead>
               <tbody>
                 {recentDevis.length === 0 ? (
-                  <>
-                    {/* Demo data if no real data */}
-                    <tr className="cl">
-                      <td>
-                        <strong>D2604006</strong>
-                      </td>
-                      <td>Dupont MQ</td>
-                      <td style={{ fontWeight: 700, color: 'var(--pu)' }}>14 200€</td>
-                      <td>
-                        <Pill variant="pu">VIP</Pill>
-                      </td>
-                      <td className="tda">
-                        <Link href="/admin/devis/D2604006">
-                          <IconButton icon={<EyeIcon />} tooltip="Ouvrir" variant="eye" />
-                        </Link>
-                      </td>
-                    </tr>
-                    <tr className="cl">
-                      <td>
-                        <strong>D2604007</strong>
-                      </td>
-                      <td>Martin GP</td>
-                      <td style={{ fontWeight: 700 }}>18 400€</td>
-                      <td>
-                        <Pill variant="or">En attente</Pill>
-                      </td>
-                      <td className="tda">
-                        <IconButton icon={<EyeIcon />} tooltip="Ouvrir" variant="eye" />
-                      </td>
-                    </tr>
-                  </>
+                  <tr>
+                    <td colSpan={5} style={{ padding: 0 }}>
+                      <EmptyState
+                        icon="📋"
+                        title="Aucun devis récent"
+                        description="Les derniers devis apparaîtront ici dès qu'ils seront créés."
+                      />
+                    </td>
+                  </tr>
                 ) : (
                   recentDevis.map((d) => (
                     <tr key={d.id} className="cl">
@@ -384,32 +363,11 @@ export default function Dashboard() {
           >
             <div style={{ padding: 12 }}>
               {conteneurs.length === 0 ? (
-                <>
-                  {/* Demo container */}
-                  <div style={{ marginBottom: 10 }}>
-                    <div
-                      style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        marginBottom: 3,
-                      }}
-                    >
-                      <strong style={{ fontSize: 12 }}>CTN-2604-001</strong>
-                      <Pill variant="or">En prep.</Pill>
-                    </div>
-                    <div
-                      style={{ fontSize: 11, color: 'var(--tx3)', marginBottom: 3 }}
-                    >
-                      40HC · MQ Fort de France · 23/04
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-                      <div style={{ flex: 1 }}>
-                        <Progress value={48} max={67} />
-                      </div>
-                      <span style={{ fontSize: 11, fontWeight: 700 }}>48/67m³</span>
-                    </div>
-                  </div>
-                </>
+                <EmptyState
+                  icon="📦"
+                  title="Aucun conteneur actif"
+                  description="Les conteneurs en préparation ou en transit s'afficheront ici."
+                />
               ) : (
                 conteneurs.map((c) => (
                   <div key={c.id} style={{ marginBottom: 10 }}>
@@ -493,27 +451,15 @@ export default function Dashboard() {
               </thead>
               <tbody>
                 {commissions.length === 0 ? (
-                  <>
-                    {/* Demo data */}
-                    <tr>
-                      <td>
-                        <Pill variant="pu">JM</Pill> Jean-Marc
-                      </td>
-                      <td style={{ fontWeight: 700, color: 'var(--pu)' }}>3 160€</td>
-                      <td>
-                        <Pill variant="or">Due</Pill>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <Pill variant="pu">TD</Pill> Thomas D.
-                      </td>
-                      <td style={{ fontWeight: 700, color: 'var(--pu)' }}>4 900€</td>
-                      <td>
-                        <Pill variant="or">Due</Pill>
-                      </td>
-                    </tr>
-                  </>
+                  <tr>
+                    <td colSpan={3} style={{ padding: 0 }}>
+                      <EmptyState
+                        icon="💰"
+                        title="Aucune commission due"
+                        description="Les commissions partenaires dues apparaîtront ici."
+                      />
+                    </td>
+                  </tr>
                 ) : (
                   commissions.map((c) => (
                     <tr key={c.id}>
