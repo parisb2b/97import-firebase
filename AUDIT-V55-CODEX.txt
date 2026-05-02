@@ -1,0 +1,302 @@
+# AUDIT V55 CODEX — 97IMPORT
+
+Date : 02/05/2026
+Branche : v2
+Projet Firebase obligatoire : importok-6ef77
+Mode : audit production + corrections non destructives
+
+## 1. Résumé de la mission
+
+Audit V55 repris depuis l'état post V53/V54.
+
+Préflight validé :
+- répertoire : /Users/mactell/97import-firebase
+- branche : v2
+- build initial : OK
+- tag backup créé et poussé : backup-pre-v55-audit-20260502-1602
+- fichier marqueur local ignoré : .v55-backup-tag.txt
+
+Corrections appliquées pendant V55 :
+- suppression du doublon BuildVersionBadge créé en V54 ;
+- conservation du composant version existant via Footer + src/lib/version.ts ;
+- remplacement de la suppression définitive produit par un archivage actif=false ;
+- verrouillage du champ EUR dans l'ancien ProductForm.
+
+Aucun déploiement Firebase exécuté.
+Aucune suppression Firestore exécutée.
+Aucun script destructif exécuté.
+
+## 2. Fichiers modifiés
+
+- .gitignore
+- src/front/pages/Home.tsx
+- src/components/BuildVersionBadge.tsx
+- src/admin/pages/FicheProduit.tsx
+- src/admin/components/ProductForm.tsx
+- AUDIT-V55-CODEX.txt
+
+## 3. Changements effectués
+
+### Anti-doublon version / badge
+
+Constat :
+- src/lib/version.ts existe déjà ;
+- src/front/components/Footer.tsx importe VERSION_LABEL et affiche la version ;
+- src/components/BuildVersionBadge.tsx dupliquait cette fonction avec une valeur statique.
+
+Action :
+- retrait de l'import BuildVersionBadge dans Home ;
+- retrait de l'affichage BuildVersionBadge dans Home ;
+- suppression de src/components/BuildVersionBadge.tsx.
+
+Conclusion :
+- BuildVersionBadge était un doublon fonctionnel ;
+- la version doit rester centralisée dans src/lib/version.ts et affichée via Footer.
+
+### Suppression produit interdite
+
+Constat :
+- src/admin/pages/FicheProduit.tsx utilisait deleteDoc sur products.
+
+Action :
+- suppression de l'import deleteDoc ;
+- remplacement du handler de suppression par handleArchive ;
+- archivage par setDoc merge :
+  - actif: false
+  - archived_at: serverTimestamp()
+  - updated_at: serverTimestamp()
+
+Résultat :
+- aucun document products n'est supprimé depuis cette UI ;
+- le produit reste conservé dans Firestore.
+
+### ProductForm legacy
+
+Constat :
+- src/admin/components/ProductForm.tsx exposait prix_achat_eur en édition.
+
+Action :
+- champ EUR passé en readOnly ;
+- ajout aria-readonly ;
+- indication que la valeur est calculée depuis le CNY par la logique pricing centralisée.
+
+## 4. Commandes exécutées
+
+Commandes locales :
+- git branch --show-current
+- git status --short
+- git log --oneline -12
+- git tag --points-at HEAD
+- npm run build
+- rg / find / grep read-only sur src et scripts
+- git diff --stat
+- npm run lint
+
+Commandes réseau sûres :
+- curl -I https://97import-firebase-git-v2-parisb2bs-projects.vercel.app/
+- curl -I https://97import-firebase-git-v2-parisb2bs-projects.vercel.app/admin
+
+Commande Firestore read-only :
+- node scripts/clean-start-business-data-v53.cjs --dry-run
+
+## 5. Tests effectués
+
+### Build
+
+Résultat :
+- npm run build : OK
+
+Warnings Vite persistants :
+- imports dynamiques et statiques mélangés sur certains modules ;
+- chunks supérieurs à 800 kB.
+
+Ces warnings ne bloquent pas le build.
+
+### Lint
+
+Résultat :
+- npm run lint : KO
+
+Cause :
+- ESLint 9 ne trouve pas eslint.config.(js|mjs|cjs).
+
+Impact :
+- non bloquant runtime ;
+- à corriger en V56 ou dans une mission qualité dédiée.
+
+### Vercel preview
+
+Résultat :
+- FRONT : HTTP 200
+- ADMIN : HTTP 200
+
+URLs vérifiées :
+- https://97import-firebase-git-v2-parisb2bs-projects.vercel.app/
+- https://97import-firebase-git-v2-parisb2bs-projects.vercel.app/admin
+
+### Dry-run Firestore V53
+
+Résultat :
+- mode : dry-run
+- project : importok-6ef77
+- aucune archive créée ;
+- aucune écriture Firestore ;
+- aucune suppression Firestore.
+
+Collections KEEP constatées :
+- users: 9
+- clients: 6
+- partners: 3
+- products: 127
+- categories: 5
+- ports: 11
+- admin_params: 4
+- tarifs_logistiques: 3
+- counters: 16
+
+Collections ARCHIVE-ONLY constatées :
+- profiles: 9
+- mail: 254
+- logs: 10
+
+Collections PURGE constatées :
+- quotes: 1
+- commissions: 0
+- factures: 0
+- invoices: 0
+- logistics_invoices: 0
+- conteneurs: 0
+- containers: 0
+- notes_commission: 0
+- listes_achat: 0
+- sav: 0
+- contacts: 0
+- stock: 0
+- price_history: 0
+
+Point d'attention :
+- une nouvelle entrée quotes existe après le clean start V53 ;
+- aucune purge n'a été exécutée dans V55.
+
+## 6. Risques restants
+
+### Haute priorité
+
+1. firebase.json contient encore un bucket import2030.
+
+Fichier :
+- firebase.json:6
+
+Risque :
+- confusion historique import2030 / importok-6ef77.
+
+Action recommandée :
+- audit Firebase/Vercel spécifique du bucket actif ;
+- correction uniquement après confirmation du bucket réel.
+
+2. firestore.rules laisse counters lisible/inscriptible par tout utilisateur authentifié.
+
+Fichier :
+- firestore.rules:161-163
+
+Risque :
+- numérotation documentaire manipulable hors admin.
+
+Action recommandée :
+- limiter counters à isAdmin() après validation fonctionnelle ;
+- ne pas déployer sans validation humaine.
+
+Commande à proposer seulement après validation :
+- firebase deploy --only firestore:rules --project=importok-6ef77
+
+3. Scripts legacy dangereux dans scripts.
+
+Constats :
+- scripts/delete-quotes.mjs peut supprimer quotes et counters ;
+- scripts/reset-database.sh reste destructif ;
+- scripts/repair-97importcom.js modifie Auth/Firestore et supprime un partenaire ;
+- scripts/seed-direct.js et scripts/seed-browser.html contiennent des opérations de purge/seed legacy ;
+- scripts/nettoyage-catalogue.js peut supprimer products.
+
+Action recommandée :
+- isoler ou désactiver les scripts legacy destructifs ;
+- ne conserver exécutables que les scripts avec garde-fous V53.
+
+### Moyenne priorité
+
+4. Pricing overrides encore présents.
+
+Fichiers :
+- src/admin/components/produit/OngletGestionPrix.tsx
+- src/admin/hooks/usePricingEngine.ts
+
+Risque :
+- les overrides prix public / partenaire peuvent contredire la règle CNY source unique + multiplicateurs.
+
+Action recommandée :
+- décision métier explicite :
+  - soit interdiction totale des overrides ;
+  - soit conservation sous champs override explicites avec motif obligatoire et audit trail.
+
+5. ESLint non opérationnel.
+
+Fichier :
+- package.json
+
+Risque :
+- npm run lint inutilisable avec ESLint 9.
+
+Action recommandée :
+- ajouter eslint.config.js compatible ESLint 9 ou adapter le script lint.
+
+6. Nouvelle donnée documentaire quotes=1 après V53.
+
+Risque :
+- environnement preview/admin a recréé au moins un devis documentaire.
+
+Action recommandée :
+- ne pas purger automatiquement ;
+- traiter uniquement via procédure dry-run + archive + validation explicite.
+
+## 7. Instructions de validation Vercel v2
+
+Après commit et push sur origin/v2 :
+- attendre le déploiement preview Vercel ;
+- vérifier le front :
+  - https://97import-firebase-git-v2-parisb2bs-projects.vercel.app/
+- vérifier l'admin :
+  - https://97import-firebase-git-v2-parisb2bs-projects.vercel.app/admin
+
+Contrôles UI recommandés :
+- le footer affiche toujours la version via VERSION_LABEL ;
+- la home ne montre plus de badge version doublon ;
+- la fiche produit affiche "Archiver" au lieu de "Supprimer" ;
+- l'archivage produit applique actif=false sans supprimer le document ;
+- l'ancien ProductForm ne permet plus de modifier prix_achat_eur.
+
+## 8. Commandes Firebase éventuelles à lancer manuellement
+
+Aucune commande Firebase n'a été exécutée pendant V55.
+
+Si et seulement si les rules counters sont corrigées et validées humainement :
+
+firebase deploy --only firestore:rules --project=importok-6ef77
+
+## 9. Rollback plan
+
+Rollback code V55 :
+- revenir au tag backup-pre-v55-audit-20260502-1602 si nécessaire ;
+- ou revert du commit V55 final.
+
+Rollback fonctionnel :
+- aucun rollback Firestore requis, car V55 n'a exécuté aucune suppression ni écriture de données.
+
+## 10. Statut final
+
+GO partiel pour publication preview v2 des corrections non destructives.
+
+NO GO pour :
+- déploiement Firebase rules automatique ;
+- purge documentaire quotes ;
+- modification bucket Storage sans audit spécifique ;
+- exécution de scripts legacy destructifs.

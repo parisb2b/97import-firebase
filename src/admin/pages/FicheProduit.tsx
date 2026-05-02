@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useRoute, useLocation, Link } from 'wouter';
-import { doc, getDoc, setDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { calculerCompletude, CHAMPS_ESSENTIEL, migrerGalerieImages } from '../../lib/productHelpers';
 import { sanitizeForFirestore } from '../../lib/firebaseUtils';
@@ -210,23 +210,25 @@ export default function FicheProduit() {
     }
   };
 
-  const handleDelete = async () => {
-    if (!confirm('⚠️ Supprimer définitivement ce produit ?\n\nCette action est irréversible.')) return;
+  const handleArchive = async () => {
+    if (!confirm('Archiver ce produit ?\n\nLe document produit sera conservé et actif=false sera appliqué.')) return;
     setSaving(true);
     try {
-      await deleteDoc(doc(db, 'products', product.reference));
+      await setDoc(doc(db, 'products', product.reference), {
+        actif: false,
+        archived_at: serverTimestamp(),
+        updated_at: serverTimestamp(),
+      }, { merge: true });
+      setProduct((prev: any) => ({ ...prev, actif: false }));
+      setDirty(false);
       setToast({
-        message: `Produit ${product.reference} supprimé ✓`,
-        type: 'success',
+        message: `Produit ${product.reference} archivé (actif=false) ✓`,
+        type: 'warning',
       });
-      // Attendre un peu avant de naviguer pour que le toast soit visible
-      setTimeout(() => {
-        setLocation('/admin/produits');
-      }, 1200);
     } catch (err: any) {
-      console.error('Erreur delete:', err);
+      console.error('Erreur archivage:', err);
       setToast({
-        message: 'Erreur lors de la suppression',
+        message: 'Erreur lors de l’archivage',
         type: 'error',
         details: [err.message],
       });
@@ -362,10 +364,10 @@ export default function FicheProduit() {
         </div>
         <div style={{ display: 'flex', gap: 10 }}>
           {!isCreation && (
-            <button onClick={handleDelete} disabled={saving}
-              className="v45-trans-fast v45-focus v45-btn-danger"
-              style={{ padding: '10px 20px', background: 'transparent', border: '1.5px solid #FCA5A5', color: '#DC2626', borderRadius: 10, fontSize: 14, fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.5 : 1 }}>
-              Supprimer
+            <button onClick={handleArchive} disabled={saving}
+              className="v45-trans-fast v45-focus v45-btn-warning"
+              style={{ padding: '10px 20px', background: 'transparent', border: '1.5px solid #FCD34D', color: '#B45309', borderRadius: 10, fontSize: 14, fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.5 : 1 }}>
+              Archiver
             </button>
           )}
           {!isCreation && product?.reference && (

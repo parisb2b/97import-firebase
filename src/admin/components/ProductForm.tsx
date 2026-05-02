@@ -185,8 +185,10 @@ export default function ProductForm({
             <input
               type="number"
               value={data.prix_achat_eur || ''}
-              onChange={(e) => handleChange('prix_achat_eur', Number(e.target.value))}
-              className="fi" style={{ background: "var(--bg2)" }}
+              readOnly
+              aria-readonly="true"
+              title="Calculé depuis le CNY par la logique pricing centralisée"
+              className="fi" style={{ background: "var(--bg2)", cursor: "not-allowed", color: "var(--tx3)" }}
             />
           </div>
 
