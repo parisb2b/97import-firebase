@@ -90,7 +90,11 @@ const SIDEBAR_SECTIONS: SidebarSection[] = [
   {
     label: 'Utilisateurs',
     items: [
-      { path: '/admin/clients', label: 'Clients', icon: '👥', badge: 3 },
+      // V49 Checkpoint L — badge dynamique = TOTAL clients (decision metier
+      // Michel V49 : pas filtre, tous les clients comptent). Avant V49 :
+      // valeur '3' hardcodee qui ne reflechait pas la realite BD (7 clients
+      // listes par AdminClients.tsx mais badge 3).
+      { path: '/admin/clients', label: 'Clients', icon: '👥' },
       { path: '/admin/partenaires', label: 'Partenaires', icon: '🤝' },
     ],
   },
@@ -219,7 +223,19 @@ export default function AdminApp() {
     }, (err) => {
       console.warn('[AdminApp badge SAV] snapshot error:', err.message);
     });
-    return () => unsubSav();
+
+    // V49 Checkpoint L — badge Clients : TOTAL clients (pas de filtre).
+    // Decision metier Michel V49 : afficher la taille de la collection.
+    const unsubClients = onSnapshot(collection(db, 'clients'), (snap) => {
+      setDynamicBadges((prev) => ({ ...prev, '/admin/clients': snap.size }));
+    }, (err) => {
+      console.warn('[AdminApp badge Clients] snapshot error:', err.message);
+    });
+
+    return () => {
+      unsubSav();
+      unsubClients();
+    };
   }, []);
 
   useEffect(() => {
