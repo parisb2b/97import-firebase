@@ -13,9 +13,9 @@ export default function DetailFraisLogistique() {
   useEffect(() => {
     const load = async () => {
       if (!params?.id) return;
-      // Try logistics_invoices first, fallback to containers
+      // Try logistics_invoices first, fallback to conteneurs (V52 CP C)
       let snap = await getDoc(doc(db, 'logistics_invoices', params.id));
-      if (!snap.exists()) snap = await getDoc(doc(db, 'containers', params.id));
+      if (!snap.exists()) snap = await getDoc(doc(db, 'conteneurs', params.id));
       if (snap.exists()) setData({ id: snap.id, ...snap.data() });
       setLoading(false);
     };

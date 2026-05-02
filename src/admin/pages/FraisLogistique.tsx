@@ -50,7 +50,7 @@ export default function FraisLogistique() {
 
   const handleFMPDF = async (f: FraisLigne) => {
     try {
-      const containerSnap = await getDoc(doc(db, 'containers', f.id));
+      const containerSnap = await getDoc(doc(db, 'conteneurs', f.id));
       const containerData = containerSnap.exists() ? containerSnap.data() : {};
       const fraisLignes = [
         { description: `Fret maritime ${containerData.port_chargement || ''} → ${containerData.port_destination || ''}`, volume_poids: `${containerData.volume_total?.toFixed(1) || 0} m³`, prix_unitaire: f.fret_maritime, total: f.fret_maritime },
@@ -76,8 +76,8 @@ export default function FraisLogistique() {
         let snap = await getDocs(query(collection(db, 'logistics_invoices'), orderBy('createdAt', 'desc')));
 
         if (snap.empty) {
-          // Fallback: build from containers
-          snap = await getDocs(query(collection(db, 'containers'), orderBy('createdAt', 'desc')));
+          // Fallback: build from conteneurs (V52 CP C)
+          snap = await getDocs(query(collection(db, 'conteneurs'), orderBy('createdAt', 'desc')));
           const data = snap.docs.map((d) => {
             const raw = d.data();
             const key = `${raw.destination || 'MQ'}-${raw.type || '40ft'}`;

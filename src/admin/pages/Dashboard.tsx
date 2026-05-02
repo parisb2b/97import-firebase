@@ -171,7 +171,7 @@ export default function Dashboard() {
 
       const loadConteneurs = async (): Promise<Conteneur[]> => {
         const contQuery = query(
-          collection(db, 'containers'),
+          collection(db, 'conteneurs'),
           where('statut', 'in', ['préparation', 'chargé', 'parti']),
           limit(3)
         );
