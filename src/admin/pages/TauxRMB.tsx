@@ -201,11 +201,13 @@ export default function TauxRMB() {
               style={{ background: modeEdition ? '#FFFBEB' : '#F3F4F6' }} />
           </div>
           <div className="fg">
-            <div className="fl">
-              1 USD = X CNY {modeEdition ? '(auto ou manuel)' : '(auto)'}
-            </div>
+            {/* V49 Checkpoint I — USD/CNY est un 3eme taux saisissable manuellement
+                (pas une valeur calculee). Suppression du label "(auto)" trompeur. */}
+            <div className="fl">1 USD = X CNY</div>
             <input className="fi" type="number" step="0.0001"
-              value={modeEdition ? draftRates.usd_cny : (draftRates.eur_cny / draftRates.eur_usd || 0).toFixed(4)}
+              value={modeEdition
+                ? draftRates.usd_cny
+                : (draftRates.usd_cny || (draftRates.eur_cny / draftRates.eur_usd) || 0).toFixed(4)}
               disabled={!modeEdition}
               onChange={(e) => setDraftRates({ ...draftRates, usd_cny: parseFloat(e.target.value) || 0 })}
               style={{ background: modeEdition ? '#FFFBEB' : '#F3F4F6', color: modeEdition ? '#111827' : '#6B7280' }} />
@@ -241,7 +243,9 @@ export default function TauxRMB() {
             <div style={{ background: '#F3F4F6', padding: 12, borderRadius: 8, marginBottom: 18, fontSize: 12, fontFamily: 'monospace' }}>
               <div>1 EUR = <strong>{draftRates.eur_usd.toFixed(4)}</strong> USD</div>
               <div>1 EUR = <strong>{draftRates.eur_cny.toFixed(4)}</strong> CNY</div>
-              <div>1 USD = <strong>{(draftRates.eur_cny / draftRates.eur_usd).toFixed(4)}</strong> CNY (auto)</div>
+              {/* V49 Checkpoint I — afficher la valeur USD/CNY DRAFT (saisie manuelle
+                  acceptee), avec fallback auto eur_cny/eur_usd si draft est 0. */}
+              <div>1 USD = <strong>{(draftRates.usd_cny || (draftRates.eur_cny / draftRates.eur_usd) || 0).toFixed(4)}</strong> CNY</div>
             </div>
             <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
               <button
