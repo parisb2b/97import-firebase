@@ -35,14 +35,14 @@ jobs:
           TEST_PARTNER_PASSWORD: ${{ secrets.TEST_PARTNER_PASSWORD }}
           TEST_ADMIN_EMAIL: ${{ secrets.TEST_ADMIN_EMAIL }}
           TEST_ADMIN_PASSWORD: ${{ secrets.TEST_ADMIN_PASSWORD }}
-        run: npx playwright test tests/specs/parcours-${{ matrix.role }}.spec.ts
+        run: npx playwright test --config=tests/playwright.config.ts tests/specs/parcours-${{ matrix.role }}.spec.ts
 
-      - name: Upload report
+      - name: Upload test-results (traces + screenshots)
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: rapport-${{ matrix.role }}
-          path: playwright-report/
+          path: test-results/
 
   check-merge:
     needs: test-parcours
