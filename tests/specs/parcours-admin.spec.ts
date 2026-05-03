@@ -54,7 +54,7 @@ test.describe('Parcours Administrateur (non-auth)', () => {
 
   test('A07 — Titre 97import visible dans login (V78 design)', async ({ page }) => {
     await page.goto('/admin');
-    await expect(page.getByText('97import')).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole('heading', { name: '97import' })).toBeVisible({ timeout: 10000 });
   });
 
   test('A08 — Aucune erreur JS sur la page login admin', async ({ page }) => {
