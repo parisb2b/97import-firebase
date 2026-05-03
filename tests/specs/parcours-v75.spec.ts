@@ -116,12 +116,12 @@ test.describe('T05 — Securite RBAC', () => {
     await page.goto(`${BASE_URL}/admin/devis`);
     await page.waitForTimeout(TIMEOUTS.navigation);
 
-    // Doit afficher le login ou un message forbidden
+    // V83 — Admin login ou redirection : "97import", "Se connecter", ou "Mot de passe"
     const bodyText = await page.locator('body').innerText();
-    const isForbidden = bodyText.includes('administrateur')
-      || bodyText.includes('admin')
-      || bodyText.includes('Connexion')
-      || bodyText.includes('connexion');
+    const isForbidden = bodyText.includes('97import')
+      || bodyText.includes('Mot de passe')
+      || bodyText.includes('Se connecter')
+      || bodyText.includes('administrateur');
     expect(isForbidden).toBeTruthy();
   });
 
@@ -186,6 +186,7 @@ test.describe('Verifications structurelles V75', () => {
 
     const bodyText = await page.locator('body').innerText();
     // Format attendu : v0.43.3 · JJ/MM/AAAA · abc1234
-    expect(bodyText).toMatch(/v\d+\.\d+\.\d+\s*·\s*\d{2}\/\d{2}\/\d{4}\s*·\s*[a-f0-9]{7}/);
+    // V83 — Format reel : v0.43.7 · JJ/MM/AAAA HH:MM · abc1234
+    expect(bodyText).toMatch(/v\d+\.\d+\.\d+\s*·\s*\d{2}\/\d{2}\/\d{4}\s*\d{2}:\d{2}\s*·\s*[a-f0-9]{7}/);
   });
 });

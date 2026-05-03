@@ -20,6 +20,7 @@ interface Devis {
   id: string;
   numero: string;
   date: string;
+  date_complete: string;
   client_nom: string;
   partenaire_code?: string;
   destination: string;
@@ -29,6 +30,10 @@ interface Devis {
   is_vip: boolean;
   conteneur_ref?: string;
   createdAt: any;
+  acomptes: any[];
+  nbAcomptesEncaisses: number;
+  nbAcomptesDeclares: number;
+  totalEncaisse: number;
 }
 
 export default function ListeDevis() {
@@ -65,13 +70,17 @@ export default function ListeDevis() {
       const snap = await getDocs(q);
       const data = snap.docs.map((d) => {
         const raw = d.data();
+        const acomptes = raw.acomptes || [];
+        const acomptesEncaisses = acomptes.filter((a: any) => a.encaisse === true);
+        const acomptesDeclares = acomptes.filter((a: any) => a.encaisse === false);
+        const dateComplete = raw.createdAt?.toDate
+          ? raw.createdAt.toDate().toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })
+          : (raw.date_creation ? new Date(raw.date_creation).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '—');
         return {
           id: d.id,
           numero: raw.numero || d.id,
-          date: raw.createdAt?.toDate?.()?.toLocaleDateString('fr-FR', {
-            day: '2-digit',
-            month: '2-digit',
-          }) || '',
+          date: dateComplete,
+          date_complete: dateComplete,
           client_nom: raw.client_nom || '',
           partenaire_code: raw.partenaire_code,
           destination: raw.destination || 'MQ',
@@ -80,7 +89,10 @@ export default function ListeDevis() {
           statut: raw.statut || 'brouillon',
           is_vip: raw.is_vip || false,
           conteneur_ref: raw.conteneur_ref,
-          acomptes: raw.acomptes || [],
+          acomptes,
+          nbAcomptesEncaisses: acomptesEncaisses.length,
+          nbAcomptesDeclares: acomptesDeclares.length,
+          totalEncaisse: acomptesEncaisses.reduce((s: number, a: any) => s + (a.montant || 0), 0),
           lignes: raw.lignes || [],
           client_id: raw.client_id,
         } as any;
@@ -216,6 +228,7 @@ export default function ListeDevis() {
               <th>Dest.</th>
               <th>Produits</th>
               <th>Montant</th>
+              <th>Acomptes</th>
               <th>Statut</th>
               <th>Ctn.</th>
               <th>Actions</th>
@@ -224,7 +237,7 @@ export default function ListeDevis() {
           <tbody>
             {filtered.length === 0 ? (
               <tr>
-                <td colSpan={10} style={{ textAlign: 'center', padding: '32px', color: '#666' }}>
+                <td colSpan={11} style={{ textAlign: 'center', padding: '32px', color: '#666' }}>
                   Aucun devis trouvé
                 </td>
               </tr>
@@ -253,6 +266,27 @@ export default function ListeDevis() {
                   }}
                 >
                   {d.total_ht.toLocaleString('fr-FR')}€
+                </td>
+                <td style={{ textAlign: 'center' }}>
+                  {d.acomptes.length > 0 ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 2, alignItems: 'center' }}>
+                      <span style={{ fontSize: 12, fontWeight: 600, color: d.totalEncaisse > 0 ? '#166534' : '#D97706' }}>
+                        {d.nbAcomptesEncaisses}/{d.acomptes.length}
+                      </span>
+                      {d.totalEncaisse > 0 && (
+                        <span style={{ fontSize: 10, color: '#6B7280' }}>
+                          {d.totalEncaisse.toLocaleString('fr-FR')}€
+                        </span>
+                      )}
+                      {d.nbAcomptesDeclares > 0 && (
+                        <span style={{ fontSize: 9, color: '#D97706', background: '#FFFBEB', padding: '1px 5px', borderRadius: 6 }}>
+                          {d.nbAcomptesDeclares} en attente
+                        </span>
+                      )}
+                    </div>
+                  ) : (
+                    <span style={{ fontSize: 11, color: '#9CA3AF' }}>—</span>
+                  )}
                 </td>
                 <td>{getStatutPill(d)}</td>
                 <td>
