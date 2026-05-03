@@ -52,12 +52,12 @@ body {
 }
 
 /* ===== SIDEBAR ===== */
-/* V77 — Clean Sweep : .sb ne scroll jamais (overflow:hidden).
-   Le defilement est delegue a .sb-scroller interne. */
+/* V78 — Refonte Gmail White : fond blanc, police agrandie, style premium */
 .sb {
-  width: 220px;
+  width: 230px;
   flex-shrink: 0;
-  background: var(--nv);
+  background: #FFFFFF;
+  border-right: 1px solid #E5E7EB;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -76,8 +76,8 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 13px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  padding: 14px 16px;
+  border-bottom: 1px solid #E5E7EB;
 }
 
 .sb-lb {
@@ -93,9 +93,9 @@ body {
 
 .sb-lt {
   font-family: var(--fh);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 800;
-  color: #fff;
+  color: var(--nv);
 }
 
 .sb-lt em {
@@ -104,93 +104,122 @@ body {
 }
 
 .sb-adm {
-  background: rgba(255, 152, 0, 0.18);
-  color: var(--or2);
+  background: #FEE2E2;
+  color: var(--rd);
   font-size: 9px;
   font-weight: 700;
-  padding: 1px 5px;
+  padding: 1px 6px;
   border-radius: 8px;
 }
 
 .sb-clk {
-  padding: 6px 12px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  padding: 8px 16px;
+  border-bottom: 1px solid #E5E7EB;
 }
 
 .sb-cr {
   display: flex;
   justify-content: space-between;
   padding: 2px 0;
-  font-size: 10px;
+  font-size: 11px;
 }
 
 .sb-cz {
-  color: rgba(255, 255, 255, 0.4);
+  color: #9CA3AF;
 }
 
 .sb-ct {
-  color: #fff;
+  color: var(--tx2);
   font-weight: 700;
 }
 
 .sb-sec {
-  padding: 8px 12px 2px;
-  font-size: 9px;
+  padding: 8px 16px 4px;
+  font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.8px;
-  color: rgba(255, 255, 255, 0.28);
-  margin-top: 3px;
+  color: #9CA3AF;
+  margin-top: 4px;
 }
 
 .si {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 7px 13px;
+  padding: 8px 16px;
   cursor: pointer;
-  color: rgba(255, 255, 255, 0.58);
-  font-size: 12px;
+  color: var(--tx2);
+  font-size: 14px;
+  font-weight: 500;
   border-left: 3px solid transparent;
   transition: all 0.15s;
   text-decoration: none;
+  border-radius: 0 8px 8px 0;
+  margin: 1px 8px;
 }
 
 .si:hover {
-  background: rgba(255, 255, 255, 0.06);
-  color: #fff;
+  background: #F3F4F6;
+  color: var(--tx);
+  border-left-color: #D1D5DB;
 }
 
 .si.on {
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
-  border-left-color: var(--or2);
+  background: #EFF6FF;
+  color: var(--nv);
+  font-weight: 600;
+  border-left-color: var(--nv);
 }
 
 .si-l {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 8px;
 }
 
 .sb-bdg {
-  background: #EF4444;
+  background: var(--rd);
   color: #fff;
-  font-size: 9px;
-  padding: 1px 5px;
+  font-size: 10px;
+  padding: 1px 6px;
   border-radius: 8px;
   font-weight: 700;
 }
 
 .sb-bdg.am {
-  background: rgba(255, 152, 0, 0.3);
-  color: var(--or2);
+  background: var(--orl);
+  color: var(--or);
 }
 
 .sb-sep {
   height: 1px;
-  background: rgba(255, 255, 255, 0.06);
-  margin: 4px 0;
+  background: #E5E7EB;
+  margin: 4px 8px;
+}
+
+/* V78 — Bouton Plus/Moins repli menu */
+.sb-expand {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--tx3);
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  font-family: var(--fb);
+  width: 100%;
+  text-align: left;
+  transition: all 0.15s;
+  border-top: 1px solid #E5E7EB;
+  margin-top: auto;
+}
+.sb-expand:hover {
+  background: #F3F4F6;
+  color: var(--tx);
 }
 
 /* ===== MAIN ===== */

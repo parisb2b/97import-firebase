@@ -202,6 +202,13 @@ export default function AdminApp() {
   // request.auth.token.role === 'admin' (set par scripts/set-admin-role.cjs).
   // Tout user authentifie sans role 'admin' tombe sur ForbiddenPage.
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
+  const [isMenuExpanded, setIsMenuExpanded] = useState(false);
+
+  // V78 — Sections repliables : Catalogue + Systeme masquees par defaut
+  const HIDDEN_SECTIONS = ['Catalogue', 'Systeme'];
+  const visibleSections = isMenuExpanded
+    ? SIDEBAR_SECTIONS
+    : SIDEBAR_SECTIONS.filter(s => !HIDDEN_SECTIONS.includes(s.label || ''));
 
   // V50-BIS Checkpoint A — logout admin avec confirmation.
   const handleAdminLogout = async () => {
@@ -377,7 +384,7 @@ export default function AdminApp() {
 
         {/* Navigation sections */}
         <div className="sb-scroller">
-        {SIDEBAR_SECTIONS.map((section, sectionIdx) => (
+        {visibleSections.map((section, sectionIdx) => (
           <div key={sectionIdx}>
             {section.separator && <div className="sb-sep" />}
             {section.label && <div className="sb-sec">{section.label}</div>}
@@ -412,6 +419,12 @@ export default function AdminApp() {
           </div>
         ))}
         </div>
+
+        {/* V78 — Bouton Plus/Moins pour deplier Catalogue + Systeme */}
+        <button className="sb-expand" onClick={() => setIsMenuExpanded(!isMenuExpanded)}>
+          <span style={{ fontSize: 14 }}>{isMenuExpanded ? '▾' : '▸'}</span>
+          {isMenuExpanded ? 'Moins' : 'Plus'}
+        </button>
 
         {/* V50-BIS Checkpoint A — bouton Deconnexion en bas de sidebar.
             Style coherent V45 (.v45-btn-danger ghost rouge), confirme via
