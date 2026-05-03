@@ -87,6 +87,16 @@ export default function DetailDevis() {
   // V69 — utilise isDevisReadonly() centralisé (aligné avec firestore.rules)
   const estLectureSeule = isDevisReadonly(devis);
 
+  // V84 — Formatage robuste date acompte (Timestamp Firestore ou string ISO)
+  const formatDateAcompte = (val: any): string => {
+    if (!val) return '—';
+    try {
+      const d = val?.toDate ? val.toDate() : new Date(val);
+      if (isNaN(d.getTime())) return '—';
+      return d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    } catch { return '—'; }
+  };
+
   useEffect(() => {
     const fetchEmetteur = async () => {
       try {
@@ -548,7 +558,7 @@ export default function DetailDevis() {
             <tbody>
               {devis.acomptes.map((a, i) => (
                 <tr key={i}>
-                  <td>{new Date(a.date).toLocaleDateString('fr-FR')}</td>
+                  <td>{formatDateAcompte(a.date_reception || a.date)}</td>
                   <td>{a.ref_fa}</td>
                   <td style={{ textAlign: 'right' }}>{a.montant.toLocaleString('fr-FR')} €</td>
                 </tr>

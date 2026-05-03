@@ -45,8 +45,8 @@ export default function MesVirements({ userId, profile }: MesVirementsProps) {
         devis_is_vip: devis.is_vip || false,
         devis_statut: devis.statut,
         devis_ref: devis,  // ref complète pour bouton acompte
-        date: a.date,
-        date_encaissement: a.date_encaissement,
+        date: a.date_reception || a.date,
+        date_encaissement: a.date_encaissement || a.date_reception,
         montant: a.montant || 0,
         type_compte: a.type_compte || 'pro',
         iban_utilise: a.iban_utilise,

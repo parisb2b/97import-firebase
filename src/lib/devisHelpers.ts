@@ -26,14 +26,17 @@ export function peutVerserAcompte(devis: DevisLike): boolean {
   if (statutPaiement === 'paye_complet') return false;
 
   const totalHt = devis.total_ht || 0;
-  const totalEncaisse = devis.total_encaisse || 0;
-  const soldeRestant = totalHt - totalEncaisse;
-  if (soldeRestant <= 0) return false;
-
-  // v43-E3.2 v2 : workflow libre — limite uniquement le nb total de paiements
-  // (encaissés + déclarés en attente). Le client peut enchaîner les versements
-  // sans attendre la validation admin. Max strict : 4 paiements totaux.
   const acomptes = Array.isArray(devis.acomptes) ? devis.acomptes : [];
+
+  // V84 — Utiliser la somme des acomptes encaisses reels, pas total_encaisse
+  const totalEncaisse = acomptes
+    .filter((a: any) => a.encaisse === true)
+    .reduce((sum: number, a: any) => sum + (a.montant || 0), 0);
+
+  const soldeRestant = totalHt - totalEncaisse;
+  if (soldeRestant <= 0.01) return false;
+
+  // Max strict : 4 paiements totaux (3 acomptes + 1 solde)
   const nbPaiementsTotal = acomptes.length;
   if (nbPaiementsTotal >= 4) return false;
 
