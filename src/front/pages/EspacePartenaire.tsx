@@ -72,10 +72,9 @@ export default function EspacePartenaire() {
     setLoginErr('');
     try {
       const cred = await signInWithEmailAndPassword(clientAuth, loginEmail, loginPwd);
-      // Vérifier que l'utilisateur a le rôle partenaire
-      const snap = await getDoc(doc(db, 'users', cred.user.uid));
-      const p = snap.exists() ? snap.data() : null;
-      if (!p || p.role !== 'partner') {
+      // V81 — Vérifier le rôle via custom claims (getIdTokenResult force le refresh)
+      const tokenResult = await cred.user.getIdTokenResult(true);
+      if (tokenResult.claims.role !== 'partner') {
         setLoginErr('Ce compte n\'est pas un compte partenaire. Veuillez utiliser l\'espace client.');
         await clientAuth.signOut();
         return;
