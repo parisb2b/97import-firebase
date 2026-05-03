@@ -51,6 +51,19 @@ service cloud.firestore {
     function partnerCodeMatches(code) {
       return isPartner() && request.auth.token.partenaire_code == code;
     }
+    // V69 — Verrouillage lecture seule des devis signés / en cours d'exécution.
+    // Aligné avec quoteStatusHelpers.isDevisReadonly().
+    function isDevisReadonly(statut) {
+      return statut == 'signe'
+          || statut == 'acompte_1' || statut == 'acompte_2' || statut == 'acompte_3'
+          || statut == 'solde_paye'
+          || statut == 'commande_ferme'
+          || statut == 'en_production'
+          || statut == 'embarque_chine'
+          || statut == 'arrive_port_domtom'
+          || statut == 'livre'
+          || statut == 'termine';
+    }
 
     // ══════════════════════════════════════════════════════════
     // 📦 CATALOGUE PUBLIC + PARAMÈTRES TAUX
@@ -105,7 +118,8 @@ service cloud.firestore {
                   || partnerCodeMatches(resource.data.partenaire_code);
       allow create: if isAuth();
       allow update: if isAdmin()
-                  || partnerCodeMatches(resource.data.partenaire_code);
+                  || (partnerCodeMatches(resource.data.partenaire_code)
+                      && !isDevisReadonly(resource.data.statut));
       allow delete: if isAdmin();
     }
 

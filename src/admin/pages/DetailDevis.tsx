@@ -11,7 +11,7 @@ import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage
 import { adminDb as db, adminStorage as storage } from '../../lib/firebase';
 import { useI18n } from '../../i18n';
 import { getNextNumber } from '../../lib/counters';
-import { prochainPaiementEstSolde, getSoldeRestant } from '../../lib/quoteStatusHelpers';
+import { prochainPaiementEstSolde, getSoldeRestant, isDevisReadonly } from '../../lib/quoteStatusHelpers';
 import { OrangeIndicator } from '../../components/OrangeIndicator';
 import { generateDevis, downloadPDF } from '../../lib/pdf-generator';
 import { Card, Button } from '../components/Icons';
@@ -84,12 +84,8 @@ export default function DetailDevis() {
 
   const isNew = params?.id === 'nouveau';
 
-  // v43-E3.1 : devis verrouillé en lecture seule à partir de la signature et au-delà
-  const estLectureSeule = [
-    'signe', 'acompte_1', 'acompte_2', 'acompte_3', 'solde_paye',
-    'commande_ferme', 'en_production', 'embarque_chine',
-    'arrive_port_domtom', 'livre', 'termine',
-  ].includes(devis.statut);
+  // V69 — utilise isDevisReadonly() centralisé (aligné avec firestore.rules)
+  const estLectureSeule = isDevisReadonly(devis);
 
   useEffect(() => {
     const fetchEmetteur = async () => {
@@ -460,9 +456,7 @@ export default function DetailDevis() {
                       const prixPublic = ligne.prix_unitaire || 0;
                       const prixNegocie = devis.prix_negocies?.[ref] ?? prixPublic;
                       const estNegocie = devis.is_vip && prixNegocie !== prixPublic;
-                      const estLectureSeule = devis.statut === 'signe' || devis.statut === 'acompte_1'
-                        || devis.statut === 'acompte_2' || devis.statut === 'acompte_3'
-                        || devis.statut === 'solde_paye';
+                      const estLectureSeule = isDevisReadonly(devis);
 
                       // Mode lecture seule (devis signé ou en cours de paiement) avec affichage VIP
                       if (estLectureSeule) {

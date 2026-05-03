@@ -8,6 +8,9 @@ import { styleNavyHeader, styleData, styleTotal, styleWarning, NAVY } from './ex
 
 // ── Constantes depuis le template BC-CHINE-中国采购单.xlsx ────────────────────
 
+// V69 — Colonnes prix (Prix Achat ¥) et client supprimées pour conformité
+// confidentialité Chine (CDC V63 Zone 5). Seuls noms produits, quantités
+// et spécifications techniques sont exportés.
 const BC_HEADERS: string[] = [
   '号码\nN°',
   '快递单号\nN° Colis envoi',
@@ -27,16 +30,14 @@ const BC_HEADERS: string[] = [
   '厂家款号\nRéf. Usine',
   '中文材质\nMatière ZH',
   '英语材质\nMatière EN',
-  '单价\nPrix Achat (¥)',
   'CE / PDF\nCertification',
   '报价单日期\nDate Devis',
   '报价单号\nN° Devis',
-  '客户\nClient',
   '集装箱号\nN° Conteneur'
 ];
 
 const BC_COL_WIDTHS: number[] = [
-  6, 14, 16, 28, 26, 8, 8, 10, 10, 10, 12, 10, 10, 28, 12, 16, 18, 18, 14, 14, 12, 14, 20, 16
+  6, 14, 16, 28, 26, 8, 8, 10, 10, 10, 12, 10, 10, 28, 12, 16, 18, 18, 14, 12, 14, 16
 ];
 
 const BC_ROW_HEIGHTS: Record<number, number> = {
@@ -47,19 +48,6 @@ const BC_ROW_HEIGHTS: Record<number, number> = {
 };
 
 // ── Helpers locaux ───────────────────────────────────────────────────────────
-
-async function getTauxRmb(): Promise<number> {
-  try {
-    const snap = await getDoc(doc(db, 'admin_params', 'taux_rmb'));
-    if (snap.exists()) {
-      const val = snap.data()?.valeur;
-      if (typeof val === 'number' && val > 0) return val;
-    }
-  } catch {
-    console.warn('getTauxRmb: échec lecture Firestore, fallback 7.82');
-  }
-  return 7.82;
-}
 
 async function enrichirLigne(ligne: LigneProduit): Promise<LigneProduit> {
   if (!ligne.reference) return ligne;
@@ -126,7 +114,6 @@ export async function generateBcChine(laId: string): Promise<void> {
   );
 
   // 2. Enrichir chaque ligne depuis products/
-  const taux = await getTauxRmb();
   const lignes = await Promise.all(lignesRaw.map(enrichirLigne));
 
   // 3. Calculs totaux
@@ -155,22 +142,22 @@ export async function generateBcChine(laId: string): Promise<void> {
     ws.getRow(Number(r)).height = h;
   });
 
-  // 7. Ligne 1 — Titre principal fusionné A1:X1
-  ws.mergeCells('A1:X1');
+  // 7. Ligne 1 — Titre principal fusionné A1:V1
+  ws.mergeCells('A1:V1');
   const titreCell = ws.getCell('A1');
   titreCell.value = `BC CHINE  中国采购单  —  LISTE D'ACHAT ${formatIdExcel(la.numero || laId)}  —  97IMPORT.COM`;
   titreCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: NAVY } };
   titreCell.font = { bold: true, color: { argb: 'FFFFFFFF' }, name: 'Arial', size: 12 };
   titreCell.alignment = { horizontal: 'center', vertical: 'middle' };
 
-  // 8. Ligne 2 — Métadonnées A2:P2 + Note Q2:X2
+  // 8. Ligne 2 — Métadonnées A2:P2 + Note Q2:V2
   const ctnId = la.conteneur_id || la.num_conteneur || '';
   ws.mergeCells('A2:P2');
   ws.getCell('A2').value = `Généré le : ${todayFr()}   |   Conteneur : ${formatIdExcel(ctnId)}   |   Destination : ${la.destination || ''}`;
   ws.getCell('A2').font = { italic: true, name: 'Arial', size: 9, color: { argb: 'FF555555' } };
   ws.getCell('A2').alignment = { horizontal: 'left', vertical: 'middle' };
 
-  ws.mergeCells('Q2:X2');
+  ws.mergeCells('Q2:V2');
   ws.getCell('Q2').value = '自动算 Calcul automatique : Volume m³';
   ws.getCell('Q2').font = { italic: true, name: 'Arial', size: 8, color: { argb: 'FF888888' } };
   ws.getCell('Q2').alignment = { horizontal: 'right', vertical: 'middle' };
@@ -207,8 +194,8 @@ export async function generateBcChine(laId: string): Promise<void> {
     const rowNum = 5 + idx;
     ws.getRow(rowNum).height = 18;
     const vol = calcVolM3(ligne.longueur_cm, ligne.largeur_cm, ligne.hauteur_cm);
-    const prixCny = ligne.prix_achat_eur ? Math.round(ligne.prix_achat_eur * taux) : 0;
 
+    // V69 — Colonnes Prix Achat (¥) et Client supprimées (confidentialité Chine)
     const cells: { v: ExcelJS.CellValue; center: boolean; placeholder?: boolean }[] = [
       { v: idx + 1, center: true },                                                    // A: N°
       { v: '', center: true },                                                         // B: N° Colis (vide)
@@ -228,12 +215,10 @@ export async function generateBcChine(laId: string): Promise<void> {
       { v: strVal(ligne.ref_usine), center: false, placeholder: !ligne.ref_usine },    // P: Réf Usine
       { v: strVal(ligne.matiere_zh), center: false, placeholder: !ligne.matiere_zh },  // Q: Matière ZH
       { v: strVal(ligne.matiere_en), center: false, placeholder: !ligne.matiere_en },  // R: Matière EN
-      { v: prixCny, center: true },                                                    // S: Prix ¥
-      { v: strVal(ligne.ce_certification), center: true, placeholder: !ligne.ce_certification }, // T: CE
-      { v: ligne.date_devis || '', center: true },                                     // U: Date Devis
-      { v: ligne.num_devis ? formatIdExcel(ligne.num_devis) : '', center: true },     // V: N° Devis
-      { v: ligne.nom_client || '', center: false },                                    // W: Client
-      { v: ligne.num_conteneur ? formatIdExcel(ligne.num_conteneur) : '', center: true } // X: N° CTN
+      { v: strVal(ligne.ce_certification), center: true, placeholder: !ligne.ce_certification }, // S: CE/PDF
+      { v: ligne.date_devis || '', center: true },                                     // T: Date Devis
+      { v: ligne.num_devis ? formatIdExcel(ligne.num_devis) : '', center: true },     // U: N° Devis
+      { v: ligne.num_conteneur ? formatIdExcel(ligne.num_conteneur) : '', center: true } // V: N° CTN
     ];
 
     cells.forEach(({ v, center, placeholder }, colIdx) => {
@@ -266,8 +251,8 @@ export async function generateBcChine(laId: string): Promise<void> {
   styleTotal(ws.getCell(`L${totalRow}`));
   ws.getCell(`M${totalRow}`).value = totalPBrut.toFixed(1);
   styleTotal(ws.getCell(`M${totalRow}`));
-  // Colonnes N-X vides
-  for (let col = 14; col <= 24; col++) {
+  // Colonnes N-V vides (22 colonnes, V69 sans Prix ni Client)
+  for (let col = 14; col <= 22; col++) {
     ws.getCell(totalRow, col).value = '—';
     styleTotal(ws.getCell(totalRow, col));
   }

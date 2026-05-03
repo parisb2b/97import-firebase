@@ -177,6 +177,34 @@ export function calculerStatutPaiement(
 }
 
 /**
+ * V69 — Détermine si un devis est en lecture seule.
+ * Un devis est verrouillé à partir de la signature (signe) et pour tous les
+ * statuts aval (paiements, commande, production, logistique, livraison).
+ * Seuls 'nouveau', 'en_negociation_partenaire', 'devis_vip_envoye' et 'annule'
+ * restent modifiables.
+ *
+ * Utilisé côté frontend (UI) ET côté Firestore rules pour bloquer les
+ * modifications API sur les devis verrouillés.
+ */
+export function isDevisReadonly(devisOrStatut: any): boolean {
+  const statut: string = typeof devisOrStatut === 'string'
+    ? devisOrStatut
+    : devisOrStatut?.statut ?? '';
+  const STATUTS_READONLY: string[] = [
+    'signe',
+    'acompte_1', 'acompte_2', 'acompte_3',
+    'solde_paye',
+    'commande_ferme',
+    'en_production',
+    'embarque_chine',
+    'arrive_port_domtom',
+    'livre',
+    'termine',
+  ];
+  return STATUTS_READONLY.includes(statut);
+}
+
+/**
  * Libellé lisible du statut
  */
 export function libelleStatut(statut: QuoteStatus): string {
