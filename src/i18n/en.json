@@ -192,6 +192,33 @@
       "autre": "Other"
     }
   },
+  "address": {
+    "facturation": "Billing address",
+    "livraison": "Delivery address",
+    "identique": "Same as billing address",
+    "type_required": "Address type is required",
+    "select_type": "Select address type"
+  },
+  "quote": {
+    "vip_request": "Request VIP price",
+    "vip_validated": "VIP price validated",
+    "vip_locked": "This VIP quote is locked in read-only mode",
+    "readonly_badge": "Read only"
+  },
+  "payment": {
+    "acompte": "Make a deposit",
+    "rib_pro": "Business Bank Account",
+    "rib_particulier": "Personal Bank Account",
+    "max_4_payments": "Maximum 3 deposits + 1 balance",
+    "progress": "Payment progress"
+  },
+  "alerts": {
+    "rate": {
+      "title": "Profitability Alert",
+      "variation_warning": "{delta}% deviation detected between manual rate and interbank rate",
+      "check_settings": "Check your exchange rate settings"
+    }
+  },
   "footer": {
     "desc": "Direct import from China to French Overseas Territories. Mini excavators, modular homes, solar kits. Factory prices, sea delivery included.",
     "categories": "Categories",

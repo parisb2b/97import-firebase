@@ -3,6 +3,7 @@ import { collection, query, getDocs, where, limit } from 'firebase/firestore';
 import { Link } from 'wouter';
 import { adminDb as db } from '../../lib/firebase';
 import { checkRateDeviation, type RateDeviation } from '../../lib/exchangeRateMonitor';
+import { useI18n } from '../../i18n';
 import {
   Kpi,
   Card,
@@ -56,6 +57,7 @@ interface Commission {
 }
 
 export default function Dashboard() {
+  const { t } = useI18n();
   const [stats, setStats] = useState<Stats>({
     devisTotal: 0,
     devisEnAttente: 0,
@@ -278,9 +280,9 @@ export default function Dashboard() {
           background: '#FFFBEB', color: '#92400E', padding: '12px 20px', marginBottom: 16,
           borderLeft: '4px solid #F59E0B', borderRadius: 8, fontSize: 13,
         }}>
-          <strong>⚠️ Alerte taux de change</strong> — Écart de {rateDeviation.ecart_pct}% détecté
+          <strong>⚠️ {t('alerts.rate.title')}</strong> — {t('alerts.rate.variation_warning').replace('{delta}', String(rateDeviation.ecart_pct))}
           (taux manuel : {rateDeviation.taux_manuel.toFixed(4)}, API {rateDeviation.source_api} : {rateDeviation.taux_api.toFixed(4)}).
-          Vérifiez les taux dans <Link href="/admin/taux-rmb"><span style={{ color: '#1565C0', textDecoration: 'underline', cursor: 'pointer' }}>Paramètres → Taux RMB</span></Link>.
+          {' '}{t('alerts.rate.check_settings')} <Link href="/admin/taux-rmb"><span style={{ color: '#1565C0', textDecoration: 'underline', cursor: 'pointer' }}>Taux RMB</span></Link>.
         </div>
       )}
       {/* KPI Grid */}

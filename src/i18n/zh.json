@@ -192,6 +192,33 @@
       "autre": "其他"
     }
   },
+  "address": {
+    "facturation": "账单地址",
+    "livraison": "送货地址",
+    "identique": "与账单地址相同",
+    "type_required": "地址类型为必填项",
+    "select_type": "选择地址类型"
+  },
+  "quote": {
+    "vip_request": "申请VIP价格",
+    "vip_validated": "VIP价格已确认",
+    "vip_locked": "此VIP报价已锁定为只读",
+    "readonly_badge": "只读"
+  },
+  "payment": {
+    "acompte": "支付定金",
+    "rib_pro": "企业银行账户",
+    "rib_particulier": "个人银行账户",
+    "max_4_payments": "最多3笔定金 + 1笔尾款",
+    "progress": "付款进度"
+  },
+  "alerts": {
+    "rate": {
+      "title": "盈利率警报",
+      "variation_warning": "手动汇率与银行间汇率之间检测到 {delta}% 的偏差",
+      "check_settings": "请检查您的汇率设置"
+    }
+  },
   "footer": {
     "desc": "从中国直接进口到法属海外领土。小型挖掘机、模块化房屋、太阳能套件。出厂价，含海运。",
     "categories": "产品分类",

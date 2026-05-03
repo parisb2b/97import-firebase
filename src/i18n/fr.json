@@ -192,6 +192,33 @@
       "autre": "Autre"
     }
   },
+  "address": {
+    "facturation": "Adresse de facturation",
+    "livraison": "Adresse de livraison",
+    "identique": "Identique à l'adresse de facturation",
+    "type_required": "Le type d'adresse est obligatoire",
+    "select_type": "Sélectionnez le type d'adresse"
+  },
+  "quote": {
+    "vip_request": "Demander un prix VIP",
+    "vip_validated": "Prix VIP validé",
+    "vip_locked": "Ce devis VIP est verrouillé en lecture seule",
+    "readonly_badge": "Lecture seule"
+  },
+  "payment": {
+    "acompte": "Payer un acompte",
+    "rib_pro": "RIB Professionnel",
+    "rib_particulier": "RIB Particulier",
+    "max_4_payments": "Maximum 3 acomptes + 1 solde",
+    "progress": "Progression des paiements"
+  },
+  "alerts": {
+    "rate": {
+      "title": "Alerte de rentabilité",
+      "variation_warning": "Écart de {delta}% détecté entre le taux manuel et le taux interbancaire",
+      "check_settings": "Vérifiez vos paramètres de taux de change"
+    }
+  },
   "footer": {
     "desc": "Import direct de Chine vers les DOM-TOM. Mini-pelles, maisons modulaires, kits solaires. Prix usine, livraison maritime incluse.",
     "categories": "Catégories",
