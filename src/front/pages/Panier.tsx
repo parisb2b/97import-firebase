@@ -181,9 +181,17 @@ export default function Panier() {
         client_tel: userProfile.phone || userProfile.telephone || '',
         client_adresse: [userProfile.adresse, userProfile.codePostal, userProfile.ville, userProfile.pays].filter(Boolean).join(', '),
         client_siret: userProfile.siret || '',
+        // V70 — Propagation adresse livraison (héritage facturation si absente)
+        adresse_livraison: userProfile.adresse_livraison || {
+          rue: userProfile.adresse || '',
+          code_postal: userProfile.codePostal || '',
+          ville: userProfile.ville || '',
+          pays: userProfile.pays || 'MQ',
+          identique_facturation: true,
+        },
         statut: 'en_negociation_partenaire',
         destination: userProfile.pays || 'Martinique',
-        pays_livraison: userProfile.pays || 'Martinique',
+        pays_livraison: (userProfile.adresse_livraison?.pays) || userProfile.pays || 'Martinique',
         is_vip: false,
         lignes,
         total_ht: total,

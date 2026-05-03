@@ -260,3 +260,9 @@ export interface Adresse {
 export interface AdresseLivraison extends Adresse {
   identique_facturation: boolean;
 }
+
+// V70 — Type d'adresse avec discriminateur obligatoire
+export interface AdresseTypee extends Adresse {
+  addressType: 'facturation' | 'livraison';
+  identique_facturation?: boolean;
+}

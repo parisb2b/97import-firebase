@@ -95,11 +95,17 @@ service cloud.firestore {
     }
 
     // /clients/{uid} : doc id = Firebase UID
+    // V70 — Verrouillage email + nom_entreprise : seul l'admin peut les modifier.
+    // Le propriétaire peut modifier les autres champs (adresse, tel, etc.)
+    // mais pas son email ni son nom d'entreprise (protection anti-détournement).
     match /clients/{userId} {
       allow read:   if isOwner(userId) || isAdmin()
                   || (isPartner() && resource.data.partenaire_code == request.auth.token.partenaire_code);
       allow create: if isAuth();
-      allow update: if isOwner(userId) || isAdmin();
+      allow update: if isAdmin()
+                  || (isOwner(userId)
+                      && request.resource.data.email == resource.data.email
+                      && request.resource.data.nom_entreprise == resource.data.nom_entreprise);
       allow delete: if isAdmin();
     }
 

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { collection, query, getDocs, where, limit } from 'firebase/firestore';
 import { Link } from 'wouter';
 import { adminDb as db } from '../../lib/firebase';
+import { checkRateDeviation, type RateDeviation } from '../../lib/exchangeRateMonitor';
 import {
   Kpi,
   Card,
@@ -71,6 +72,7 @@ export default function Dashboard() {
   const [commissions, setCommissions] = useState<Commission[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState('');
+  const [rateDeviation, setRateDeviation] = useState<RateDeviation | null>(null);
 
   // V50-BIS Checkpoint D — diagnostic systematic-debugging :
   // Avant V50-BIS, loadData wrappait 5 queries Firestore dans un seul
@@ -82,6 +84,13 @@ export default function Dashboard() {
   // toutes lancees en Promise.allSettled. Echec local = log console +
   // fallback (KPI "—", liste vide, demo data). Banniere globale n'apparait
   // que si TOUTES les sections echouent (ultime degraded mode).
+
+  // V70 — Surveillance écart taux de change (seuil ±3%)
+  useEffect(() => {
+    checkRateDeviation().then((dev) => {
+      if (dev?.depasse_seuil) setRateDeviation(dev);
+    }).catch(() => {});
+  }, []);
 
   useEffect(() => {
     const loadData = async () => {
@@ -264,6 +273,16 @@ export default function Dashboard() {
   return (
     <>
       {errorMsg && <div className="card" style={{ background: '#FEE2E2', color: '#991B1B', padding: '12px 20px', marginBottom: 16, borderLeft: '4px solid #EF4444' }}>{errorMsg}</div>}
+      {rateDeviation && (
+        <div style={{
+          background: '#FFFBEB', color: '#92400E', padding: '12px 20px', marginBottom: 16,
+          borderLeft: '4px solid #F59E0B', borderRadius: 8, fontSize: 13,
+        }}>
+          <strong>⚠️ Alerte taux de change</strong> — Écart de {rateDeviation.ecart_pct}% détecté
+          (taux manuel : {rateDeviation.taux_manuel.toFixed(4)}, API {rateDeviation.source_api} : {rateDeviation.taux_api.toFixed(4)}).
+          Vérifiez les taux dans <Link href="/admin/taux-rmb"><span style={{ color: '#1565C0', textDecoration: 'underline', cursor: 'pointer' }}>Paramètres → Taux RMB</span></Link>.
+        </div>
+      )}
       {/* KPI Grid */}
       <div className="kgrid">
         <Kpi

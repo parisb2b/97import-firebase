@@ -84,6 +84,8 @@ export default function Profil() {
         codePostal,
         ville,
         pays,
+        // V70 — Type d'adresse explicite
+        addressType: 'facturation' as const,
         adresse_livraison: identiqueFacturation ? {
           rue: adresse,
           code_postal: codePostal,
@@ -96,6 +98,7 @@ export default function Profil() {
           ville: livraisonVille,
           pays: livraisonPays,
           identique_facturation: false,
+          addressType: 'livraison' as const,
         },
         updatedAt: serverTimestamp(),
       };
@@ -157,6 +160,7 @@ export default function Profil() {
           <div style={{ marginBottom: 16 }}>
             <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 }}>{t('auth.email')}</label>
             <input type="email" value={email} disabled style={{ ...inputStyle, background: '#F3F4F6', color: '#9CA3AF' }} />
+            <span style={{ fontSize: 11, color: '#9CA3AF', marginTop: 4, display: 'flex', alignItems: 'center', gap: 4 }}>🔒 Ce champ est verrouillé</span>
           </div>
 
           <div style={{ marginBottom: 16 }}>
@@ -166,7 +170,10 @@ export default function Profil() {
           </div>
 
           <div style={{ marginBottom: 16 }}>
-            <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 }}>{t('profil.adresse')} *</label>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+              <label style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>{t('profil.adresse')} *</label>
+              <span style={{ fontSize: 10, background: '#DBEAFE', color: '#1565C0', padding: '2px 8px', borderRadius: 10, fontWeight: 600 }}>Facturation</span>
+            </div>
             <input type="text" value={adresse} onChange={e => setAdresse(e.target.value)} required
               placeholder="12 rue du Port" style={inputStyle} />
           </div>
@@ -197,7 +204,10 @@ export default function Profil() {
 
           {/* V62 — Adresse de livraison */}
           <div style={{ borderTop: '2px solid #E5E7EB', paddingTop: 20, marginBottom: 20 }}>
-            <h2 style={{ fontSize: 16, fontWeight: 700, color: '#1565C0', marginBottom: 12 }}>Adresse de livraison</h2>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+              <h2 style={{ fontSize: 16, fontWeight: 700, color: '#1565C0', margin: 0 }}>Adresse de livraison</h2>
+              <span style={{ fontSize: 10, background: '#EDE9FE', color: '#7C3AED', padding: '2px 8px', borderRadius: 10, fontWeight: 600 }}>Livraison</span>
+            </div>
             <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16, cursor: 'pointer', fontSize: 13, color: '#4B5563' }}>
               <input type="checkbox" checked={identiqueFacturation} onChange={e => {
                 setIdentiqueFacturation(e.target.checked);
