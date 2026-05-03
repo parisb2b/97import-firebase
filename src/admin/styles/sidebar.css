@@ -1,22 +1,14 @@
-/* Sidebar 97import Admin — V71
-   Scrollbar invisible (Gmail-style).
-   Le conteneur parent .admin-layout porte overflow: hidden (admin.css L51).
-   La sidebar .sb porte overflow-y: auto (admin.css L59). */
+/* Sidebar 97import Admin — V73
+   Scrollbar invisible (Gmail-style) — !important pour forcer la priorite
+   sur admin.css L59 (.sb { overflow-y: auto }). */
 
 .sb {
-  scrollbar-width: none;           /* Firefox */
-  -ms-overflow-style: none;        /* IE/Edge */
+  scrollbar-width: none !important;           /* Firefox */
+  -ms-overflow-style: none !important;        /* IE/Edge */
 }
 
 .sb::-webkit-scrollbar {
-  width: 0;                        /* Chrome/Safari */
-  height: 0;
-}
-
-.sb::-webkit-scrollbar-thumb {
-  display: none;
-}
-
-.sb::-webkit-scrollbar-track {
-  display: none;
+  display: none !important;                   /* Chrome/Safari */
+  width: 0 !important;
+  height: 0 !important;
 }
