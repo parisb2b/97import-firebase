@@ -3,6 +3,7 @@ import PopupAcompte from './PopupAcompte';
 import PopupSaisieRIB from '../../components/PopupSaisieRIB';
 import PopupVerserAcompte from '../../components/PopupVerserAcompte';
 import { getMontantRestantAVerser } from '../../../lib/devisHelpers';
+import { isDevisReadonly } from '../../../lib/quoteStatusHelpers';
 import { db } from '../../../lib/firebase';
 import { doc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { generateDevis, downloadPDF } from '../../../lib/pdf-generator';
@@ -256,6 +257,35 @@ export default function DevisCard({ devis, profile, onRefresh, forceOpen = false
 
         <span style={{ color: '#9CA3AF', fontSize: 14 }}>{open ? '▲' : '▼'}</span>
       </div>
+
+      {/* V79 — Barre progression acomptes */}
+      {acomptes.length > 0 && (
+        <div style={{ padding: '8px 20px 12px', display: 'flex', gap: 4 }}>
+          {[1, 2, 3, 4].map(n => {
+            const isComplete = n <= acomptesEncaisses.length;
+            const isCurrent = n === acomptesEncaisses.length + 1 && n <= 4;
+            const isSolde = n === 4;
+            return (
+              <div key={n} style={{
+                flex: 1, textAlign: 'center', padding: '6px 4px', borderRadius: 8,
+                background: isComplete ? '#DCFCE7' : isCurrent ? '#EFF6FF' : '#F3F4F6',
+                border: isCurrent ? '2px solid #1565C0' : '1px solid transparent',
+                fontSize: 10, fontWeight: 600,
+                color: isComplete ? '#166534' : isCurrent ? '#1565C0' : '#9CA3AF',
+              }}>
+                {isComplete ? '✅' : isCurrent ? '●' : '○'} {isSolde ? 'Solde' : `A.${n}`}
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* V79 — Mode lecture seule visuel */}
+      {isDevisReadonly(devis) && (
+        <div style={{ padding: '6px 20px', background: '#FFF7ED', borderTop: '1px solid #FED7AA', borderBottom: '1px solid #FED7AA', display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: '#92400E' }}>
+          🔒 Ce devis est verrouillé en lecture seule. Contactez votre partenaire pour toute modification.
+        </div>
+      )}
 
       {/* Détail dépliable */}
       {open && (

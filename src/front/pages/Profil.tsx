@@ -25,6 +25,7 @@ export default function Profil() {
   const [livraisonVille, setLivraisonVille] = useState('');
   const [livraisonPays, setLivraisonPays] = useState('MQ');
   const [identiqueFacturation, setIdentiqueFacturation] = useState(true);
+  const [addressType, setAddressType] = useState('facturation');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [isIncomplete, setIsIncomplete] = useState(false);
@@ -52,6 +53,7 @@ export default function Profil() {
           setLivraisonVille(al.ville || '');
           setLivraisonPays(al.pays || 'MQ');
           setIdentiqueFacturation(al.identique_facturation !== false);
+          setAddressType(data.addressType || 'facturation');
           setIsIncomplete(!data.telephone || !data.adresse);
           setIsNewProfile(false);
         } else {
@@ -87,8 +89,8 @@ export default function Profil() {
         codePostal,
         ville,
         pays,
-        // V70 — Type d'adresse explicite
-        addressType: 'facturation' as const,
+        // V79 — Type d'adresse depuis le selecteur
+        addressType: addressType || 'facturation',
         adresse_livraison: identiqueFacturation ? {
           rue: adresse,
           code_postal: codePostal,
@@ -176,8 +178,19 @@ export default function Profil() {
 
           <div style={{ marginBottom: 16 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+              <label style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>Type d'adresse *</label>
+            </div>
+            <select value={addressType} onChange={e => setAddressType(e.target.value)} required style={inputStyle}>
+              <option value="">{t('address.select_type')}</option>
+              <option value="facturation">{t('address.facturation')}</option>
+              <option value="livraison">{t('address.livraison')}</option>
+            </select>
+            {!addressType && (
+              <span style={{ fontSize: 11, color: '#DC2626', marginTop: 2 }}>{t('address.type_required')}</span>
+            )}
+            <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
               <label style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>{t('profil.adresse')} *</label>
-              <span style={{ fontSize: 10, background: '#DBEAFE', color: '#1565C0', padding: '2px 8px', borderRadius: 10, fontWeight: 600 }}>Facturation</span>
+              <span style={{ fontSize: 10, background: addressType === 'facturation' ? '#DBEAFE' : '#FFF7ED', color: addressType === 'facturation' ? '#1565C0' : '#EA580C', padding: '2px 8px', borderRadius: 10, fontWeight: 600 }}>{addressType === 'facturation' ? 'Facturation' : 'Livraison'}</span>
             </div>
             <input type="text" value={adresse} onChange={e => setAdresse(e.target.value)} required
               placeholder="12 rue du Port" style={inputStyle} />
