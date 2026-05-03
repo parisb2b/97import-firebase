@@ -56,10 +56,14 @@ body {
   width: 220px;
   flex-shrink: 0;
   background: var(--nv);
-  overflow-y: auto;
+  overflow-y: overlay !important;
+  scrollbar-width: none !important;
   display: flex;
   flex-direction: column;
 }
+
+/* V76 — Écrasement total scrollbar (force brute) */
+.sb::-webkit-scrollbar { display: none !important; width: 0 !important; }
 
 .sb-logo {
   display: flex;

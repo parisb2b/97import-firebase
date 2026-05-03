@@ -359,6 +359,8 @@ export default function AdminApp() {
 
   return (
     <div className="admin-layout">
+      {/* V76 — Injection brute anti-scrollbar au plus pres du DOM */}
+      <style>{`.sb{overflow-y:overlay!important;scrollbar-width:none!important;-ms-overflow-style:none!important}.sb::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}`}</style>
       {/* Sidebar */}
       <div className="sb">
         {/* Logo */}
