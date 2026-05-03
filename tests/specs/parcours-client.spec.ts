@@ -54,4 +54,20 @@ test.describe('Parcours Client', () => {
     await page.goto('/');
     await expect(page.locator('h1, h2, header').first()).toBeVisible();
   });
+
+  // V80 — Nouveaux tests V79 (selecteur adresse + progression acomptes)
+
+  test('C09 — Page profil accessible sans auth (redirige vers connexion)', async ({ page }) => {
+    await page.goto('/profil');
+    await page.waitForURL('**/connexion**', { timeout: 10000 });
+    expect(page.url()).toContain('connexion');
+  });
+
+  test('C10 — Page panier : pas d\'erreur JS dans la console', async ({ page }) => {
+    const errors: string[] = [];
+    page.on('pageerror', (err) => errors.push(err.message));
+    await page.goto('/panier');
+    await page.waitForTimeout(2000);
+    expect(errors.filter(e => !e.includes('firebase') && !e.includes('network'))).toEqual([]);
+  });
 });

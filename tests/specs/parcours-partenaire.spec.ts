@@ -35,4 +35,20 @@ test.describe('Parcours Partenaire', () => {
       // Firebase peut retourner d'autres messages d'erreur
     });
   });
+
+  // V80 — Nouveaux tests V79 (diagnostic partenaire + menu)
+
+  test('P04 — Menu Mon Espace Client visible', async ({ page }) => {
+    await page.goto('/espace-partenaire');
+    // Le bouton/badge "MON ESPACE CLIENT" doit etre present
+    await expect(page.getByText('MON ESPACE CLIENT').or(page.getByText('Espace client'))).toBeVisible({ timeout: 5000 });
+  });
+
+  test('P05 — Page partenaire sans erreur JS', async ({ page }) => {
+    const errors: string[] = [];
+    page.on('pageerror', (err) => errors.push(err.message));
+    await page.goto('/espace-partenaire');
+    await page.waitForTimeout(2000);
+    expect(errors.filter(e => !e.includes('firebase') && !e.includes('network'))).toEqual([]);
+  });
 });
