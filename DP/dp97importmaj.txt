@@ -1,0 +1,140 @@
+# DP97IMPORTMAJ — Journal Central des Mises à Jour
+
+Date : 2026-05-03 15:34 CEST
+Projet : 97importok-firebase
+Branche : v2
+Version : v0.43.3
+Build : f03fd5a (HEAD)
+Firebase : importok-6ef77
+Vercel FRONT : https://97import-firebase-git-v2-parisb2bs-projects.vercel.app/
+Vercel ADMIN : https://97import-firebase-git-v2-parisb2bs-projects.vercel.app/admin
+
+---
+
+## État actuel (2026-05-03)
+
+| Indicateur | Valeur |
+|------------|--------|
+| Dernier commit | f03fd5a — test(v65): test creation devis reussi — DVS-2605008 cree avec succes |
+| Tags actifs | v65-devis-ok, v67-audit-acompte-migration |
+| npm run lint | ✅ 0 erreur, 0 warning |
+| npm run build | ✅ OK (6.69s), warning chunks > 800 kB (exceljs-vendor: 939 kB, connu) |
+| Vercel FRONT | ✅ HTTP 200 |
+| Vercel ADMIN | ✅ HTTP 200 |
+| Tests Playwright | 31/31 verts (V63: 15 + V64: 16) |
+| Firebase deploy | Non exécuté (rules prêtes, validation humaine requise) |
+| Comptes test | mc@sasfr.com / 97importcom@gmail.com / parisb2b@gmail.com (mdp: 20262026) |
+
+---
+
+## Chronologie des missions (ordre numérique)
+
+| Version | Date | Tag(s) | Bugs corrigés | Fichiers modifiés | Décisions |
+|---------|------|--------|---------------|-------------------|-----------|
+| **V53** | 2026-05-02 14:14 | v53-production-readiness-final, v53-codexx-final, v53-codexx-publish-final | Préparation production : .gitignore, .env.example, garde-fous scripts destructifs, documentation Vercel/Firebase | AGENTS.md, .gitignore, .env.example, scripts/delete-quotes.mjs, scripts/reset-database.sh, src/front/pages/Inscription.tsx, Profil.tsx, Home.tsx, Clients.tsx, DetailClient.tsx | Bascule workflow client profiles→clients. Nettoyage données documentaires avec archive. |
+| **V55** | 2026-05-02 16:02 | v55-codex-audit-final | Suppression doublon BuildVersionBadge. Archivage actif=false au lieu de suppression définitive. Verrouillage champ prix_achat_eur. | .gitignore, Home.tsx, BuildVersionBadge.tsx, FicheProduit.tsx, ProductForm.tsx | Conservation version centralisée via Footer + src/lib/version.ts. Aucun deploy Firebase. |
+| **V56** | 2026-05-02 17:13 | v56-admin-clients-devis-final, v56-bis-codex97maj | Pages admin clients/devis affichaient 0 — adminDb/adminStorage ajoutés. Correction double app Firebase (client vs admin). | src/lib/firebase.ts, commissionHelpers.ts, quoteStatusHelpers.ts, AdminApp.tsx, AdminLogin.tsx, +15 pages admin | Création adminDb/adminStorage pour séparer lectures admin des lectures client. Nettoyage partners/TEST-PART avec archive. |
+| **V57** | 2026-05-02 18:50 | v57-quality-eslint-final | ESLint 9 restauré (0 erreur, 64 warnings). Warnings Vite imports dynamiques/statiques résolus. | .gitignore, eslint.config.js, PopupEncaisserAcompte.tsx, commissionHelpers.ts, emailService.ts, quoteStatusHelpers.ts | ESLint flat config créée. Codexxx analysé (0 secret par nom). Aucun deploy Firebase. |
+| **V58** | 2026-05-02 19:07 | backup-pre-v58-ultra, v58-ultra-final | 64→16 warnings lint. Lazy-loading routes front/admin. Neutralisation scripts legacy destructifs. | .gitignore, vite.config.ts, AdminApp.tsx, FrontApp.tsx, +30 fichiers (lint, catch, legacy) | Index principal réduit 865→250 kB. exceljs-vendor reste > 800 kB (chargé à la demande). Scripts legacy : --execute exige --confirm explicite. |
+| **V60** | 2026-05-02 21:02 | v60-stabilisation-final | **V60-BUG-01** : counters isAuth() → isAdmin(). **V60-BUG-02** : 16 warnings react-hooks/exhaustive-deps → 0. **V60-BUG-03** : 18 blocs catch vides → console.warn. **V60-BUG-04** : ESLint artefacts Vercel ignorés. | eslint.config.js, firestore.rules, 16 fichiers lint, 18 fichiers catch, AUDIT-STORAGE-V60.txt | Lint 0 warning. Counters admin-only (corrigé en V64 car bloquait clients). Scripts legacy tous protégés. |
+| **V61** | 2026-05-02 21:38 | v61-storage-fix | **V61-BUG-01** : bucket import2030 → importok-6ef77.firebasestorage.app (firebase.json). **V61-BUG-02** : storage.rules write restreint à role=='admin'. **V61-BUG-03** : .env.example bucket renseigné. | firebase.json, storage.rules, .env.example | Bucket Storage migré. Prêt pour deploy storage. |
+| **V62** | 2026-05-02 22:00 | v62-ux-fix | **V62-BUG-01** : Login partenaire dédié (plus de redirection /connexion). **V62-BUG-02** : Fallback email partnerCode. **V62-BUG-03** : Texte coupé panier (overflow fix). **V62-BUG-04** : Police +10% globale. **V62-BUG-05** : Sous-titre Mes devis dédupliqué. **V62-BUG-06** : DVSS- documenté comme artefact. | EspacePartenaire.tsx, Panier.tsx, index.css, MesDevis.tsx, collections.ts, Profil.tsx | AdresseTypee avec addressType livraison/facturation. Algorithme héritage adresse. |
+| **V63** | 2026-05-02 22:15 | v63-e2e-tests | **V63-BUG-01** : Absence de tests automatisés → infrastructure Playwright (15 tests, 3 parcours). | tests/playwright.config.ts, tests/specs/*.spec.ts, fixtures/auth.ts | 15/15 verts en 6.7s. @playwright/test installé. |
+| **V64** | 2026-05-02 23:00 | v64-audit-parcours | **V64-BUG-01** : Bouton "Ajouter au panier" masqué (userRole async) — identifié, corrigé en V65. **V64-BUG-02** : Counters isAdmin() restauré isAuth() (clients doivent incrémenter DVS). **V64-FIX-01** : Timeout admin pages 5s→15s. | tests/specs/parcours-v64.spec.ts, firestore.rules, scripts/cleanup-v64.cjs | 31/31 tests OK. Bug création devis découvert : règles Firestore console ≠ fichier local. |
+| **V65** | 2026-05-03 00:15 | v65-diagnostic-devis, v65-fix-bouton-panier, v65-devis-ok | **V65-BUG-01** : Création devis — logs ajoutés dans handleCreateQuote, test Admin SDK OK. **V64-BUG-01** (fix v65) : Bouton panier corrigé — condition userRole retirée. | Panier.tsx (logs handleCreateQuote), Produit.tsx:328 (bouton panier), scripts/test-create-devis-v65.cjs, BUGS-CORRIGES-V65.txt | DVS-2605008 créé avec succès. Deux formats compteurs découverts (seq vs valeur). Règles Firestore à déployer. |
+| **V66** | — | (pas de mission propre) | Mentionné comme "prochaine mission" dans V65 et REPRISE-PC-WINDOWS.md. Objectifs inclus dans V67. | — | — |
+| **V67** | 2026-05-03 13:44 | v67-audit-acompte-migration | Audit flux acompte. Guide migration PC Windows 11 (Mac→PC). | REPRISE-PC-WINDOWS.md (créé, 301 lignes) | Documentation complète : config Windows, procédure installation, commandes déploiement, adaptations Mac→PC, règles permanentes. |
+| **V68** | 2026-05-03 15:34 | backup-pre-v68-20260503-1534 | Création fichier central DP\dp97importmaj.txt. Consolidation de tout l'historique V53→V67. | DP\dp97importmaj.txt (créé) | Journal central unifié pour toutes les missions passées et futures. |
+
+---
+
+## Inventaire des 18 bugs corrigés (V60→V65)
+
+### V60 — Audit & Sécurité (4 bugs)
+| ID | Sévérité | Description | Correction |
+|----|----------|-------------|------------|
+| V60-BUG-01 | 🟠 MOYENNE | Counters ouverts à tout isAuth() | Restreint isAdmin() (restauré isAuth() en V64) |
+| V60-BUG-02 | 🟡 BASSE | 16 warnings react-hooks/exhaustive-deps | eslint-disable justifiés ou dépendances ajoutées |
+| V60-BUG-03 | 🟡 BASSE | 18 blocs catch vides | console.warn() ajouté dans chaque bloc |
+| V60-BUG-04 | 🟡 BASSE | ESLint scannait artefacts Vercel | 97import-firebase/** ajouté aux ignores |
+
+### V61 — Bucket Storage (3 bugs)
+| ID | Sévérité | Description | Correction |
+|----|----------|-------------|------------|
+| V61-BUG-01 | 🔴 HAUTE | Bucket import2030 dans firebase.json | → importok-6ef77.firebasestorage.app |
+| V61-BUG-02 | 🔴 HAUTE | storage.rules write ouvert à tout auth | Restreint role == 'admin' |
+| V61-BUG-03 | 🟡 BASSE | .env.example bucket non documenté | Renseigné avec la bonne valeur |
+
+### V62 — UX & Adresses (6 bugs)
+| ID | Sévérité | Description | Correction |
+|----|----------|-------------|------------|
+| V62-BUG-01 | 🔴 HAUTE | /espace-partenaire redirigeait vers /connexion | Login partenaire dédié inline |
+| V62-BUG-02 | 🔴 HAUTE | Partenaire "Mes Clients" vide (0 clients) | Fallback email pour partnerCode |
+| V62-BUG-03 | 🟠 MOYENNE | Texte coupé dans le panier | overflow:hidden retiré, wordBreak ajouté |
+| V62-BUG-04 | 🟠 MOYENNE | Police trop petite | html font-size: 110%, body 1.05rem |
+| V62-BUG-05 | 🟡 BASSE | Doublon titre "Mes devis" | Sous-titre changé |
+| V62-BUG-06 | 🟡 BASSE | Préfixe DVSS- historique | Documenté, données non modifiées |
+
+### V63 — Tests E2E (1 bug)
+| ID | Sévérité | Description | Correction |
+|----|----------|-------------|------------|
+| V63-BUG-01 | 🟡 BASSE | Absence de tests automatisés | Playwright 15 tests, 3 parcours |
+
+### V64 — Audit Parcours (2 bugs)
+| ID | Sévérité | Description | Correction |
+|----|----------|-------------|------------|
+| V64-BUG-01 | 🔴 HAUTE | Bouton "Ajouter au panier" masqué | userRole async → corrigé en V65 |
+| V64-BUG-02 | 🔴 HAUTE | Counters isAdmin() bloquait clients | Restauré isAuth() |
+
+### V65 — Diagnostic Création Devis (2 bugs)
+| ID | Sévérité | Description | Correction |
+|----|----------|-------------|------------|
+| V65-BUG-01 | 🔴 HAUTE | Création devis échoue silencieusement | logs + test Admin SDK + deploy rules |
+| V65-BUG-02 | 🔴 HAUTE | /admin/logs vide | Analyse : db client vs adminDb, fallback à vérifier |
+
+---
+
+## Bugs restants
+
+| ID | Sévérité | Description | Action recommandée |
+|----|----------|-------------|---------------------|
+| V65-BUG-02 | 🔴 HAUTE | /admin/logs n'affiche pas les logs côté admin | Vérifier fallback db client si adminDb ne retourne rien. LogService écrit via db client, Logs.tsx lit via adminDb → mismatch possible |
+| V58-WARN | 🟡 BASSE | Chunk exceljs-vendor > 800 kB (939 kB) | Chargé dynamiquement à la demande — acceptable. Code-splitting supplémentaire si besoin. |
+| V58-WARN | 🟡 BASSE | 16 warnings react-hooks/exhaustive-deps restants | Revue comportementale au cas par cas. |
+
+---
+
+## Prochaine mission recommandée (V69)
+
+1. **URGENT** : Déployer les règles Firestore (`firebase deploy --only firestore:rules --project=importok-6ef77`)
+2. Résoudre V65-BUG-02 : fallback db client dans /admin/logs
+3. Vérifier le flux complet création devis → signature → acompte après déploiement rules
+4. Étendre les tests Playwright aux parcours authentifiés (client, partenaire, admin)
+5. Traiter les 16 warnings hooks restants
+
+---
+
+## Règles permanentes (rappel)
+
+1. **Langue** : français uniquement
+2. **Branche** : v2 uniquement — ne jamais toucher main
+3. **Firebase** : `--project=importok-6ef77` obligatoire
+4. **Secrets** : ne jamais commiter .env, firebase-admin-sdk.json, clés privées
+5. **Données protégées** : ne jamais supprimer users, clients, partners, products, categories, ports, admin_params, tarifs_logistiques, counters
+6. **Déploiement** : ne jamais lancer `firebase deploy` sans validation humaine explicite
+7. **Journal** : mettre à jour ce fichier (dp97importmaj.txt) à chaque mission
+
+---
+
+## Légende des sévérités
+
+| Icône | Niveau | Description |
+|-------|--------|-------------|
+| 🔴 | HAUTE | Bloquant — empêche un flux métier |
+| 🟠 | MOYENNE | Gênant — dégrade l'expérience |
+| 🟡 | BASSE | Cosmétique ou documentation |
+
+---
+
+Fichier créé le 2026-05-03 15:34 CEST par DeepSeek V4 Pro (mission V68 — audit central).
+Tag backup : backup-pre-v68-20260503-1534

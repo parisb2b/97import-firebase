@@ -1,10 +1,10 @@
 # Codex97MAJ - Journal central permanent 97IMPORT
 
-Date/heure de mise a jour : 2026-05-02 22:20:00 CEST
-Projet : /Users/mactell/97import-firebase
+Date/heure de mise a jour : 2026-05-03 15:34 CEST
+Projet : C:\DATA-MC-2030\97import-firebase
 Branche : v2
 Projet Firebase obligatoire : importok-6ef77
-Mission courante : V64 — audit parcours complet autonome
+Mission courante : V68 — audit central + fichier DP\dp97importmaj.txt
 
 Regle permanente :
 - A chaque prochaine mission Codex sur 97IMPORT, mettre a jour Codex97MAJ.txt.
@@ -508,3 +508,63 @@ Bugs restants :
 - V65-BUG-02 : /admin/logs vide
 
 Prochaine action V66 : deployer rules Firestore, corriger Produit.tsx bouton panier.
+
+## V66 — (pas de mission propre)
+
+V66 etait la mission recommandee en fin de V65. Les corrections ont ete integrees dans les commits V65 suivants :
+- 509fd34 fix(v65): corrige bouton ajout panier masque par userRole async
+- f03fd5a test(v65): test creation devis reussi — DVS-2605008 cree avec succes
+
+Aucun tag V66 dedie.
+
+## V67 — Audit flux acompte + migration PC Windows 11
+
+Date : 2026-05-03 13:44 CEST
+Mission : audit du flux acompte et creation du guide de migration Mac → PC Windows 11.
+Commit : d5a186a
+Tag : v67-audit-acompte-migration
+
+Actions :
+- Audit du flux acompte (PopupEncaisserAcompte, PopupVerserAcompte)
+- Creation de REPRISE-PC-WINDOWS.md (301 lignes) : guide complet d'installation
+- Documentation : config Windows 11, procedure installation, commandes deploiement
+- Adaptations Mac→PC : chemins, scripts bash→PowerShell, fins de ligne, variables env
+- Rappel des regles permanentes et fichiers cles
+
+Fichiers modifies/crees :
+- REPRISE-PC-WINDOWS.md (nouveau)
+
+Firebase deploy : non execute.
+
+## V68 — Audit central + fichier DP\dp97importmaj.txt
+
+Date/heure : 2026-05-03 15:34 CEST
+Mission : consolidation de tout l'historique V53→V67 dans un fichier central unique.
+Commit : [a venir]
+Tag : backup-pre-v68-20260503-1534, v68-audit-central (a venir)
+
+Actions :
+- Lecture de tous les fichiers dans DP\ (3 fichiers)
+- Lecture de tous les rapports MAJ-V*.txt, BUGS-CORRIGES*.txt, Codex97MAJ.txt
+- Analyse des tags git et historique des commits
+- Creation de DP\dp97importmaj.txt : journal central unifie
+  - 18 bugs documentes avec severite, description et correction
+  - Tableau chronologique V53→V68
+  - Bugs restants (3)
+  - Etat actuel (build, lint, tests, Vercel, Firebase)
+  - Prochaine mission recommandee (V69)
+- Mise a jour de Codex97MAJ.txt (ce fichier)
+- Verifications : curl Vercel FRONT 200, ADMIN 200, lint 0, build OK
+
+Fichiers modifies/crees :
+- DP\dp97importmaj.txt (nouveau, journal central)
+- Codex97MAJ.txt (mis a jour)
+
+Firebase deploy : non execute.
+
+Prochaine mission V69 recommandee :
+1. Deployer firestore.rules : firebase deploy --only firestore:rules --project=importok-6ef77
+2. Resoudre V65-BUG-02 : fallback db client dans /admin/logs
+3. Tester flux complet creation devis → signature → acompte
+4. Etendre tests Playwright aux parcours authentifies
+5. Traiter les 16 warnings hooks restants
