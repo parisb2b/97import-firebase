@@ -118,8 +118,9 @@ service cloud.firestore {
     // ══════════════════════════════════════════════════════════
     // 📋 DEVIS / FACTURES / ACOMPTES / COMMISSIONS
     // ══════════════════════════════════════════════════════════
-    // V82 — Le client peut modifier ses propres devis non verrouilles
-    // (signature, declaration acompte). Partner et admin gardent leurs droits.
+    // V84 — Le client peut modifier ses propres devis MEME apres signature
+    // (declaration acompte sur devis VIP signe). Partner garde restriction
+    // isDevisReadonly (negociation prix bloquee apres signature).
     match /quotes/{quoteId} {
       allow read:   if isAdmin()
                   || (isAuth() && resource.data.client_id == request.auth.uid)
@@ -128,8 +129,7 @@ service cloud.firestore {
       allow update: if isAdmin()
                   || (partnerCodeMatches(resource.data.partenaire_code)
                       && !isDevisReadonly(resource.data.statut))
-                  || (isAuth() && resource.data.client_id == request.auth.uid
-                      && !isDevisReadonly(resource.data.statut));
+                  || (isAuth() && resource.data.client_id == request.auth.uid);
       allow delete: if isAdmin();
     }
 
