@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { collection, query, orderBy, getDocs } from 'firebase/firestore';
+import { collection, query, getDocs } from 'firebase/firestore';
 import { useLocation } from 'wouter';
 import { adminDb as db } from '../../lib/firebase';
 import { Card, Kpi, Pill, IconButton, EyeIcon } from '../components/Icons';
@@ -16,16 +16,18 @@ interface Client {
 export default function Clients() {
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
+  const [errMsg, setErrMsg] = useState('');
   const [search, setSearch] = useState('');
   const [, setLocation] = useLocation();
 
   useEffect(() => {
     const load = async () => {
       try {
-        const q = query(collection(db, 'clients'), orderBy('createdAt', 'desc'));
+        const q = query(collection(db, 'clients'));
         const snap = await getDocs(q);
         setClients(snap.docs.map((d) => ({ id: d.id, ...d.data() } as Client)));
-      } catch (err) {
+      } catch (err: any) {
+        setErrMsg(err?.message || 'Erreur inconnue');
         console.error('Error loading clients:', err);
       } finally {
         setLoading(false);
@@ -42,6 +44,15 @@ export default function Clients() {
   const partners = filtered.filter(c => c.role === 'partner').length;
 
   if (loading) return <LoadingState message="Chargement des clients…" />;
+
+  if (errMsg) return (
+    <div style={{ padding: 40, textAlign: 'center' }}>
+      <div style={{ background: '#FEE2E2', color: '#991B1B', padding: '16px 24px', borderRadius: 12, display: 'inline-block', maxWidth: 600 }}>
+        <strong>Erreur chargement clients</strong>
+        <p style={{ fontSize: 13, marginTop: 8, opacity: 0.8 }}>{errMsg}</p>
+      </div>
+    </div>
+  );
 
   return (
     <>

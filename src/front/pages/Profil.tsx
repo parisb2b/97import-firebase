@@ -28,6 +28,7 @@ export default function Profil() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [isIncomplete, setIsIncomplete] = useState(false);
+  const [isNewProfile, setIsNewProfile] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -52,11 +53,13 @@ export default function Profil() {
           setLivraisonPays(al.pays || 'MQ');
           setIdentiqueFacturation(al.identique_facturation !== false);
           setIsIncomplete(!data.telephone || !data.adresse);
+          setIsNewProfile(false);
         } else {
           setEmail(user.email || '');
           setPrenom(user.displayName?.split(' ')[0] || '');
           setNom(user.displayName?.split(' ').slice(1).join(' ') || '');
           setIsIncomplete(true);
+          setIsNewProfile(true);
         }
       } catch (err) {
         console.error('Error loading profile:', err);
@@ -101,6 +104,8 @@ export default function Profil() {
           addressType: 'livraison' as const,
         },
         updatedAt: serverTimestamp(),
+        // V71 — createdAt uniquement au premier enregistrement
+        ...(isNewProfile ? { createdAt: serverTimestamp() } : {}),
       };
 
       await setDoc(doc(db, 'clients', user.uid), commonFields, { merge: true });

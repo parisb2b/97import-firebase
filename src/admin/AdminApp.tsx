@@ -7,6 +7,7 @@ import { ErrorBoundary } from '../components/ErrorBoundary';
 import AdminLogin from './AdminLogin';
 import './styles/admin.css';
 import './styles/polish-v45.css';
+import './styles/sidebar.css';
 
 // Pages
 import Dashboard from './pages/Dashboard';
