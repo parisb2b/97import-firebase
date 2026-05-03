@@ -52,18 +52,25 @@ body {
 }
 
 /* ===== SIDEBAR ===== */
+/* V77 — Clean Sweep : .sb ne scroll jamais (overflow:hidden).
+   Le defilement est delegue a .sb-scroller interne. */
 .sb {
   width: 220px;
   flex-shrink: 0;
   background: var(--nv);
-  overflow-y: overlay !important;
-  scrollbar-width: none !important;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
 }
 
-/* V76 — Écrasement total scrollbar (force brute) */
-.sb::-webkit-scrollbar { display: none !important; width: 0 !important; }
+/* V77 — Scroller interne invisible (Firefox + Chrome/Safari) */
+.sb-scroller {
+  flex: 1;
+  overflow-y: scroll;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+.sb-scroller::-webkit-scrollbar { display: none !important; }
 
 .sb-logo {
   display: flex;

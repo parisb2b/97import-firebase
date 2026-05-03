@@ -359,9 +359,7 @@ export default function AdminApp() {
 
   return (
     <div className="admin-layout">
-      {/* V76 — Injection brute anti-scrollbar au plus pres du DOM */}
-      <style>{`.sb{overflow-y:overlay!important;scrollbar-width:none!important;-ms-overflow-style:none!important}.sb::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}`}</style>
-      {/* Sidebar */}
+      {/* Sidebar — V77 Clean Sweep */}
       <div className="sb">
         {/* Logo */}
         <div className="sb-logo">
@@ -378,7 +376,7 @@ export default function AdminApp() {
         <Clocks />
 
         {/* Navigation sections */}
-        <div style={{ flex: 1, overflowY: 'auto' }}>
+        <div className="sb-scroller">
         {SIDEBAR_SECTIONS.map((section, sectionIdx) => (
           <div key={sectionIdx}>
             {section.separator && <div className="sb-sep" />}
