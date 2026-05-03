@@ -5,6 +5,7 @@ import { adminAuth, adminDb as db } from '../lib/firebase';
 import { useI18n } from '../i18n';
 import { GlobeToggle } from '../components/GlobeToggle';
 import ForgotPasswordModal from './components/ForgotPasswordModal';
+import { formatBuildInfo } from '../lib/version';
 
 export default function AdminLogin() {
   const { t } = useI18n();
@@ -99,6 +100,16 @@ export default function AdminLogin() {
               >
                 Mot de passe oublié ?
               </button>
+            </div>
+
+            {/* V72 — Badge version build (traçabilité admin) */}
+            <div className="text-center pt-4" style={{
+              fontSize: 11,
+              color: '#9CA3AF',
+              fontFamily: 'monospace',
+              letterSpacing: '0.02em',
+            }}>
+              {formatBuildInfo()}
             </div>
           </form>
         </div>
