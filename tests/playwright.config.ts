@@ -14,5 +14,6 @@ export default defineConfig({
     { name: 'client', testMatch: 'parcours-client.spec.ts' },
     { name: 'partenaire', testMatch: 'parcours-partenaire.spec.ts' },
     { name: 'admin', testMatch: 'parcours-admin.spec.ts' },
+    { name: 'v75', testMatch: 'parcours-v75.spec.ts' },
   ],
 });
