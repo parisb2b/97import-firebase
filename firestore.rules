@@ -139,10 +139,22 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // V82 — Collection top-level /acomptes : lecture client, ecriture admin
     match /acomptes/{acompteId} {
       allow read:  if isAdmin()
                  || (isAuth() && resource.data.client_id == request.auth.uid);
-      allow write: if isAdmin();
+      allow create: if isAuth() && request.resource.data.client_id == request.auth.uid;
+      allow update, delete: if isAdmin();
+    }
+
+    // V82 — Sous-collection /quotes/{quoteId}/acomptes : le client peut creer
+    match /quotes/{quoteId}/acomptes/{acompteId} {
+      allow create: if isAuth()
+        && request.auth.uid == get(/databases/$(database)/documents/quotes/$(quoteId)).data.client_id;
+      allow read: if isAdmin()
+        || (isAuth() && resource.data.client_id == request.auth.uid)
+        || (isPartner() && get(/databases/$(database)/documents/quotes/$(quoteId)).data.partenaire_code == request.auth.token.partenaire_code);
+      allow update, delete: if isAdmin();
     }
 
     match /commissions/{commissionId} {
