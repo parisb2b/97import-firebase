@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App'
 import './index.css'
+import './styles/global-overrides.css'
 import { logError } from './lib/logService'
 
 // v43-M1 : capture globale des erreurs JS et des promesses non-attrapées.

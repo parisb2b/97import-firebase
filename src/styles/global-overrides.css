@@ -1,0 +1,16 @@
+/* V78 — Global CSS Overrides (Cause Racine 2)
+   Fichier unique charge EN DERNIER dans main.tsx et AdminApp.tsx.
+   Force le masquage de TOUTES les scrollbars sur l'ensemble du DOM admin. */
+
+html, body, #root, .admin-layout, .sb, .content, nav, aside, main {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+html::-webkit-scrollbar, body::-webkit-scrollbar, #root::-webkit-scrollbar,
+.admin-layout::-webkit-scrollbar, .sb::-webkit-scrollbar, .content::-webkit-scrollbar,
+nav::-webkit-scrollbar, aside::-webkit-scrollbar, main::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}

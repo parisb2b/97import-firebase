@@ -8,6 +8,7 @@ import AdminLogin from './AdminLogin';
 import './styles/admin.css';
 import './styles/polish-v45.css';
 import './styles/sidebar.css';
+import '../styles/global-overrides.css';
 
 // Pages
 import Dashboard from './pages/Dashboard';

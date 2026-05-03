@@ -56,9 +56,18 @@ export default function GestionDevisPartner({ partnerCode }: { partnerCode: stri
         .map(d => ({ id: d.id, ...d.data() } as Devis))
         .sort((a, b) => (b.createdAt?.toMillis?.() || b.createdAt?.seconds * 1000 || 0) - (a.createdAt?.toMillis?.() || a.createdAt?.seconds * 1000 || 0));
       setDevis(list);
-    } catch (err) {
-      console.error(err);
-      showToast('Erreur de chargement', 'error');
+    } catch (err: any) {
+      // V78 — Diagnostic précis pour identifier la cause racine
+      const code = err?.code || 'unknown';
+      const msg = err?.message || String(err);
+      console.error(`[GestionDevisPartner] Erreur chargement (code=${code}):`, msg);
+      if (code === 'permission-denied') {
+        showToast('Accès refusé — Vérifiez que vos droits partenaire sont configurés (custom claims)', 'error');
+      } else if (code === 'unavailable' || code === 'network-request-failed') {
+        showToast('Réseau indisponible — Vérifiez votre connexion ou VPN', 'error');
+      } else {
+        showToast(`Erreur de chargement: ${msg.slice(0, 80)}`, 'error');
+      }
     } finally {
       setLoading(false);
     }
