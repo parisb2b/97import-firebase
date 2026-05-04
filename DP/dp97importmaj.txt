@@ -1,6 +1,6 @@
 # DP97IMPORTMAJ — Journal Central des Mises à Jour
 
-Date : 2026-05-05 17:30 CEST
+Date : 2026-05-05 18:00 CEST
 Projet : 97importok-firebase
 Branche : v2
 Version : v0.43.10
@@ -726,3 +726,37 @@ Badges visuels `{a.type === 'facturation' && <span>🧾 Facturation</span>}` et 
         // Dedup par ID, tri par date décroissante, limit 100
 ```
 Parcourt `adminDb` puis `clientDb`, fusionne et dédoublonne les résultats, avec logs console de diagnostic.
+
+---
+
+## 🔴 MISSION V92 - PARTIE 1 : BOUTONS ADRESSES (05/05/2026 18:00 CEST)
+
+### INJECTION 1 — Logique exclusive Facturation/Livraison
+📄 Fichier : `src/front/pages/espace-client/MesAdresses.tsx` (Lignes 68-74)
+
+❌ AVANT :
+```tsx
+  const handleSetType = async (idx: number, newType: 'facturation' | 'livraison') => {
+    const updated = adresses.map((a, i) => i === idx ? { ...a, type: newType } : a);
+    await saveToFirestore(updated);
+  };
+```
+
+✅ APRÈS :
+```tsx
+  const handleSetType = async (idx: number, newType: 'facturation' | 'livraison') => {
+    const updated = adresses.map((a, i) => {
+      if (i === idx) return { ...a, type: newType };
+      // Rend le choix exclusif : retire le type des autres adresses
+      if (a.type === newType) return { ...a, type: undefined };
+      return a;
+    });
+    await saveToFirestore(updated);
+  };
+```
+
+### INJECTION 2 — Refonte visuelle des boutons d'action
+📄 Fichier : `src/front/pages/espace-client/MesAdresses.tsx` (Lignes 101-114 → 101-132)
+
+❌ AVANT : Mini-boutons `🧾 Facturation` / `📦 Livraison` (10px, 4px padding) dans l'en-tête, invisibles.
+✅ APRÈS : Gros boutons (13px, 10px padding, flex:1) sous les coordonnées, avec séparateur dashed, texte `✓ Adresse Facturation` / `✓ Adresse Livraison` si actif, fond inversé (bleu foncé/orange foncé). Choix exclusif.

@@ -66,7 +66,12 @@ export default function MesAdresses({ userId, profile }: { userId: string; profi
   };
 
   const handleSetType = async (idx: number, newType: 'facturation' | 'livraison') => {
-    const updated = adresses.map((a, i) => i === idx ? { ...a, type: newType } : a);
+    const updated = adresses.map((a, i) => {
+      if (i === idx) return { ...a, type: newType };
+      // Rend le choix exclusif : retire le type des autres adresses
+      if (a.type === newType) return { ...a, type: undefined };
+      return a;
+    });
     await saveToFirestore(updated);
   };
 
@@ -110,15 +115,29 @@ export default function MesAdresses({ userId, profile }: { userId: string; profi
                 {!a.par_defaut && (
                   <button onClick={() => handleDefault(i)} style={{ fontSize: 10, padding: '4px 8px', borderRadius: 6, border: '1px solid #E5E7EB', background: '#fff', cursor: 'pointer', color: '#1565C0' }}>⭐ Défaut</button>
                 )}
-                <button onClick={() => handleSetType(i, 'facturation')} style={{ fontSize: 10, padding: '4px 8px', borderRadius: 6, border: '1px solid #BFDBFE', background: a.type === 'facturation' ? '#DBEAFE' : '#fff', cursor: 'pointer', color: '#1E40AF', fontWeight: a.type === 'facturation' ? 700 : 400 }}>🧾 Facturation</button>
-                <button onClick={() => handleSetType(i, 'livraison')} style={{ fontSize: 10, padding: '4px 8px', borderRadius: 6, border: '1px solid #FED7AA', background: a.type === 'livraison' ? '#FFF7ED' : '#fff', cursor: 'pointer', color: '#9A3412', fontWeight: a.type === 'livraison' ? 700 : 400 }}>📦 Livraison</button>
-                <button onClick={() => handleEdit(i)} style={{ fontSize: 10, padding: '4px 8px', borderRadius: 6, border: '1px solid #E5E7EB', background: '#fff', cursor: 'pointer' }}>✏️</button>
-                <button onClick={() => handleDelete(i)} style={{ fontSize: 10, padding: '4px 8px', borderRadius: 6, border: '1px solid #FEE2E2', background: '#FEF2F2', cursor: 'pointer', color: '#991B1B' }}>🗑</button>
+                <button onClick={() => handleEdit(i)} style={{ fontSize: 10, padding: '4px 8px', borderRadius: 6, border: '1px solid #E5E7EB', background: '#fff', cursor: 'pointer', color: '#374151' }}>✏️ Éditer</button>
+                <button onClick={() => handleDelete(i)} style={{ fontSize: 10, padding: '4px 8px', borderRadius: 6, border: '1px solid #FEE2E2', background: '#FEF2F2', cursor: 'pointer', color: '#991B1B' }}>🗑 Supprimer</button>
               </div>
             </div>
             <p style={{ fontSize: 12, color: '#374151' }}>{a.prenom} {a.nom}</p>
             <p style={{ fontSize: 12, color: '#6B7280' }}>{a.adresse}, {a.code_postal} {a.ville}, {a.pays}</p>
-            {a.telephone && <p style={{ fontSize: 12, color: '#6B7280' }}>📞 {a.telephone}</p>}
+            {a.telephone && <p style={{ fontSize: 12, color: '#6B7280', marginBottom: 8 }}>📞 {a.telephone}</p>}
+
+
+            <div style={{ display: 'flex', gap: '10px', marginTop: '14px', borderTop: '1px dashed #E5E7EB', paddingTop: '14px' }}>
+              <button
+                onClick={() => handleSetType(i, 'facturation')}
+                style={{ flex: 1, fontSize: '13px', padding: '10px 12px', background: a.type === 'facturation' ? '#1E40AF' : '#EFF6FF', color: a.type === 'facturation' ? '#FFF' : '#1E40AF', border: '1px solid #BFDBFE', borderRadius: '8px', cursor: 'pointer', fontWeight: 600, transition: 'all 0.2s' }}
+              >
+                🧾 {a.type === 'facturation' ? '✓ Adresse Facturation' : 'Définir Facturation'}
+              </button>
+              <button
+                onClick={() => handleSetType(i, 'livraison')}
+                style={{ flex: 1, fontSize: '13px', padding: '10px 12px', background: a.type === 'livraison' ? '#9A3412' : '#FFF7ED', color: a.type === 'livraison' ? '#FFF' : '#9A3412', border: '1px solid #FED7AA', borderRadius: '8px', cursor: 'pointer', fontWeight: 600, transition: 'all 0.2s' }}
+              >
+                📦 {a.type === 'livraison' ? '✓ Adresse Livraison' : 'Définir Livraison'}
+              </button>
+            </div>
           </div>
         ))}
       </div>
