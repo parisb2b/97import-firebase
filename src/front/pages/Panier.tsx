@@ -448,23 +448,34 @@ export default function Panier() {
           <input value={customLien} onChange={e => setCustomLien(e.target.value)}
             placeholder="Lien site internet de votre produit pour exemple (optionnel)"
             style={{ width: '100%', padding: '10px 14px', borderRadius: 8, border: '1px solid #E5E7EB', fontSize: 14, marginBottom: 12, outline: 'none', boxSizing: 'border-box' }} />
-          <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#92400E', marginBottom: 4 }}>
+          <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#92400E', marginBottom: 6 }}>
             Nous envoyer une ou des photos
           </label>
-          <input type="file" accept="image/*" capture="environment"
-            onChange={e => setCustomPhoto(e.target.files?.[0] || null)}
-            style={{ width: '100%', padding: '8px 10px', borderRadius: 8, border: '1px solid #E5E7EB', fontSize: 13, marginBottom: 12, outline: 'none', boxSizing: 'border-box', background: '#fff' }} />
-          {customPhoto && (
-            <span style={{ fontSize: 11, color: '#059669', marginTop: -8, marginBottom: 12, display: 'block' }}>
-              📷 {customPhoto.name} ({(customPhoto.size / 1024).toFixed(0)} Ko)
-            </span>
-          )}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+            <input type="file" accept="image/*" capture="environment"
+              id="custom-photo-upload"
+              onChange={e => setCustomPhoto(e.target.files?.[0] || null)}
+              style={{ display: 'none' }} />
+            <label htmlFor="custom-photo-upload" style={{
+              display: 'inline-flex', alignItems: 'center', gap: 6,
+              padding: '8px 16px', borderRadius: 8, border: '1px solid #D1D5DB',
+              background: '#fff', color: '#374151', fontSize: 13, fontWeight: 500,
+              cursor: 'pointer', whiteSpace: 'nowrap',
+            }}>
+              📁 Cliquez ici pour envoyer vos photos
+            </label>
+            {customPhoto && (
+              <span style={{ fontSize: 12, color: '#059669', fontWeight: 500 }}>
+                📷 {customPhoto.name}
+              </span>
+            )}
+          </div>
           <button onClick={handleAddCustom} disabled={photoUploading}
             style={{ ...btnStyle('#EA580C'), width: 'auto', padding: '10px 24px' }}>
             📦 Ajouter au devis
           </button>
-          <p style={{ fontSize: 11, color: '#92400E', marginTop: 8 }}>
-            ⚠️ L'ajout d'un produit sur mesure envoie une notification a l'equipe 97import
+          <p style={{ fontSize: 11, color: '#92400E', marginTop: 8, lineHeight: 1.5 }}>
+            ⚠️ CLIQUER sur le bouton Ajouter au devis = nous allons recevoir votre demande devis et nous allons vous répondre sous 72h sauf si vos coordonnées sont erronées, dans ce cas-là, nous n'allons pas prendre en compte.
           </p>
         </div>
       </div>
