@@ -1,6 +1,6 @@
 # DP97IMPORTMAJ — Journal Central des Mises à Jour
 
-Date : 2026-05-05 16:30 CEST
+Date : 2026-05-05 17:00 CEST
 Projet : 97importok-firebase
 Branche : v2
 Version : v0.43.10
@@ -459,3 +459,129 @@ La variable `isSurMesure` contrôle : `prixMin=0`, `prixMax=999999`, `estValide=
 📄 `src/admin/pages/DetailDevis.tsx` (LigneDevis) : ajout `id?: string`, `photoUrl?: string`
 📄 `src/front/pages/espace-partenaire/GestionDevisPartner.tsx` (DevisLine) : ajout `type?: 'product' | 'custom'`
 📄 `src/front/pages/Panier.tsx` (CartItem) : ajout `photoUrl?: string`
+
+---
+
+## 🗓️ Date : 05/05/2026 17:00 CEST | 🎯 Mission : V89 — UI Sourcing & Input File Personnalisé
+
+📄 Fichier : `src/front/pages/Panier.tsx` (Lignes 462-470)
+
+❌ AVANT :
+```tsx
+          <p style={{ fontSize: 11, color: '#92400E', marginTop: 8 }}>
+            ⚠️ L'ajout d'un produit sur mesure envoie une notification a l'equipe 97import
+          </p>
+```
+
+✅ APRÈS :
+```tsx
+          <p style={{ fontSize: 11, color: '#92400E', marginTop: 8, lineHeight: 1.5 }}>
+            ⚠️ CLIQUER sur le bouton Ajouter au devis = nous allons recevoir votre demande devis
+            et nous allons vous répondre sous 72h sauf si vos coordonnées sont erronées,
+            dans ce cas-là, nous n'allons pas prendre en compte.
+          </p>
+```
+
+---
+
+📄 Fichier : `src/front/pages/Panier.tsx` (Lignes 451-464)
+
+❌ AVANT :
+```tsx
+          <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#92400E', marginBottom: 4 }}>
+            Nous envoyer une ou des photos
+          </label>
+          <input type="file" accept="image/*" capture="environment"
+            onChange={e => setCustomPhoto(e.target.files?.[0] || null)}
+            style={{ width: '100%', padding: '8px 10px', borderRadius: 8, border: '1px solid #E5E7EB', fontSize: 13, marginBottom: 12, outline: 'none', boxSizing: 'border-box', background: '#fff' }} />
+          {customPhoto && (
+            <span style={{ fontSize: 11, color: '#059669', marginTop: -8, marginBottom: 12, display: 'block' }}>
+              📷 {customPhoto.name} ({(customPhoto.size / 1024).toFixed(0)} Ko)
+            </span>
+          )}
+```
+
+✅ APRÈS :
+```tsx
+          <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#92400E', marginBottom: 6 }}>
+            Nous envoyer une ou des photos
+          </label>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+            <input type="file" accept="image/*" capture="environment"
+              id="custom-photo-upload"
+              onChange={e => setCustomPhoto(e.target.files?.[0] || null)}
+              style={{ display: 'none' }} />
+            <label htmlFor="custom-photo-upload" style={{
+              display: 'inline-flex', alignItems: 'center', gap: 6,
+              padding: '8px 16px', borderRadius: 8, border: '1px solid #D1D5DB',
+              background: '#fff', color: '#374151', fontSize: 13, fontWeight: 500,
+              cursor: 'pointer', whiteSpace: 'nowrap',
+            }}>
+              📁 Cliquez ici pour envoyer vos photos
+            </label>
+            {customPhoto && (
+              <span style={{ fontSize: 12, color: '#059669', fontWeight: 500 }}>
+                📷 {customPhoto.name}
+              </span>
+            )}
+          </div>
+```
+
+---
+
+## 🔴 AUDIT V90 — VÉRIFICATION DES 7 POINTS CRITIQUES (05/05/2026 17:00 CEST)
+
+### Point 1 — N°11-12 & 22 : Sélecteur adresse + héritage livraison
+📄 `src/front/pages/Profil.tsx:179` — ✅ CORRIGÉ (V87)
+- Boîte bleue `#F0F9FF` avec bordure `#BAE6FD`, icônes 📋🧾📦, badge dynamique Facturation/Livraison
+- Fallback français sur toutes les clés i18n
+📄 `src/front/pages/Panier.tsx:184-192` — ✅ CORRIGÉ (V87ter)
+- `adresse_livraison?.rue ? userProfile.adresse_livraison : { ...facturation }`
+
+### Point 2 — N°29 : Invalid Date sur acomptes
+📄 `src/front/pages/espace-client/MesFactures.tsx:6,199,253` — ✅ CORRIGÉ (V87)
+- `import { toDate } from '../../../lib/dateHelpers'` — utilisé à toutes les occurrences
+📄 `src/front/pages/espace-client/MesVirements.tsx` — ✅ CORRIGÉ (V87)
+📄 `src/admin/components/PopupEncaisserAcompte.tsx:11,416` — ✅ CORRIGÉ (V83)
+📄 `src/admin/pages/ListeDevis.tsx:18,79` — ✅ CORRIGÉ (V87)
+📄 `src/admin/pages/ListeConteneurs.tsx` — ✅ CORRIGÉ (V87)
+📄 `src/admin/pages/ListeListesAchat.tsx` — ✅ CORRIGÉ (V87)
+📄 `src/admin/pages/Logs.tsx:6` — ✅ CORRIGÉ (V87)
+
+### Point 3 — N°31 : Colonne Date dans liste admin
+📄 `src/admin/pages/ListeDevis.tsx:226` — ✅ CORRIGÉ (V83)
+- `<th>Date</th>` présent, `<td>{d.date}</td>` présent
+- `toDate()` utilisé pour conversion robuste des Timestamps Firestore
+
+### Point 4 — N°34 : 3e acompte débloqué
+📄 `src/front/pages/espace-client/PopupAcompte.tsx:12` — ✅ CORRIGÉ (V85)
+- `getRestantAPayer()` compte TOUS les acomptes (déclarés + encaissés)
+- Aligné avec `validerNouveauPaiement()` dans `quoteStatusHelpers.ts`
+📄 `firestore.rules:132` — ✅ CORRIGÉ (V84)
+- Client peut modifier ses propres devis sans restriction `isDevisReadonly`
+📄 `src/front/pages/espace-client/DevisCard.tsx:545-600` — ✅ CORRIGÉ
+- Boutons de paiement hors condition `isDevisReadonly()`
+
+### Point 5 — N°35-36 : Commission + Facture Finale auto
+📄 `src/admin/components/PopupEncaisserAcompte.tsx:272-342` — ✅ CORRIGÉ (V86)
+- `if (Math.abs(soldeRestant) < 0.01)` → `nouveauStatut = 'commande_ferme'`
+- Ligne 342 : `await traiterCascadeSoldePaye(devisFinal)` — génère commission + facture finale
+- DVS-2605001 : NC-2605-003 (15202€) + FA-2605-001 vérifiés
+
+### Point 6 — N°37 : /admin/logs fonctionnel
+📄 `src/admin/pages/Logs.tsx:3,26,43` — ✅ CORRIGÉ (V87)
+- `import { adminDb, db as clientDb } from '../../lib/firebase'`
+- `const firestoreDb = clientDb || adminDb` — priorité clientDb
+- Fallback `adminDb` + `fetchRecentLogs()` du `logService.ts`
+
+### Point 7 — N°39-40 : Cloud Functions fallbacks
+📄 `src/lib/exchangeRateUpdater.ts` — ✅ CORRIGÉ (V87)
+- Constante `EXCHANGE_RATE_UPDATER_STATUS` avec raison "API key required"
+- Fonction `updateExchangeRate()` retourne `{ ok: false, reason }`
+📄 `src/lib/deeplTranslator.ts` — ✅ CORRIGÉ (V87)
+- Constante `DEEPL_TRANSLATOR_STATUS` avec raison "DeepL API key required"
+- Fonction `translateProductField()` retourne le texte inchangé
+
+---
+
+### Conclusion V90 : 7/7 points vérifiés — code correct en place. Déploiement Vercel requis pour propager.
