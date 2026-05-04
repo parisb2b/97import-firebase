@@ -3,6 +3,8 @@ import { Link, useLocation } from 'wouter';
 import { clientAuth, db } from '../../lib/firebase';
 import { logError, logInfo, logWarn } from '../../lib/logService';
 import { doc, setDoc, getDoc, serverTimestamp, collection, query, where, getDocs } from 'firebase/firestore';
+import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { storage } from '../../lib/firebase';
 import { getNextNumber } from '../../lib/counters';
 import { useI18n } from '../../i18n';
 import { useToast } from '../components/Toast';
@@ -19,6 +21,7 @@ interface CartItem {
   type?: 'product' | 'custom';
   description?: string;
   lien?: string;
+  photoUrl?: string;
 }
 
 interface Partner {
@@ -59,6 +62,8 @@ export default function Panier() {
   const [customQte, setCustomQte] = useState(1);
   const [customDesc, setCustomDesc] = useState('');
   const [customLien, setCustomLien] = useState('');
+  const [customPhoto, setCustomPhoto] = useState<File | null>(null);
+  const [photoUploading, setPhotoUploading] = useState(false);
   const [clientProfile, setClientProfile] = useState<any>(null);
 
   // V62 — chargement profil client pour adresse livraison
@@ -100,15 +105,36 @@ export default function Panier() {
   const total = cart.reduce((sum, item) => sum + item.prix * item.qte, 0);
 
   // ─── Add custom product ───
-  const handleAddCustom = () => {
+  const handleAddCustom = async () => {
     if (!customNom.trim()) return;
     const id = `custom_${Date.now()}`;
+    let photoUrl: string | undefined;
+
+    // V87 — Upload photo vers Firebase Storage si fournie
+    if (customPhoto) {
+      setPhotoUploading(true);
+      try {
+        const ext = customPhoto.name.split('.').pop() || 'jpg';
+        const path = `custom_products/${id}.${ext}`;
+        const fileRef = storageRef(storage, path);
+        await uploadBytes(fileRef, customPhoto, { contentType: customPhoto.type || 'image/jpeg' });
+        photoUrl = await getDownloadURL(fileRef);
+        logInfo('Panier', 'Photo produit sur mesure uploadée', { path });
+      } catch (err: any) {
+        logError('Panier', 'Échec upload photo sur mesure', { error: err?.message });
+        showToast('Erreur upload photo — le produit sera ajouté sans photo', 'warning');
+      } finally {
+        setPhotoUploading(false);
+      }
+    }
+
     const newItem: CartItem = {
       id, ref: 'SUR-MESURE', nom_fr: customNom.trim(), prix: 0, qte: customQte,
-      type: 'custom', description: customDesc, lien: customLien,
+      type: 'custom', description: customDesc, lien: customLien, photoUrl,
     };
     saveCart([...cart, newItem]);
     setCustomNom(''); setCustomQte(1); setCustomDesc(''); setCustomLien('');
+    setCustomPhoto(null);
   };
 
   // ─── Open popup flow ───
@@ -160,6 +186,7 @@ export default function Panier() {
           type: item.type || 'product',
           ...(item.description ? { description: item.description } : {}),
           ...(item.lien ? { lien: item.lien } : {}),
+          ...(item.photoUrl ? { photoUrl: item.photoUrl } : {}),
         };
       });
 
@@ -394,7 +421,15 @@ export default function Panier() {
           <input value={customLien} onChange={e => setCustomLien(e.target.value)}
             placeholder="Lien YouTube ou site (optionnel)"
             style={{ width: '100%', padding: '10px 14px', borderRadius: 8, border: '1px solid #E5E7EB', fontSize: 14, marginBottom: 12, outline: 'none', boxSizing: 'border-box' }} />
-          <button onClick={handleAddCustom}
+          <input type="file" accept="image/*" capture="environment"
+            onChange={e => setCustomPhoto(e.target.files?.[0] || null)}
+            style={{ width: '100%', padding: '8px 10px', borderRadius: 8, border: '1px solid #E5E7EB', fontSize: 13, marginBottom: 12, outline: 'none', boxSizing: 'border-box', background: '#fff' }} />
+          {customPhoto && (
+            <span style={{ fontSize: 11, color: '#059669', marginTop: -8, marginBottom: 12, display: 'block' }}>
+              📷 {customPhoto.name} ({(customPhoto.size / 1024).toFixed(0)} Ko)
+            </span>
+          )}
+          <button onClick={handleAddCustom} disabled={photoUploading}
             style={{ ...btnStyle('#EA580C'), width: 'auto', padding: '10px 24px' }}>
             📦 Ajouter au devis
           </button>

@@ -1,10 +1,10 @@
 # DP97IMPORTMAJ — Journal Central des Mises à Jour
 
-Date : 2026-05-05 12:00 CEST
+Date : 2026-05-05 14:00 CEST
 Projet : 97importok-firebase
 Branche : v2
 Version : v0.43.10
-Build : à confirmer après commit V87ter
+Build : à confirmer après commit V87quater
 Firebase : importok-6ef77
 Vercel FRONT : https://97import-firebase-git-v2-parisb2bs-projects.vercel.app/
 Vercel ADMIN : https://97import-firebase-git-v2-parisb2bs-projects.vercel.app/admin
@@ -30,6 +30,96 @@ Vercel ADMIN : https://97import-firebase-git-v2-parisb2bs-projects.vercel.app/ad
 | N°37 /admin/logs | ✅ Logs.tsx lit clientDb + fallback adminDb + fetchRecentLogs |
 | N°39-40 Cloud/DeepL | ✅ Placeholders exchangeRateUpdater.ts + deeplTranslator.ts crees |
 | Comptes test | mc@sasfr.com / 97importcom@gmail.com / parisb2b@gmail.com (mdp: 20262026) |
+
+---
+
+## PREUVES DE CODE & RÉSOLUTIONS — MISSION V87ter
+
+### Tableau récapitulatif Priorités 0 & 1
+
+| N° | Priorité | Fichier | Correction | Lignes |
+|----|----------|---------|------------|--------|
+| 05 | 0 | `Panier.tsx` | Formulaire produit sur mesure TOUJOURS visible | 375-410 |
+| 05 | 0 | `Panier.tsx` | Upload photo → Firebase Storage → photoUrl | 103-127 |
+| 05 | 0 | `Panier.tsx` | photoUrl inclus dans handleCreateQuote | 162 |
+| 05 | 0 | `DetailDevis.tsx` | Affichage miniature photo 📷 | 470-481 |
+| 05 | 0 | `DevisCard.tsx` | Affichage miniature photo 📷 (client) | 348-358 |
+| 11-22 | 1 | `Profil.tsx` | Selecteur type adresse en boîte bleue #F0F9FF | 179-204 |
+| 12 | 1 | `Panier.tsx` | Héritage adresse livraison via .rue (pas `||`) | 184-192 |
+| — | 1 | `firestore.rules` | Validation adresses (aucun changement requis) | 90-95 |
+| — | — | `storage.rules` | Autorisation upload custom_products/ pour clients | 9-11 |
+
+### Panier.tsx — Formulaire produit sur mesure toujours visible
+
+❌ AVANT (l.316-346 dans le conditionnel `cart.length === 0 ? ... : ...`) :
+```tsx
+              {/* ═══ Custom product form ═══ */}
+              <div style={{ marginTop: 24, border: '2px dashed #EA580C', ... }}>
+```
+Le formulaire était dans la branche `else` → invisible si panier vide.
+
+✅ APRÈS (l.375-410, hors conditionnel) :
+```tsx
+      {/* V87 — Formulaire produit sur mesure (TOUJOURS visible, meme panier vide) */}
+      <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px 40px' }}>
+        <div style={{ border: '2px dashed #EA580C', borderRadius: 16, padding: 24, background: '#FFF7ED' }}>
+          <h3>Produit sur mesure</h3>
+          <input ... nom /> <input ... qte />
+          <textarea ... description />
+          <input ... lien URL />
+          <input type="file" accept="image/*" capture="environment" />
+          <button ...>📦 Ajouter au devis</button>
+        </div>
+      </div>
+```
+
+### Panier.tsx — Upload photo + handleAddCustom
+
+❌ AVANT (l.103-112) :
+```tsx
+  const handleAddCustom = () => {
+    if (!customNom.trim()) return;
+    const newItem: CartItem = {
+      id, ref: 'SUR-MESURE', nom_fr: customNom.trim(), prix: 0, qte: customQte,
+      type: 'custom', description: customDesc, lien: customLien,
+    };
+    saveCart([...cart, newItem]);
+  };
+```
+
+✅ APRÈS (l.105-130) :
+```tsx
+  const handleAddCustom = async () => {
+    if (!customNom.trim()) return;
+    const id = `custom_${Date.now()}`;
+    let photoUrl: string | undefined;
+    if (customPhoto) {
+      setPhotoUploading(true);
+      try {
+        const path = `custom_products/${id}.${customPhoto.name.split('.').pop()}`;
+        await uploadBytes(storageRef(storage, path), customPhoto);
+        photoUrl = await getDownloadURL(storageRef(storage, path));
+      } finally { setPhotoUploading(false); }
+    }
+    const newItem: CartItem = {
+      id, ref: 'SUR-MESURE', nom_fr: customNom.trim(), prix: 0, qte: customQte,
+      type: 'custom', description: customDesc, lien: customLien, photoUrl,
+    };
+    saveCart([...cart, newItem]);
+  };
+```
+
+### Profil.tsx — Sélecteur Type d'adresse
+
+❌ AVANT (l.179-197, V79) : Simple `<select>` noyé dans le formulaire, sans mise en évidence.
+
+✅ APRÈS (l.179-204, V87) : Boîte bleue `#F0F9FF` avec bordure `#BAE6FD`, icônes 📋🧾📦, badge dynamique coloré, fallback français.
+
+### Panier.tsx — Héritage adresse livraison
+
+❌ AVANT (l.184-191) : `userProfile.adresse_livraison || { ... }` — un objet vide `{}` passait le `||`.
+
+✅ APRÈS (l.184-192) : `userProfile.adresse_livraison?.rue ? userProfile.adresse_livraison : { ... }` — test explicite sur `.rue`.
 
 ---
 

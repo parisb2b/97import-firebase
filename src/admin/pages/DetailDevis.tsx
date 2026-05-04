@@ -27,6 +27,7 @@ interface LigneDevis {
   type?: 'product' | 'custom';
   description?: string;
   lien?: string;
+  photoUrl?: string;
 }
 
 interface Devis {
@@ -468,9 +469,14 @@ export default function DetailDevis() {
                     <input className="fi" type="text" value={ligne.nom_fr}
                       disabled={estLectureSeule}
                       onChange={(e) => handleLigneChange(index, 'nom_fr', e.target.value)} />
-                    {(ligne.description || ligne.lien) && (
+                    {(ligne.description || ligne.lien || ligne.photoUrl) && (
                       <div style={{ marginTop: 4, padding: '6px 8px', background: '#FFF7ED', borderRadius: 6, border: '1px solid #FED7AA', fontSize: 11 }}>
-                        {ligne.description && <div style={{ color: '#92400E', marginBottom: ligne.lien ? 4 : 0 }}>📝 {ligne.description}</div>}
+                        {ligne.photoUrl && (
+                          <a href={ligne.photoUrl} target="_blank" rel="noopener noreferrer" style={{ display: 'block', marginBottom: 6 }}>
+                            <img src={ligne.photoUrl} alt="Photo produit sur mesure" style={{ maxWidth: 120, maxHeight: 90, borderRadius: 4, border: '1px solid #FED7AA' }} />
+                          </a>
+                        )}
+                        {ligne.description && <div style={{ color: '#92400E', marginBottom: (ligne.lien || ligne.photoUrl) ? 4 : 0 }}>📝 {ligne.description}</div>}
                         {ligne.lien && <a href={ligne.lien} target="_blank" rel="noopener noreferrer" style={{ color: '#EA580C', wordBreak: 'break-all' }}>🔗 {ligne.lien}</a>}
                       </div>
                     )}
