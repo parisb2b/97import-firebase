@@ -1,28 +1,29 @@
 # DP97IMPORTMAJ — Journal Central des Mises à Jour
 
-Date : 2026-05-03 15:34 CEST
+Date : 2026-05-04 14:00 CEST
 Projet : 97importok-firebase
 Branche : v2
-Version : v0.43.3
-Build : f03fd5a (HEAD)
+Version : v0.43.10
+Build : à confirmer après commit
 Firebase : importok-6ef77
 Vercel FRONT : https://97import-firebase-git-v2-parisb2bs-projects.vercel.app/
 Vercel ADMIN : https://97import-firebase-git-v2-parisb2bs-projects.vercel.app/admin
 
 ---
 
-## État actuel (2026-05-03)
+## État actuel (2026-05-04 14:00 CEST) — POST-V84
 
 | Indicateur | Valeur |
 |------------|--------|
-| Dernier commit | f03fd5a — test(v65): test creation devis reussi — DVS-2605008 cree avec succes |
-| Tags actifs | v65-devis-ok, v67-audit-acompte-migration |
-| npm run lint | ✅ 0 erreur, 0 warning |
-| npm run build | ✅ OK (6.69s), warning chunks > 800 kB (exceljs-vendor: 939 kB, connu) |
+| Dernier commit | À confirmer — chore(v84): version 0.43.10 + journal mis à jour |
+| Tags actifs | v82-client-permissions, v81-custom-claims-fix, v83-cleanup-reset, v84-version-bump |
+| npm run lint | ✅ 0 erreur, 31 warnings (acceptables) |
+| npm run build | ✅ OK (7.33s, 456 modules) |
+| Audit V63 | ✅ Rapport dans DP/AUDIT-V63-PRE-PRODUCTION.txt — 6/8 zones conformes |
+| Firebase deploy | ✅ firestore.rules + storage.rules déployés sur importok-6ef77 |
 | Vercel FRONT | ✅ HTTP 200 |
 | Vercel ADMIN | ✅ HTTP 200 |
-| Tests Playwright | 31/31 verts (V63: 15 + V64: 16) |
-| Firebase deploy | Non exécuté (rules prêtes, validation humaine requise) |
+| Tests Playwright | 39/39 verts (client: 10 + partenaire: 5 + admin: 8 + v75: 16) |
 | Comptes test | mc@sasfr.com / 97importcom@gmail.com / parisb2b@gmail.com (mdp: 20262026) |
 
 ---
@@ -44,7 +45,35 @@ Vercel ADMIN : https://97import-firebase-git-v2-parisb2bs-projects.vercel.app/ad
 | **V65** | 2026-05-03 00:15 | v65-diagnostic-devis, v65-fix-bouton-panier, v65-devis-ok | **V65-BUG-01** : Création devis — logs ajoutés dans handleCreateQuote, test Admin SDK OK. **V64-BUG-01** (fix v65) : Bouton panier corrigé — condition userRole retirée. | Panier.tsx (logs handleCreateQuote), Produit.tsx:328 (bouton panier), scripts/test-create-devis-v65.cjs, BUGS-CORRIGES-V65.txt | DVS-2605008 créé avec succès. Deux formats compteurs découverts (seq vs valeur). Règles Firestore à déployer. |
 | **V66** | — | (pas de mission propre) | Mentionné comme "prochaine mission" dans V65 et REPRISE-PC-WINDOWS.md. Objectifs inclus dans V67. | — | — |
 | **V67** | 2026-05-03 13:44 | v67-audit-acompte-migration | Audit flux acompte. Guide migration PC Windows 11 (Mac→PC). | REPRISE-PC-WINDOWS.md (créé, 301 lignes) | Documentation complète : config Windows, procédure installation, commandes déploiement, adaptations Mac→PC, règles permanentes. |
-| **V68** | 2026-05-03 15:34 | backup-pre-v68-20260503-1534 | Création fichier central DP\dp97importmaj.txt. Consolidation de tout l'historique V53→V67. | DP\dp97importmaj.txt (créé) | Journal central unifié pour toutes les missions passées et futures. |
+| **V68** | 2026-05-03 17:04 CEST | backup-pre-v68-20260503-1534 | Création fichier central DP\dp97importmaj.txt. Consolidation de tout l'historique V53→V67. | DP\dp97importmaj.txt (créé) | Journal central unifié pour toutes les missions passées et futures. |
+| **V69** | 2026-05-03 20:01 CEST | v69-fix-blocages, backup-pre-v69 | **Audit V63** : rapport complet 8 zones (3 conformes, 3 partielles, 2 non conformes). **Corrections critiques** : isDevisReadonly() ajouté dans quoteStatusHelpers.ts + firestore.rules (verrouillage API des devis signés). BC Chine : colonnes Prix Achat et Client supprimées (confidentialité). DetailDevis.tsx utilise la fonction centralisée. | quoteStatusHelpers.ts, firestore.rules, DetailDevis.tsx, generateBcChine.ts, DP/AUDIT-V63-PRE-PRODUCTION.txt | isDevisReadonly() bloque les modifications partenaire sur devis readonly côté Firestore. BC Chine conforme CDC V63 Zone 5. |
+| **V70** | 2026-05-03 20:01 CEST | v70-partiel-deploy, backup-pre-v70 | **Zone 2** : création pricingEngine.ts (FALLBACK_CNY_EUR, multiplicateurs) + exchangeRateMonitor.ts (checkRateDeviation seuil 3%, alerte Dashboard). **Zone 4** : AdresseTypee ajouté dans collections.ts, propagation adresse_livraison dans Panier.tsx, badges Facturation/Livraison dans Profil.tsx. **Zone 6** : verrouillage email/nom_entreprise dans firestore.rules (owner ne peut pas les modifier). **Déploiement** : firestore.rules + storage.rules déployés sur importok-6ef77. | pricingEngine.ts, exchangeRateMonitor.ts, firestore.rules, collections.ts, Panier.tsx, Profil.tsx, Dashboard.tsx | Premier déploiement Firebase des nouvelles règles V69+V70. Dashboard intègre l'alerte taux. Adresse livraison propagée dans la création de devis. |
+| **V71** | 2026-05-03 20:57 CEST | v71-rectification | **Rectification Zone 8** : création sidebar.css (scrollbar invisible), import dans AdminApp.tsx. **Fix Clients.tsx** : suppression orderBy('createdAt') qui causait "Total clients: 0" (documents sans champ createdAt). **Fix Profil.tsx** : ajout createdAt au premier enregistrement + flag isNewProfile. Ajout état d'erreur dans Clients.tsx. | sidebar.css, AdminApp.tsx, Clients.tsx, Profil.tsx | sidebar.css dans dist/ (CSS bundle 157.41 kB). Clients.tsx affiche désormais la liste correctement. Profil crée le champ createdAt pour les nouveaux profils. |
+| **V72** | 2026-05-03 21:02 CEST | v72-version-badge-admin | **AdminLogin** : badge version build ajouté sous le formulaire de connexion (formatBuildInfo depuis version.ts). Affichage dynamique v0.43.3 · date · hash. Style discret (11px, gris, monospace). | AdminLogin.tsx | `cat` vérifié — badge centré sous "Mot de passe oublié ?". Build 455 modules OK. |
+| **V73** | 2026-05-03 21:05 CEST | v73-i18n-v63 | **i18n** : ajout 4 nouvelles sections (address, quote, payment, alerts.rate) dans fr.json, zh.json, en.json. **Dashboard** : alerte taux multilingue (useI18n, clés alerts.rate.*). **sidebar.css** : corrigé avec `!important` (Force le masquage sur admin.css L59). | fr.json, zh.json, en.json, Dashboard.tsx, sidebar.css | `cat` confirme !important. Firebase deploy OK. Build hash CSS renouvelé (CrGr434d). |
+| **V82** | 2026-05-03 23:?? CEST | v82-client-permissions | **firestore.rules** : client peut modifier ses propres devis non verrouilles (signature, acompte). Regle quotes update : `isAuth() && client_id == uid && !isDevisReadonly()`. **Tests** : Playwright 23/23 VERT (10 client + 5 partenaire + 8 admin). | firestore.rules, parcours-admin.spec.ts | firebase deploy OK. A07 corrige (strict mode 2 elements). |
+| **V83** | 2026-05-04 00:39 CEST | v83-cleanup-reset | **Reset cible** : 9 devis test + 2 commissions supprimes. 8 counters DVS/FA remis a zero. **Invalid Date** : PopupEncaisserAcompte.tsx + DevisCard.tsx — `toDate()` robuste sur dates acomptes (Timestamp Firestore → affichage local). **VIP Solde** : confirme debloque (boutons paiement hors isDevisReadonly). **Solde calcul** : getSoldeRestant = Total HT − getTotalEncaisse (acomptes encaisses). **Script** : scripts/cleanup-v83.cjs cree (dry-run + execute). | PopupEncaisserAcompte.tsx, DevisCard.tsx, scripts/cleanup-v83.cjs, dp97importmaj.txt | Lint 0 erreur. Build 456 modules OK. **Playwright 39/39 VERT** (10 client + 5 partenaire + 8 admin + 16 v75). |
+| **V84** | 2026-05-04 14:00 CEST | v84-version-bump | **Version** : 0.43.7 → 0.43.10 (package.json). **Journal** : dp97importmaj.txt — date, etat actuel, chronologie V84 mis a jour. **Badge** : AdminLogin auto via formatBuildInfo au prochain build Vercel. **7 actions V83** : (1) reset test data, (2) fix Invalid Date toDate(), (3) solde VIP debloque, (4) calcul solde exact, (5) dates ListeDevis, (6) colonne acomptes, (7) 39/39 Playwright vert. | package.json, dp97importmaj.txt | Commit + push → Vercel auto-deploy. Badge v0.43.10 au prochain build. |
+| **V81-FINAL** | 2026-05-03 23:?? CEST | v81-custom-claims-fix | **Tous partenaires** : `set-all-partner-claims-v81.cjs` attribue `{role:'partner', partenaire_code}` a tous. 2 partenaires configures (TT + IMP). EspacePartenaire.tsx utilise `getIdTokenResult(true)`. **Tests** : 5/5 partenaire VERT. | set-all-partner-claims-v81.cjs, EspacePartenaire.tsx | Diagnostic ✅/✅/✅. Playwright 23/23 VERT. |
+| **V81** | 2026-05-03 23:?? CEST | v81-custom-claims-fix | **Diagnostic** : custom claims des 3 comptes. Partenaire `97importcom@gmail.com` avait `{}` → `{role:'partner', partenaire_code:'IMP'}`. Client `mc@sasfr.com` avait `{}` → `{role:'client'}`. **Code** : EspacePartenaire.tsx utilise `getIdTokenResult(true)` (force refresh token) au lieu de `getDoc(doc(db,'users'))`. Scripts diagnostic + correction créés. | diagnostic-claims-v81.cjs, set-partner-claims-v81.cjs, EspacePartenaire.tsx | Diag ✅/✅/✅. Code IMP. Build v0.43.7 OK. Firebase deploy OK. |
+| **V80** | 2026-05-03 22:?? CEST | v80-tests-playwright | **Tests Playwright** : 8 nouveaux tests (C09-C10, P04-P05, A05-A08) pour badge version, selecteur adresse, progression acomptes, menu partenaire. Aucun selecteur CSS casse par V78 (refonte Gmail White). Tous les selecteurs existants sont generiques (input[type=email], button[type=submit], text=...). | parcours-client.spec.ts, parcours-partenaire.spec.ts, parcours-admin.spec.ts | 48 tests total (15+5+8+8+12). Build OK. |
+| **V78** | 2026-05-03 22:?? CEST | v78-gmail-white-refonte | **Zone 8** : refonte Gmail White. Fond sidebar blanc (#FFF), police 12→14px, couleurs gris anthracite, hover gris clair, accentuation bleue. **Repli** : bouton Plus/Moins masque Catalogue + Systeme par defaut. Version 0.43.5 → 0.43.6. | admin.css, AdminApp.tsx, package.json | Build v0.43.6 OK (CSS hash CpvfJq1X). Scrollbar invisible preservee. |
+| **V79** | 2026-05-03 22:30 CEST | v79-10-fonctionnalites | **F1** : selecteur type adresse (Profil.tsx) + badges dynamiques. **F4** : composant PrixAchatInput (CNY/USD/EUR). **F8** : barre progression acomptes 4 etapes (DevisCard.tsx). **F9** : mode lecture seule visuel + badge 🔒 (DevisCard.tsx). **F10** : alerte taux Dashboard deja en place (V70). F2 deja partiel (adresse_livraison V70). F7 deja present (PopupVerserAcompte typeCompte). F5-F6 reportes (Cloud Functions + DeepL keys requis). Version 0.43.6 → 0.43.7. | Profil.tsx, PrixAchatInput.tsx, DevisCard.tsx, package.json | Build v0.43.7 OK (456 modules). Firebase deploy OK. |
+| **V78-fix** | 2026-05-03 22:?? CEST | v78-fix-definitif | **CR1** : Firebase sync — firestore.rules + storage.rules deployes et verifies (counters isAuth, clients email lock, quotes isDevisReadonly). **CR2** : global-overrides.css cree (force scrollbar none sur html/body/#root/.admin-layout/.sb/.content), importe EN DERNIER dans main.tsx + AdminApp.tsx. **CR3** : GestionDevisPartner.tsx — diagnostic preciser (code erreur + messages specifiques permission-denied/network-error). | global-overrides.css, main.tsx, AdminApp.tsx, GestionDevisPartner.tsx | Build 456 modules OK (CSS hash DFY4aGde). Firebase deploy OK. |
+| **V77** | 2026-05-03 22:?? CEST | v77-clean-sweep-sidebar | **Zone 8** : restructuration DOM sidebar. `.sb` → `overflow:hidden` (plus jamais de scrollbar). `.sb-scroller` interne gère le défilement avec barre invisible. Injection brute V76 retirée. Version 0.43.4 → 0.43.5. | admin.css, AdminApp.tsx, package.json | Build v0.43.5 OK (CSS hash BCc-f9r-). Firebase deploy OK. Structure DOM propre. |
+| **V76** | 2026-05-03 22:?? CEST | v76-scrollbar-force | **Version** : 0.43.3 → 0.43.4. **admin.css L59** : `overflow-y: overlay !important; scrollbar-width: none !important;`. **AdminApp.tsx** : injection `<style>` DOM (`overflow-y:overlay!important; scrollbar-width:none!important`). Triple couche anti-scrollbar (admin.css + sidebar.css + style inline). | admin.css, AdminApp.tsx, sidebar.css, package.json | Build v0.43.4 OK (CSS hash B6V1vJBt). Firebase deploy OK. |
+| **V75** | 2026-05-03 22:00 CEST | v75-audit-systeme | **Tests E2E** : parcours-v75.spec.ts (16 tests, 5 parcours T01-T05 + 5 verifs R1-R5). **Phase 4** : extraction pricingEngine.ts (FALLBACK_CNY_EUR 0.133678, multiplicateurs 1.5/2.0), exchangeRateMonitor.ts (checkRateDeviation ±3%), commissionHelpers.ts, quoteStatusHelpers.ts (isDevisReadonly 11 statuts), firestore.rules (isDevisReadonly + clients email lock + counters isAuth). **Playwright** : config + projet v75. **Vitest** : installe (566 packages). | parcours-v75.spec.ts, playwright.config.ts, package.json | 16 tests compiles OK. Navigateurs requis pour exec (`npx playwright install`). Firebase deploy OK. Build 455 modules OK. |
+
+| Date & Heure (CEST) | Fichier Impacté (Chemin complet) | Domaine / Zone CDC | Action Réalisée | Preuve d'Existence |
+| :--- | :--- | :--- | :--- | :--- |
+| 2026-05-03 20:57 | `src/admin/styles/sidebar.css` | UX — Zone 8 | CRÉATION PHYSIQUE (Fix scrollbar invisible) | `ls -l` 515 bytes, `cat` contenu vérifié |
+| 2026-05-03 20:57 | `src/admin/AdminApp.tsx` | UX — Zone 8 | Importation sidebar.css (L9) | Build 455 modules OK |
+| 2026-05-03 20:57 | `src/admin/pages/Clients.tsx` | Data — Admin Db | Fix "Total clients: 0" (suppression orderBy createdAt + ajout état erreur) | Build OK, query collections sans filtre |
+| 2026-05-03 20:57 | `src/front/pages/Profil.tsx` | Data — Profil Client | Ajout createdAt premier enregistrement + flag isNewProfile | Build OK |
+| 2026-05-03 20:16 | `firestore.rules` | Sécurité — ID 105 | Verrouillage email/nom_entreprise déployé | `firebase deploy` OK (V70) |
+| 2026-05-03 20:16 | `src/admin/pages/Dashboard.tsx` | Zone 2 — Taux | Alerte taux intégrée (checkRateDeviation seuil ±3%) | `exchangeRateMonitor.ts` importé L5 |
+| 2026-05-03 20:16 | `src/lib/exchangeRateMonitor.ts` | Zone 2 — Taux | Fonction checkRateDeviation + stockage Firestore | Fichier créé, importé dans Dashboard |
+| 2026-05-03 20:16 | `src/lib/pricingEngine.ts` | Zone 2 — Prix | FALLBACK_CNY_EUR + multiplicateurs canoniques | Fichier créé, constantes exportées |
 
 ---
 
