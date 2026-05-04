@@ -432,7 +432,7 @@ export default function Panier() {
           border: '2px dashed #EA580C', borderRadius: 16, padding: 24, background: '#FFF7ED',
         }}>
           <h3 style={{ fontSize: 16, fontWeight: 700, color: '#1565C0', marginBottom: 16 }}>
-            {t('cart.customProduct')}
+            Ajouter un produit non listé dans notre catalogue — on va chercher pour vous en Chine
           </h3>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 12, marginBottom: 12 }}>
             <input value={customNom} onChange={e => setCustomNom(e.target.value)}
@@ -446,8 +446,11 @@ export default function Panier() {
             rows={3}
             style={{ width: '100%', padding: '10px 14px', borderRadius: 8, border: '1px solid #E5E7EB', fontSize: 14, resize: 'vertical', marginBottom: 12, outline: 'none', boxSizing: 'border-box' }} />
           <input value={customLien} onChange={e => setCustomLien(e.target.value)}
-            placeholder="Lien YouTube ou site (optionnel)"
+            placeholder="Lien site internet de votre produit pour exemple (optionnel)"
             style={{ width: '100%', padding: '10px 14px', borderRadius: 8, border: '1px solid #E5E7EB', fontSize: 14, marginBottom: 12, outline: 'none', boxSizing: 'border-box' }} />
+          <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#92400E', marginBottom: 4 }}>
+            Nous envoyer une ou des photos
+          </label>
           <input type="file" accept="image/*" capture="environment"
             onChange={e => setCustomPhoto(e.target.files?.[0] || null)}
             style={{ width: '100%', padding: '8px 10px', borderRadius: 8, border: '1px solid #E5E7EB', fontSize: 13, marginBottom: 12, outline: 'none', boxSizing: 'border-box', background: '#fff' }} />

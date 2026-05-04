@@ -1,6 +1,6 @@
 # DP97IMPORTMAJ — Journal Central des Mises à Jour
 
-Date : 2026-05-05 16:00 CEST
+Date : 2026-05-05 16:30 CEST
 Projet : 97importok-firebase
 Branche : v2
 Version : v0.43.10
@@ -267,3 +267,195 @@ Le formulaire était dans la branche `else` → invisible si panier vide.
 
 Fichier créé le 2026-05-03 15:34 CEST par DeepSeek V4 Pro (mission V68 — audit central).
 Tag backup : backup-pre-v68-20260503-1534
+
+---
+
+## 🔴 PREUVES DE CODE — MISSION V88 (05/05/2026 16:30 CEST)
+
+### 🗓️ Tâche 1 — UI : Nouveaux libellés du formulaire sur mesure
+📄 Fichier : `src/front/pages/Panier.tsx` (Lignes 434-458)
+
+❌ AVANT :
+```tsx
+          <h3 style={{ fontSize: 16, fontWeight: 700, color: '#1565C0', marginBottom: 16 }}>
+            {t('cart.customProduct')}
+          </h3>
+          ...
+          <input value={customLien} onChange={e => setCustomLien(e.target.value)}
+            placeholder="Lien YouTube ou site (optionnel)"
+            style={{ ... }} />
+          <input type="file" accept="image/*" capture="environment"
+            onChange={e => setCustomPhoto(e.target.files?.[0] || null)}
+            style={{ ... }} />
+```
+
+✅ APRÈS :
+```tsx
+          <h3 style={{ fontSize: 16, fontWeight: 700, color: '#1565C0', marginBottom: 16 }}>
+            Ajouter un produit non listé dans notre catalogue — on va chercher pour vous en Chine
+          </h3>
+          ...
+          <input value={customLien} onChange={e => setCustomLien(e.target.value)}
+            placeholder="Lien site internet de votre produit pour exemple (optionnel)"
+            style={{ ... }} />
+          <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#92400E', marginBottom: 4 }}>
+            Nous envoyer une ou des photos
+          </label>
+          <input type="file" accept="image/*" capture="environment"
+            onChange={e => setCustomPhoto(e.target.files?.[0] || null)}
+            style={{ ... }} />
+```
+
+---
+
+### 🗓️ Tâche 2 — Backend : handleAddCustom (PS-XXXX + Firestore + Storage)
+📄 Fichier : `src/front/pages/Panier.tsx` (Lignes 108-163)
+📄 Fichier : `src/front/pages/Panier.tsx` (Lignes 196-199 — handleCreateQuote, ajout id)
+
+❌ AVANT (V87) :
+```tsx
+  const handleAddCustom = async () => {
+    if (!customNom.trim()) return;
+    const id = `custom_${Date.now()}`;
+    let photoUrl: string | undefined;
+    if (customPhoto) { /* upload Storage */ }
+    const newItem: CartItem = {
+      id, ref: 'SUR-MESURE', nom_fr: customNom.trim(), prix: 0, qte: customQte,
+      type: 'custom', description: customDesc, lien: customLien, photoUrl,
+    };
+    saveCart([...cart, newItem]);
+  };
+```
+
+✅ APRÈS (V88) :
+```tsx
+  const handleAddCustom = async () => {
+    if (!customNom.trim()) return;
+    setPhotoUploading(true);
+    const refGeneree = `PS-${String(Math.floor(Math.random() * 9000) + 1000)}`;
+    let photoUrl: string | undefined;
+    const slug = `${refGeneree}-${Date.now()}`;
+    if (customPhoto) { /* upload vers custom_products/ */ }
+    // Création produit Firestore (brouillon, actif=false)
+    let produitId: string;
+    try {
+      const docRef = await addDoc(collection(db, 'produits'), {
+        ref: refGeneree, nom_fr: customNom.trim(), categorie: 'Divers',
+        prix_achat_eur: 1, prix: 0, description: customDesc || '',
+        lien_fournisseur: customLien || '', image: photoUrl || '',
+        type: 'custom', actif: false, createdAt: serverTimestamp(),
+      });
+      produitId = docRef.id;
+    } catch (err: any) {
+      produitId = slug; // fallback
+    }
+    const newItem: CartItem = {
+      id: produitId, ref: refGeneree, nom_fr: customNom.trim(), prix: 0, qte: customQte,
+      type: 'custom', description: customDesc, lien: customLien, photoUrl,
+    };
+    saveCart([...cart, newItem]);
+    setPhotoUploading(false);
+  };
+```
+
+❌ AVANT — handleCreateQuote (l.198) :
+```tsx
+        return {
+          reference: item.ref,
+```
+
+✅ APRÈS :
+```tsx
+        return {
+          id: item.id, // V88 — ID Firestore pour lien admin catalogue
+          reference: item.ref,
+```
+
+---
+
+### 🗓️ Tâche 3 — Déblocage prix SUR-MESURE (PS-*)
+📄 Fichier : `src/front/pages/espace-partenaire/GestionDevisPartner.tsx` (Lignes 264-275)
+
+❌ AVANT :
+```tsx
+                      const isSurMesure = l.type === 'custom' || l.ref === 'SUR-MESURE';
+```
+
+✅ APRÈS :
+```tsx
+                      const isSurMesure = l.type === 'custom' || l.ref === 'SUR-MESURE' || l.ref?.startsWith('PS-');
+```
+
+La variable `isSurMesure` contrôle : `prixMin=0`, `prixMax=999999`, `estValide=true`, badge "Prix libre (sur mesure)" vert.
+
+---
+
+### 🗓️ Tâche 3 — Affichage miniature + lien admin 📋
+📄 Fichier : `src/admin/pages/DetailDevis.tsx` (Lignes 463-495)
+
+❌ AVANT :
+```tsx
+                  <td>
+                    <input className="fi" type="text" value={ligne.ref} ... />
+                  </td>
+                  <td>
+                    <input className="fi" type="text" value={ligne.nom_fr} ... />
+                    {(ligne.description || ...) && ( ... )}
+                  </td>
+```
+
+✅ APRÈS :
+```tsx
+                  <td>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <input className="fi" type="text" value={ligne.ref} ... />
+                      {(ligne.ref?.startsWith('PS-') || ligne.type === 'custom') && ligne.id && (
+                        <a href={`/admin/produits/${ligne.id}`} target="_blank"
+                          title="Ouvrir la fiche produit dans le catalogue"
+                          style={{ fontSize: 11, color: '#7C3AED', ... }}>📋</a>
+                      )}
+                    </div>
+                  </td>
+                  <td>
+                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+                      {ligne.photoUrl && (
+                        <a href={ligne.photoUrl} target="_blank">
+                          <img src={ligne.photoUrl} alt="" style={{ width: 50, height: 50, borderRadius: 6, objectFit: 'cover' }} />
+                        </a>
+                      )}
+                      <div style={{ flex: 1 }}>
+                        <input className="fi" type="text" value={ligne.nom_fr} ... />
+                        {(ligne.description || ...) && ( ... )}
+                      </div>
+                    </div>
+                  </td>
+```
+
+📄 Fichier : `src/front/pages/espace-client/DevisCard.tsx` (Lignes 348-354)
+
+❌ AVANT :
+```tsx
+                      <td style={{ padding: '10px 4px' }}>
+                        <div>{ligne.nom_fr || ligne.designation}</div>
+```
+
+✅ APRÈS :
+```tsx
+                      <td style={{ padding: '10px 4px' }}>
+                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+                          {ligne.photoUrl && (
+                            <a href={ligne.photoUrl} target="_blank">
+                              <img src={ligne.photoUrl} alt="" style={{ width: 40, height: 40, borderRadius: 6, objectFit: 'cover' }} />
+                            </a>
+                          )}
+                          <div style={{ flex: 1 }}>
+                            <div>{ligne.nom_fr || ligne.designation}</div>
+```
+
+---
+
+### 🗓️ Interfaces TypeScript mises à jour
+
+📄 `src/admin/pages/DetailDevis.tsx` (LigneDevis) : ajout `id?: string`, `photoUrl?: string`
+📄 `src/front/pages/espace-partenaire/GestionDevisPartner.tsx` (DevisLine) : ajout `type?: 'product' | 'custom'`
+📄 `src/front/pages/Panier.tsx` (CartItem) : ajout `photoUrl?: string`
