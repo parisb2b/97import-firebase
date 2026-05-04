@@ -14,6 +14,7 @@ interface DevisLine {
   total: number;
   prix_negocie?: number;
   prix_achat?: number;
+  type?: 'product' | 'custom';
 }
 
 interface Devis {
@@ -260,15 +261,17 @@ export default function GestionDevisPartner({ partnerCode }: { partnerCode: stri
                   <div style={{ borderTop: '1px solid #F3F4F6', padding: 20 }}>
                     {/* Products with editable VIP prices */}
                     {d.lignes?.map((l, i) => {
+                      // V87 — Produit sur mesure : prix libre (pas de bornes)
+                      const isSurMesure = l.type === 'custom' || l.ref === 'SUR-MESURE';
                       const prixAchat = l.prix_achat ?? 0;
                       const prixPublic = l.prix_unitaire ?? 0;
-                      const prixMin = prixAchat > 0 ? parseFloat((prixAchat * coefs.coefficient_vip_min).toFixed(2)) : 0;
+                      const prixMin = isSurMesure ? 0 : (prixAchat > 0 ? parseFloat((prixAchat * coefs.coefficient_vip_min).toFixed(2)) : 0);
                       // V49 Checkpoint E — Bug N1 : prixMax cappé au prix public
                       // (jamais au-dessus). VIP ne paie pas plus qu'un standard.
-                      const prixMaxCoef = prixAchat > 0 ? parseFloat((prixAchat * coefs.coefficient_vip_max).toFixed(2)) : prixPublic;
-                      const prixMax = prixPublic > 0 ? Math.min(prixMaxCoef, prixPublic) : prixMaxCoef;
+                      const prixMaxCoef = isSurMesure ? 999999 : (prixAchat > 0 ? parseFloat((prixAchat * coefs.coefficient_vip_max).toFixed(2)) : prixPublic);
+                      const prixMax = isSurMesure ? 999999 : (prixPublic > 0 ? Math.min(prixMaxCoef, prixPublic) : prixMaxCoef);
                       const prixActuel = prices[i] !== undefined ? prices[i] : (l.prix_negocie ?? l.prix_unitaire ?? 0);
-                      const estValide = prixActuel >= prixMin && prixActuel <= prixMax;
+                      const estValide = isSurMesure ? true : (prixActuel >= prixMin && prixActuel <= prixMax);
 
                       return (
                         <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '12px 0', borderBottom: '1px solid #F9FAFB' }}>
@@ -299,7 +302,9 @@ export default function GestionDevisPartner({ partnerCode }: { partnerCode: stri
                               }}
                             />
                             <div style={{ fontSize: 10, color: '#6B7280', marginTop: 2 }}>
-                              Min: {prixMin.toFixed(2)} € · Max: {prixMax.toFixed(2)} €
+                              {isSurMesure
+                                ? <span style={{ color: '#059669', fontWeight: 600 }}>Prix libre (sur mesure)</span>
+                                : <>Min: {prixMin.toFixed(2)} € · Max: {prixMax.toFixed(2)} €</>}
                               {!estValide && <span style={{ color: '#DC2626', fontWeight: 600 }}> ⚠️ Hors bornes</span>}
                             </div>
                           </div>
