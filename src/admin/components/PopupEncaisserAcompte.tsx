@@ -8,6 +8,7 @@ import { envoyerEmailCommissionPartenaire, envoyerEmailFactureFinale, notifyAcom
 import { creerCommissionDevis } from '../../lib/commissionHelpers';
 import { logError, logWarn } from '../../lib/logService';
 import { sanitizeForFirestore } from '../../lib/firebaseUtils';
+import { toDate } from '../../lib/dateHelpers';
 
 /**
  * v43-E3.2 — Cascade best-effort à exécuter quand un devis passe à `solde_paye`.
@@ -269,7 +270,9 @@ export default function PopupEncaisserAcompte({ devis, onClose, onSuccess }: Pro
       let nouvelleDateCommande = devis.date_commande;
 
       if (Math.abs(soldeRestant) < 0.01) {
-        nouveauStatut = 'solde_paye';
+        // V86 — Solde complet → Commande Ferme (plus solde_paye intermediaire)
+        nouveauStatut = 'commande_ferme';
+        nouvelleDateCommande = devis.date_commande || new Date().toISOString();
       } else if (estPremierEncaissement && !statutsAvances.includes(devis.statut)) {
         // v43-E3.1 : bascule directe Devis → Commande au premier acompte encaissé
         nouveauStatut = 'commande_ferme';
@@ -323,8 +326,8 @@ export default function PopupEncaisserAcompte({ devis, onClose, onSuccess }: Pro
         console.error('Erreur notification acompte encaissé:', err);
       }
 
-      // v43-E3.2 : Cascade solde_paye (best-effort, non bloquant)
-      if (nouveauStatut === 'solde_paye') {
+      // V86 — Cascade commission + facture finale quand tout est payé
+      if (Math.abs(soldeRestant) < 0.01) {
         const devisFinal = {
           ...devis,
           acomptes: acomptesActuels,
@@ -410,7 +413,7 @@ export default function PopupEncaisserAcompte({ devis, onClose, onSuccess }: Pro
             <strong style={{ color: '#1565C0' }}>{a.montant} €</strong>
             {' · '}
             <span style={{ fontSize: 13, color: '#374151' }}>
-              Déclaré le {new Date(a.date_reception || a.date || a.created_at).toLocaleDateString('fr-FR')}
+              Déclaré le {(toDate(a.date_reception || a.date || a.created_at) || new Date()).toLocaleDateString('fr-FR')}
             </span>
             {a.reference_virement && (
               <>

@@ -412,9 +412,21 @@ export default function DetailDevis() {
             <select className="fsel" value={devis.statut}
               onChange={(e) => setDevis({ ...devis, statut: e.target.value })}>
               <option value="brouillon">Brouillon</option>
+              <option value="nouveau">Nouveau</option>
               <option value="envoye">Envoyé</option>
-              <option value="accepte">Accepté</option>
-              <option value="refuse">Refusé</option>
+              <option value="en_negociation_partenaire">Négociation partenaire</option>
+              <option value="devis_vip_envoye">Devis VIP envoyé</option>
+              <option value="signe">Signé</option>
+              <option value="acompte_1">Acompte 1</option>
+              <option value="acompte_2">Acompte 2</option>
+              <option value="acompte_3">Acompte 3</option>
+              <option value="solde_paye">Soldé</option>
+              <option value="commande_ferme">Commande ferme</option>
+              <option value="en_production">En production</option>
+              <option value="embarque_chine">Embarqué Chine</option>
+              <option value="arrive_port_domtom">Arrivé port</option>
+              <option value="livre">Livré</option>
+              <option value="termine">Terminé</option>
               <option value="annule">Annulé</option>
             </select>
           </div>
