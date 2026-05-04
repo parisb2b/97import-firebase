@@ -1,6 +1,6 @@
 # DP97IMPORTMAJ — Journal Central des Mises à Jour
 
-Date : 2026-05-05 18:45 CEST
+Date : 2026-05-05 19:00 CEST
 Projet : 97importok-firebase
 Branche : v2
 Version : v0.43.10
@@ -937,3 +937,51 @@ Logique :
 | 2 | MesAdresses.tsx | ✅ Déjà fait (V92) |
 | 3 | PopupAcompte.tsx | ✅ Snapshot adresses ajouté |
 | 4 | pdf-generator.ts | ✅ Déjà fait (V93) |
+
+---
+
+## 🔴 MISSION V96 — MÉGA AUDIT COMPLET (05/05/2026 19:00 CEST)
+
+### AUDIT DES 29 FICHIERS — ÉTAT DES LIEUX
+
+| # | Fichier | Statut | Notes |
+|---|---|---|---|
+| 1 | Panier.tsx | ✅ OK | Bouton 📍 V94.1, handleAddCustom PS-XXXX V88, formulaire hors conditionnel V87ter |
+| 2 | MesAdresses.tsx | ✅ OK | Boutons exclusifs V92, interface Adresse avec type V91 |
+| 3 | PopupAcompte.tsx | ✅ OK | getRestantAPayer V85, snapshot adresses V94.1 |
+| 4 | DevisCard.tsx | ✅ OK | Miniature photo V88, toDate V83, barre progression V79 |
+| 5 | DetailDevis.tsx | ✅ OK | 17 statuts dropdown V86, miniature photo V88, lien 📋 admin V88 |
+| 6 | pdf-generator.ts | ✅ OK | Intl.NumberFormat V93, formatDateCourt via dateHelpers V45 |
+| 7 | commissionHelpers.ts | ✅ OK | creerCommissionDevis V43-E3.2, calculerCommissionLigne, vente à perte |
+| 8 | devisHelpers.ts | ✅ OK | peutVerserAcompte V84, getMontantRestantAVerser, referenceAcompte |
+| 9 | quoteStatusHelpers.ts | ✅ OK | isDevisReadonly V69, validerNouveauPaiement V46, generateNumeroDocument |
+| 10 | Profil.tsx | ✅ OK | Sélecteur boîte bleue V87, adresse_livraison V62 |
+| 11 | SignatureDevis.tsx | ✅ OK | Flux complet 6 étapes (token→signature→RIB→acompte) |
+| 12 | dateHelpers.ts | ✅ OK | toDate() robuste: Timestamp, {_seconds}, Date, string ISO, epoch ms |
+| 13 | firebaseUtils.ts | ✅ OK | sanitizeForFirestore récursif |
+| 14 | pricingEngine.ts | ✅ OK | Constantes canoniques FALLBACK_CNY_EUR, multiplicateurs 1.5/2.0 |
+| 15 | exchangeRateMonitor.ts | ✅ OK | API frankfurter + exchangerate-api, seuil ±3%, stockage alerte |
+| 16 | Dashboard.tsx | ✅ OK | Alerte taux intégrée V70 |
+| 17 | ListeDevis.tsx | ✅ OK | Colonne Date V83, toDate V87, colonne Acomptes V83 |
+| 18 | GestionDevisPartner.tsx | ⚠️ Chemin | src/front/pages/espace-partenaire/ (pas src/admin/) |
+| 19 | LogsDebug.tsx | ✅ OK | fetchRecentLogs(), filtres niveau/catégorie/rôle, expandable |
+| 20 | AdminApp.tsx | ✅ OK | Routes admin complètes, sidebar avec badges |
+| 21 | firestore.rules | ✅ OK | isDevisReadonly V69, client quotes update V84, custom_products V87 |
+| 22 | firebase.ts | ✅ OK | Double instance client/admin, ignoreUndefinedProperties |
+| 23 | vite.config.ts | ✅ OK | Lazy-loading routes V58, chunk splitting |
+| 24 | package.json | ✅ OK | v0.43.10, scripts build/lint/dev |
+| 25 | AdresseTypee.tsx | ❌ ABSENT | Existe uniquement comme interface dans collections.ts (l.265) |
+| 26 | PopupEncaisserAcompte.tsx | ✅ OK | cascade V86, commande_ferme V86, anti-flottant V91 |
+| 27 | productHelpers.ts | ✅ OK | Fonctions de calcul prix/stock |
+| 28 | MesVirements.tsx | ✅ OK | toDate V87, peutVerserAcompte |
+| 29 | MesCommandes.tsx | ✅ OK | Filtre acomptes encaissés, DevisCard intégré |
+
+### SYNTHÈSE
+
+- **27/29 fichiers OK** (93%)
+- **1 fichier absent** : AdresseTypee.tsx — l'interface existe dans types/collections.ts mais pas de composant React. Non bloquant car Profil.tsx et MesAdresses.tsx gèrent déjà le type d'adresse sans ce composant.
+- **1 erreur de chemin** : GestionDevisPartner.tsx est dans src/front/pages/espace-partenaire/, pas src/admin/pages/
+
+### ACTIONS CORRECTIVES V96
+
+Aucune correction de code nécessaire. L'audit confirme que les missions V83 à V94.1 ont corrigé l'ensemble des problèmes identifiés. Les 2 anomalies (AdresseTypee inexistant, chemin GestionDevisPartner) sont documentaires — pas de bug fonctionnel.
