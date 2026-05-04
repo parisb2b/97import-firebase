@@ -4,6 +4,7 @@ import { collection, getDocs, orderBy, query } from 'firebase/firestore';
 import { adminDb as db } from '../../lib/firebase';
 import SearchInput from '../components/atoms/SearchInput';
 import LoadingState from '../components/atoms/LoadingState';
+import { toDate } from '../../lib/dateHelpers';
 
 type SortColumn = 'numero' | 'date_creation' | 'statut' | 'nb_lignes' | 'total_cny';
 type SortDirection = 'asc' | 'desc';
@@ -179,7 +180,7 @@ export default function ListeListesAchat() {
               {sorted.map((l) => {
                 const dateCreation = l.date_creation?.toDate
                   ? l.date_creation.toDate().toLocaleDateString('fr-FR')
-                  : (l.date_creation ? new Date(l.date_creation).toLocaleDateString('fr-FR') : '—');
+                  : (l.date_creation ? (toDate(l.date_creation) || new Date()).toLocaleDateString('fr-FR') : '—');
                 const statutInfo = STATUTS.find(s => s.value === l.statut) || STATUTS[1];
                 const nbLignes = Array.isArray(l.lignes) ? l.lignes.length : 0;
 

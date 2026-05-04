@@ -3,6 +3,7 @@ import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import PopupAcompte from './PopupAcompte';
 import { peutVerserAcompte } from '../../../lib/devisHelpers';
+import { toDate } from '../../../lib/dateHelpers';
 
 interface MesVirementsProps {
   userId: string;
@@ -179,7 +180,7 @@ export default function MesVirements({ userId, profile }: MesVirementsProps) {
                   ? { label: 'Encaissé', bg: '#D1FAE5', color: '#065F46' }
                   : { label: 'Déclaré', bg: '#FEF3C7', color: '#92400E' };
 
-                const dateStr = v.date ? new Date(v.date).toLocaleDateString('fr-FR') : '—';
+                const dateStr = v.date ? (toDate(v.date) || new Date()).toLocaleDateString('fr-FR') : '—';
                 const canVerser = peutVerserAcompte(v.devis_ref);
 
                 return (
@@ -258,9 +259,9 @@ export default function MesVirements({ userId, profile }: MesVirementsProps) {
 
 // Modal visualisation
 function ModalVirement({ v, onClose }: { v: any, onClose: () => void }) {
-  const dateStr = v.date ? new Date(v.date).toLocaleDateString('fr-FR') : '—';
+  const dateStr = v.date ? (toDate(v.date) || new Date()).toLocaleDateString('fr-FR') : '—';
   const dateEnc = v.date_encaissement
-    ? new Date(v.date_encaissement).toLocaleDateString('fr-FR')
+    ? (toDate(v.date_encaissement) || new Date()).toLocaleDateString('fr-FR')
     : null;
 
   return (

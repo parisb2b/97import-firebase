@@ -15,6 +15,7 @@ import {
   EuroIcon,
 } from '../components/Icons';
 import LoadingState from '../components/atoms/LoadingState';
+import { toDate } from '../../lib/dateHelpers';
 
 interface Devis {
   id: string;
@@ -75,7 +76,7 @@ export default function ListeDevis() {
         const acomptesDeclares = acomptes.filter((a: any) => a.encaisse === false);
         const dateComplete = raw.createdAt?.toDate
           ? raw.createdAt.toDate().toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })
-          : (raw.date_creation ? new Date(raw.date_creation).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '—');
+          : (raw.date_creation ? (toDate(raw.date_creation) || new Date()).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '—');
         return {
           id: d.id,
           numero: raw.numero || d.id,

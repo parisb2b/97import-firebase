@@ -176,24 +176,31 @@ export default function Profil() {
               placeholder="+596 6 00 00 00 00" style={inputStyle} />
           </div>
 
-          <div style={{ marginBottom: 16 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-              <label style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>Type d'adresse *</label>
+          <div style={{ marginBottom: 16, background: '#F0F9FF', padding: 16, borderRadius: 12, border: '2px solid #BAE6FD' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+              <span style={{ fontSize: 18 }}>📋</span>
+              <label style={{ fontSize: 14, fontWeight: 700, color: '#0369A1' }}>Type d'adresse *</label>
             </div>
-            <select value={addressType} onChange={e => setAddressType(e.target.value)} required style={inputStyle}>
-              <option value="">{t('address.select_type')}</option>
-              <option value="facturation">{t('address.facturation')}</option>
-              <option value="livraison">{t('address.livraison')}</option>
+            <select value={addressType} onChange={e => setAddressType(e.target.value)} required
+              style={{ ...inputStyle, background: '#fff', fontWeight: 600, color: '#0369A1', border: '2px solid #BAE6FD' }}>
+              <option value="">{t('address.select_type') || '— Sélectionnez le type d\'adresse —'}</option>
+              <option value="facturation">{t('address.facturation') || '🧾 Adresse de facturation'}</option>
+              <option value="livraison">{t('address.livraison') || '📦 Adresse de livraison'}</option>
             </select>
-            {!addressType && (
-              <span style={{ fontSize: 11, color: '#DC2626', marginTop: 2 }}>{t('address.type_required')}</span>
+            {!addressType ? (
+              <span style={{ fontSize: 11, color: '#DC2626', marginTop: 4, display: 'block' }}>
+                {t('address.type_required') || 'Le type d\'adresse est obligatoire'}
+              </span>
+            ) : (
+              <span style={{ fontSize: 12, marginTop: 6, display: 'inline-flex', alignItems: 'center', gap: 6, background: addressType === 'facturation' ? '#DBEAFE' : '#FFF7ED', color: addressType === 'facturation' ? '#1E40AF' : '#9A3412', padding: '6px 12px', borderRadius: 8, fontWeight: 600 }}>
+                {addressType === 'facturation' ? '🧾' : '📦'} {addressType === 'facturation' ? 'Adresse de FACTURATION' : 'Adresse de LIVRAISON'}
+              </span>
             )}
-            <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-              <label style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>{t('profil.adresse')} *</label>
-              <span style={{ fontSize: 10, background: addressType === 'facturation' ? '#DBEAFE' : '#FFF7ED', color: addressType === 'facturation' ? '#1565C0' : '#EA580C', padding: '2px 8px', borderRadius: 10, fontWeight: 600 }}>{addressType === 'facturation' ? 'Facturation' : 'Livraison'}</span>
+            <div style={{ marginTop: 14 }}>
+              <label style={{ fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6, display: 'block' }}>{t('profil.adresse')} *</label>
+              <input type="text" value={adresse} onChange={e => setAdresse(e.target.value)} required
+                placeholder="12 rue du Port" style={inputStyle} />
             </div>
-            <input type="text" value={adresse} onChange={e => setAdresse(e.target.value)} required
-              placeholder="12 rue du Port" style={inputStyle} />
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 16 }}>

@@ -1,10 +1,10 @@
 # DP97IMPORTMAJ — Journal Central des Mises à Jour
 
-Date : 2026-05-04 17:00 CEST
+Date : 2026-05-04 18:30 CEST
 Projet : 97importok-firebase
 Branche : v2
 Version : v0.43.10
-Build : à confirmer après commit V86
+Build : à confirmer après commit V87
 Firebase : importok-6ef77
 Vercel FRONT : https://97import-firebase-git-v2-parisb2bs-projects.vercel.app/
 Vercel ADMIN : https://97import-firebase-git-v2-parisb2bs-projects.vercel.app/admin
@@ -24,6 +24,11 @@ Vercel ADMIN : https://97import-firebase-git-v2-parisb2bs-projects.vercel.app/ad
 | Vercel FRONT | ✅ HTTP 200 |
 | Vercel ADMIN | ✅ HTTP 200 |
 | Tests Playwright | 45/45 verts (client: 10 + partenaire: 5 + admin: 8 + v75: 16 + v86: 6) |
+| N°11-22 Adresses | ✅ Selecteur Type adresse refondu (boite bleue, icones, fallback fr) |
+| N°29 Invalid Date | ✅ 12+ occurrences corrigees (toDate() dans ListeDevis, MesFactures, MesVirements, ListeConteneurs, ListeListesAchat, Logs) |
+| N°35-36 Commission/FF | ✅ Verifie Firestore : NC-2605-003 (15202€) + FA-2605-001 generes |
+| N°37 /admin/logs | ✅ Logs.tsx lit clientDb + fallback adminDb + fetchRecentLogs |
+| N°39-40 Cloud/DeepL | ✅ Placeholders exchangeRateUpdater.ts + deeplTranslator.ts crees |
 | Comptes test | mc@sasfr.com / 97importcom@gmail.com / parisb2b@gmail.com (mdp: 20262026) |
 
 ---
@@ -56,6 +61,7 @@ Vercel ADMIN : https://97import-firebase-git-v2-parisb2bs-projects.vercel.app/ad
 | **V84** | 2026-05-04 14:00 CEST | v84-version-bump | **Version** : 0.43.7 → 0.43.10 (package.json). **Journal** : dp97importmaj.txt — date, etat actuel, chronologie V84 mis a jour. **Badge** : AdminLogin auto via formatBuildInfo au prochain build Vercel. **7 actions V83** : (1) reset test data, (2) fix Invalid Date toDate(), (3) solde VIP debloque, (4) calcul solde exact, (5) dates ListeDevis, (6) colonne acomptes, (7) 39/39 Playwright vert. | package.json, dp97importmaj.txt | Commit + push → Vercel auto-deploy. Badge v0.43.10 au prochain build. |
 | **V85** | 2026-05-04 15:30 CEST | v85-fix-solde-adresses | **P1 — Solde incorrect** : PopupAcompte.tsx utilisait `getSoldeRestant()` (encaisses seulement) → remplace par `getRestantAPayer()` (tous acomptes declares + encaisses). Montant verrouille du solde desormais exact. **P2 — Selecteur adresse** : Profil.tsx deja complet (selecteur + badges Facturation/Livraison). i18n verifie dans fr/en/zh. **P3 — Compte verrouille** : meme cause que P1 — `getSoldeRestant()` ignorait acomptes declares, `validerNouveauPaiement()` les comptait → conflit resolu par `getRestantAPayer()`. | PopupAcompte.tsx, dp97importmaj.txt | Lint 0 erreur. Build 456 modules OK. **Playwright 39/39 VERT** (44.8s). |
 | **V86** | 2026-05-04 17:00 CEST | v86-commande-ferme | **P1 — Transition commande_ferme** : PopupEncaisserAcompte.tsx — solde complet passe desormais a `commande_ferme` (plus `solde_paye` bloque). Cascade commission+facture finale declenchee sur soldeRestant≈0. **Admin dropdown** : DetailDevis.tsx — 17 statuts ajoutes (brouillon→termine). **DVS-2605001** : script fix-v86-commande-ferme.cjs → transition solde_paye→commande_ferme. Commission NC-2605-003 (15202€) + Facture FA-2605-001 deja generees. **Tests** : 6 nouveaux tests V86 (CM1-CM6) + config Playwright projet v86. | PopupEncaisserAcompte.tsx, DetailDevis.tsx, scripts/fix-v86-commande-ferme.cjs, tests/specs/parcours-commandes.spec.ts, tests/playwright.config.ts, dp97importmaj.txt | Lint 0 erreur. Build 456 modules OK. **Playwright 45/45 VERT** (1.7min). |
+| **V87** | 2026-05-04 18:30 CEST | v87-rectification-globale | **N°11-22** : Selecteur type adresse refondu dans Profil.tsx (boite bleue #F0F9FF, icones, fallback i18n francais). **N°29-31** : 12+ occurrences `new Date(timestamp)` corrigees → `toDate()` dans ListeDevis, MesFactures, MesVirements, ListeConteneurs, ListeListesAchat, Logs. **N°35-36** : Verifie Firestore — DVS-2605001 a bien commission NC-2605-003 (15202€) + facture FA-2605-001. **N°37** : Logs.tsx lit clientDb en priorite + fallback adminDb + fetchRecentLogs(). **N°39-40** : Placeholders exchangeRateUpdater.ts + deeplTranslator.ts (attente cles API). | Profil.tsx, ListeDevis.tsx, MesFactures.tsx, MesVirements.tsx, ListeConteneurs.tsx, ListeListesAchat.tsx, Logs.tsx, exchangeRateUpdater.ts, deeplTranslator.ts, dp97importmaj.txt | Lint 0 erreur. Build 456 modules OK. **Playwright 45/45 VERT** (1.8min). |
 | **V81-FINAL** | 2026-05-03 23:?? CEST | v81-custom-claims-fix | **Tous partenaires** : `set-all-partner-claims-v81.cjs` attribue `{role:'partner', partenaire_code}` a tous. 2 partenaires configures (TT + IMP). EspacePartenaire.tsx utilise `getIdTokenResult(true)`. **Tests** : 5/5 partenaire VERT. | set-all-partner-claims-v81.cjs, EspacePartenaire.tsx | Diagnostic ✅/✅/✅. Playwright 23/23 VERT. |
 | **V81** | 2026-05-03 23:?? CEST | v81-custom-claims-fix | **Diagnostic** : custom claims des 3 comptes. Partenaire `97importcom@gmail.com` avait `{}` → `{role:'partner', partenaire_code:'IMP'}`. Client `mc@sasfr.com` avait `{}` → `{role:'client'}`. **Code** : EspacePartenaire.tsx utilise `getIdTokenResult(true)` (force refresh token) au lieu de `getDoc(doc(db,'users'))`. Scripts diagnostic + correction créés. | diagnostic-claims-v81.cjs, set-partner-claims-v81.cjs, EspacePartenaire.tsx | Diag ✅/✅/✅. Code IMP. Build v0.43.7 OK. Firebase deploy OK. |
 | **V80** | 2026-05-03 22:?? CEST | v80-tests-playwright | **Tests Playwright** : 8 nouveaux tests (C09-C10, P04-P05, A05-A08) pour badge version, selecteur adresse, progression acomptes, menu partenaire. Aucun selecteur CSS casse par V78 (refonte Gmail White). Tous les selecteurs existants sont generiques (input[type=email], button[type=submit], text=...). | parcours-client.spec.ts, parcours-partenaire.spec.ts, parcours-admin.spec.ts | 48 tests total (15+5+8+8+12). Build OK. |

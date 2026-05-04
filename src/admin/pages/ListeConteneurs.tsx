@@ -4,6 +4,7 @@ import { collection, getDocs, orderBy, query } from 'firebase/firestore';
 import { adminDb as db } from '../../lib/firebase';
 import SearchInput from '../components/atoms/SearchInput';
 import LoadingState from '../components/atoms/LoadingState';
+import { toDate } from '../../lib/dateHelpers';
 
 type SortColumn = 'numero' | 'type' | 'destination' | 'date_depart_est' | 'statut';
 type SortDirection = 'asc' | 'desc';
@@ -193,7 +194,7 @@ export default function ListeConteneurs() {
               {sorted.map((c) => {
                 const dateDepart = c.date_depart_est?.toDate
                   ? c.date_depart_est.toDate().toLocaleDateString('fr-FR')
-                  : (c.date_depart_est ? new Date(c.date_depart_est).toLocaleDateString('fr-FR') : '—');
+                  : (c.date_depart_est ? (toDate(c.date_depart_est) || new Date()).toLocaleDateString('fr-FR') : '—');
                 const statutInfo = STATUTS.find(s => s.value === c.statut) || STATUTS[1];
                 const nbDevis = Array.isArray(c.devis_lies) ? c.devis_lies.length : 0;
 

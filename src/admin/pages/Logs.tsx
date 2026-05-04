@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { collection, query, orderBy, getDocs, limit } from 'firebase/firestore';
-import { adminDb as db } from '../../lib/firebase';
+import { adminDb, db as clientDb } from '../../lib/firebase';
+import { fetchRecentLogs } from '../../lib/logService';
+import { toDate } from '../../lib/dateHelpers';
 import { Card, Pill } from '../components/Icons';
 
 interface Log {
@@ -20,11 +22,29 @@ export default function Logs() {
   useEffect(() => {
     const load = async () => {
       try {
-        const q = query(collection(db, 'logs'), orderBy('createdAt', 'desc'), limit(100));
+        // V87 — Lire depuis clientDb (la ou logService ecrit), fallback vers adminDb
+        const firestoreDb = clientDb || adminDb;
+        const q = query(collection(firestoreDb, 'logs'), orderBy('createdAt', 'desc'), limit(100));
         const snap = await getDocs(q);
-        setLogs(snap.docs.map((d) => ({ id: d.id, ...d.data() } as Log)));
+        if (!snap.empty) {
+          setLogs(snap.docs.map((d) => ({ id: d.id, ...d.data() } as Log)));
+        } else {
+          // Fallback: essayer adminDb si clientDb est vide
+          if (firestoreDb !== adminDb) {
+            const q2 = query(collection(adminDb, 'logs'), orderBy('createdAt', 'desc'), limit(100));
+            const snap2 = await getDocs(q2);
+            setLogs(snap2.docs.map((d) => ({ id: d.id, ...d.data() } as Log)));
+          }
+        }
       } catch (err) {
         console.error('Error loading logs:', err);
+        // Fallback: utiliser fetchRecentLogs du logService
+        try {
+          const recentLogs = await fetchRecentLogs({ limit: 100 });
+          setLogs(recentLogs.map((l: any) => ({ id: l.id, ...l } as Log)));
+        } catch (e2) {
+          console.error('Fallback logs also failed:', e2);
+        }
       } finally {
         setLoading(false);
       }
@@ -65,7 +85,7 @@ export default function Logs() {
               <tr><td colSpan={5} style={{ textAlign: 'center', padding: 32, color: '#666' }}>Aucun log</td></tr>
             ) : filtered.map((log) => (
               <tr key={log.id}>
-                <td style={{ color: 'var(--tx3)', fontSize: 12 }}>{log.createdAt?.toDate?.()?.toLocaleString('fr-FR') || '—'}</td>
+                <td style={{ color: 'var(--tx3)', fontSize: 12 }}>{(toDate(log.createdAt) || new Date()).toLocaleString('fr-FR')}</td>
                 <td>{getTypePill(log)}</td>
                 <td style={{ fontWeight: 600 }}>{log.action}</td>
                 <td>{log.user || '—'}</td>

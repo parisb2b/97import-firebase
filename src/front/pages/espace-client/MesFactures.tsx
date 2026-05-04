@@ -3,6 +3,7 @@ import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import PopupAcompte from './PopupAcompte';
 import { peutVerserAcompte } from '../../../lib/devisHelpers';
+import { toDate } from '../../../lib/dateHelpers';
 
 interface MesFacturesProps {
   userId: string;
@@ -195,7 +196,7 @@ export default function MesFactures({ userId, profile }: MesFacturesProps) {
             </thead>
             <tbody>
               {sorted.map((f, idx) => {
-                const dateStr = f.date ? new Date(f.date).toLocaleDateString('fr-FR') : '—';
+                const dateStr = f.date ? (toDate(f.date) || new Date()).toLocaleDateString('fr-FR') : '—';
                 const typeBadge = {
                   FA: { bg: '#FEE2E2', color: '#991B1B' },
                   FF: { bg: '#D1FAE5', color: '#065F46' },
@@ -249,7 +250,7 @@ export default function MesFactures({ userId, profile }: MesFacturesProps) {
 }
 
 function ModalFacture({ f, onClose }: { f: FactureLigne, onClose: () => void }) {
-  const dateStr = f.date ? new Date(f.date).toLocaleDateString('fr-FR') : '—';
+  const dateStr = f.date ? (toDate(f.date) || new Date()).toLocaleDateString('fr-FR') : '—';
   return (
     <div style={{
       position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
