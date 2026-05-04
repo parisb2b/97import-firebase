@@ -1,13 +1,47 @@
 # DP97IMPORTMAJ — Journal Central des Mises à Jour
 
-Date : 2026-05-05 19:45 CEST
+Date : 2026-05-06 00:41 CEST
 Projet : 97importok-firebase
 Branche : v2
 Version : v0.43.10
-Build : à confirmer après commit V87quater
+Build : 52b3b56 (HEAD)
 Firebase : importok-6ef77
 Vercel FRONT : https://97import-firebase-git-v2-parisb2bs-projects.vercel.app/
 Vercel ADMIN : https://97import-firebase-git-v2-parisb2bs-projects.vercel.app/admin
+
+---
+
+## 📊 MISSIONS DU 5 MAI 2026 — RÉCAPITULATIF DE CLÔTURE
+
+| Mission | N° | Fichiers modifiés | Statut |
+|---------|----|--------------------|--------|
+| V85 — Fix solde acomptes | 33-34 | PopupAcompte.tsx | ✅ |
+| V86 — Transition commande_ferme | 35-36 | PopupEncaisserAcompte.tsx, DetailDevis.tsx | ✅ |
+| V87 — Rectification globale 11 points | 11-40 | Profil.tsx, ListeDevis.tsx, MesFactures.tsx, MesVirements.tsx, ListeConteneurs.tsx, ListeListesAchat.tsx, Logs.tsx, exchangeRateUpdater.ts, deeplTranslator.ts | ✅ |
+| V87bis — Produit sur mesure (description + lien) | #05 | DetailDevis.tsx, DevisCard.tsx | ✅ |
+| V87ter — Formulaire SUR-MESURE visible + héritage adresse | #05, #12 | Panier.tsx | ✅ |
+| V87quater — Upload photo + preuves journal | #05 | Panier.tsx, DetailDevis.tsx, DevisCard.tsx, storage.rules | ✅ |
+| V88 — Sourcing collaboratif PS-XXXX | T1-T3 | Panier.tsx, GestionDevisPartner.tsx, DetailDevis.tsx, DevisCard.tsx | ✅ |
+| V89 — UI Sourcing + input file personnalisé | T1-T2 | Panier.tsx | ✅ |
+| V90 — Audit vérité 7 points | 1-7 | Audit (vérification) | ✅ |
+| V91 — Corrections fonctionnelles | 1-3 | MesAdresses.tsx, PopupEncaisserAcompte.tsx, Logs.tsx | ✅ |
+| V92 — Boutons adresses exclusifs | Part1 | MesAdresses.tsx | ✅ |
+| V93 — Fix PDF & filtrage admin | 1-3 | pdf-generator.ts, AcomptesEncaisser.tsx | ✅ |
+| V94.1 — Flux adresses → paiement → facture | 1-4 | Panier.tsx, PopupAcompte.tsx | ✅ |
+| V96 — Méga audit 29 fichiers | — | dp97importmaj.txt, V96-FICHIERS-COMPLETS.txt | ✅ |
+| V97 — 12 corrections finales | 1-12 | MesAdresses.tsx, Panier.tsx, PopupAcompte.tsx, MesVirements.tsx, MesCommandes.tsx, DevisCard.tsx, LogsDebug.tsx | ✅ |
+
+### État final au 5 mai 2026 00:41 CEST
+
+| Indicateur | Valeur |
+|------------|--------|
+| Version | v0.43.10 |
+| Dernier commit | 52b3b56 — docs(v97): tableau 12 points + blocs AVANT/APRES complets |
+| Build | ✅ OK (456 modules) |
+| Lint | ✅ 0 erreur, 31 warnings |
+| Firebase deploy | ✅ firestore.rules + storage.rules |
+| Total missions | 15 (V85→V97) |
+| Fichiers modifiés | 21 fichiers source |
 
 ---
 
