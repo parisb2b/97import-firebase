@@ -250,12 +250,12 @@ export default function PopupEncaisserAcompte({ devis, onClose, onSuccess }: Pro
       // Mettre à jour l'URL dans l'acompte
       acomptesActuels[selectedIndex].facture_acompte_pdf_url = pdfUrl;
 
-      // Recalculs
-      const totalEncaisse = acomptesActuels
+      // Recalculs — V91 robustesse anti-flottant
+      const totalEncaisse = Number(acomptesActuels
         .filter((a: any) => a.encaisse === true)
-        .reduce((sum: number, a: any) => sum + (a.montant || 0), 0);
-      const totalHt = devis.total_ht || devis.total || 0;
-      const soldeRestant = totalHt - totalEncaisse;
+        .reduce((sum: number, a: any) => sum + (Number(a.montant) || 0), 0).toFixed(2));
+      const totalHt = Number((devis.total_ht || devis.total || 0).toFixed(2));
+      const soldeRestant = Number((totalHt - totalEncaisse).toFixed(2));
 
       // Déterminer le nouveau statut du devis (v43-E3.1 : option b, atomique intégré)
       const nbEncaissesAvant = (devis.acomptes || []).filter((a: any) => a.encaisse === true).length;

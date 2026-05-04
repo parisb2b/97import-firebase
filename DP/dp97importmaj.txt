@@ -1,6 +1,6 @@
 # DP97IMPORTMAJ — Journal Central des Mises à Jour
 
-Date : 2026-05-05 17:00 CEST
+Date : 2026-05-05 17:30 CEST
 Projet : 97importok-firebase
 Branche : v2
 Version : v0.43.10
@@ -585,3 +585,144 @@ La variable `isSurMesure` contrôle : `prixMin=0`, `prixMax=999999`, `estValide=
 ---
 
 ### Conclusion V90 : 7/7 points vérifiés — code correct en place. Déploiement Vercel requis pour propager.
+
+---
+
+## 🔴 PREUVES V91 — CORRECTIONS FONCTIONNELLES (05/05/2026 17:30 CEST)
+
+### 🗓️ Tâche 1 — MesAdresses.tsx : Sélecteur type Facturation/Livraison
+
+**Pourquoi ça échouait :** `MesAdresses.tsx` gérait des adresses multiples mais l'interface `Adresse` n'avait PAS de champ `type`. Le seul toggle était `par_defaut`. Impossible de marquer une adresse comme "Facturation" ou "Livraison". `Profil.tsx` avait un sélecteur de type, mais il n'était pas relié aux adresses multiples.
+
+📄 Fichier : `src/front/pages/espace-client/MesAdresses.tsx` (Lignes 6-16)
+
+❌ AVANT :
+```tsx
+interface Adresse {
+  label: string;
+  prenom: string;
+  nom: string;
+  adresse: string;
+  code_postal: string;
+  ville: string;
+  pays: string;
+  telephone: string;
+  par_defaut?: boolean;
+}
+```
+
+✅ APRÈS :
+```tsx
+interface Adresse {
+  label: string;
+  prenom: string;
+  nom: string;
+  adresse: string;
+  code_postal: string;
+  ville: string;
+  pays: string;
+  telephone: string;
+  par_defaut?: boolean;
+  type?: 'facturation' | 'livraison'; // V91
+}
+```
+
+📄 Fichier : `src/front/pages/espace-client/MesAdresses.tsx` (Lignes 62-65) — Nouvelle fonction handleSetType
+
+✅ APRÈS :
+```tsx
+  const handleSetType = async (idx: number, newType: 'facturation' | 'livraison') => {
+    const updated = adresses.map((a, i) => i === idx ? { ...a, type: newType } : a);
+    await saveToFirestore(updated);
+  };
+```
+
+📄 Fichier : `src/front/pages/espace-client/MesAdresses.tsx` (Lignes 96-109) — UI carte adresse avec boutons type
+
+❌ AVANT :
+```tsx
+              <div style={{ display: 'flex', gap: 6 }}>
+                {!a.par_defaut && (
+                  <button onClick={() => handleDefault(i)} ...>⭐ Défaut</button>
+                )}
+                <button onClick={() => handleEdit(i)} ...>✏️</button>
+                <button onClick={() => handleDelete(i)} ...>🗑</button>
+              </div>
+```
+
+✅ APRÈS :
+```tsx
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                ...
+                <button onClick={() => handleSetType(i, 'facturation')}
+                  style={{ background: a.type === 'facturation' ? '#DBEAFE' : '#fff', fontWeight: a.type === 'facturation' ? 700 : 400, ... }}>
+                  🧾 Facturation
+                </button>
+                <button onClick={() => handleSetType(i, 'livraison')}
+                  style={{ background: a.type === 'livraison' ? '#FFF7ED' : '#fff', fontWeight: a.type === 'livraison' ? 700 : 400, ... }}>
+                  📦 Livraison
+                </button>
+                <button onClick={() => handleEdit(i)} ...>✏️</button>
+                <button onClick={() => handleDelete(i)} ...>🗑</button>
+              </div>
+```
+Badges visuels `{a.type === 'facturation' && <span>🧾 Facturation</span>}` et `{a.type === 'livraison' && <span>📦 Livraison</span>}` ajoutés.
+
+---
+
+### 🗓️ Tâche 2 — N°35-36 : Robustesse anti-flottant cascade Commission
+
+**Pourquoi ça pouvait échouer :** Le calcul `totalHt - totalEncaisse` pouvait produire un float résiduel (ex: `0.0000000001`) empêchant `Math.abs(soldeRestant) < 0.01` d'être vrai. Les montants d'acomptes non normalisés aggravaient le risque.
+
+📄 Fichier : `src/admin/components/PopupEncaisserAcompte.tsx` (Lignes 253-258)
+
+❌ AVANT :
+```tsx
+      const totalEncaisse = acomptesActuels
+        .filter((a: any) => a.encaisse === true)
+        .reduce((sum: number, a: any) => sum + (a.montant || 0), 0);
+      const totalHt = devis.total_ht || devis.total || 0;
+      const soldeRestant = totalHt - totalEncaisse;
+```
+
+✅ APRÈS :
+```tsx
+      const totalEncaisse = Number(acomptesActuels
+        .filter((a: any) => a.encaisse === true)
+        .reduce((sum: number, a: any) => sum + (Number(a.montant) || 0), 0).toFixed(2));
+      const totalHt = Number((devis.total_ht || devis.total || 0).toFixed(2));
+      const soldeRestant = Number((totalHt - totalEncaisse).toFixed(2));
+```
+`Number(x.toFixed(2))` force l'arrondi à 2 décimales → `0.00` exact quand le solde est payé.
+
+---
+
+### 🗓️ Tâche 3 — N°37 : Correction Logs.tsx (priorité auth admin)
+
+**Pourquoi ça échouait :** La V87 lisait `clientDb` en priorité, mais l'admin est authentifié sur `adminApp` (pas `clientApp`). `clientDb` utilise `clientAuth` → pas d'admin → Firestore rules `isAdmin()` bloque la lecture. `adminDb` utilise `adminAuth` → admin authentifié → lecture autorisée.
+
+📄 Fichier : `src/admin/pages/Logs.tsx` (Lignes 22-48)
+
+❌ AVANT (V87) :
+```tsx
+        // V87 — Lire depuis clientDb (la ou logService ecrit), fallback vers adminDb
+        const firestoreDb = clientDb || adminDb;
+        const q = query(collection(firestoreDb, 'logs'), ...);
+```
+
+✅ APRÈS (V91) :
+```tsx
+        // V91 — Priorité adminDb (page admin, auth admin active), fallback clientDb
+        const sources = [adminDb, clientDb].filter(Boolean);
+        let allLogs: Log[] = [];
+        for (const firestoreDb of sources) {
+          try {
+            const q = query(collection(firestoreDb, 'logs'), ...);
+            const snap = await getDocs(q);
+            // console.log diagnostic inclus
+            allLogs = [...allLogs, ...snap.docs.map(...)];
+          } catch (err2) { console.warn(...); }
+        }
+        // Dedup par ID, tri par date décroissante, limit 100
+```
+Parcourt `adminDb` puis `clientDb`, fusionne et dédoublonne les résultats, avec logs console de diagnostic.

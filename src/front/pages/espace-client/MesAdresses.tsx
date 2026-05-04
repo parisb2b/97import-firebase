@@ -13,6 +13,7 @@ interface Adresse {
   pays: string;
   telephone: string;
   par_defaut?: boolean;
+  type?: 'facturation' | 'livraison'; // V91
 }
 
 const EMPTY_ADRESSE: Adresse = { label: '', prenom: '', nom: '', adresse: '', code_postal: '', ville: '', pays: '', telephone: '', par_defaut: false };
@@ -64,6 +65,11 @@ export default function MesAdresses({ userId, profile }: { userId: string; profi
     await saveToFirestore(updated);
   };
 
+  const handleSetType = async (idx: number, newType: 'facturation' | 'livraison') => {
+    const updated = adresses.map((a, i) => i === idx ? { ...a, type: newType } : a);
+    await saveToFirestore(updated);
+  };
+
   const handleEdit = (idx: number) => {
     setForm(adresses[idx]);
     setEditIndex(idx);
@@ -94,14 +100,18 @@ export default function MesAdresses({ userId, profile }: { userId: string; profi
             border: a.par_defaut ? '2px solid #1565C0' : '1px solid #E5E7EB',
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-              <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
                 <span style={{ fontWeight: 700, color: '#1565C0', fontSize: 13 }}>{a.label || `Adresse ${i + 1}`}</span>
-                {a.par_defaut && <span style={{ marginLeft: 8, fontSize: 10, background: '#DBEAFE', color: '#1565C0', padding: '2px 8px', borderRadius: 10, fontWeight: 600 }}>Par défaut</span>}
+                {a.par_defaut && <span style={{ fontSize: 10, background: '#DBEAFE', color: '#1565C0', padding: '2px 8px', borderRadius: 10, fontWeight: 600 }}>Par défaut</span>}
+                {a.type === 'facturation' && <span style={{ fontSize: 10, background: '#DBEAFE', color: '#1E40AF', padding: '2px 8px', borderRadius: 10, fontWeight: 600 }}>🧾 Facturation</span>}
+                {a.type === 'livraison' && <span style={{ fontSize: 10, background: '#FFF7ED', color: '#9A3412', padding: '2px 8px', borderRadius: 10, fontWeight: 600 }}>📦 Livraison</span>}
               </div>
-              <div style={{ display: 'flex', gap: 6 }}>
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                 {!a.par_defaut && (
                   <button onClick={() => handleDefault(i)} style={{ fontSize: 10, padding: '4px 8px', borderRadius: 6, border: '1px solid #E5E7EB', background: '#fff', cursor: 'pointer', color: '#1565C0' }}>⭐ Défaut</button>
                 )}
+                <button onClick={() => handleSetType(i, 'facturation')} style={{ fontSize: 10, padding: '4px 8px', borderRadius: 6, border: '1px solid #BFDBFE', background: a.type === 'facturation' ? '#DBEAFE' : '#fff', cursor: 'pointer', color: '#1E40AF', fontWeight: a.type === 'facturation' ? 700 : 400 }}>🧾 Facturation</button>
+                <button onClick={() => handleSetType(i, 'livraison')} style={{ fontSize: 10, padding: '4px 8px', borderRadius: 6, border: '1px solid #FED7AA', background: a.type === 'livraison' ? '#FFF7ED' : '#fff', cursor: 'pointer', color: '#9A3412', fontWeight: a.type === 'livraison' ? 700 : 400 }}>📦 Livraison</button>
                 <button onClick={() => handleEdit(i)} style={{ fontSize: 10, padding: '4px 8px', borderRadius: 6, border: '1px solid #E5E7EB', background: '#fff', cursor: 'pointer' }}>✏️</button>
                 <button onClick={() => handleDelete(i)} style={{ fontSize: 10, padding: '4px 8px', borderRadius: 6, border: '1px solid #FEE2E2', background: '#FEF2F2', cursor: 'pointer', color: '#991B1B' }}>🗑</button>
               </div>

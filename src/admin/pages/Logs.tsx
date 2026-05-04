@@ -22,23 +22,36 @@ export default function Logs() {
   useEffect(() => {
     const load = async () => {
       try {
-        // V87 — Lire depuis clientDb (la ou logService ecrit), fallback vers adminDb
-        const firestoreDb = clientDb || adminDb;
-        const q = query(collection(firestoreDb, 'logs'), orderBy('createdAt', 'desc'), limit(100));
-        const snap = await getDocs(q);
-        if (!snap.empty) {
-          setLogs(snap.docs.map((d) => ({ id: d.id, ...d.data() } as Log)));
-        } else {
-          // Fallback: essayer adminDb si clientDb est vide
-          if (firestoreDb !== adminDb) {
-            const q2 = query(collection(adminDb, 'logs'), orderBy('createdAt', 'desc'), limit(100));
-            const snap2 = await getDocs(q2);
-            setLogs(snap2.docs.map((d) => ({ id: d.id, ...d.data() } as Log)));
+        // V91 — Priorité adminDb (page admin, auth admin est active), fallback clientDb
+        // logService ecrit avec db client, mais admin est authentifie sur adminApp
+        const sources = [adminDb, clientDb].filter(Boolean);
+        let allLogs: Log[] = [];
+
+        for (const firestoreDb of sources) {
+          try {
+            const q = query(collection(firestoreDb, 'logs'), orderBy('createdAt', 'desc'), limit(100));
+            const snap = await getDocs(q);
+            console.log(`[Logs] ${firestoreDb === adminDb ? 'adminDb' : 'clientDb'}: ${snap.size} logs trouves`);
+            if (!snap.empty) {
+              const sourceLogs = snap.docs.map((d) => ({ id: d.id, ...d.data() } as Log));
+              allLogs = [...allLogs, ...sourceLogs];
+            }
+          } catch (err2: any) {
+            console.warn(`[Logs] Echec lecture ${firestoreDb === adminDb ? 'adminDb' : 'clientDb'}:`, err2?.code || err2?.message);
           }
         }
+
+        // Dedup par ID, tri par date decroissante
+        const seen = new Set<string>();
+        const deduped = allLogs.filter(l => { if (seen.has(l.id)) return false; seen.add(l.id); return true; });
+        deduped.sort((a, b) => {
+          const da = a.createdAt?.toDate?.()?.getTime() || 0;
+          const db = b.createdAt?.toDate?.()?.getTime() || 0;
+          return db - da;
+        });
+        setLogs(deduped.slice(0, 100));
       } catch (err) {
         console.error('Error loading logs:', err);
-        // Fallback: utiliser fetchRecentLogs du logService
         try {
           const recentLogs = await fetchRecentLogs({ limit: 100 });
           setLogs(recentLogs.map((l: any) => ({ id: l.id, ...l } as Log)));
