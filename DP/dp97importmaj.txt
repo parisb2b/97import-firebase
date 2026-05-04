@@ -1,6 +1,6 @@
 # DP97IMPORTMAJ — Journal Central des Mises à Jour
 
-Date : 2026-05-06 00:41 CEST
+Date : 2026-05-06 01:00 CEST
 Projet : 97importok-firebase
 Branche : v2
 Version : v0.43.10
@@ -1221,3 +1221,80 @@ Aucune correction de code nécessaire. L'audit confirme que les missions V83 à 
       }
   // Bannière rouge : {error && <div style={...}>❌ {error}</div>}
 ```
+
+---
+
+## 🔴 MISSION V98 — CORRECTIONS FINALES FIRESTORE RULES (06/05/2026 01:00 CEST)
+
+### Point 1 — Adresses figées dans les devis (isAddressFrozen)
+📄 `firestore.rules` — Helpers + Quotes
+
+❌ AVANT :
+```rules
+    match /quotes/{quoteId} {
+      ...
+      allow update: if isAdmin()
+                  || (partnerCodeMatches(resource.data.partenaire_code)
+                      && !isDevisReadonly(resource.data.statut))
+                  || (isAuth() && resource.data.client_id == request.auth.uid);
+```
+
+✅ APRÈS :
+```rules
+    // V98 — Protection adresses figées : helper isAddressFrozen()
+    function isAddressFrozen() {
+      let oldFact = resource.data.adresse_facturation;
+      let newFact = request.resource.data.adresse_facturation;
+      let oldLivr = resource.data.adresse_livraison;
+      let newLivr = request.resource.data.adresse_livraison;
+      return (oldFact != null && newFact != oldFact) ||
+             (oldLivr != null && newLivr != oldLivr);
+    }
+    ...
+    match /quotes/{quoteId} {
+      ...
+      allow update: if isAdmin()
+                  || (partnerCodeMatches(...) && !isDevisReadonly(...))
+                  // V98 — Client : update SAUF si adresses déjà figées
+                  || (isAuth() && resource.data.client_id == request.auth.uid
+                      && !isAddressFrozen());
+```
+
+### Point 2 — Acomptes encaissés protégés
+📄 `firestore.rules` — Quotes/Acomptes
+
+❌ AVANT :
+```rules
+      allow update, delete: if isAdmin();
+```
+
+✅ APRÈS :
+```rules
+      allow update: if isAdmin()
+        && !(resource.data.encaisse == true && request.resource.data.encaisse == true);
+      allow delete: if isAdmin()
+        && !(resource.data.encaisse == true);
+```
+
+### Point 3 — Produits inactifs masqués
+📄 `firestore.rules` — Products + Produits
+
+❌ AVANT :
+```rules
+    match /products/{productId} {
+      allow read:  if true;
+```
+
+✅ APRÈS :
+```rules
+    match /products/{productId} {
+      allow read:  if resource.data.actif == true || isAdmin();
+    }
+    match /produits/{productId} {
+      allow read:  if resource.data.actif == true || isAdmin();
+      allow write: if isAdmin();
+    }
+```
+
+### Déploiement
+- `firebase deploy --only firestore:rules` → ✅ compiled + released

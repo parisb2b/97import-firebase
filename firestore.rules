@@ -64,19 +64,36 @@ service cloud.firestore {
           || statut == 'livre'
           || statut == 'termine';
     }
+    // V98 — Vérifie si une adresse déjà figée est en cours de modification.
+    // Empêche l'écrasement des adresses facturation/livraison après snapshot.
+    function isAddressFrozen() {
+      let oldFact = resource.data.adresse_facturation;
+      let newFact = request.resource.data.adresse_facturation;
+      let oldLivr = resource.data.adresse_livraison;
+      let newLivr = request.resource.data.adresse_livraison;
+      return (oldFact != null && newFact != oldFact) ||
+             (oldLivr != null && newLivr != oldLivr);
+    }
 
     // ══════════════════════════════════════════════════════════
     // 📦 CATALOGUE PUBLIC + PARAMÈTRES TAUX
     // ══════════════════════════════════════════════════════════
     match /products/{productId} {
-      allow read:  if true;
+      // V98 — Lecture publique seulement pour les produits actifs
+      // Les brouillons (actif=false, ex: PS-XXXX) sont masqués sauf admin
+      allow read:  if resource.data.actif == true || isAdmin();
       allow write: if isAdmin();
 
-      // Sub-collection price_history (V44-TER)
       match /price_history/{historyId} {
         allow read:  if true;
         allow write: if isAdmin();
       }
+    }
+
+    // V98 — Collection 'produits' (nom français utilisé par handleAddCustom V88)
+    match /produits/{productId} {
+      allow read:  if resource.data.actif == true || isAdmin();
+      allow write: if isAdmin();
     }
 
     match /admin_params/{paramId} {
@@ -129,7 +146,9 @@ service cloud.firestore {
       allow update: if isAdmin()
                   || (partnerCodeMatches(resource.data.partenaire_code)
                       && !isDevisReadonly(resource.data.statut))
-                  || (isAuth() && resource.data.client_id == request.auth.uid);
+                  // V98 — Client : update autorisé SAUF si adresses déjà figées
+                  || (isAuth() && resource.data.client_id == request.auth.uid
+                      && !isAddressFrozen());
       allow delete: if isAdmin();
     }
 
@@ -147,14 +166,18 @@ service cloud.firestore {
       allow update, delete: if isAdmin();
     }
 
-    // V82 — Sous-collection /quotes/{quoteId}/acomptes : le client peut creer
+    // V82 + V98 — Sous-collection /quotes/{quoteId}/acomptes : client peut creer,
+    // admin peut update/delete SAUF si acompte deja encaisse (protection anti-fraude)
     match /quotes/{quoteId}/acomptes/{acompteId} {
       allow create: if isAuth()
         && request.auth.uid == get(/databases/$(database)/documents/quotes/$(quoteId)).data.client_id;
       allow read: if isAdmin()
         || (isAuth() && resource.data.client_id == request.auth.uid)
         || (isPartner() && get(/databases/$(database)/documents/quotes/$(quoteId)).data.partenaire_code == request.auth.token.partenaire_code);
-      allow update, delete: if isAdmin();
+      allow update: if isAdmin()
+        && !(resource.data.encaisse == true && request.resource.data.encaisse == true);
+      allow delete: if isAdmin()
+        && !(resource.data.encaisse == true);
     }
 
     match /commissions/{commissionId} {
