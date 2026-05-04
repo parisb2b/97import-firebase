@@ -420,6 +420,13 @@ export default function Panier() {
                 <p style={{ fontSize: 11, color: '#9CA3AF', textAlign: 'center', marginTop: 8 }}>
                   {t('cart.devisNote')}
                 </p>
+
+                {/* V94.1 — Bouton navigation adresses */}
+                <button
+                  onClick={() => setLocation('/espace-client/adresses')}
+                  style={{ marginTop: 12, width: '100%', padding: '14px', background: '#1E40AF', color: '#fff', borderRadius: 8, fontWeight: 600, border: 'none', cursor: 'pointer', fontSize: 14, fontFamily: 'inherit' }}>
+                  📍 Définir mes adresses de facturation et livraison
+                </button>
               </div>
             </div>
           </div>

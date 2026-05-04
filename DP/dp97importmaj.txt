@@ -1,6 +1,6 @@
 # DP97IMPORTMAJ — Journal Central des Mises à Jour
 
-Date : 2026-05-05 18:15 CEST
+Date : 2026-05-05 18:45 CEST
 Projet : 97importok-firebase
 Branche : v2
 Version : v0.43.10
@@ -822,3 +822,118 @@ Le filtre "nouveau" scanne maintenant le tableau `acomptes` pour trouver ceux av
 - `.reduce((sum, a) => sum + (a.montant || 0), 0)`
 - `Math.max(0, total_ht - totalEncaisse)`
 Aucune division, aucun formatage texte. Arithmétique pure.
+
+---
+
+## 🔴 MISSION V94.1 — AUDIT GLOBAL & RÉFORME FLUX ADRESSES→PAIEMENT→FACTURE (05/05/2026 18:45 CEST)
+
+### ANALYSE FIRESTORE — Structure à figer
+
+Collections concernées : `users`, `clients`, `quotes`
+
+Champs à figer dans `quotes/{quoteId}` au 1er acompte :
+- `adresse_facturation` : objet complet (rue, code_postal, ville, pays, telephone)
+- `adresse_livraison` : objet complet (rue, code_postal, ville, pays, telephone)
+
+Règle : une fois le devis créé et le 1er acompte déclaré, les adresses dans `quotes/{quoteId}` deviennent **immuables** (même si le client modifie son profil plus tard).
+
+---
+
+### INJECTION 1 — Panier.tsx : Bouton navigation vers les adresses
+📄 Fichier : `src/front/pages/Panier.tsx` (Lignes 420-428)
+
+❌ AVANT :
+```tsx
+                <p style={{ fontSize: 11, color: '#9CA3AF', textAlign: 'center', marginTop: 8 }}>
+                  {t('cart.devisNote')}
+                </p>
+              </div>
+```
+
+✅ APRÈS :
+```tsx
+                <p style={{ fontSize: 11, color: '#9CA3AF', textAlign: 'center', marginTop: 8 }}>
+                  {t('cart.devisNote')}
+                </p>
+
+                {/* V94.1 — Bouton navigation adresses */}
+                <button
+                  onClick={() => setLocation('/espace-client/adresses')}
+                  style={{ marginTop: 12, width: '100%', padding: '14px', background: '#1E40AF', color: '#fff', borderRadius: 8, fontWeight: 600, border: 'none', cursor: 'pointer', fontSize: 14, fontFamily: 'inherit' }}>
+                  📍 Définir mes adresses de facturation et livraison
+                </button>
+              </div>
+```
+
+---
+
+### INJECTION 2 — MesAdresses.tsx : Boutons exclusifs Facturation/Livraison
+📄 Fichier : `src/front/pages/espace-client/MesAdresses.tsx`
+
+✅ DÉJÀ EN PLACE (V92 Partie 1) — Boutons larges (flex:1, 13px), séparateur dashed, choix exclusif via `handleSetType`, badges ✓ Facturation / ✓ Livraison.
+
+---
+
+### INJECTION 3 — PopupAcompte.tsx : Snapshot adresses dans le devis
+📄 Fichier : `src/front/pages/espace-client/PopupAcompte.tsx` (Lignes 127-130)
+
+❌ AVANT :
+```tsx
+      await updateDoc(devisRef, sanitizeForFirestore({
+        acomptes: [...currentAcomptes, nouvelAcompte],
+        updatedAt: new Date(),
+      }));
+```
+
+✅ APRÈS :
+```tsx
+      // V94.1 — Snapshot des adresses client dans le devis (fige au 1er acompte)
+      const adressesSnapshot: any = {};
+      if (!currentData?.adresse_facturation || !currentData?.adresse_livraison) {
+        try {
+          const userSnap = await getDocs(query(collection(db, 'users'),
+            where('__name__', '==', currentData?.client_id || '')));
+          const userData = userSnap.docs[0]?.data();
+          if (userData) {
+            const adresses = userData.adresses || [];
+            const facturation = adresses.find((a: any) => a.type === 'facturation');
+            const livraison = adresses.find((a: any) => a.type === 'livraison');
+            if (facturation) adressesSnapshot.adresse_facturation = facturation;
+            if (livraison) adressesSnapshot.adresse_livraison = livraison;
+            if (!facturation && adresses.length > 0)
+              adressesSnapshot.adresse_facturation = adresses.find((a: any) => a.par_defaut) || adresses[0];
+            if (!livraison && adresses.length > 0)
+              adressesSnapshot.adresse_livraison = adresses.find((a: any) => a.par_defaut) || adresses[0];
+          }
+        } catch (e) { console.warn('[V94.1] Snapshot adresses impossible, continue sans'); }
+      }
+
+      await updateDoc(devisRef, sanitizeForFirestore({
+        acomptes: [...currentAcomptes, nouvelAcompte],
+        updatedAt: new Date(),
+        ...adressesSnapshot,
+      }));
+```
+Logique :
+1. Vérifie si le devis a déjà `adresse_facturation` / `adresse_livraison`
+2. Si non, lit `users/{client_id}` → cherche les adresses marquées `type: 'facturation'` / `type: 'livraison'`
+3. Fallback : adresse `par_defaut` ou première adresse du tableau
+4. Injecte dans le `updateDoc` → figé dans le devis à vie
+
+---
+
+### INJECTION 4 — pdf-generator.ts : Nettoyage formatage prix
+📄 Fichier : `src/lib/pdf-generator.ts` (Lignes 74-80)
+
+✅ DÉJÀ EN PLACE (V93) — `new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(amount)`
+
+---
+
+### RÉSUMÉ V94.1
+
+| Injection | Fichier | Statut |
+|---|---|---|
+| 1 | Panier.tsx | ✅ Bouton 📍 ajouté |
+| 2 | MesAdresses.tsx | ✅ Déjà fait (V92) |
+| 3 | PopupAcompte.tsx | ✅ Snapshot adresses ajouté |
+| 4 | pdf-generator.ts | ✅ Déjà fait (V93) |

@@ -124,9 +124,30 @@ export default function PopupAcompte({ devisId, devisNumero, clientNom, montantI
         iban_utilise: rib.iban,
       };
 
+      // V94.1 — Snapshot des adresses client dans le devis (fige au 1er acompte)
+      const adressesSnapshot: any = {};
+      if (!currentData?.adresse_facturation || !currentData?.adresse_livraison) {
+        try {
+          const userSnap = await getDocs(query(collection(db, 'users'), where('__name__', '==', currentData?.client_id || '')));
+          const userData = userSnap.docs[0]?.data();
+          if (userData) {
+            // Chercher les adresses marquees facturation/livraison
+            const adresses = userData.adresses || [];
+            const facturation = adresses.find((a: any) => a.type === 'facturation');
+            const livraison = adresses.find((a: any) => a.type === 'livraison');
+            if (facturation) adressesSnapshot.adresse_facturation = facturation;
+            if (livraison) adressesSnapshot.adresse_livraison = livraison;
+            // Fallback : adresse par defaut ou premiere adresse
+            if (!facturation && adresses.length > 0) adressesSnapshot.adresse_facturation = adresses.find((a: any) => a.par_defaut) || adresses[0];
+            if (!livraison && adresses.length > 0) adressesSnapshot.adresse_livraison = adresses.find((a: any) => a.par_defaut) || adresses[0];
+          }
+        } catch (e) { console.warn('[V94.1] Snapshot adresses impossible, continue sans'); }
+      }
+
       await updateDoc(devisRef, sanitizeForFirestore({
         acomptes: [...currentAcomptes, nouvelAcompte],
         updatedAt: new Date(),
+        ...adressesSnapshot,
       }));
 
       // Notification email
