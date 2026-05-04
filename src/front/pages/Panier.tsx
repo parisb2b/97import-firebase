@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'wouter';
 import { clientAuth, db } from '../../lib/firebase';
 import { logError, logInfo, logWarn } from '../../lib/logService';
-import { doc, setDoc, getDoc, serverTimestamp, collection, query, where, getDocs } from 'firebase/firestore';
+import { doc, setDoc, getDoc, serverTimestamp, collection, query, where, getDocs, addDoc } from 'firebase/firestore';
 import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { storage } from '../../lib/firebase';
 import { getNextNumber } from '../../lib/counters';
@@ -107,15 +107,18 @@ export default function Panier() {
   // ─── Add custom product ───
   const handleAddCustom = async () => {
     if (!customNom.trim()) return;
-    const id = `custom_${Date.now()}`;
-    let photoUrl: string | undefined;
+    setPhotoUploading(true);
 
-    // V87 — Upload photo vers Firebase Storage si fournie
+    // V88 — Génération référence PS-XXXX
+    const refGeneree = `PS-${String(Math.floor(Math.random() * 9000) + 1000)}`;
+    let photoUrl: string | undefined;
+    const slug = `${refGeneree}-${Date.now()}`;
+
+    // Upload photo vers Firebase Storage si fournie
     if (customPhoto) {
-      setPhotoUploading(true);
       try {
         const ext = customPhoto.name.split('.').pop() || 'jpg';
-        const path = `custom_products/${id}.${ext}`;
+        const path = `custom_products/${slug}.${ext}`;
         const fileRef = storageRef(storage, path);
         await uploadBytes(fileRef, customPhoto, { contentType: customPhoto.type || 'image/jpeg' });
         photoUrl = await getDownloadURL(fileRef);
@@ -123,18 +126,41 @@ export default function Panier() {
       } catch (err: any) {
         logError('Panier', 'Échec upload photo sur mesure', { error: err?.message });
         showToast('Erreur upload photo — le produit sera ajouté sans photo', 'warning');
-      } finally {
-        setPhotoUploading(false);
       }
     }
 
+    // V88 — Création du produit dans Firestore (brouillon, actif=false)
+    let produitId: string;
+    try {
+      const docRef = await addDoc(collection(db, 'produits'), {
+        ref: refGeneree,
+        nom_fr: customNom.trim(),
+        categorie: 'Divers',
+        prix_achat_eur: 1,
+        prix: 0,
+        description: customDesc || '',
+        lien_fournisseur: customLien || '',
+        image: photoUrl || '',
+        type: 'custom',
+        actif: false,
+        createdAt: serverTimestamp(),
+      });
+      produitId = docRef.id;
+      logInfo('Panier', 'Produit sur mesure créé au catalogue', { ref: refGeneree, id: produitId });
+    } catch (err: any) {
+      logError('Panier', 'Échec création produit catalogue', { error: err?.message });
+      showToast('Erreur création produit — ajout au panier sans fiche catalogue', 'warning');
+      produitId = slug; // fallback
+    }
+
     const newItem: CartItem = {
-      id, ref: 'SUR-MESURE', nom_fr: customNom.trim(), prix: 0, qte: customQte,
+      id: produitId, ref: refGeneree, nom_fr: customNom.trim(), prix: 0, qte: customQte,
       type: 'custom', description: customDesc, lien: customLien, photoUrl,
     };
     saveCart([...cart, newItem]);
     setCustomNom(''); setCustomQte(1); setCustomDesc(''); setCustomLien('');
     setCustomPhoto(null);
+    setPhotoUploading(false);
   };
 
   // ─── Open popup flow ───
@@ -170,6 +196,7 @@ export default function Panier() {
       const lignes = cart.map(item => {
         const prix_partenaire = item.prix * 0.7;
         return {
+          id: item.id, // V88 — ID Firestore pour lien admin catalogue
           reference: item.ref,
           ref: item.ref,
           nom: item.nom_fr,

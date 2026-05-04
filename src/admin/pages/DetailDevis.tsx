@@ -19,6 +19,7 @@ import PopupEncaisserAcompte from '../components/PopupEncaisserAcompte';
 import ModalDupliquerDevis from '../components/ModalDupliquerDevis';
 
 interface LigneDevis {
+  id?: string;
   ref: string;
   nom_fr: string;
   qte: number;
@@ -461,15 +462,32 @@ export default function DetailDevis() {
               {devis.lignes.map((ligne, index) => (
                 <tr key={index}>
                   <td>
-                    <input className="fi" type="text" value={ligne.ref}
-                      disabled={estLectureSeule}
-                      onChange={(e) => handleLigneChange(index, 'ref', e.target.value)} />
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <input className="fi" type="text" value={ligne.ref}
+                        disabled={estLectureSeule}
+                        onChange={(e) => handleLigneChange(index, 'ref', e.target.value)} />
+                      {/* V88 — Lien admin pour produits PS-XXXX (catalogue) */}
+                      {(ligne.ref?.startsWith('PS-') || ligne.type === 'custom') && ligne.id && (
+                        <a href={`/admin/produits/${ligne.id}`} target="_blank" rel="noopener noreferrer"
+                          title="Ouvrir la fiche produit dans le catalogue"
+                          style={{ fontSize: 11, color: '#7C3AED', textDecoration: 'none', whiteSpace: 'nowrap' }}>
+                          📋
+                        </a>
+                      )}
+                    </div>
                   </td>
                   <td>
-                    <input className="fi" type="text" value={ligne.nom_fr}
-                      disabled={estLectureSeule}
-                      onChange={(e) => handleLigneChange(index, 'nom_fr', e.target.value)} />
-                    {(ligne.description || ligne.lien || ligne.photoUrl) && (
+                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+                      {ligne.photoUrl && (
+                        <a href={ligne.photoUrl} target="_blank" rel="noopener noreferrer" style={{ flexShrink: 0 }}>
+                          <img src={ligne.photoUrl} alt="" style={{ width: 50, height: 50, borderRadius: 6, objectFit: 'cover', border: '1px solid #E5E7EB' }} />
+                        </a>
+                      )}
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <input className="fi" type="text" value={ligne.nom_fr}
+                          disabled={estLectureSeule}
+                          onChange={(e) => handleLigneChange(index, 'nom_fr', e.target.value)} />
+                        {(ligne.description || ligne.lien) && (
                       <div style={{ marginTop: 4, padding: '6px 8px', background: '#FFF7ED', borderRadius: 6, border: '1px solid #FED7AA', fontSize: 11 }}>
                         {ligne.photoUrl && (
                           <a href={ligne.photoUrl} target="_blank" rel="noopener noreferrer" style={{ display: 'block', marginBottom: 6 }}>
@@ -480,6 +498,8 @@ export default function DetailDevis() {
                         {ligne.lien && <a href={ligne.lien} target="_blank" rel="noopener noreferrer" style={{ color: '#EA580C', wordBreak: 'break-all' }}>🔗 {ligne.lien}</a>}
                       </div>
                     )}
+                      </div>
+                    </div>
                   </td>
                   <td>
                     <input className="fi" type="number" value={ligne.qte} min={1}

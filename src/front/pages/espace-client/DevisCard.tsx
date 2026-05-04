@@ -346,7 +346,14 @@ export default function DevisCard({ devis, profile, onRefresh, forceOpen = false
                     <tr key={idx} style={{ borderBottom: '1px solid #F3F4F6' }}>
                       <td style={{ padding: '10px 4px' }}>{ref}</td>
                       <td style={{ padding: '10px 4px' }}>
-                        <div>{ligne.nom_fr || ligne.designation}</div>
+                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+                          {ligne.photoUrl && (
+                            <a href={ligne.photoUrl} target="_blank" rel="noopener noreferrer" style={{ flexShrink: 0 }}>
+                              <img src={ligne.photoUrl} alt="" style={{ width: 40, height: 40, borderRadius: 6, objectFit: 'cover', border: '1px solid #E5E7EB' }} />
+                            </a>
+                          )}
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div>{ligne.nom_fr || ligne.designation}</div>
                         {(ligne.description || ligne.lien || ligne.photoUrl) && (
                           <div style={{ marginTop: 4, padding: '6px 8px', background: '#FFF7ED', borderRadius: 6, border: '1px solid #FED7AA', fontSize: 11 }}>
                             {ligne.photoUrl && (
@@ -358,6 +365,8 @@ export default function DevisCard({ devis, profile, onRefresh, forceOpen = false
                             {ligne.lien && <a href={ligne.lien} target="_blank" rel="noopener noreferrer" style={{ color: '#EA580C', wordBreak: 'break-all' }}>🔗 {ligne.lien}</a>}
                           </div>
                         )}
+                          </div>
+                        </div>
                       </td>
                       <td style={{ padding: '10px 4px', textAlign: 'center' }}>{qte}</td>
                       <td style={{ padding: '10px 4px', textAlign: 'right' }}>

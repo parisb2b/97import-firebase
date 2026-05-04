@@ -261,8 +261,8 @@ export default function GestionDevisPartner({ partnerCode }: { partnerCode: stri
                   <div style={{ borderTop: '1px solid #F3F4F6', padding: 20 }}>
                     {/* Products with editable VIP prices */}
                     {d.lignes?.map((l, i) => {
-                      // V87 — Produit sur mesure : prix libre (pas de bornes)
-                      const isSurMesure = l.type === 'custom' || l.ref === 'SUR-MESURE';
+                      // V88 — Produit sur mesure : prix libre (type=custom, SUR-MESURE, PS-XXXX)
+                      const isSurMesure = l.type === 'custom' || l.ref === 'SUR-MESURE' || l.ref?.startsWith('PS-');
                       const prixAchat = l.prix_achat ?? 0;
                       const prixPublic = l.prix_unitaire ?? 0;
                       const prixMin = isSurMesure ? 0 : (prixAchat > 0 ? parseFloat((prixAchat * coefs.coefficient_vip_min).toFixed(2)) : 0);
