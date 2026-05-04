@@ -181,14 +181,16 @@ export default function Panier() {
         client_tel: userProfile.phone || userProfile.telephone || '',
         client_adresse: [userProfile.adresse, userProfile.codePostal, userProfile.ville, userProfile.pays].filter(Boolean).join(', '),
         client_siret: userProfile.siret || '',
-        // V70 — Propagation adresse livraison (héritage facturation si absente)
-        adresse_livraison: userProfile.adresse_livraison || {
-          rue: userProfile.adresse || '',
-          code_postal: userProfile.codePostal || '',
-          ville: userProfile.ville || '',
-          pays: userProfile.pays || 'MQ',
-          identique_facturation: true,
-        },
+        // V87 — Héritage adresse livraison : si pas de rue, clone la facturation
+        adresse_livraison: userProfile.adresse_livraison?.rue
+          ? userProfile.adresse_livraison
+          : {
+              rue: userProfile.adresse || '',
+              code_postal: userProfile.codePostal || '',
+              ville: userProfile.ville || '',
+              pays: userProfile.pays || 'MQ',
+              identique_facturation: true,
+            },
         statut: 'en_negociation_partenaire',
         destination: userProfile.pays || 'Martinique',
         pays_livraison: (userProfile.adresse_livraison?.pays) || userProfile.pays || 'Martinique',
@@ -315,35 +317,6 @@ export default function Panier() {
                 ))}
               </div>
 
-              {/* ═══ Custom product form ═══ */}
-              <div style={{
-                marginTop: 24, border: '2px dashed #EA580C', borderRadius: 16, padding: 24, background: '#FFF7ED',
-              }}>
-                <h3 style={{ fontSize: 16, fontWeight: 700, color: '#1565C0', marginBottom: 16 }}>
-                  {t('cart.customProduct')}
-                </h3>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 12, marginBottom: 12 }}>
-                  <input value={customNom} onChange={e => setCustomNom(e.target.value)}
-                    placeholder="Nom du produit souhaité"
-                    style={{ padding: '10px 14px', borderRadius: 8, border: '1px solid #E5E7EB', fontSize: 14, outline: 'none' }} />
-                  <input type="number" min={1} value={customQte} onChange={e => setCustomQte(Number(e.target.value) || 1)}
-                    style={{ width: 70, padding: '10px 14px', borderRadius: 8, border: '1px solid #E5E7EB', fontSize: 14, textAlign: 'center', outline: 'none' }} />
-                </div>
-                <textarea value={customDesc} onChange={e => setCustomDesc(e.target.value)}
-                  placeholder="Description détaillée (dimensions, matériaux, usage...)"
-                  rows={3}
-                  style={{ width: '100%', padding: '10px 14px', borderRadius: 8, border: '1px solid #E5E7EB', fontSize: 14, resize: 'vertical', marginBottom: 12, outline: 'none', boxSizing: 'border-box' }} />
-                <input value={customLien} onChange={e => setCustomLien(e.target.value)}
-                  placeholder="Lien YouTube ou site (optionnel)"
-                  style={{ width: '100%', padding: '10px 14px', borderRadius: 8, border: '1px solid #E5E7EB', fontSize: 14, marginBottom: 12, outline: 'none', boxSizing: 'border-box' }} />
-                <button onClick={handleAddCustom}
-                  style={{ ...btnStyle('#EA580C'), width: 'auto', padding: '10px 24px' }}>
-                  📦 Ajouter au devis
-                </button>
-                <p style={{ fontSize: 11, color: '#92400E', marginTop: 8 }}>
-                  ⚠️ L'ajout d'un produit sur mesure envoie une notification a l'equipe 97import
-                </p>
-              </div>
             </div>
 
             {/* ═══ RIGHT — Recap (sticky) ═══ */}
@@ -397,6 +370,38 @@ export default function Panier() {
             </div>
           </div>
         )}
+      </div>
+
+      {/* V87 — Formulaire produit sur mesure (TOUJOURS visible, meme panier vide) */}
+      <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px 40px' }}>
+        <div style={{
+          border: '2px dashed #EA580C', borderRadius: 16, padding: 24, background: '#FFF7ED',
+        }}>
+          <h3 style={{ fontSize: 16, fontWeight: 700, color: '#1565C0', marginBottom: 16 }}>
+            {t('cart.customProduct')}
+          </h3>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 12, marginBottom: 12 }}>
+            <input value={customNom} onChange={e => setCustomNom(e.target.value)}
+              placeholder="Nom du produit souhaité"
+              style={{ padding: '10px 14px', borderRadius: 8, border: '1px solid #E5E7EB', fontSize: 14, outline: 'none' }} />
+            <input type="number" min={1} value={customQte} onChange={e => setCustomQte(Number(e.target.value) || 1)}
+              style={{ width: 70, padding: '10px 14px', borderRadius: 8, border: '1px solid #E5E7EB', fontSize: 14, textAlign: 'center', outline: 'none' }} />
+          </div>
+          <textarea value={customDesc} onChange={e => setCustomDesc(e.target.value)}
+            placeholder="Description détaillée (dimensions, matériaux, usage...)"
+            rows={3}
+            style={{ width: '100%', padding: '10px 14px', borderRadius: 8, border: '1px solid #E5E7EB', fontSize: 14, resize: 'vertical', marginBottom: 12, outline: 'none', boxSizing: 'border-box' }} />
+          <input value={customLien} onChange={e => setCustomLien(e.target.value)}
+            placeholder="Lien YouTube ou site (optionnel)"
+            style={{ width: '100%', padding: '10px 14px', borderRadius: 8, border: '1px solid #E5E7EB', fontSize: 14, marginBottom: 12, outline: 'none', boxSizing: 'border-box' }} />
+          <button onClick={handleAddCustom}
+            style={{ ...btnStyle('#EA580C'), width: 'auto', padding: '10px 24px' }}>
+            📦 Ajouter au devis
+          </button>
+          <p style={{ fontSize: 11, color: '#92400E', marginTop: 8 }}>
+            ⚠️ L'ajout d'un produit sur mesure envoie une notification a l'equipe 97import
+          </p>
+        </div>
       </div>
 
       {/* ═══════════════════════════════════════════════ */}
