@@ -72,11 +72,10 @@ function getConfig(emetteur?: any) {
 }
 
 // ============ FORMAT HELPERS ============
+// V93 — Intl.NumberFormat robuste (plus de remplacement manuel des separateurs)
 function formatEUR(amount: number | undefined): string {
   if (amount === undefined || amount === null) return '0,00 €';
-  const parts = amount.toFixed(2).split('.');
-  const intPart = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-  return `${intPart},${parts[1]} €`;
+  return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(amount);
 }
 
 // V45 Bug B — Délégation au helper dateHelpers.formatDateCourt qui couvre :

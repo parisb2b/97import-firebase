@@ -38,6 +38,11 @@ export default function AcomptesEncaisser() {
 
   const quotesFiltered = quotes.filter(q => {
     if (filtreStatut === 'tous') return true;
+    // V93 — Filtre "nouveau" = devis avec acomptes declares non encaisses
+    if (filtreStatut === 'nouveau') {
+      const acomptes = (q.acomptes || []) as Acompte[];
+      return acomptes.some(a => a.encaisse === false);
+    }
     return q.statut === filtreStatut;
   });
 

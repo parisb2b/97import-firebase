@@ -1,6 +1,6 @@
 # DP97IMPORTMAJ — Journal Central des Mises à Jour
 
-Date : 2026-05-05 18:00 CEST
+Date : 2026-05-05 18:15 CEST
 Projet : 97importok-firebase
 Branche : v2
 Version : v0.43.10
@@ -760,3 +760,65 @@ Parcourt `adminDb` puis `clientDb`, fusionne et dédoublonne les résultats, ave
 
 ❌ AVANT : Mini-boutons `🧾 Facturation` / `📦 Livraison` (10px, 4px padding) dans l'en-tête, invisibles.
 ✅ APRÈS : Gros boutons (13px, 10px padding, flex:1) sous les coordonnées, avec séparateur dashed, texte `✓ Adresse Facturation` / `✓ Adresse Livraison` si actif, fond inversé (bleu foncé/orange foncé). Choix exclusif.
+
+---
+
+## 🔴 MISSION V93 — FIX PDF & FILTRAGE ADMIN (05/05/2026 18:15 CEST)
+
+### FICHIER 1 — pdf-generator.ts : formatEUR robuste
+📄 `src/lib/pdf-generator.ts` (Lignes 74-80)
+
+❌ AVANT :
+```tsx
+function formatEUR(amount: number | undefined): string {
+  if (amount === undefined || amount === null) return '0,00 €';
+  const parts = amount.toFixed(2).split('.');
+  const intPart = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+  return `${intPart},${parts[1]} €`;
+}
+```
+
+✅ APRÈS :
+```tsx
+// V93 — Intl.NumberFormat robuste (plus de remplacement manuel des separateurs)
+function formatEUR(amount: number | undefined): string {
+  if (amount === undefined || amount === null) return '0,00 €';
+  return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(amount);
+}
+```
+Plus de `.replace()` manuel → `47 175,91 €` garanti sans slash `/`.
+
+### FICHIER 2 — AcomptesEncaisser.tsx : Filtrage acomptes déclarés
+📄 `src/admin/pages/AcomptesEncaisser.tsx` (Lignes 39-43)
+
+❌ AVANT :
+```tsx
+  const quotesFiltered = quotes.filter(q => {
+    if (filtreStatut === 'tous') return true;
+    return q.statut === filtreStatut;
+  });
+```
+Le filtre "nouveau" cherchait `q.statut === 'nouveau'` — mais les devis avec acomptes déclarés ont un statut différent (ex: `signe`).
+
+✅ APRÈS :
+```tsx
+  const quotesFiltered = quotes.filter(q => {
+    if (filtreStatut === 'tous') return true;
+    // V93 — Filtre "nouveau" = devis avec acomptes declares non encaisses
+    if (filtreStatut === 'nouveau') {
+      const acomptes = (q.acomptes || []) as Acompte[];
+      return acomptes.some(a => a.encaisse === false);
+    }
+    return q.statut === filtreStatut;
+  });
+```
+Le filtre "nouveau" scanne maintenant le tableau `acomptes` pour trouver ceux avec `encaisse === false`.
+
+### FICHIER 3 — quoteStatusHelpers.ts : Calculs vérifiés
+📄 `src/lib/quoteStatusHelpers.ts` (Lignes 57-68)
+
+✅ Aucune modification nécessaire. Les fonctions `getTotalEncaisse()` et `getSoldeRestant()` utilisent uniquement :
+- `.filter(a => a.encaisse === true)`
+- `.reduce((sum, a) => sum + (a.montant || 0), 0)`
+- `Math.max(0, total_ht - totalEncaisse)`
+Aucune division, aucun formatage texte. Arithmétique pure.
