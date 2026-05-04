@@ -79,8 +79,8 @@ export default function MesVirements({ userId, profile }: MesVirementsProps) {
       let valB: any = b[sortCol === 'devis' ? 'devis_id' : sortCol];
 
       if (sortCol === 'date') {
-        valA = new Date(valA).getTime() || 0;
-        valB = new Date(valB).getTime() || 0;
+        valA = toDate(valA)?.getTime() || 0;
+        valB = toDate(valB)?.getTime() || 0;
       }
       else if (typeof valA === 'string' || typeof valB === 'string') {
         valA = (valA || '').toString().toLowerCase();

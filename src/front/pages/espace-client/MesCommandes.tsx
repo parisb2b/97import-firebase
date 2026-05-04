@@ -17,9 +17,7 @@ export default function MesCommandes({ userId, profile }: { userId: string; prof
       const snap = await getDocs(q);
       const all = snap.docs.map(d => ({ id: d.id, ...d.data() } as any));
       // Filtre : devis avec au moins 1 acompte encaissé
-      const filtered = all
-        .filter((d: any) => Array.isArray(d.acomptes) && d.acomptes.some((a: any) => a.encaisse === true)) // v43 P3-COMPLET format
-        .sort((a: any, b: any) => (b.createdAt?.toMillis?.() || b.createdAt?.seconds * 1000 || 0) - (a.createdAt?.toMillis?.() || a.createdAt?.seconds * 1000 || 0));
+      const filtered = all.filter((d: any) => Array.isArray(d.acomptes) && d.acomptes.some((a: any) => a.encaisse === true));
       setCommandes(filtered);
     } catch (err) {
       console.error(err);

@@ -47,6 +47,7 @@ function rolePill(role?: string) {
 export default function LogsDebug() {
   const [logs, setLogs] = useState<DebugLog[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [filterLevel, setFilterLevel] = useState<'' | LogLevel>('');
   const [filterCategory, setFilterCategory] = useState('');
   const [filterRole, setFilterRole] = useState<'' | 'admin' | 'client' | 'anonymous'>('');
@@ -62,8 +63,9 @@ export default function LogsDebug() {
           level: filterLevel || undefined,
         });
         setLogs(docs as DebugLog[]);
-      } catch (err) {
-        console.error('Erreur chargement logs-debug:', err);
+      } catch (err: any) {
+        console.error('[V97 LogsDebug] Erreur Firestore :', err);
+        setError(`Erreur Firestore : ${err?.message || err?.code || 'inconnue'}`);
       } finally {
         setLoading(false);
       }
@@ -98,6 +100,11 @@ export default function LogsDebug() {
 
   return (
     <>
+      {error && (
+        <div style={{ padding: '12px 16px', background: '#FEE2E2', border: '1px solid #FCA5A5', borderRadius: 8, color: '#991B1B', fontSize: 13, marginBottom: 16 }}>
+          ❌ {error}
+        </div>
+      )}
       <div className="filters" style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
         <select className="fsel" value={filterLevel} onChange={e => setFilterLevel(e.target.value as any)}>
           <option value="">Tous niveaux</option>

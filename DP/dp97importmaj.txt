@@ -1,6 +1,6 @@
 # DP97IMPORTMAJ — Journal Central des Mises à Jour
 
-Date : 2026-05-05 19:15 CEST
+Date : 2026-05-05 19:30 CEST
 Projet : 97importok-firebase
 Branche : v2
 Version : v0.43.10
@@ -985,3 +985,41 @@ Logique :
 ### ACTIONS CORRECTIVES V96
 
 Aucune correction de code nécessaire. L'audit confirme que les missions V83 à V94.1 ont corrigé l'ensemble des problèmes identifiés. Les 2 anomalies (AdresseTypee inexistant, chemin GestionDevisPartner) sont documentaires — pas de bug fonctionnel.
+
+---
+
+## 🔴 MISSION V97 — CORRECTIONS FINALES 12 POINTS (05/05/2026 19:30 CEST)
+
+### Point 1 — MesAdresses.tsx : Boutons agrandis + ✏️🗑 restaurés
+📄 `src/front/pages/espace-client/MesAdresses.tsx`
+
+### Point 2 — Panier.tsx : Bouton adresses avec ombre + sous-titre
+📄 `src/front/pages/Panier.tsx`
+
+### Point 3 — PopupAcompte.tsx : Snapshot via getDoc (plus fiable)
+📄 `src/front/pages/espace-client/PopupAcompte.tsx`
+- Remplace `getDocs(query(collection(...)))` par `getDoc(doc(...))` (plus rapide, moins d'erreurs)
+
+### Point 4 — MesVirements.tsx : Tri dates avec toDate()
+📄 `src/front/pages/espace-client/MesVirements.tsx` (l.82-83)
+
+### Point 5 — MesCommandes.tsx : Filtre simplifié
+📄 `src/front/pages/espace-client/MesCommandes.tsx`
+
+### Point 6 — GestionDevisPartner.tsx : PS-* déjà OK (V88)
+
+### Point 7 — DetailDevis.tsx : Photo + lien 📋 déjà OK (V88)
+
+### Point 8 — PopupEncaisserAcompte.tsx : Anti-flottant déjà OK (V91)
+
+### Point 9 — DevisCard.tsx : Affichage adresse livraison figée
+📄 `src/front/pages/espace-client/DevisCard.tsx`
+- `{devis.adresse_livraison && <div>📦 Livraison : {rue}, {cp} {ville}</div>}`
+
+### Point 10 — quoteStatusHelpers.ts : isDevisReadonly déjà OK (V69)
+
+### Point 11 — LogsDebug.tsx : Gestion erreur Firestore
+📄 `src/admin/pages/LogsDebug.tsx`
+- State `error`, affichage bannière rouge, message dans catch
+
+### Point 12 — pdf-generator.ts : Intl.NumberFormat déjà OK (V93)

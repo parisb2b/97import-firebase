@@ -421,12 +421,9 @@ export default function Panier() {
                   {t('cart.devisNote')}
                 </p>
 
-                {/* V94.1 — Bouton navigation adresses */}
-                <button
-                  onClick={() => setLocation('/espace-client/adresses')}
-                  style={{ marginTop: 12, width: '100%', padding: '14px', background: '#1E40AF', color: '#fff', borderRadius: 8, fontWeight: 600, border: 'none', cursor: 'pointer', fontSize: 14, fontFamily: 'inherit' }}>
-                  📍 Définir mes adresses de facturation et livraison
-                </button>
+                {/* V97 — Bouton adresses amélioré */}
+                <button onClick={() => setLocation('/espace-client/adresses')} style={{ marginTop: 12, width: '100%', padding: '16px', background: '#1E40AF', color: '#fff', borderRadius: 12, fontWeight: 700, fontSize: 15, border: 'none', cursor: 'pointer', boxShadow: '0 4px 14px rgba(30,64,175,0.4)' }}>📍 Définir mes adresses de facturation et livraison</button>
+                <p style={{ fontSize: 11, color: '#6B7280', textAlign: 'center', marginTop: 6 }}>Obligatoire avant le premier acompte</p>
               </div>
             </div>
           </div>

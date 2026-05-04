@@ -124,19 +124,11 @@ export default function MesAdresses({ userId, profile }: { userId: string; profi
             {a.telephone && <p style={{ fontSize: 12, color: '#6B7280', marginBottom: 8 }}>📞 {a.telephone}</p>}
 
 
-            <div style={{ display: 'flex', gap: '10px', marginTop: '14px', borderTop: '1px dashed #E5E7EB', paddingTop: '14px' }}>
-              <button
-                onClick={() => handleSetType(i, 'facturation')}
-                style={{ flex: 1, fontSize: '13px', padding: '10px 12px', background: a.type === 'facturation' ? '#1E40AF' : '#EFF6FF', color: a.type === 'facturation' ? '#FFF' : '#1E40AF', border: '1px solid #BFDBFE', borderRadius: '8px', cursor: 'pointer', fontWeight: 600, transition: 'all 0.2s' }}
-              >
-                🧾 {a.type === 'facturation' ? '✓ Adresse Facturation' : 'Définir Facturation'}
-              </button>
-              <button
-                onClick={() => handleSetType(i, 'livraison')}
-                style={{ flex: 1, fontSize: '13px', padding: '10px 12px', background: a.type === 'livraison' ? '#9A3412' : '#FFF7ED', color: a.type === 'livraison' ? '#FFF' : '#9A3412', border: '1px solid #FED7AA', borderRadius: '8px', cursor: 'pointer', fontWeight: 600, transition: 'all 0.2s' }}
-              >
-                📦 {a.type === 'livraison' ? '✓ Adresse Livraison' : 'Définir Livraison'}
-              </button>
+            <div style={{ display: 'flex', gap: 8, marginTop: 14, borderTop: '1px dashed #E5E7EB', paddingTop: 14 }}>
+              <button onClick={() => handleSetType(i, 'facturation')} style={{ flex: 1, padding: '12px 14px', fontSize: '14px', fontWeight: a.type === 'facturation' ? 700 : 500, background: a.type === 'facturation' ? '#1E40AF' : '#EFF6FF', color: a.type === 'facturation' ? '#fff' : '#1E40AF', border: '2px solid #BFDBFE', borderRadius: '10px', cursor: 'pointer' }}>🧾 Facturation</button>
+              <button onClick={() => handleSetType(i, 'livraison')} style={{ flex: 1, padding: '12px 14px', fontSize: '14px', fontWeight: a.type === 'livraison' ? 700 : 500, background: a.type === 'livraison' ? '#EA580C' : '#FFF7ED', color: a.type === 'livraison' ? '#fff' : '#EA580C', border: '2px solid #FED7AA', borderRadius: '10px', cursor: 'pointer' }}>📦 Livraison</button>
+              <button onClick={() => handleEdit(i)} style={{ padding: '12px 14px', border: '1px solid #E5E7EB', background: '#fff', borderRadius: '10px', cursor: 'pointer', color: '#374151' }}>✏️</button>
+              <button onClick={() => handleDelete(i)} style={{ padding: '12px 14px', border: '1px solid #FEE2E2', background: '#FEF2F2', borderRadius: '10px', cursor: 'pointer', color: '#991B1B' }}>🗑</button>
             </div>
           </div>
         ))}

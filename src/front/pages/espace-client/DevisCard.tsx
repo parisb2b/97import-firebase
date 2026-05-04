@@ -316,6 +316,11 @@ export default function DevisCard({ devis, profile, onRefresh, forceOpen = false
                 </div>
               </div>
             </div>
+            {devis.adresse_livraison && (
+              <div style={{ marginTop: 8, fontSize: 12, color: '#6B7280' }}>
+                📦 Livraison : {devis.adresse_livraison.rue}, {devis.adresse_livraison.code_postal} {devis.adresse_livraison.ville}
+              </div>
+            )}
           </div>
 
           {/* Section 2 : Lignes produits */}
