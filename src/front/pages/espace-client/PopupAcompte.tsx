@@ -4,8 +4,17 @@ import { db } from '../../../lib/firebase';
 import { useToast } from '../../components/Toast';
 import { montantAcompteParDefaut } from '../../../lib/devisHelpers';
 import { notifyAcompteDeclare } from '../../../lib/emailService';
-import { validerNouveauPaiement, prochainPaiementEstSolde, getSoldeRestant } from '../../../lib/quoteStatusHelpers';
+import { validerNouveauPaiement, prochainPaiementEstSolde } from '../../../lib/quoteStatusHelpers';
 import { sanitizeForFirestore } from '../../../lib/firebaseUtils';
+
+/** V85 — Restant à payer = Total HT − TOUS les acomptes (déclarés + encaissés, hors solde forcé).
+ *  Différent de getSoldeRestant() qui ne compte que les encaissés. */
+function getRestantAPayer(totalHt: number, acomptes: any[]): number {
+  const totalDejaPaye = (acomptes || [])
+    .filter((a: any) => !a.is_solde)
+    .reduce((s: number, a: any) => s + (a.montant || 0), 0);
+  return Math.max(0, totalHt - totalDejaPaye);
+}
 
 interface Props {
   devisId: string;
@@ -44,7 +53,7 @@ export default function PopupAcompte({ devisId, devisNumero, clientNom, montantI
 
   // v43-E3.2 : dérivés pour la logique limite 3 acomptes + montant forcé au solde
   const acomptesCharges = devisCharge?.acomptes || [];
-  const soldeRestant = devisCharge ? getSoldeRestant(devisCharge.total_ht || 0, acomptesCharges) : 0;
+  const soldeRestant = devisCharge ? getRestantAPayer(devisCharge.total_ht || 0, acomptesCharges) : 0;
   const estSolde = prochainPaiementEstSolde(acomptesCharges);
 
   // Calculer le montant par défaut adapté au solde restant
@@ -61,7 +70,7 @@ export default function PopupAcompte({ devisId, devisNumero, clientNom, montantI
           const acomptesEnBase = devisData.acomptes || [];
           if (prochainPaiementEstSolde(acomptesEnBase)) {
             // Forcer au montant exact du solde restant
-            setMontant(getSoldeRestant(devisData.total_ht || 0, acomptesEnBase));
+            setMontant(getRestantAPayer(devisData.total_ht || 0, acomptesEnBase));
           } else {
             setMontant(montantAcompteParDefaut(devisData));
           }
@@ -89,7 +98,7 @@ export default function PopupAcompte({ devisId, devisNumero, clientNom, montantI
 
       // v43-E3.2 : forcer le montant au solde restant si c'est le 4e paiement
       const estSoldeFresh = prochainPaiementEstSolde(currentAcomptes);
-      const soldeRestantFresh = getSoldeRestant(totalHt, currentAcomptes);
+      const soldeRestantFresh = getRestantAPayer(totalHt, currentAcomptes);
       const montantFinal = estSoldeFresh ? soldeRestantFresh : montant;
 
       // v43-E3.2 : validation centralisée (min 50€, max solde, 4e = solde forcé)
