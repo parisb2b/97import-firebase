@@ -4,6 +4,7 @@ import PopupSaisieRIB from '../../components/PopupSaisieRIB';
 import PopupVerserAcompte from '../../components/PopupVerserAcompte';
 import { getMontantRestantAVerser } from '../../../lib/devisHelpers';
 import { isDevisReadonly } from '../../../lib/quoteStatusHelpers';
+import { toDate } from '../../../lib/dateHelpers';
 import { db } from '../../../lib/firebase';
 import { doc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { generateDevis, downloadPDF } from '../../../lib/pdf-generator';
@@ -344,7 +345,15 @@ export default function DevisCard({ devis, profile, onRefresh, forceOpen = false
                   return (
                     <tr key={idx} style={{ borderBottom: '1px solid #F3F4F6' }}>
                       <td style={{ padding: '10px 4px' }}>{ref}</td>
-                      <td style={{ padding: '10px 4px' }}>{ligne.nom_fr || ligne.designation}</td>
+                      <td style={{ padding: '10px 4px' }}>
+                        <div>{ligne.nom_fr || ligne.designation}</div>
+                        {(ligne.description || ligne.lien) && (
+                          <div style={{ marginTop: 4, padding: '6px 8px', background: '#FFF7ED', borderRadius: 6, border: '1px solid #FED7AA', fontSize: 11 }}>
+                            {ligne.description && <div style={{ color: '#92400E', marginBottom: ligne.lien ? 4 : 0 }}>📝 {ligne.description}</div>}
+                            {ligne.lien && <a href={ligne.lien} target="_blank" rel="noopener noreferrer" style={{ color: '#EA580C', wordBreak: 'break-all' }}>🔗 {ligne.lien}</a>}
+                          </div>
+                        )}
+                      </td>
                       <td style={{ padding: '10px 4px', textAlign: 'center' }}>{qte}</td>
                       <td style={{ padding: '10px 4px', textAlign: 'right' }}>
                         {estNegocie && (
@@ -444,7 +453,7 @@ export default function DevisCard({ devis, profile, onRefresh, forceOpen = false
                 <tbody>
                   {acomptes.map((a: any, idx: number) => {
                     const dateA = a.date
-                      ? new Date(a.date).toLocaleDateString('fr-FR')
+                      ? (toDate(a.date) || new Date()).toLocaleDateString('fr-FR')
                       : '—';
                     const statutBadge = a.encaisse === true
                       ? { label: 'Encaissé', bg: '#D1FAE5', color: '#065F46' }

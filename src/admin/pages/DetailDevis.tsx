@@ -24,6 +24,9 @@ interface LigneDevis {
   qte: number;
   prix_unitaire: number;
   total: number;
+  type?: 'product' | 'custom';
+  description?: string;
+  lien?: string;
 }
 
 interface Devis {
@@ -465,6 +468,12 @@ export default function DetailDevis() {
                     <input className="fi" type="text" value={ligne.nom_fr}
                       disabled={estLectureSeule}
                       onChange={(e) => handleLigneChange(index, 'nom_fr', e.target.value)} />
+                    {(ligne.description || ligne.lien) && (
+                      <div style={{ marginTop: 4, padding: '6px 8px', background: '#FFF7ED', borderRadius: 6, border: '1px solid #FED7AA', fontSize: 11 }}>
+                        {ligne.description && <div style={{ color: '#92400E', marginBottom: ligne.lien ? 4 : 0 }}>📝 {ligne.description}</div>}
+                        {ligne.lien && <a href={ligne.lien} target="_blank" rel="noopener noreferrer" style={{ color: '#EA580C', wordBreak: 'break-all' }}>🔗 {ligne.lien}</a>}
+                      </div>
+                    )}
                   </td>
                   <td>
                     <input className="fi" type="number" value={ligne.qte} min={1}
