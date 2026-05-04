@@ -1,6 +1,6 @@
 # DP97IMPORTMAJ — Journal Central des Mises à Jour
 
-Date : 2026-05-05 19:30 CEST
+Date : 2026-05-05 19:45 CEST
 Projet : 97importok-firebase
 Branche : v2
 Version : v0.43.10
@@ -1023,3 +1023,167 @@ Aucune correction de code nécessaire. L'audit confirme que les missions V83 à 
 - State `error`, affichage bannière rouge, message dans catch
 
 ### Point 12 — pdf-generator.ts : Intl.NumberFormat déjà OK (V93)
+
+---
+
+## 📊 ÉTAT DES CORRECTIONS V97 — TABLEAU RÉCAPITULATIF
+
+| N° | Fichier | Correction | Statut |
+|----|---------|------------|--------|
+| 1 | MesAdresses.tsx | Boutons XL 14px border 2px + ✏️🗑 restaurés | ✅ |
+| 2 | Panier.tsx | Bouton 📍 avec boxShadow + sous-titre obligatoire | ✅ |
+| 3 | PopupAcompte.tsx | Snapshot adresses via getDoc (plus fiable) | ✅ |
+| 4 | MesVirements.tsx | Tri dates avec toDate() au lieu de new Date() | ✅ |
+| 5 | MesCommandes.tsx | Filtre commandes simplifié | ✅ |
+| 6 | GestionDevisPartner.tsx | Déjà OK — PS-* reconnu (V88) | ✅ |
+| 7 | DetailDevis.tsx | Déjà OK — photo 📷 + lien 📋 (V88) | ✅ |
+| 8 | PopupEncaisserAcompte.tsx | Déjà OK — anti-flottant Number.toFixed(2) (V91) | ✅ |
+| 9 | DevisCard.tsx | Affichage adresse livraison figée | ✅ |
+| 10 | quoteStatusHelpers.ts | Déjà OK — isDevisReadonly inclut commande_ferme... (V69) | ✅ |
+| 11 | LogsDebug.tsx | State error + bannière rouge + message catch | ✅ |
+| 12 | pdf-generator.ts | Déjà OK — Intl.NumberFormat minimumFractionDigits (V93) | ✅ |
+
+---
+
+## BLOCS AVANT/APRÈS — FICHIERS MODIFIÉS
+
+### 📄 MesAdresses.tsx (Point 1) — Boutons Facturation/Livraison
+
+❌ AVANT (V92) :
+```tsx
+            <div style={{ display: 'flex', gap: '10px', marginTop: '14px', borderTop: '1px dashed #E5E7EB', paddingTop: '14px' }}>
+              <button onClick={() => handleSetType(i, 'facturation')}
+                style={{ flex: 1, fontSize: '13px', padding: '10px 12px', background: a.type === 'facturation' ? '#1E40AF' : '#EFF6FF', ... }}>
+                🧾 {a.type === 'facturation' ? '✓ Adresse Facturation' : 'Définir Facturation'}
+              </button>
+              <button onClick={() => handleSetType(i, 'livraison')}
+                style={{ flex: 1, fontSize: '13px', padding: '10px 12px', background: a.type === 'livraison' ? '#9A3412' : '#FFF7ED', ... }}>
+                📦 {a.type === 'livraison' ? '✓ Adresse Livraison' : 'Définir Livraison'}
+              </button>
+            </div>
+```
+
+✅ APRÈS (V97) :
+```tsx
+            <div style={{ display: 'flex', gap: 8, marginTop: 14, borderTop: '1px dashed #E5E7EB', paddingTop: 14 }}>
+              <button onClick={() => handleSetType(i, 'facturation')} style={{ flex: 1, padding: '12px 14px', fontSize: '14px', fontWeight: a.type === 'facturation' ? 700 : 500, background: a.type === 'facturation' ? '#1E40AF' : '#EFF6FF', color: a.type === 'facturation' ? '#fff' : '#1E40AF', border: '2px solid #BFDBFE', borderRadius: '10px', cursor: 'pointer' }}>🧾 Facturation</button>
+              <button onClick={() => handleSetType(i, 'livraison')} style={{ flex: 1, padding: '12px 14px', fontSize: '14px', fontWeight: a.type === 'livraison' ? 700 : 500, background: a.type === 'livraison' ? '#EA580C' : '#FFF7ED', color: a.type === 'livraison' ? '#fff' : '#EA580C', border: '2px solid #FED7AA', borderRadius: '10px', cursor: 'pointer' }}>📦 Livraison</button>
+              <button onClick={() => handleEdit(i)} style={{ padding: '12px 14px', border: '1px solid #E5E7EB', background: '#fff', borderRadius: '10px', cursor: 'pointer', color: '#374151' }}>✏️</button>
+              <button onClick={() => handleDelete(i)} style={{ padding: '12px 14px', border: '1px solid #FEE2E2', background: '#FEF2F2', borderRadius: '10px', cursor: 'pointer', color: '#991B1B' }}>🗑</button>
+            </div>
+```
+
+### 📄 Panier.tsx (Point 2) — Bouton adresses
+
+❌ AVANT (V94.1) :
+```tsx
+                <button onClick={() => setLocation('/espace-client/adresses')}
+                  style={{ marginTop: 12, width: '100%', padding: '14px', background: '#1E40AF', ... }}>
+                  📍 Définir mes adresses de facturation et livraison
+                </button>
+```
+
+✅ APRÈS (V97) :
+```tsx
+                <button onClick={() => setLocation('/espace-client/adresses')}
+                  style={{ marginTop: 12, width: '100%', padding: '16px', background: '#1E40AF', color: '#fff', borderRadius: 12, fontWeight: 700, fontSize: 15, border: 'none', cursor: 'pointer', boxShadow: '0 4px 14px rgba(30,64,175,0.4)' }}>
+                  📍 Définir mes adresses de facturation et livraison
+                </button>
+                <p style={{ fontSize: 11, color: '#6B7280', textAlign: 'center', marginTop: 6 }}>
+                  Obligatoire avant le premier acompte
+                </p>
+```
+
+### 📄 PopupAcompte.tsx (Point 3) — Snapshot adresses
+
+❌ AVANT (V94.1) :
+```tsx
+      const adressesSnapshot: any = {};
+      if (!currentData?.adresse_facturation || !currentData?.adresse_livraison) {
+        try {
+          const userSnap = await getDocs(query(collection(db, 'users'), where('__name__', '==', currentData?.client_id || '')));
+          const userData = userSnap.docs[0]?.data();
+          ...
+        } catch (e) { console.warn('[V94.1] Snapshot adresses impossible, continue sans'); }
+      }
+```
+
+✅ APRÈS (V97) :
+```tsx
+      const adressesSnapshot: any = {};
+      try {
+        const userSnap = await getDoc(doc(db, 'users', currentData?.client_id || ''));
+        if (userSnap.exists()) {
+          const userData = userSnap.data();
+          ...
+        }
+        console.log('[V97] Snapshot adresses réussi', adressesSnapshot);
+      } catch (e) { console.warn('[V97] Snapshot adresses échoué (non bloquant)', e); }
+```
+
+### 📄 MesVirements.tsx (Point 4) — Tri dates
+
+❌ AVANT :
+```tsx
+        valA = new Date(valA).getTime() || 0;
+        valB = new Date(valB).getTime() || 0;
+```
+
+✅ APRÈS :
+```tsx
+        valA = toDate(valA)?.getTime() || 0;
+        valB = toDate(valB)?.getTime() || 0;
+```
+
+### 📄 MesCommandes.tsx (Point 5) — Filtre
+
+❌ AVANT :
+```tsx
+      const filtered = all
+        .filter(...)
+        .sort((a, b) => (b.createdAt?.toMillis?.() || ...) - (a.createdAt?.toMillis?.() || ...));
+```
+
+✅ APRÈS :
+```tsx
+      const filtered = all.filter((d: any) => Array.isArray(d.acomptes) && d.acomptes.some((a: any) => a.encaisse === true));
+```
+
+### 📄 DevisCard.tsx (Point 9) — Adresse livraison figée
+
+❌ AVANT : Aucun affichage de l'adresse livraison figée.
+
+✅ APRÈS (après Détail commande) :
+```tsx
+            {devis.adresse_livraison && (
+              <div style={{ marginTop: 8, fontSize: 12, color: '#6B7280' }}>
+                📦 Livraison : {devis.adresse_livraison.rue}, {devis.adresse_livraison.code_postal} {devis.adresse_livraison.ville}
+              </div>
+            )}
+```
+
+### 📄 LogsDebug.tsx (Point 11) — Gestion erreur
+
+❌ AVANT :
+```tsx
+  const [logs, setLogs] = useState<DebugLog[]>([]);
+  const [loading, setLoading] = useState(true);
+  // pas de state error
+  ...
+      } catch (err) {
+        console.error('Erreur chargement logs-debug:', err);
+      }
+```
+
+✅ APRÈS :
+```tsx
+  const [logs, setLogs] = useState<DebugLog[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  ...
+      } catch (err: any) {
+        console.error('[V97 LogsDebug] Erreur Firestore :', err);
+        setError(`Erreur Firestore : ${err?.message || err?.code || 'inconnue'}`);
+      }
+  // Bannière rouge : {error && <div style={...}>❌ {error}</div>}
+```
