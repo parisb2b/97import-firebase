@@ -1437,3 +1437,32 @@ export const getBuildInfo = () => {
 - Build ✅ OK (456 modules, 6.57s)
 - Import Excel fonctionnel : `/admin/produits` → bouton 📥 Import Excel
 - Badge version temps réel disponible via `getBuildInfo()`
+
+---
+
+## 🔴 MISSION V102 — FIX AFFICHAGE CATALOGUE FRONT (06/05/2026 19:20 CEST)
+
+### Cause racine
+`firestore.rules` ligne 84 : `allow read: if resource.data.actif == true || isAdmin();`
+
+Le front `Catalogue.tsx` faisait `getDocs(collection(db, 'products'))` SANS `where('actif', '==', true)`. Firestore rejetait la requête entière côté client car elle pouvait retourner des documents non actifs. L'admin passait grâce à `isAdmin()`.
+
+### 📄 src/front/pages/Catalogue.tsx
+
+❌ AVANT (l.3, l.100) :
+```tsx
+import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
+...
+const snap = await getDocs(collection(db, 'products'));
+```
+
+✅ APRÈS (l.3, l.101) :
+```tsx
+import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
+...
+const snap = await getDocs(query(collection(db, 'products'), where('actif', '==', true)));
+```
+
+### Résultat
+- La requête front ne demande QUE les produits actifs → alignée avec la règle Firestore
+- Build ✅ OK (456 modules, 12.29s)

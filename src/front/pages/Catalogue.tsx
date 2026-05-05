@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useRoute, Link } from 'wouter';
-import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { db, clientAuth } from '../../lib/firebase';
 import { useI18n } from '../../i18n';
@@ -97,7 +97,7 @@ export default function Catalogue() {
     const load = async () => {
       setLoading(true);
       try {
-        const snap = await getDocs(collection(db, 'products'));
+        const snap = await getDocs(query(collection(db, 'products'), where('actif', '==', true)));
         const all: any[] = snap.docs.map(d => ({ id: d.id, ...d.data() }));
 
         // Helper local pour normaliser les catégories (gère anciennes et nouvelles)
