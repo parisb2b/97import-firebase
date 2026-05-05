@@ -1466,3 +1466,38 @@ const snap = await getDocs(query(collection(db, 'products'), where('actif', '=='
 ### Résultat
 - La requête front ne demande QUE les produits actifs → alignée avec la règle Firestore
 - Build ✅ OK (456 modules, 12.29s)
+
+---
+
+## 🔴 MISSION V100-FINAL — RÉSOLUTION GLOBALE (06/05/2026 19:30 CEST)
+
+### Audit des 10 points
+
+| Point | Fichier | Statut |
+|-------|---------|--------|
+| 0 | version.ts | ✅ Déjà OK (V101) |
+| 1 | ListeDevis.tsx | ✅ Déjà OK (V100) |
+| 2 | MesAdresses.tsx | ✅ Déjà OK (V92/V97) |
+| 3 | Panier.tsx | ✅ Déjà OK (V94.1/V97) |
+| 4 | PopupAcompte.tsx | ✅ Déjà OK (V97) |
+| 5 | DevisCard.tsx | ✅ Déjà OK (V97) |
+| 6 | LogsDebug.tsx | ✅ Déjà OK (V97) |
+| 7 | PopupEncaisserAcompte.tsx | ✅ Déjà OK (V91) |
+| 8 | MesVirements.tsx | ✅ Déjà OK (V97) |
+| 9 | firestore.rules | ✅ Ajout `isAcompteEncaisseProtected` |
+
+### 📄 firestore.rules — Ajout unique
+
+❌ AVANT : Seulement `isAddressFrozen` défini
+
+✅ APRÈS (l.78-81) :
+```rules
+    function isAcompteEncaisseProtected() {
+      return resource.data.encaisse == true && request.resource.data.encaisse == true;
+    }
+```
+
+### Résultat
+- 9/10 points déjà en place par les missions V91→V102
+- 1 ajout : `isAcompteEncaisseProtected` dans firestore.rules
+- Build ✅ OK (456 modules, 16.39s)

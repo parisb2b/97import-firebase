@@ -74,6 +74,11 @@ service cloud.firestore {
       return (oldFact != null && newFact != oldFact) ||
              (oldLivr != null && newLivr != oldLivr);
     }
+    // V100 — Empêche la modification d'un acompte déjà encaissé.
+    // Une fois encaisse=true, le flag ne peut plus être changé (même par admin).
+    function isAcompteEncaisseProtected() {
+      return resource.data.encaisse == true && request.resource.data.encaisse == true;
+    }
 
     // ══════════════════════════════════════════════════════════
     // 📦 CATALOGUE PUBLIC + PARAMÈTRES TAUX
