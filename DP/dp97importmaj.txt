@@ -1359,3 +1359,42 @@ Dans `ListeDevis.tsx`, la colonne DATE affichait "—" pour tous les devis car :
 - Fallback 1 : `date_creation` (string Firestore)
 - Fallback 2 : `'—'` si rien
 - Build ✅ OK (456 modules, 16.24s)
+
+---
+
+## 🔴 MISSION V100 — CORRECTION FINALE DATE LISTE DEVIS (06/05/2026 01:40 CEST)
+
+### Cause racine
+La V99 utilisait `d.createdAt?.toDate?.()` qui échoue si le Timestamp Firestore est un objet `{_seconds, _nanoseconds}` sans méthode `toDate`. La fonction robuste `toDate()` de `dateHelpers.ts` gère TOUS les formats : Timestamp, `{_seconds}`, Date, string ISO, epoch ms.
+
+### 📄 src/admin/pages/ListeDevis.tsx — Cellule Date table
+
+❌ AVANT (V99 — l.255) :
+```tsx
+                <td>{d.createdAt?.toDate?.()?.toLocaleDateString('fr-FR') || d.date_creation || '—'}</td>
+```
+
+✅ APRÈS (V100 — l.255-264) :
+```tsx
+                <td>
+                  {d.createdAt
+                    ? toDate(d.createdAt)?.toLocaleDateString('fr-FR', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric'
+                      })
+                    : d.date_creation
+                      ? new Date(d.date_creation).toLocaleDateString('fr-FR')
+                      : d.date || '—'
+                  }
+                </td>
+```
+
+### Chaîne de fallback
+1. `d.createdAt` → `toDate()` robuste (Timestamp, {_seconds}, Date, string, number) → format FR
+2. `d.date_creation` → `new Date()` → format FR
+3. `d.date` → string déjà formatée (legacy)
+4. `'—'` → aucun champ trouvé
+
+### Résultat
+- Build ✅ OK (456 modules, 16.54s)

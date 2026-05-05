@@ -252,7 +252,18 @@ export default function ListeDevis() {
                     <strong style={{ cursor: 'pointer' }}>{d.numero}</strong>
                   </Link>
                 </td>
-                <td>{d.createdAt?.toDate?.()?.toLocaleDateString('fr-FR') || d.date_creation || '—'}</td>
+                <td>
+                  {d.createdAt
+                    ? toDate(d.createdAt)?.toLocaleDateString('fr-FR', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric'
+                      })
+                    : d.date_creation
+                      ? new Date(d.date_creation).toLocaleDateString('fr-FR')
+                      : d.date || '—'
+                  }
+                </td>
                 <td>{d.client_nom}</td>
                 <td>
                   {d.partenaire_code ? (
