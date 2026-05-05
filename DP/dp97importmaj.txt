@@ -1298,3 +1298,64 @@ Aucune correction de code nécessaire. L'audit confirme que les missions V83 à 
 
 ### Déploiement
 - `firebase deploy --only firestore:rules` → ✅ compiled + released
+
+---
+
+## 🔴 MISSION V99 — CORRECTION DATES LISTE DEVIS ADMIN (06/05/2026 01:15 CEST)
+
+### Diagnostic
+Dans `ListeDevis.tsx`, la colonne DATE affichait "—" pour tous les devis car :
+1. L'objet mappé dans `loadDevis()` ne passait **pas** `createdAt` brut au render
+2. La date était pré-calculée en string (`dateComplete`) mais si `raw.createdAt?.toDate` était falsy (Timestamp sans méthode `toDate`) ET `raw.date_creation` absent → `'—'`
+3. La table affichait `{d.date}` sans fallback direct sur le Timestamp
+
+### 📄 src/admin/pages/ListeDevis.tsx — Interface Devis
+
+❌ AVANT (l.33-35) :
+```tsx
+  createdAt: any;
+  acomptes: any[];
+```
+
+✅ APRÈS (l.33-36) :
+```tsx
+  createdAt: any;
+  date_creation: string | null;
+  acomptes: any[];
+```
+
+### 📄 src/admin/pages/ListeDevis.tsx — Objet mappé loadDevis()
+
+❌ AVANT (l.96-98) :
+```tsx
+          totalEncaisse: acomptesEncaisses.reduce((s: number, a: any) => s + (a.montant || 0), 0),
+          lignes: raw.lignes || [],
+          client_id: raw.client_id,
+```
+
+✅ APRÈS (l.97-101) :
+```tsx
+          totalEncaisse: acomptesEncaisses.reduce((s: number, a: any) => s + (a.montant || 0), 0),
+          createdAt: raw.createdAt,
+          date_creation: raw.date_creation || null,
+          lignes: raw.lignes || [],
+          client_id: raw.client_id,
+```
+
+### 📄 src/admin/pages/ListeDevis.tsx — Cellule Date table
+
+❌ AVANT (l.252) :
+```tsx
+                <td>{d.date}</td>
+```
+
+✅ APRÈS (l.253) :
+```tsx
+                <td>{d.createdAt?.toDate?.()?.toLocaleDateString('fr-FR') || d.date_creation || '—'}</td>
+```
+
+### Résultat
+- `createdAt` (Firestore Timestamp brut) passé au render → `.toDate()` appelé directement
+- Fallback 1 : `date_creation` (string Firestore)
+- Fallback 2 : `'—'` si rien
+- Build ✅ OK (456 modules, 16.24s)

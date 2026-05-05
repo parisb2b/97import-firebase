@@ -31,6 +31,7 @@ interface Devis {
   is_vip: boolean;
   conteneur_ref?: string;
   createdAt: any;
+  date_creation: string | null;
   acomptes: any[];
   nbAcomptesEncaisses: number;
   nbAcomptesDeclares: number;
@@ -94,6 +95,8 @@ export default function ListeDevis() {
           nbAcomptesEncaisses: acomptesEncaisses.length,
           nbAcomptesDeclares: acomptesDeclares.length,
           totalEncaisse: acomptesEncaisses.reduce((s: number, a: any) => s + (a.montant || 0), 0),
+          createdAt: raw.createdAt,
+          date_creation: raw.date_creation || null,
           lignes: raw.lignes || [],
           client_id: raw.client_id,
         } as any;
@@ -249,7 +252,7 @@ export default function ListeDevis() {
                     <strong style={{ cursor: 'pointer' }}>{d.numero}</strong>
                   </Link>
                 </td>
-                <td>{d.date}</td>
+                <td>{d.createdAt?.toDate?.()?.toLocaleDateString('fr-FR') || d.date_creation || '—'}</td>
                 <td>{d.client_nom}</td>
                 <td>
                   {d.partenaire_code ? (
