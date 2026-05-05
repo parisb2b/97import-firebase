@@ -1501,3 +1501,47 @@ const snap = await getDocs(query(collection(db, 'products'), where('actif', '=='
 - 9/10 points déjà en place par les missions V91→V102
 - 1 ajout : `isAcompteEncaisseProtected` dans firestore.rules
 - Build ✅ OK (456 modules, 16.39s)
+
+---
+
+🗓️ Date : 06/05/2026 19:35 CEST | 🎯 Mission : V102-CORRECTION JOURNAL
+
+### Point V102 — Correction affichage catalogue front
+
+📄 Fichier : src/front/pages/Catalogue.tsx
+
+❌ AVANT :
+```tsx
+import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
+...
+const snap = await getDocs(collection(db, 'products'));
+```
+
+✅ APRÈS :
+```tsx
+import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
+...
+const snap = await getDocs(query(collection(db, 'products'), where('actif', '==', true)));
+```
+
+### Point 0 — Badge version temps réel
+
+📄 Fichier : src/lib/version.ts
+
+❌ AVANT : (ancienne fonction sans heure)
+✅ APRÈS :
+```ts
+export const getBuildInfo = () => {
+  const date = new Date();
+  const formattedDate = date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  const formattedTime = date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+  return `v0.43.10 · ${formattedDate} ${formattedTime} · ${import.meta.env.VITE_GIT_HASH || 'local'}`;
+};
+```
+
+---
+
+**Résumé V102 :**
+- Ajout du filtre `where('actif', '==', true)` dans le front
+- Badge version mis à jour avec heure réelle
+- Build OK - v0.43.10 · 06/05/2026 19:35
