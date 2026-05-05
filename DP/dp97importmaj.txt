@@ -1545,3 +1545,25 @@ export const getBuildInfo = () => {
 - Ajout du filtre `where('actif', '==', true)` dans le front
 - Badge version mis à jour avec heure réelle
 - Build OK - v0.43.10 · 06/05/2026 19:35
+
+---
+
+## 🔴 MISSION V106 — RESET COMPLET DES DOCUMENTS (06/05/2026 21:50 CEST)
+
+### Action réalisée
+- Script `scripts/cleanup-v106.cjs` créé et exécuté
+- **18 compteurs** remis à zéro (DVS, FA, NC, SAV, FF, FL, FM, BL, CTN, LA, facture_*, note_commission_*)
+- **9 devis** supprimés (DVS-2605001 → DVS-2605009) avec leurs acomptes
+- **2 commissions** supprimées (NC-2605-003, NC-2605-004)
+- **0 factures**, **0 notes_commission**, **0 commandes/bons_commande** à supprimer
+
+### Conservé
+- ✅ 127 produits (products)
+- ✅ 9 utilisateurs (users)
+- ✅ 6 clients (clients)
+- ✅ 2 partenaires (partners)
+- ✅ 4 admin_params, 3 tarifs_logistiques, 5 categories, 11 ports
+
+### Résultat
+- Base de données propre, prête pour les nouveaux modèles PDF V2
+- Build ✅ OK (456 modules, 17.12s)
