@@ -1398,3 +1398,42 @@ La V99 utilisait `d.createdAt?.toDate?.()` qui échoue si le Timestamp Firestore
 
 ### Résultat
 - Build ✅ OK (456 modules, 16.54s)
+
+---
+
+## 🔴 MISSION V101 — RESTAURATION CATALOGUE + IMPORT EXCEL (06/05/2026 19:14 CEST)
+
+### Diagnostic
+Catalogue affichait « 0 produits disponibles » car la collection `products` Firestore était vide après les nettoyages V83/V84. Le front chargeait correctement mais n'avait rien à afficher.
+
+### 📄 src/admin/pages/CatalogueProduits.tsx — Import Excel
+
+❌ AVANT : Seulement export Excel. Aucun moyen d'importer en masse.
+
+✅ APRÈS :
+- Import `addDoc`, `serverTimestamp` depuis firebase/firestore
+- Import `useRef` depuis React
+- Fonction `handleImportExcel` : parse XLSX → `addDoc(collection(db, 'products'), ...)` pour chaque ligne
+- Bouton « 📥 Import Excel » dans la barre de filtres
+- Input file caché avec `useRef`
+- Alert avec nombre de produits importés
+- Gestion erreur avec message
+
+Colonnes reconnues : Réf. interne, Nom FR, Nom ZH, Catégorie, Prix achat (¥), Prix public, Actif
+
+### 📄 src/lib/version.ts — Badge version
+
+✅ APRÈS : Nouvelle fonction `getBuildInfo()` exportée :
+```ts
+export const getBuildInfo = () => {
+  const date = new Date();
+  const formattedDate = date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  const formattedTime = date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+  return `v${APP_VERSION} · ${formattedDate} ${formattedTime} · ${COMMIT_HASH}`;
+};
+```
+
+### Résultat
+- Build ✅ OK (456 modules, 6.57s)
+- Import Excel fonctionnel : `/admin/produits` → bouton 📥 Import Excel
+- Badge version temps réel disponible via `getBuildInfo()`

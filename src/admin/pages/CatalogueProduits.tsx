@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { collection, query, orderBy, getDocs } from 'firebase/firestore';
+import { useState, useEffect, useRef } from 'react';
+import { collection, query, orderBy, getDocs, addDoc, serverTimestamp } from 'firebase/firestore';
 import { Link, useLocation } from 'wouter';
 import { adminDb as db } from '../../lib/firebase';
 import { scoreCompletude } from '../../components/OrangeIndicator';
@@ -43,9 +43,47 @@ function CompletudeDisplay({ score }: { score: number }) {
 export default function CatalogueProduits() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [importing, setImporting] = useState(false);
   const [search, setSearch] = useState('');
   const [filterCat, setFilterCat] = useState<string>('');
   const [, setLocation] = useLocation();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImportExcel = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImporting(true);
+    try {
+      const XLSX = await import('xlsx');
+      const data = await file.arrayBuffer();
+      const workbook = XLSX.read(data, { type: 'array' });
+      const sheet = workbook.Sheets[workbook.SheetNames[0]];
+      const jsonData = XLSX.utils.sheet_to_json(sheet);
+      let imported = 0;
+      for (const row of jsonData as any[]) {
+        const produit = {
+          numero_interne: row['Réf. interne'] || row.ref || `AUTO-${Date.now()}`,
+          nom_fr: row['Nom FR'] || row.nom_fr || row.nom || 'Sans nom',
+          nom_chinois: row['Nom ZH'] || row.nom_zh || row.nom_chinois || '',
+          categorie: row['Catégorie'] || row.categorie || 'divers',
+          prix_achat_cny: Number(row['Prix achat (¥)'] || row.prix_achat_cny || row.prix_achat || 0),
+          prix_public_eur: Number(row.prix_public_eur || row.prix_vente || 0),
+          actif: row['Actif'] === 'Non' || row.actif === false ? false : true,
+          createdAt: serverTimestamp(),
+        };
+        await addDoc(collection(db, 'products'), produit);
+        imported++;
+      }
+      alert(`${imported} produits importés avec succès !`);
+      window.location.reload();
+    } catch (err: any) {
+      console.error('Erreur import Excel:', err);
+      alert(`Erreur import : ${err?.message || 'inconnue'}`);
+    } finally {
+      setImporting(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
 
   useEffect(() => {
     const load = async () => {
@@ -132,6 +170,20 @@ export default function CatalogueProduits() {
             XLSX.writeFile(wb, `catalogue_97import_${new Date().toISOString().slice(0, 10)}.xlsx`);
           }}
         />
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".xlsx,.xls,.csv"
+          onChange={handleImportExcel}
+          style={{ display: 'none' }}
+          id="import-excel-input"
+        />
+        <Button
+          variant="o"
+          onClick={() => fileInputRef.current?.click()}
+        >
+          {importing ? '⏳ Import...' : '📥 Import Excel'}
+        </Button>
         <Link href="/admin/produits/nouveau">
           <Button variant="p">➕ Ajouter produit</Button>
         </Link>

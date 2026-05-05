@@ -54,3 +54,21 @@ export function formatBuildInfo(): string {
 
 // Export pour compatibilité avec les usages existants (Footer.tsx).
 export const VERSION_LABEL = formatBuildInfo();
+
+/**
+ * Badge version mis à jour en temps réel (date/heure locale).
+ * Exemple : "v0.43.10 · 06/05/2026 18:45 · local"
+ */
+export const getBuildInfo = () => {
+  const date = new Date();
+  const formattedDate = date.toLocaleDateString('fr-FR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  });
+  const formattedTime = date.toLocaleTimeString('fr-FR', {
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+  return `v${APP_VERSION} · ${formattedDate} ${formattedTime} · ${COMMIT_HASH}`;
+};
