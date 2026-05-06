@@ -1693,3 +1693,8 @@ Modifs clés : Logo 17.2mm, Pill 31.5x10.8mm, radius 3.2/4.3/10mm, Émetteur 7 l
 📄 src/admin/pages/DetailDevis.tsx — Bouton Signature (statut=envoye) + Visibilité Encaisser (statut=signe)
 📄 src/lib/pdf-generator.ts — formatDateSafe Firestore-proof + mapLignesToItems VIP pricing + 5 wrappers rétrocompatibles
 📄 Auto-transition commande_ferme déjà en place dans PopupEncaisserAcompte
+----------------------------------------
+🗓️ 06/05/2026 22:00 CEST | 🎯 Mission V118 : Consolidation Finale — Tous les correctifs V116+V117 vérifiés conformes
+✅ formatDateSafe Firestore-proof | ✅ VIP pricing mapLignesToItems | ✅ Bouton Signature (envoye→signe)
+✅ Encaisser visible dès signe | ✅ Route /espace-client/:tab? | ✅ Auto-transition commande_ferme
+✅ 4 wrappers rétrocompatibles | ✅ Design V115 sanctuarisé | ✅ Build OK
