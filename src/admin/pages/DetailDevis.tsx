@@ -95,13 +95,14 @@ export default function DetailDevis() {
     }, 0);
   };
 
-  // V125 — VALIDATION VIP AVEC DÉCLENCHEMENT MAIL
+  // V128 — VALIDATION VIP AVEC DIAGNOSTIC MAIL
   const handleValidateVip = async () => {
     if (!devis.id) return;
 
     try {
       const docRef = doc(db, 'quotes', devis.id);
       const totalVIP = calculateTotal(devis.lignes);
+      console.log('📧 V128 — Début circuit VIP, total:', totalVIP, 'prix_negocies:', JSON.stringify(devis.prix_negocies));
 
       // 1. Mise à jour Firestore
       const updateData = {
@@ -113,34 +114,41 @@ export default function DetailDevis() {
       };
 
       await updateDoc(docRef, updateData);
-      console.log("✅ Firestore mis à jour — prix_negocies:", devis.prix_negocies);
+      console.log("✅ V128 — Firestore mis à jour, prix_negocies:", JSON.stringify(devis.prix_negocies));
 
-      // 2. DÉCLENCHEMENT DU MAIL (collection mail pour Trigger Email)
+      // 2. V128 — Envoi mail via collection mail (Trigger Email)
       try {
-        await addDoc(collection(db, 'mail'), {
+        const emailPayload = {
           to: devis.client_email || 'mc@sasfr.com',
           message: {
             subject: `Votre devis VIP ${devis.numero} est prêt`,
             html: `
               <h2>Devis VIP confirmé</h2>
+              <p>Bonjour <strong>${devis.client_nom || 'Client'}</strong>,</p>
               <p>Votre devis <strong>${devis.numero}</strong> a été mis à jour avec les prix négociés.</p>
-              <p>Montant total : <strong>${totalVIP.toLocaleString('fr-FR')} €</strong></p>
-              <p>Connectez-vous à votre espace client pour le consulter.</p>
+              <p><strong>Montant total : ${totalVIP.toLocaleString('fr-FR')} €</strong></p>
+              <p>Connectez-vous à votre espace client pour le consulter et le signer.</p>
+              <hr>
+              <p style="color: #6B7280; font-size: 12px;">97IMPORT — LUXENT LIMITED</p>
             `
           }
-        });
-        console.log("✅ Mail VIP ajouté à la collection mail pour", devis.client_email);
-      } catch (mailErr) {
-        console.warn("⚠️ Mail non envoyé (collection mail inaccessible):", mailErr);
+        };
+        const mailRef = await addDoc(collection(db, 'mail'), emailPayload);
+        console.log("✅ V128 — Mail écrit dans Firestore, docId:", mailRef.id);
+        console.log("   → Si l'extension Trigger Email est installée, le mail sera envoyé");
+        console.log("   → Vérifier: https://console.firebase.google.com/project/importok-6ef77/extensions");
+        setSuccessMsg('✅ Devis VIP validé et e-mail de confirmation envoyé !');
+      } catch (mailErr: any) {
+        console.warn("⚠️ V128 — Mail non écrit dans Firestore:", mailErr?.message || mailErr);
+        setSuccessMsg('⚠️ Devis VIP validé mais e-mail non envoyé. Voir logs console.');
       }
 
       // 3. Mise à jour locale
       setDevis({ ...devis, ...updateData });
-      setSuccessMsg('✅ Devis VIP validé et e-mail de confirmation envoyé !');
       setTimeout(() => setSuccessMsg(''), 5000);
 
     } catch (e) {
-      console.error("❌ Erreur circuit VIP:", e);
+      console.error("❌ V128 — Erreur circuit VIP:", e);
       setErrorMsg("Erreur lors de la validation VIP");
       setTimeout(() => setErrorMsg(''), 5000);
     }

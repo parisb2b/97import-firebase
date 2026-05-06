@@ -9,3 +9,4 @@ V123-bis | 06/05/2026 | Alignement strict specs user (mapLignesToItems simplifi�
 V123-ULTIMATE | 06/05/2026 | Réparation finale mapLignesToItems (!= undefined) + export + vérifié | ✅ RÉSOLU
 V125 | 06/05/2026 | Réparation circuit mail VIP + sync PDF (remplacement intégral) | ✅ RÉSOLU
 V126 | 07/05/2026 | Verrouillage mapLignesToItems (!= undefined) + sync totale UI/Mail/PDF | ✅ RÉSOLU
+V128 | 07/05/2026 | Diagnostic et réparation envoi mail VIP (logs V128 + collection mail vérifiée) | ✅ RÉSOLU

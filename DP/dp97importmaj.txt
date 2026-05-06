@@ -1731,3 +1731,8 @@ V118-ULTIMATE | 06/05 | Injection Force Majeure (Date/Sign/Paiement) | ✅ RÉSO
 📄 pdf-generator.ts — Remplacement intégral : mapLignesToItems prix_negocies[ref] !== undefined (priorité map > ligne)
 📄 formatDateSafe : 4 formats (toDate/seconds/_seconds/Date) + drawFooter conservé
 📄 5 wrappers rétrocompatibles : generateDevis, downloadPDF, generateFactureFinale, generateNoteCommission, generateFactureLogistique
+----------------------------------------
+🗓️ 07/05/2026 00:25 | 🎯 Mission V128 : Diagnostic et réparation envoi mail VIP
+📄 DetailDevis.tsx — handleValidateVip V128 : logs enrichis + payload complet (client_nom, signature)
+📄 emailService.ts — Conservé (1058 lignes, 6 consommateurs). Collection mail : 5 docs existants
+📄 Diagnostic : Trigger Email non installé dans firebase.json. Les mails sont écrits dans Firestore
