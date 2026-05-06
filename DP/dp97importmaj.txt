@@ -1683,3 +1683,8 @@ Nouveau code V3 (417 lignes) — Refonte intégrale avec :
 🗓️ 06/05/2026 19:45 CEST | 🎯 Mission V115 : Conformité 100% avec TOUTPDF.HTML
 📄 src/lib/pdf-generator.ts — Remplacement intégral (alignement millimétré HTML)
 Modifs clés : Logo 17.2mm, Pill 31.5x10.8mm, radius 3.2/4.3/10mm, Émetteur 7 lignes, RIB 7 lignes, euro() arithmétique pure, drawTotals simplifié, PAID stamp inline
+----------------------------------------
+🗓️ 06/05/2026 21:10 CEST | 🎯 Mission V116 : Restauration prix partenaire + Fix lien Adresses
+📄 src/lib/pdf-generator.ts — mapLignesToItems restauré avec logique prixNegocies (VIP)
+📄 src/front/FrontApp.tsx — Route /espace-client/:tab? pour navigation directe aux onglets
+📄 src/front/pages/EspaceClient.tsx — Lecture paramètre tab depuis URL (useRoute)

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useLocation, Redirect } from 'wouter';
+import { useLocation, Redirect, useRoute } from 'wouter';
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { clientAuth, db } from '../../lib/firebase';
@@ -21,6 +21,15 @@ export default function EspaceClient() {
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [, navigate] = useLocation();
+  const [, params] = useRoute('/espace-client/:tab?');
+
+  // Si un onglet est spécifié dans l'URL, l'activer
+  const tabFromUrl = params?.tab;
+  useEffect(() => {
+    if (tabFromUrl && ['devis','commandes','virements','factures','suivi','achats','infos','adresses','sav'].includes(tabFromUrl)) {
+      setActiveTab(tabFromUrl);
+    }
+  }, [tabFromUrl]);
 
   useEffect(() => {
     const unsub = onAuthStateChanged(clientAuth, async (u) => {

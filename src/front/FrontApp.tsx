@@ -40,7 +40,7 @@ export default function FrontApp() {
           <Route path="/mon-compte/:tab?">{() => <Redirect to="/espace-client" />}</Route>
           <Route path="/services" component={Services} />
           <Route path="/contact" component={Contact} />
-          <Route path="/espace-client" component={EspaceClient} />
+          <Route path="/espace-client/:tab?" component={EspaceClient} />
           <Route path="/espace-partenaire" component={EspacePartenaire} />
           <Route path="/signature/:token" component={SignatureDevis} />
           <Route path="/profil" component={Profil} />
