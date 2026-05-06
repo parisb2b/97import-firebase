@@ -1688,3 +1688,8 @@ Modifs clés : Logo 17.2mm, Pill 31.5x10.8mm, radius 3.2/4.3/10mm, Émetteur 7 l
 📄 src/lib/pdf-generator.ts — mapLignesToItems restauré avec logique prixNegocies (VIP)
 📄 src/front/FrontApp.tsx — Route /espace-client/:tab? pour navigation directe aux onglets
 📄 src/front/pages/EspaceClient.tsx — Lecture paramètre tab depuis URL (useRoute)
+----------------------------------------
+🗓️ 06/05/2026 21:45 CEST | 🎯 Mission V117 : Restauration Logique V116 + Design Sanctuarisé + Flux Signature/Paiement
+📄 src/admin/pages/DetailDevis.tsx — Bouton Signature (statut=envoye) + Visibilité Encaisser (statut=signe)
+📄 src/lib/pdf-generator.ts — formatDateSafe Firestore-proof + mapLignesToItems VIP pricing + 5 wrappers rétrocompatibles
+📄 Auto-transition commande_ferme déjà en place dans PopupEncaisserAcompte

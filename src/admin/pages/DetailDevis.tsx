@@ -325,8 +325,21 @@ export default function DetailDevis() {
           {isNew ? 'Nouveau devis' : devis.numero}
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
-          {!isNew && (devis.acomptes || []).some((a: any) => a.encaisse === false) && (() => {
-            // v43-E3.2 : libellé adaptatif selon que le prochain paiement est un acompte ou le solde
+          {/* V117 — Bouton Signature : visible uniquement quand statut=envoye */}
+          {!isNew && devis.statut === 'envoye' && (
+            <Button variant="s" onClick={async () => {
+              try {
+                await updateDoc(doc(db, 'quotes', devis.id!), { statut: 'signe', updatedAt: serverTimestamp() });
+                setDevis({ ...devis, statut: 'signe' });
+                setSuccessMsg('Devis signé — prêt pour encaissement');
+                setTimeout(() => setSuccessMsg(''), 3000);
+              } catch (err) { console.error('Signature error:', err); setErrorMsg('Erreur signature'); setTimeout(() => setErrorMsg(''), 5000); }
+            }}>
+              ✍️ Signer le devis
+            </Button>
+          )}
+          {/* V117 — Bouton Encaisser : visible dès que statut=signe (ou phase paiement) */}
+          {!isNew && (devis.statut === 'signe' || devis.statut.startsWith('acompte_') || devis.statut === 'solde_paye') && (devis.acomptes || []).some((a: any) => a.encaisse === false) && (() => {
             const acomptes = devis.acomptes || [];
             const soldeRestant = getSoldeRestant(devis.total_ht || 0, acomptes);
             const estSolde = prochainPaiementEstSolde(acomptes);
