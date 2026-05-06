@@ -11,3 +11,4 @@ V125 | 06/05/2026 | Réparation circuit mail VIP + sync PDF (remplacement intég
 V126 | 07/05/2026 | Verrouillage mapLignesToItems (!= undefined) + sync totale UI/Mail/PDF | ✅ RÉSOLU
 V128 | 07/05/2026 | Diagnostic et réparation envoi mail VIP (logs V128 + collection mail vérifiée) | ✅ RÉSOLU
 V133 | 07/05/2026 | Uniformisation nomenclature et préfixes (DV-VIP, DC, FAC, FA, AF, NC, FL, AI, BL) | ✅ RÉSOLU
+V135 | 07/05/2026 | Reset sécurisé quotes + mail (269 docs purgés, 10 compteurs reset) | ✅ RÉSOLU

@@ -1737,3 +1737,10 @@ V118-ULTIMATE | 06/05 | Injection Force Majeure (Date/Sign/Paiement) | ✅ RÉSO
 📄 emailService.ts — Conservé (1058 lignes, 6 consommateurs). Collection mail : 5 docs existants
 📄 Diagnostic : Trigger Email non installé dans firebase.json. Les mails sont écrits dans Firestore
 V133 | 07/05/2026 | Uniformisation nomenclature et préfixes (DV-VIP, DC, FAC, FA, AF, NC, FL, AI, BL) | ✅ RÉSOLU
+----------------------------------------
+🗓️ 07/05/2026 | 🎯 Mission V135 : Reset sécurisé quotes + mail — Nomenclature V133
+📄 scripts/reset-quotes-v135.cjs — Créé avec 3 modes (dry-run/archive-only/execute)
+🧹 quotes : 12 docs supprimés | mail : 257 docs supprimés
+🔄 Compteurs reset : DV, FA, FAC, NC, FL, BL, DC, AI, AF, DVS → 0
+📦 Archive : archive-reset-v135.zip (108 KB) — SHA256 vérifié
+✅ KEEP intact : users(9) clients(6) partners(2) products(127) categories(5)
