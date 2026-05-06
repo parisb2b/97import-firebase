@@ -1,657 +1,462 @@
 import { useState, useEffect } from 'react';
-import { useRoute, useLocation } from 'wouter';
-import {
-  doc,
-  getDoc,
-  setDoc,
-  updateDoc,
-  serverTimestamp,
-} from 'firebase/firestore';
-import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { adminDb as db, adminStorage as storage } from '../../lib/firebase';
+import { useLocation, useRoute } from 'wouter';
+import { doc, getDoc, updateDoc, addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { adminDb as db } from '../../lib/firebase';
 import { useI18n } from '../../i18n';
 import { getNextNumber } from '../../lib/counters';
 import { isDevisReadonly } from '../../lib/quoteStatusHelpers';
-import { OrangeIndicator } from '../../components/OrangeIndicator';
 import { generateDevis, downloadPDF } from '../../lib/pdf-generator';
 import { Card, Button } from '../components/Icons';
 import PopupEncaisserAcompte from '../components/PopupEncaisserAcompte';
-import ModalDupliquerDevis from '../components/ModalDupliquerDevis';
-
-interface LigneDevis {
-  id?: string;
-  ref: string;
-  nom_fr: string;
-  qte: number;
-  prix_unitaire: number;
-  prix_negocie?: number;
-  total: number;
-  type?: 'product' | 'custom';
-  description?: string;
-  lien?: string;
-  photoUrl?: string;
-}
-
-interface Devis {
-  id?: string;
-  numero: string;
-  client_id: string;
-  client_nom: string;
-  client_email: string;
-  client_tel: string;
-  client_adresse: string;
-  client_siret: string;
-  partenaire_id: string | null;
-  partenaire_code?: string | null;
-  statut: string;
-  lignes: LigneDevis[];
-  total_ht: number;
-  acompte_pct: number;
-  acomptes: any[];
-  total_encaisse: number;
-  solde_restant: number;
-  destination: string;
-  is_vip?: boolean;
-  prix_negocies?: Record<string, number>;
-}
-
-const emptyDevis: Devis = {
-  numero: '',
-  client_id: '',
-  client_nom: '',
-  client_email: '',
-  client_tel: '',
-  client_adresse: '',
-  client_siret: '',
-  partenaire_id: null,
-  statut: 'brouillon',
-  lignes: [],
-  total_ht: 0,
-  acompte_pct: 30,
-  acomptes: [],
-  total_encaisse: 0,
-  solde_restant: 0,
-  destination: 'MQ',
-};
 
 export default function DetailDevis() {
-  const { t } = useI18n();
   const [, params] = useRoute('/admin/devis/:id');
   const [, setLocation] = useLocation();
-  const [devis, setDevis] = useState<Devis>(emptyDevis);
+  const { t } = useI18n();
+  const isNew = !params?.id || params.id === 'nouveau';
+
+  const [devis, setDevis] = useState<any>({
+    numero: '',
+    client_id: '',
+    client_nom: '',
+    client_email: '',
+    partenaire_code: '',
+    destination: 'MQ',
+    statut: 'nouveau',
+    is_vip: false,
+    prix_negocies: {},
+    lignes: [],
+    acomptes: [],
+    total_ht: 0,
+    adresse_facturation: null,
+    adresse_livraison: null
+  });
+
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
-  const [successMsg, setSuccessMsg] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
-  const [emetteurData, setEmetteurData] = useState<any>(null);
+  const [successMsg, setSuccessMsg] = useState('');
   const [showEncaisserModal, setShowEncaisserModal] = useState(false);
-  const [modalDupliquerOpen, setModalDupliquerOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState('details');
 
-  const isNew = params?.id === 'nouveau';
-
-  // V69 — utilise isDevisReadonly() centralisé (aligné avec firestore.rules)
   const estLectureSeule = isDevisReadonly(devis);
 
-  // V84 — Formatage robuste date acompte (Timestamp Firestore ou string ISO)
-  const formatDateAcompte = (val: any): string => {
-    if (!val) return '—';
-    try {
-      if (val?.toDate) return val.toDate().toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-      if (typeof val.seconds === 'number') return new Date(val.seconds * 1000).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-      if (typeof val._seconds === 'number') return new Date(val._seconds * 1000).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-      const d = new Date(val);
-      if (isNaN(d.getTime())) return '—';
-      return d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-    } catch { return '—'; }
-  };
-
   useEffect(() => {
-    const fetchEmetteur = async () => {
+    if (isNew) {
+      setLoading(false);
+      return;
+    }
+    async function load() {
       try {
-        const snap = await getDoc(doc(db, 'admin_params', 'emetteur'));
-        if (snap.exists()) setEmetteurData(snap.data());
+        const snap = await getDoc(doc(db, 'quotes', params?.id || ''));
+        if (snap.exists()) {
+          const data = snap.data();
+          setDevis({
+            ...data,
+            id: snap.id,
+            lignes: data.lignes || [],
+            acomptes: data.acomptes || [],
+            prix_negocies: data.prix_negocies || {},
+            is_vip: data.is_vip || false
+          });
+        }
       } catch (e) {
-        console.error('Erreur chargement émetteur:', e);
-      }
-    };
-    fetchEmetteur();
-  }, []);
-
-  useEffect(() => {
-    const load = async () => {
-      try {
-        if (isNew) {
-          const numero = await getNextNumber('DV');
-          setDevis({ ...emptyDevis, numero });
-          setLoading(false);
-          return;
-        }
-
-        if (params?.id) {
-          const docRef = doc(db, 'quotes', params.id);
-          const snap = await getDoc(docRef);
-          if (snap.exists()) {
-            const data = snap.data();
-
-            // Pré-remplir depuis le devis
-            let clientNom = data.client_nom || '';
-            let clientEmail = data.client_email || '';
-            let clientTel = data.client_tel || data.telephone || '';
-            let clientAdresse = data.client_adresse || data.adresse || '';
-            let clientSiret = data.client_siret || data.siret || '';
-            let destination = data.destination || 'MQ';
-
-            // Si des champs sont vides, charger depuis users/{client_id}
-            if (data.client_id && (!clientNom || !clientTel || !clientAdresse)) {
-              try {
-                const userSnap = await getDoc(doc(db, 'users', data.client_id));
-                if (userSnap.exists()) {
-                  const u = userSnap.data();
-                  clientNom = clientNom || `${u.firstName || u.prenom || ''} ${u.lastName || u.nom || ''}`.trim();
-                  clientEmail = clientEmail || u.email || '';
-                  clientTel = clientTel || u.phone || u.telephone || '';
-                  clientAdresse = clientAdresse || [u.adresse, u.codePostal, u.ville, u.pays].filter(Boolean).join(', ');
-                  clientSiret = clientSiret || u.siret || '';
-                  destination = destination || u.pays || 'MQ';
-                }
-              } catch (e) {
-                console.error('Erreur chargement profil client:', e);
-              }
-            }
-
-            setDevis({
-              id: snap.id,
-              numero: data.numero || snap.id,
-              client_id: data.client_id || '',
-              client_nom: clientNom,
-              client_email: clientEmail,
-              client_tel: clientTel,
-              client_adresse: clientAdresse,
-              client_siret: clientSiret,
-              partenaire_id: data.partenaire_id || null,
-              partenaire_code: data.partenaire_code || null,
-              is_vip: data.is_vip || false,
-              prix_negocies: data.prix_negocies || {},
-              statut: data.statut || 'brouillon',
-              lignes: data.lignes || [],
-              total_ht: data.total_ht || 0,
-              acompte_pct: data.acompte_pct || 30,
-              acomptes: data.acomptes || [],
-              total_encaisse: data.total_encaisse || 0,
-              solde_restant: data.solde_restant || 0,
-              destination,
-            });
-          } else {
-            setError(`Devis ${params.id} introuvable`);
-          }
-        }
-      } catch (err: any) {
-        console.error('Erreur chargement devis:', err);
-        setError(err.message || 'Erreur de chargement');
+        console.error('Erreur chargement devis:', e);
+        setErrorMsg('Impossible de charger le devis');
       } finally {
         setLoading(false);
       }
-    };
-    load();
-  }, [params?.id, isNew]);
-
-  const calculateTotal = (lignes: LigneDevis[]) => {
-    return lignes.reduce((sum, l) => sum + l.total, 0);
-  };
-
-  const handleSave = async () => {
-    if (!devis.client_nom) { setErrorMsg('Nom du client obligatoire'); setTimeout(() => setErrorMsg(''), 5000); return; }
-    if (!devis.lignes || devis.lignes.length === 0) { setErrorMsg('Au moins une ligne obligatoire'); setTimeout(() => setErrorMsg(''), 5000); return; }
-    setSaving(true);
-    try {
-      const total_ht = calculateTotal(devis.lignes);
-      console.log("🔍 handleSave — prix_negocies:", JSON.stringify(devis.prix_negocies), "is_vip:", devis.is_vip);
-      const data = {
-        ...devis,
-        total_ht,
-        solde_restant: total_ht - devis.total_encaisse,
-        // Persister les infos client dans le devis pour les prochaines ouvertures
-        client_nom: devis.client_nom,
-        client_email: devis.client_email,
-        client_tel: devis.client_tel,
-        client_adresse: devis.client_adresse,
-        client_siret: devis.client_siret,
-        updatedAt: serverTimestamp(),
-      };
-
-      if (isNew || !devis.id) {
-        const newId = devis.numero.replace(/[^a-zA-Z0-9]/g, '-');
-        await setDoc(doc(db, 'quotes', newId), {
-          ...data,
-          createdAt: serverTimestamp(),
-        });
-        setLocation(`/admin/devis/${newId}`);
-      } else {
-        await updateDoc(doc(db, 'quotes', devis.id), data);
-      }
-      setSuccessMsg('Devis sauvegardé'); setTimeout(() => setSuccessMsg(''), 3000);
-    } catch (err) {
-      console.error('Error saving:', err);
-      setErrorMsg('Erreur sauvegarde'); setTimeout(() => setErrorMsg(''), 5000);
-    } finally {
-      setSaving(false);
     }
+    load();
+  }, [isNew, params?.id]);
+
+  const handleLigneChange = (index: number, field: string, value: any) => {
+    const updated = [...devis.lignes];
+    updated[index] = { ...updated[index], [field]: value };
+    setDevis({ ...devis, lignes: updated });
   };
 
   const handleAddLigne = () => {
     setDevis({
       ...devis,
-      lignes: [
-        ...devis.lignes,
-        { ref: '', nom_fr: '', qte: 1, prix_unitaire: 0, total: 0 },
-      ],
+      lignes: [...devis.lignes, { ref: '', qte: 1, nom_fr: '', prix_unitaire: 0, prix_negocie: 0 }]
     });
-  };
-
-  const handleLigneChange = (
-    index: number,
-    field: keyof LigneDevis,
-    value: string | number
-  ) => {
-    const newLignes = [...devis.lignes];
-    newLignes[index] = { ...newLignes[index], [field]: value };
-    if (field === 'qte' || field === 'prix_unitaire') {
-      newLignes[index].total =
-        newLignes[index].qte * newLignes[index].prix_unitaire;
-    }
-    setDevis({ ...devis, lignes: newLignes });
   };
 
   const handleRemoveLigne = (index: number) => {
-    setDevis({
+    const updated = devis.lignes.filter((_: any, i: number) => i !== index);
+    setDevis({ ...devis, lignes: updated });
+  };
+
+  const calculateTotal = (lignes: any[]) => {
+    return lignes.reduce((sum: number, l: any) => {
+      const prix = devis.prix_negocies?.[l.ref] || l.prix_unitaire || 0;
+      return sum + prix * (l.qte || 1);
+    }, 0);
+  };
+
+  // V125 — VALIDATION VIP AVEC DÉCLENCHEMENT MAIL
+  const handleValidateVip = async () => {
+    if (!devis.id) return;
+
+    try {
+      const docRef = doc(db, 'quotes', devis.id);
+      const totalVIP = calculateTotal(devis.lignes);
+
+      // 1. Mise à jour Firestore
+      const updateData = {
+        statut: 'envoye',
+        is_vip: true,
+        prix_negocies: devis.prix_negocies,
+        total_ht: totalVIP,
+        updatedAt: serverTimestamp()
+      };
+
+      await updateDoc(docRef, updateData);
+      console.log("✅ Firestore mis à jour — prix_negocies:", devis.prix_negocies);
+
+      // 2. DÉCLENCHEMENT DU MAIL (collection mail pour Trigger Email)
+      try {
+        await addDoc(collection(db, 'mail'), {
+          to: devis.client_email || 'mc@sasfr.com',
+          message: {
+            subject: `Votre devis VIP ${devis.numero} est prêt`,
+            html: `
+              <h2>Devis VIP confirmé</h2>
+              <p>Votre devis <strong>${devis.numero}</strong> a été mis à jour avec les prix négociés.</p>
+              <p>Montant total : <strong>${totalVIP.toLocaleString('fr-FR')} €</strong></p>
+              <p>Connectez-vous à votre espace client pour le consulter.</p>
+            `
+          }
+        });
+        console.log("✅ Mail VIP ajouté à la collection mail pour", devis.client_email);
+      } catch (mailErr) {
+        console.warn("⚠️ Mail non envoyé (collection mail inaccessible):", mailErr);
+      }
+
+      // 3. Mise à jour locale
+      setDevis({ ...devis, ...updateData });
+      setSuccessMsg('✅ Devis VIP validé et e-mail de confirmation envoyé !');
+      setTimeout(() => setSuccessMsg(''), 5000);
+
+    } catch (e) {
+      console.error("❌ Erreur circuit VIP:", e);
+      setErrorMsg("Erreur lors de la validation VIP");
+      setTimeout(() => setErrorMsg(''), 5000);
+    }
+  };
+
+  const handleSave = async () => {
+    if (!devis.id && !isNew) return;
+    setSaving(true);
+    try {
+      const total_ht = calculateTotal(devis.lignes);
+      console.log("🔍 handleSave — prix_negocies:", JSON.stringify(devis.prix_negocies), "is_vip:", devis.is_vip);
+
+      const data = {
+        ...devis,
+        total_ht,
+        updatedAt: serverTimestamp()
+      };
+
+      if (isNew) {
+        const numero = await getNextNumber('DV');
+        const docRef = doc(collection(db, 'quotes'));
+        await updateDoc(docRef, { ...data, numero, createdAt: serverTimestamp() });
+        setDevis({ ...data, numero, id: docRef.id });
+        setLocation(`/admin/devis/${docRef.id}`);
+      } else {
+        const docRef = doc(db, 'quotes', devis.id);
+        await updateDoc(docRef, data);
+      }
+      setSuccessMsg('Devis enregistré');
+      setTimeout(() => setSuccessMsg(''), 3000);
+    } catch (e) {
+      console.error('Erreur sauvegarde:', e);
+      setErrorMsg('Erreur lors de la sauvegarde');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // V118 — Bouton Signer le devis
+  const handleSigner = async () => {
+    if (!devis.id) return;
+    try {
+      const docRef = doc(db, 'quotes', devis.id);
+      await updateDoc(docRef, { statut: 'signe', updatedAt: serverTimestamp() });
+      setDevis({ ...devis, statut: 'signe' });
+      setSuccessMsg('Devis marqué comme SIGNÉ — Prêt pour encaissement');
+      setTimeout(() => setSuccessMsg(''), 3000);
+    } catch (e) {
+      console.error('Erreur signature:', e);
+      setErrorMsg('Erreur signature');
+      setTimeout(() => setErrorMsg(''), 5000);
+    }
+  };
+
+  const handleGeneratePDF = () => {
+    const doc = generateDevis({
       ...devis,
-      lignes: devis.lignes.filter((_, i) => i !== index),
+      numero: devis.numero,
+      lignes: devis.lignes,
+      prix_negocies: devis.prix_negocies,
+      is_vip: devis.is_vip,
+      total_ht: calculateTotal(devis.lignes),
+      createdAt: devis.createdAt || new Date()
     });
+    const filename = `${devis.numero || 'devis'}.pdf`;
+    downloadPDF(doc, filename);
   };
 
   if (loading) {
     return <div style={{ textAlign: 'center', padding: 32 }}>Chargement...</div>;
   }
 
-  if (error) {
-    return (
-      <div style={{ padding: 24 }}>
-        <div className="alert rd">
-          <strong>Erreur</strong> — {error}
-          <br />
-          <a href="/admin/devis" style={{ color: 'var(--bl)', marginTop: 8, display: 'inline-block' }}>
-            Retour à la liste des devis
-          </a>
-        </div>
-      </div>
-    );
-  }
-
   // V122 — Debug live : inspecter l'état du devis dans la console navigateur
-  console.log("🔍 V122 DEVIS ACTUEL:", { id: devis.id, numero: devis.numero, statut: devis.statut, isNew, acomptes: devis.acomptes?.length || 0, estLectureSeule });
+  console.log("🔍 V122/V125 DEVIS ACTUEL:", { id: devis.id, numero: devis.numero, statut: devis.statut, isNew, is_vip: devis.is_vip, prix_negocies: devis.prix_negocies, acomptes: devis.acomptes?.length || 0, estLectureSeule });
 
   return (
-    <>
-      {successMsg && <div className="card" style={{ background: '#DCFCE7', color: '#166534', padding: '12px 20px', marginBottom: 16, borderLeft: '4px solid #22C55E' }}>✅ {successMsg}</div>}
-      {errorMsg && <div className="card" style={{ background: '#FEE2E2', color: '#991B1B', padding: '12px 20px', marginBottom: 16, borderLeft: '4px solid #EF4444' }}>❌ {errorMsg}</div>}
-      {estLectureSeule && (
-        <div style={{
-          background: '#FEF3C7',
-          border: '1px solid #F59E0B',
-          borderRadius: 8,
-          padding: '14px 16px',
-          marginBottom: 20,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 12,
-        }}>
-          <span style={{ fontSize: 22 }}>🔒</span>
-          <div>
-            <div style={{ fontSize: 14, fontWeight: 700, color: '#92400E' }}>
-              Devis en lecture seule (commande en cours)
-            </div>
-            <div style={{ fontSize: 12, color: '#78350F', marginTop: 2 }}>
-              Pour créer un devis similaire, utilisez le bouton "📋 Dupliquer" ci-dessous.
-            </div>
-          </div>
+    <div style={{ padding: 20, maxWidth: 1200, margin: '0 auto' }}>
+      {/* Messages */}
+      {errorMsg && (
+        <div style={{ background: '#FEE2E2', color: '#991B1B', padding: 12, borderRadius: 8, marginBottom: 16 }}>
+          {errorMsg}
         </div>
       )}
-      {/* Header */}
-      <div className="filters" style={{ justifyContent: 'space-between' }}>
-        <div className="ct" style={{ fontSize: 18 }}>
-          {isNew ? 'Nouveau devis' : devis.numero}
+      {successMsg && (
+        <div style={{ background: '#D1FAE5', color: '#065F46', padding: 12, borderRadius: 8, marginBottom: 16 }}>
+          {successMsg}
+        </div>
+      )}
+
+      {/* En-tête */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+        <div>
+          <h1 style={{ fontSize: 24, fontWeight: 800, color: '#1E88E5' }}>
+            {isNew ? 'Nouveau devis' : devis.numero}
+          </h1>
+          {devis.is_vip && (
+            <span style={{ background: '#A78BFA', color: '#fff', padding: '4px 12px', borderRadius: 12, fontSize: 12, fontWeight: 600 }}>
+              ⭐ VIP
+            </span>
+          )}
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
-          {/* V122 FORCE SIGNATURE : Si envoyé, sans condition isNew */}
-          {devis.statut === 'envoye' && (
-            <Button variant="s" onClick={async () => {
-              const docRef = doc(db, 'quotes', devis.id!);
-              await updateDoc(docRef, { statut: 'signe', updatedAt: serverTimestamp() });
-              setDevis({ ...devis, statut: 'signe' });
-              alert("Succès : Devis passé au statut SIGNÉ");
-            }}>
+          {/* V118 — Bouton Signer : visible uniquement quand statut=envoye */}
+          {!isNew && devis.statut === 'envoye' && (
+            <Button variant="s" onClick={handleSigner}>
               ✍️ Signer le devis
             </Button>
           )}
 
-          {/* V122 FORCE ENCAISSEMENT : Si signé ou acompte_*, sans condition isNew */}
-          {(devis.statut === 'signe' || devis.statut.startsWith('acompte_')) && (
-            <Button variant="s" onClick={() => {
-              setShowEncaisserModal(true);
-            }}>
+          {/* V118 — Bouton Encaisser : visible dès que signe */}
+          {!isNew && (devis.statut === 'signe' || devis.statut?.startsWith('acompte_')) && (
+            <Button variant="s" onClick={() => setShowEncaisserModal(true)}>
               💰 Encaisser un acompte
             </Button>
           )}
+
+          {/* V125 — Bouton Valider VIP avec déclenchement mail */}
+          {!isNew && devis.is_vip && devis.statut !== 'envoye' && (
+            <Button variant="s" onClick={handleValidateVip} style={{ background: '#A78BFA' }}>
+              📧 Envoyer prix VIP au client
+            </Button>
+          )}
+
           <Button variant="p" onClick={handleSave} disabled={saving || estLectureSeule}>
             {saving ? t('loading') : t('btn.enregistrer')}
           </Button>
-          {!isNew && (
-            <Button variant="t" onClick={() => setModalDupliquerOpen(true)}>
-              📋 Dupliquer
-            </Button>
-          )}
-          {!isNew && (
-            <Button variant="t" onClick={async () => {
-              try {
-                const pdfDoc = generateDevis(devis, emetteurData);
-                // Upload dans Storage si pas encore fait
-                if (!(devis as any).devis_url) {
-                  const pdfBlob = pdfDoc.output('blob');
-                  const fileRef = storageRef(storage, `devis/${devis.numero}.pdf`);
-                  await uploadBytes(fileRef, pdfBlob, { contentType: 'application/pdf' });
-                  const pdfUrl = await getDownloadURL(fileRef);
-                  await updateDoc(doc(db, 'quotes', devis.id!), { devis_url: pdfUrl, updatedAt: serverTimestamp() });
-                }
-                downloadPDF(pdfDoc, `${devis.numero}.pdf`);
-              } catch (err) { console.error('PDF error:', err); }
-            }}>
-              PDF
-            </Button>
-          )}
+          <Button variant="p" onClick={handleGeneratePDF}>
+            📄 Générer PDF
+          </Button>
+          <Button variant="p" onClick={() => setLocation('/admin/devis')}>
+            ← Retour
+          </Button>
         </div>
       </div>
 
-      {/* Client info */}
-      <Card title="Informations client">
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, padding: 16 }}>
-          <div className="fg">
-            <div className="fl">Nom <OrangeIndicator show={!devis.client_nom} /></div>
-            <input className="fi" type="text" value={devis.client_nom}
-              disabled={estLectureSeule}
-              onChange={(e) => setDevis({ ...devis, client_nom: e.target.value })} />
-          </div>
-          <div className="fg">
-            <div className="fl">Email <OrangeIndicator show={!devis.client_email} /></div>
-            <input className="fi" type="email" value={devis.client_email}
-              disabled={estLectureSeule}
-              onChange={(e) => setDevis({ ...devis, client_email: e.target.value })} />
-          </div>
-          <div className="fg">
-            <div className="fl">Téléphone</div>
-            <input className="fi" type="tel" value={devis.client_tel}
-              disabled={estLectureSeule}
-              onChange={(e) => setDevis({ ...devis, client_tel: e.target.value })} />
-          </div>
-          <div className="fg">
-            <div className="fl">SIRET</div>
-            <input className="fi" type="text" value={devis.client_siret}
-              disabled={estLectureSeule}
-              onChange={(e) => setDevis({ ...devis, client_siret: e.target.value })} />
-          </div>
-          <div className="fg" style={{ gridColumn: 'span 2' }}>
-            <div className="fl">Adresse</div>
-            <textarea className="fi" value={devis.client_adresse} rows={2}
-              disabled={estLectureSeule}
-              onChange={(e) => setDevis({ ...devis, client_adresse: e.target.value })} />
-          </div>
-          <div className="fg">
-            <div className="fl">Destination</div>
-            <select className="fsel" value={devis.destination}
-              disabled={estLectureSeule}
-              onChange={(e) => setDevis({ ...devis, destination: e.target.value })}>
-              <option value="MQ">Martinique</option>
-              <option value="GP">Guadeloupe</option>
-              <option value="RE">Réunion</option>
-              <option value="GF">Guyane</option>
-              <option value="FR">France métropolitaine</option>
-            </select>
-          </div>
-          <div className="fg">
-            <div className="fl">Statut</div>
-            <select className="fsel" value={devis.statut}
-              onChange={(e) => setDevis({ ...devis, statut: e.target.value })}>
-              <option value="brouillon">Brouillon</option>
-              <option value="nouveau">Nouveau</option>
-              <option value="envoye">Envoyé</option>
-              <option value="en_negociation_partenaire">Négociation partenaire</option>
-              <option value="devis_vip_envoye">Devis VIP envoyé</option>
-              <option value="signe">Signé</option>
-              <option value="acompte_1">Acompte 1</option>
-              <option value="acompte_2">Acompte 2</option>
-              <option value="acompte_3">Acompte 3</option>
-              <option value="solde_paye">Soldé</option>
-              <option value="commande_ferme">Commande ferme</option>
-              <option value="en_production">En production</option>
-              <option value="embarque_chine">Embarqué Chine</option>
-              <option value="arrive_port_domtom">Arrivé port</option>
-              <option value="livre">Livré</option>
-              <option value="termine">Terminé</option>
-              <option value="annule">Annulé</option>
-            </select>
-          </div>
-        </div>
-      </Card>
+      {/* Onglets */}
+      <div style={{ display: 'flex', gap: 8, marginBottom: 20, borderBottom: '1px solid #E2E8F0', paddingBottom: 12 }}>
+        {['details', 'adresses', 'acomptes'].map(tab => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            style={{
+              padding: '8px 20px',
+              border: 'none',
+              background: activeTab === tab ? '#1E88E5' : '#F1F5F9',
+              color: activeTab === tab ? '#fff' : '#64748B',
+              borderRadius: 8,
+              cursor: 'pointer',
+              fontWeight: 600,
+              fontSize: 13
+            }}
+          >
+            {tab === 'details' ? '📋 Détails' : tab === 'adresses' ? '📍 Adresses' : '💰 Acomptes'}
+          </button>
+        ))}
+      </div>
 
-      {/* Lignes */}
-      <Card title="Lignes du devis" actions={
-        <Button variant="o" onClick={handleAddLigne} disabled={estLectureSeule} style={{ fontSize: 12 }}>
-          + Ajouter une ligne
-        </Button>
-      }>
-        {devis.lignes.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: 24, color: 'var(--tx3)' }}>Aucune ligne</div>
-        ) : (
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>Réf</th>
-                <th>Désignation</th>
-                <th style={{ textAlign: 'right', width: 80 }}>Qté</th>
-                <th style={{ textAlign: 'right', width: 110 }}>PU HT</th>
-                <th style={{ textAlign: 'right', width: 110 }}>Total HT</th>
-                <th style={{ width: 40 }}></th>
-              </tr>
-            </thead>
-            <tbody>
-              {devis.lignes.map((ligne, index) => (
-                <tr key={index}>
-                  <td>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <input className="fi" type="text" value={ligne.ref}
-                        disabled={estLectureSeule}
-                        onChange={(e) => handleLigneChange(index, 'ref', e.target.value)} />
-                      {/* V88 — Lien admin pour produits PS-XXXX (catalogue) */}
-                      {(ligne.ref?.startsWith('PS-') || ligne.type === 'custom') && ligne.id && (
-                        <a href={`/admin/produits/${ligne.id}`} target="_blank" rel="noopener noreferrer"
-                          title="Ouvrir la fiche produit dans le catalogue"
-                          style={{ fontSize: 11, color: '#7C3AED', textDecoration: 'none', whiteSpace: 'nowrap' }}>
-                          📋
-                        </a>
-                      )}
-                    </div>
-                  </td>
-                  <td>
-                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
-                      {ligne.photoUrl && (
-                        <a href={ligne.photoUrl} target="_blank" rel="noopener noreferrer" style={{ flexShrink: 0 }}>
-                          <img src={ligne.photoUrl} alt="" style={{ width: 50, height: 50, borderRadius: 6, objectFit: 'cover', border: '1px solid #E5E7EB' }} />
-                        </a>
-                      )}
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <input className="fi" type="text" value={ligne.nom_fr}
-                          disabled={estLectureSeule}
-                          onChange={(e) => handleLigneChange(index, 'nom_fr', e.target.value)} />
-                        {(ligne.description || ligne.lien) && (
-                      <div style={{ marginTop: 4, padding: '6px 8px', background: '#FFF7ED', borderRadius: 6, border: '1px solid #FED7AA', fontSize: 11 }}>
-                        {ligne.photoUrl && (
-                          <a href={ligne.photoUrl} target="_blank" rel="noopener noreferrer" style={{ display: 'block', marginBottom: 6 }}>
-                            <img src={ligne.photoUrl} alt="Photo produit sur mesure" style={{ maxWidth: 120, maxHeight: 90, borderRadius: 4, border: '1px solid #FED7AA' }} />
-                          </a>
+      {/* Contenu onglet Détails */}
+      {activeTab === 'details' && (
+        <>
+          {/* Informations générales */}
+          <Card title="Informations générales">
+            <div style={{ padding: 20, display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
+              <div>
+                <label style={{ fontSize: 12, color: '#64748B', display: 'block', marginBottom: 4 }}>Client</label>
+                <input className="fi" value={devis.client_nom || ''} onChange={(e) => setDevis({ ...devis, client_nom: e.target.value })} disabled={estLectureSeule} />
+              </div>
+              <div>
+                <label style={{ fontSize: 12, color: '#64748B', display: 'block', marginBottom: 4 }}>Partenaire</label>
+                <input className="fi" value={devis.partenaire_code || ''} onChange={(e) => setDevis({ ...devis, partenaire_code: e.target.value })} disabled={estLectureSeule} />
+              </div>
+              <div>
+                <label style={{ fontSize: 12, color: '#64748B', display: 'block', marginBottom: 4 }}>Destination</label>
+                <select className="fi" value={devis.destination || 'MQ'} onChange={(e) => setDevis({ ...devis, destination: e.target.value })} disabled={estLectureSeule}>
+                  <option value="MQ">Martinique</option>
+                  <option value="GP">Guadeloupe</option>
+                  <option value="RE">Réunion</option>
+                  <option value="GF">Guyane</option>
+                  <option value="FR">France métropolitaine</option>
+                </select>
+              </div>
+            </div>
+          </Card>
+
+          {/* Lignes du devis */}
+          <Card title="Lignes du devis"
+            actions={!estLectureSeule ? (
+              <button onClick={handleAddLigne} style={{
+                padding: '8px 16px',
+                background: '#1E88E5',
+                color: '#fff',
+                border: 'none',
+                borderRadius: 8,
+                cursor: 'pointer',
+                fontWeight: 600
+              }}>
+                + Ajouter une ligne
+              </button>
+            ) : undefined}
+          >
+            <div style={{ padding: 20 }}>
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr style={{ background: '#F8FAFC', borderBottom: '2px solid #E2E8F0' }}>
+                    <th style={{ padding: 10, textAlign: 'left', fontSize: 12, color: '#64748B' }}>RÉF.</th>
+                    <th style={{ padding: 10, textAlign: 'center', fontSize: 12, color: '#64748B' }}>QT</th>
+                    <th style={{ padding: 10, textAlign: 'left', fontSize: 12, color: '#64748B' }}>DÉSIGNATION</th>
+                    <th style={{ padding: 10, textAlign: 'right', fontSize: 12, color: '#64748B' }}>PRIX</th>
+                    <th style={{ padding: 10, textAlign: 'right', fontSize: 12, color: '#64748B' }}>TOTAL</th>
+                    <th style={{ padding: 10, textAlign: 'center', fontSize: 12, color: '#64748B' }}></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {devis.lignes.map((ligne: any, index: number) => (
+                    <tr key={index} style={{ borderBottom: '1px solid #F1F5F9' }}>
+                      <td style={{ padding: 8 }}>
+                        <input className="fi" value={ligne.ref || ''} onChange={(e) => handleLigneChange(index, 'ref', e.target.value)} disabled={estLectureSeule} />
+                      </td>
+                      <td style={{ padding: 8, textAlign: 'center' }}>
+                        <input className="fi" type="number" min={1} value={ligne.qte || 1} style={{ width: 60, textAlign: 'center' }} onChange={(e) => handleLigneChange(index, 'qte', Number(e.target.value))} disabled={estLectureSeule} />
+                      </td>
+                      <td style={{ padding: 8 }}>
+                        <input className="fi" value={ligne.nom_fr || ''} onChange={(e) => handleLigneChange(index, 'nom_fr', e.target.value)} disabled={estLectureSeule} />
+                      </td>
+                      <td style={{ padding: 8, textAlign: 'right' }}>
+                        {/* V123-ULTIMATE — Prix VIP depuis prix_negocies[ref] (source Firestore réelle) */}
+                        {(() => {
+                          const ref = ligne.ref || '';
+                          const prixPublic = ligne.prix_unitaire || 0;
+                          const prixNegocie = devis.prix_negocies?.[ref];
+                          const estNegocie = devis.is_vip && prixNegocie !== undefined && prixNegocie !== prixPublic;
+
+                          if (estNegocie) {
+                            return (
+                              <div>
+                                <div style={{ textDecoration: 'line-through', color: '#CBD5E1', fontSize: 12 }}>
+                                  {prixPublic.toLocaleString('fr-FR')} €
+                                </div>
+                                <input className="fi" type="number" value={prixNegocie} min={0}
+                                  style={{ textAlign: 'right', color: '#A78BFA', fontWeight: 600, width: 100 }}
+                                  onChange={(e) => {
+                                    const newPrice = Number(e.target.value);
+                                    const updated = { ...(devis.prix_negocies || {}), [ref]: newPrice };
+                                    setDevis({ ...devis, prix_negocies: updated });
+                                    console.log("🔍 VIP SAVE — ref:", ref, "prixNegocie:", newPrice, "prix_negocies:", updated);
+                                  }} />
+                              </div>
+                            );
+                          }
+                          return (
+                            <input className="fi" type="number" value={prixPublic} min={0}
+                              style={{ textAlign: 'right', width: 100 }}
+                              disabled={estLectureSeule}
+                              onChange={(e) => handleLigneChange(index, 'prix_unitaire', Number(e.target.value))} />
+                          );
+                        })()}
+                      </td>
+                      <td style={{ padding: 8, textAlign: 'right', fontWeight: 600 }}>
+                        {/* V123-ULTIMATE — Total avec VIP depuis prix_negocies[ref] */}
+                        {(() => {
+                          const ref = ligne.ref || '';
+                          const prixPublic = ligne.prix_unitaire || 0;
+                          const prixNegocie = devis.prix_negocies?.[ref];
+                          const estNegocie = devis.is_vip && prixNegocie !== undefined && prixNegocie !== prixPublic;
+                          const totalVIP = (prixNegocie ?? prixPublic) * (ligne.qte || 1);
+                          const totalPublic = prixPublic * (ligne.qte || 1);
+
+                          if (estNegocie) {
+                            return (
+                              <div>
+                                <div style={{ textDecoration: 'line-through', color: '#CBD5E1', fontSize: 12, fontWeight: 400 }}>
+                                  {totalPublic.toLocaleString('fr-FR')} €
+                                </div>
+                                <div style={{ color: '#A78BFA', fontWeight: 600 }}>
+                                  {totalVIP.toLocaleString('fr-FR')} €
+                                </div>
+                              </div>
+                            );
+                          }
+                          return <span>{totalVIP.toLocaleString('fr-FR')} €</span>;
+                        })()}
+                      </td>
+                      <td style={{ padding: 8, textAlign: 'center' }}>
+                        {!estLectureSeule && (
+                          <button onClick={() => handleRemoveLigne(index)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#EF4444', fontSize: 16 }}>
+                            🗑
+                          </button>
                         )}
-                        {ligne.description && <div style={{ color: '#92400E', marginBottom: (ligne.lien || ligne.photoUrl) ? 4 : 0 }}>📝 {ligne.description}</div>}
-                        {ligne.lien && <a href={ligne.lien} target="_blank" rel="noopener noreferrer" style={{ color: '#EA580C', wordBreak: 'break-all' }}>🔗 {ligne.lien}</a>}
-                      </div>
-                    )}
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <input className="fi" type="number" value={ligne.qte} min={1}
-                      style={{ textAlign: 'right' }}
-                      disabled={estLectureSeule}
-                      onChange={(e) => handleLigneChange(index, 'qte', Number(e.target.value))} />
-                  </td>
-                  <td style={{ textAlign: 'right', verticalAlign: 'middle', paddingRight: 8 }}>
-                    {/* V123-ULTIMATE — Prix VIP depuis prix_negocies[ref] (source Firestore réelle) */}
-                    {(() => {
-                      const ref = ligne.ref || '';
-                      const prixPublic = ligne.prix_unitaire || 0;
-                      const prixNegocie = devis.prix_negocies?.[ref];
-                      const estNegocie = devis.is_vip && prixNegocie !== undefined && prixNegocie !== prixPublic;
-
-                      if (estNegocie) {
-                        return (
-                          <div>
-                            <div style={{ textDecoration: 'line-through', color: '#CBD5E1', fontSize: 12 }}>
-                              {prixPublic.toLocaleString('fr-FR')} €
-                            </div>
-                            <input className="fi" type="number" value={prixNegocie} min={0}
-                              style={{ textAlign: 'right', color: '#A78BFA', fontWeight: 600, width: 100 }}
-                              onChange={(e) => {
-                                const newPrice = Number(e.target.value);
-                                const updated = { ...(devis.prix_negocies || {}), [ref]: newPrice };
-                                setDevis({ ...devis, prix_negocies: updated });
-                                console.log("🔍 VIP SAVE — ref:", ref, "prixNegocie:", newPrice, "prix_negocies:", updated);
-                              }} />
-                          </div>
-                        );
-                      }
-                      return (
-                        <input className="fi" type="number" value={prixPublic} min={0}
-                          style={{ textAlign: 'right', width: 100 }}
-                          disabled={estLectureSeule}
-                          onChange={(e) => handleLigneChange(index, 'prix_unitaire', Number(e.target.value))} />
-                      );
-                    })()}
-                  </td>
-                  <td style={{ textAlign: 'right', fontWeight: 600, paddingRight: 8 }}>
-                    {/* V123-ULTIMATE — Total avec VIP depuis prix_negocies[ref] */}
-                    {(() => {
-                      const ref = ligne.ref || '';
-                      const prixPublic = ligne.prix_unitaire || 0;
-                      const prixNegocie = devis.prix_negocies?.[ref];
-                      const estNegocie = devis.is_vip && prixNegocie !== undefined && prixNegocie !== prixPublic;
-                      const totalVIP = (prixNegocie ?? prixPublic) * (ligne.qte || 1);
-                      const totalPublic = prixPublic * (ligne.qte || 1);
-
-                      if (estNegocie) {
-                        return (
-                          <div>
-                            <div style={{ textDecoration: 'line-through', color: '#CBD5E1', fontSize: 12, fontWeight: 400 }}>
-                              {totalPublic.toLocaleString('fr-FR')} €
-                            </div>
-                            <div style={{ color: '#A78BFA', fontWeight: 600 }}>
-                              {totalVIP.toLocaleString('fr-FR')} €
-                            </div>
-                          </div>
-                        );
-                      }
-                      return <span>{totalVIP.toLocaleString('fr-FR')} €</span>;
-                    })()}
-                  </td>
-                  <td>
-                    <button onClick={() => handleRemoveLigne(index)}
-                      disabled={estLectureSeule}
-                      style={{ color: 'var(--rd)', background: 'none', border: 'none', cursor: estLectureSeule ? 'not-allowed' : 'pointer', fontSize: 16, opacity: estLectureSeule ? 0.4 : 1 }}>
-                      ✕
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-            <tfoot>
-              <tr>
-                <td colSpan={4} style={{ textAlign: 'right', fontWeight: 700, padding: '12px 8px' }}>
-                  Total HT
-                </td>
-                <td style={{ textAlign: 'right', fontWeight: 700, padding: '12px 8px' }}>
-                  {calculateTotal(devis.lignes).toLocaleString('fr-FR')} €
-                </td>
-                <td></td>
-              </tr>
-            </tfoot>
-          </table>
-        )}
-      </Card>
-
-      {/* Acomptes */}
-      {devis.acomptes && devis.acomptes.length > 0 && (
-        <Card title="Acomptes encaissés">
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Référence</th>
-                <th style={{ textAlign: 'right' }}>Montant</th>
-              </tr>
-            </thead>
-            <tbody>
-              {devis.acomptes.map((a, i) => (
-                <tr key={i}>
-                  <td>{formatDateAcompte(a.date_reception || a.date)}</td>
-                  <td>{a.ref_fa}</td>
-                  <td style={{ textAlign: 'right' }}>{a.montant.toLocaleString('fr-FR')} €</td>
-                </tr>
-              ))}
-            </tbody>
-            <tfoot>
-              <tr>
-                <td colSpan={2} style={{ textAlign: 'right', fontWeight: 700, padding: '12px 8px' }}>
-                  Solde restant
-                </td>
-                <td style={{ textAlign: 'right', fontWeight: 700, padding: '12px 8px', color: 'var(--or)' }}>
-                  {devis.solde_restant?.toLocaleString('fr-FR')} €
-                </td>
-              </tr>
-            </tfoot>
-          </table>
-        </Card>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            </div>
+          </Card>
+        </>
       )}
 
-      {/* Modal Encaisser */}
-      {showEncaisserModal && (
+      {/* Popup Encaisser Acompte */}
+      {showEncaisserModal && devis.id && (
         <PopupEncaisserAcompte
           devis={devis}
           onClose={() => setShowEncaisserModal(false)}
           onSuccess={() => {
             setShowEncaisserModal(false);
-            window.location.reload();
+            setSuccessMsg('Acompte encaissé avec succès');
+            setTimeout(() => setSuccessMsg(''), 3000);
+            // Recharger le devis
+            getDoc(doc(db, 'quotes', devis.id)).then(snap => {
+              if (snap.exists()) setDevis({ ...snap.data(), id: snap.id });
+            });
           }}
         />
       )}
-
-      {/* Modal Dupliquer (v43-E3.1) */}
-      <ModalDupliquerDevis
-        isOpen={modalDupliquerOpen}
-        onClose={() => setModalDupliquerOpen(false)}
-        devisSource={devis}
-        onDuplicated={(newId) => {
-          setModalDupliquerOpen(false);
-          setSuccessMsg(`Devis dupliqué : ${newId}`);
-          setLocation(`/admin/devis/${newId}`);
-        }}
-      />
-    </>
+    </div>
   );
 }

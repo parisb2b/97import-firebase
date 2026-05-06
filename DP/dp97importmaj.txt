@@ -1721,3 +1721,8 @@ V118-ULTIMATE | 06/05 | Injection Force Majeure (Date/Sign/Paiement) | ✅ RÉSO
 📄 DetailDevis.tsx — Mode édition VIP: prix public barré + input prix négocié violet
 📄 ListeDevis.tsx — Date unifiée via toDate() (createdAt/date_creation/date)
 📄 Panier.tsx — Ajout date + date_creation (ISO) pour les devis créés par les clients
+----------------------------------------
+🗓️ 06/05/2026 23:55 CEST | 🎯 Mission V125 : Réparation circuit mail VIP + sync PDF
+📄 DetailDevis.tsx — Remplacement intégral : handleValidateVip + collection mail + Card actions
+📄 Nouveau: bouton 📧 Envoyer prix VIP (addDoc collection mail pour Trigger Email)
+📄 Conservé: Signer/Encaisser V118, VIP V123-ULTIMATE, console.log V122, DV- V120

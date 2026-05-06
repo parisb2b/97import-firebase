@@ -7,3 +7,4 @@ V122 | 06/05/2026 | Déblocage final flux paiement (console.log + force boutons 
 V123 | 06/05/2026 | Correction Prix VIP (PDF/UI) + Dates Liste Admin + Panier date field | ✅ RÉSOLU
 V123-bis | 06/05/2026 | Alignement strict specs user (mapLignesToItems simplifié + formatDateSafe export + serverTimestamp date) | ✅ RÉSOLU
 V123-ULTIMATE | 06/05/2026 | Réparation finale mapLignesToItems (!= undefined) + export + vérifié | ✅ RÉSOLU
+V125 | 06/05/2026 | Réparation circuit mail VIP + sync PDF (remplacement intégral) | ✅ RÉSOLU
