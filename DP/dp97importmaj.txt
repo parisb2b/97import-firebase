@@ -1726,3 +1726,8 @@ V118-ULTIMATE | 06/05 | Injection Force Majeure (Date/Sign/Paiement) | ✅ RÉSO
 📄 DetailDevis.tsx — Remplacement intégral : handleValidateVip + collection mail + Card actions
 📄 Nouveau: bouton 📧 Envoyer prix VIP (addDoc collection mail pour Trigger Email)
 📄 Conservé: Signer/Encaisser V118, VIP V123-ULTIMATE, console.log V122, DV- V120
+----------------------------------------
+🗓️ 07/05/2026 | 🎯 Mission V126 : Verrouillage mapLignesToItems via !== undefined + circuit complet
+📄 pdf-generator.ts — Remplacement intégral : mapLignesToItems prix_negocies[ref] !== undefined (priorité map > ligne)
+📄 formatDateSafe : 4 formats (toDate/seconds/_seconds/Date) + drawFooter conservé
+📄 5 wrappers rétrocompatibles : generateDevis, downloadPDF, generateFactureFinale, generateNoteCommission, generateFactureLogistique
