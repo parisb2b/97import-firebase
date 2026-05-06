@@ -286,6 +286,9 @@ export default function DetailDevis() {
     );
   }
 
+  // V122 — Debug live : inspecter l'état du devis dans la console navigateur
+  console.log("🔍 V122 DEVIS ACTUEL:", { id: devis.id, numero: devis.numero, statut: devis.statut, isNew, acomptes: devis.acomptes?.length || 0, estLectureSeule });
+
   return (
     <>
       {successMsg && <div className="card" style={{ background: '#DCFCE7', color: '#166534', padding: '12px 20px', marginBottom: 16, borderLeft: '4px solid #22C55E' }}>✅ {successMsg}</div>}
@@ -318,22 +321,23 @@ export default function DetailDevis() {
           {isNew ? 'Nouveau devis' : devis.numero}
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
-          {/* V118 - BOUTON SIGNER : Uniquement si envoyé */}
-          {!isNew && devis.statut === 'envoye' && (
+          {/* V122 FORCE SIGNATURE : Si envoyé, sans condition isNew */}
+          {devis.statut === 'envoye' && (
             <Button variant="s" onClick={async () => {
               const docRef = doc(db, 'quotes', devis.id!);
               await updateDoc(docRef, { statut: 'signe', updatedAt: serverTimestamp() });
               setDevis({ ...devis, statut: 'signe' });
-              setSuccessMsg('Devis marqué comme SIGNÉ — Prêt pour encaissement');
-              setTimeout(() => setSuccessMsg(''), 3000);
+              alert("Succès : Devis passé au statut SIGNÉ");
             }}>
               ✍️ Signer le devis
             </Button>
           )}
 
-          {/* V118 - BOUTON ENCAISSER : Dès que signé */}
-          {!isNew && (devis.statut === 'signe' || devis.statut.startsWith('acompte_')) && (
-            <Button variant="s" onClick={() => setShowEncaisserModal(true)}>
+          {/* V122 FORCE ENCAISSEMENT : Si signé ou acompte_*, sans condition isNew */}
+          {(devis.statut === 'signe' || devis.statut.startsWith('acompte_')) && (
+            <Button variant="s" onClick={() => {
+              setShowEncaisserModal(true);
+            }}>
               💰 Encaisser un acompte
             </Button>
           )}

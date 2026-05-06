@@ -1710,3 +1710,8 @@ V118-ULTIMATE | 06/05 | Injection Force Majeure (Date/Sign/Paiement) | ✅ RÉSO
 📏 Phase 2 : DVS- → DV- dans 3 fichiers (Panier, ModalDupliquer, DetailDevis) + counters.ts
 ⚙️ Phase 3 : Correctifs V118 vérifiés (formatDateSafe, boutons Signer/Encaisser)
 🚀 Phase 4 : Build OK, firestore:rules déployé, serveur redémarré
+----------------------------------------
+🗓️ 06/05/2026 22:50 CEST | 🔴 Mission V122 : Déblocage final du flux de paiement
+📄 DetailDevis.tsx — console.log debug + suppression !isNew + alert() feedback
+📄 firestore.rules — bypass temporaire quotes+acomptes (allow read,write: if true)
+⚠️ Rappel: Reverter firestore.rules après validation du circuit
