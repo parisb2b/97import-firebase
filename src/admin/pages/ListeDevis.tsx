@@ -253,16 +253,13 @@ export default function ListeDevis() {
                   </Link>
                 </td>
                 <td>
-                  {d.createdAt
-                    ? toDate(d.createdAt)?.toLocaleDateString('fr-FR', {
-                        day: '2-digit',
-                        month: '2-digit',
-                        year: 'numeric'
-                      })
-                    : d.date_creation
-                      ? new Date(d.date_creation).toLocaleDateString('fr-FR')
-                      : d.date || '—'
-                  }
+                  {(() => {
+                    const dateObj = d.createdAt || d.date_creation || d.date;
+                    const parsed = toDate(dateObj);
+                    return parsed
+                      ? parsed.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })
+                      : '—';
+                  })()}
                 </td>
                 <td>{d.client_nom}</td>
                 <td>

@@ -261,7 +261,13 @@ function mapLignesToItems(lignes: any[], prixNegocies?: Record<string, number>, 
   return (lignes || []).map((l: any) => {
     const ref = l.ref || l.reference || '';
     const publicPrice = l.prix_unitaire || 0;
-    const vipPrice = (isVip && prixNegocies && prixNegocies[ref] !== undefined) ? prixNegocies[ref] : publicPrice;
+    // V123 — Priorité prix négocié : 1) ligne.prix_negocie > 0  2) prixNegocies[ref]  3) prix_unitaire
+    const lignePrixNegocie = (l.prix_negocie || l.prix_negocie_vip || 0);
+    const vipPrice = (isVip && lignePrixNegocie > 0)
+      ? lignePrixNegocie
+      : (isVip && prixNegocies && prixNegocies[ref] !== undefined && prixNegocies[ref] > 0)
+        ? prixNegocies[ref]
+        : publicPrice;
     return {
       ref, qt: l.qte || 1, desc: l.nom_fr || l.description || ref,
       publicPrice, vipPrice, total: vipPrice * (l.qte || 1),

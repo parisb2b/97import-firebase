@@ -253,6 +253,8 @@ export default function Panier() {
         total_ht: total,
         partenaire_code: selectedPartner || 'ADMIN',
         acomptes: [],
+        date: new Date().toISOString(),
+        date_creation: new Date().toISOString(),
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       };

@@ -4,3 +4,4 @@ V118 | 06/05/2026 | Consolidation Finale & Correction Force Majeure (vérificati
 V119 | 06/05/2026 22:15 | Correction sentinel serverTimestamp() Firestore (8 devis) + support _seconds admin SDK | ✅ RÉSOLU
 V120 | 06/05/2026 | Hard Reset circuit commercial (purge DB + libellés DV- + counters 001) | ✅ RÉSOLU
 V122 | 06/05/2026 | Déblocage final flux paiement (console.log + force boutons + bypass rules) | ✅ RÉSOLU
+V123 | 06/05/2026 | Correction Prix VIP (PDF/UI) + Dates Liste Admin + Panier date field | ✅ RÉSOLU

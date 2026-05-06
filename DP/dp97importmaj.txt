@@ -1715,3 +1715,9 @@ V118-ULTIMATE | 06/05 | Injection Force Majeure (Date/Sign/Paiement) | ✅ RÉSO
 📄 DetailDevis.tsx — console.log debug + suppression !isNew + alert() feedback
 📄 firestore.rules — bypass temporaire quotes+acomptes (allow read,write: if true)
 ⚠️ Rappel: Reverter firestore.rules après validation du circuit
+----------------------------------------
+🗓️ 06/05/2026 23:05 CEST | 🔴 Mission V123 : Correction Prix VIP + Dates Liste + Panier
+📄 pdf-generator.ts — mapLignesToItems: priorité ligne.prix_negocie > prixNegocies[ref] > prix_unitaire
+📄 DetailDevis.tsx — Mode édition VIP: prix public barré + input prix négocié violet
+📄 ListeDevis.tsx — Date unifiée via toDate() (createdAt/date_creation/date)
+📄 Panier.tsx — Ajout date + date_creation (ISO) pour les devis créés par les clients

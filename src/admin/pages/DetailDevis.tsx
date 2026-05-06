@@ -537,7 +537,23 @@ export default function DetailDevis() {
                         );
                       }
 
-                      // Mode édition (devis brouillon, en négociation, etc.)
+                      // Mode édition — V123 : affichage VIP si prix négocié détecté
+                      if (devis.is_vip && estNegocie) {
+                        return (
+                          <div>
+                            <div style={{ textDecoration: 'line-through', color: '#9CA3AF', fontSize: 12 }}>
+                              {prixPublic.toLocaleString('fr-FR')} €
+                            </div>
+                            <input className="fi" type="number" value={prixNegocie} min={0}
+                              style={{ textAlign: 'right', color: '#7c3aed', fontWeight: 600 }}
+                              onChange={(e) => {
+                                const newNegocie = Number(e.target.value);
+                                const nouveauxPrix = { ...(devis.prix_negocies || {}), [ref]: newNegocie };
+                                setDevis({ ...devis, prix_negocies: nouveauxPrix });
+                              }} />
+                          </div>
+                        );
+                      }
                       return (
                         <input className="fi" type="number" value={ligne.prix_unitaire} min={0}
                           style={{ textAlign: 'right' }}
