@@ -1736,3 +1736,4 @@ V118-ULTIMATE | 06/05 | Injection Force Majeure (Date/Sign/Paiement) | ✅ RÉSO
 📄 DetailDevis.tsx — handleValidateVip V128 : logs enrichis + payload complet (client_nom, signature)
 📄 emailService.ts — Conservé (1058 lignes, 6 consommateurs). Collection mail : 5 docs existants
 📄 Diagnostic : Trigger Email non installé dans firebase.json. Les mails sont écrits dans Firestore
+V133 | 07/05/2026 | Uniformisation nomenclature et préfixes (DV-VIP, DC, FAC, FA, AF, NC, FL, AI, BL) | ✅ RÉSOLU
