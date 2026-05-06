@@ -1620,3 +1620,62 @@ npm run lint  → ✅ 0 erreur (31 warnings préexistants, 1 corrigé: prefer-co
 - Tampon PAYÉE sur factures (FA)
 - Récapitulatif paiements sur factures
 - Pied de page adapté par type
+
+---
+🗓️ Date : 06/05/2026 09:15 CEST | 🎯 Mission V112 : Refonte du moteur de génération PDF
+📄 Fichier : `src/lib/pdf-generator.ts` (Lignes 1 à 544)
+
+❌ AVANT :
+Remplacement intégral du fichier src/lib/pdf-generator.ts (544 lignes)
+Le fichier comprenait : types (PdfDocumentType, PdfItem, PdfPayment, PdfData), palette COLORS,
+données fixes (EMETTEUR_LINES, RIB_LINES, CLIENT_FACT_LINES, CLIENT_LIV_LINES), helpers
+(hexToRgb, setFill, setDraw, setText, euro, formatDateSafe), getDocConfig avec Record<string,...>,
+getSecondaryLines, drawHeader (roundedRect 4mm logo), drawInfoBox avec param center + roundedRect 3mm,
+drawCommonBlocks avec center conditionnel, drawNote (roundedRect 2mm, bordure pleine sans ajustement arrondi),
+getTableDefinition (NC: PRIX VENTE FINAL au lieu de PRIX VENTE, 7 colonnes),
+drawTable avec bodyStyles valign middle, drawPaidStamp, drawTotals (x=125 w=70 calculés),
+drawGrandTotal, drawPayments (tableau récapitulatif acomptes), drawFooter,
+renderDocument avec logique conditionnelle complexe (if/else drawCommonBlocks, drawPayments),
+generateDocumentPDF/doc.output('bloburl') as unknown as string, downloadDocumentPDF,
+et 5 wrappers backward-compatibles (downloadPDF, formatDateSafe, mapLignesToItems,
+generateDevis, generateFactureFinale, generateNoteCommission, generateFactureLogistique)
+qui importaient formatDateCourt de dateHelpers.
+
+✅ APRÈS :
+Nouveau code V3 (417 lignes) — Refonte intégrale avec :
+- Angles arrondis 4.3mm (cadres) et 3.2mm (logo, note) pour tous les cadres
+- RIB complet intégré dans RIB_LINES (LUXENT LIMITED, IBAN, SWIFT, TEL, WeChat)
+- EMETTEUR_LINES figées (6 lignes, adresse UK sur 4 lignes, SIRET, email)
+- CLIENT_FACT_LINES et CLIENT_LIV_LINES sans mention "(MQ)"
+- getDocConfig en `as const` au lieu de Record<string,...>
+- drawInfoBox sans paramètre `center`, toujours aligné à gauche
+- drawCommonBlocks sans condition center
+- drawNote avec roundedRect 3.2mm, bordure latérale ajustée aux arrondis (y+2 à y-2)
+- NC: colonne "PRIX VENTE" (au lieu de "PRIX VENTE FINAL")
+- drawTable sans bodyStyles valign middle
+- drawTotals: x=125, w implicite via 195 pour value
+- renderDocument simplifié (plus de drawPayments, plus de logique if/else)
+- Suppression de tous les wrappers backward-compatibles (downloadPDF, generateDevis, etc.)
+- Suppression de l'import formatDateCourt
+- generateDocumentPDF: retour direct doc.output('bloburl') sans `as unknown as string`
+---
+
+---
+🗓️ Date : 06/05/2026 19:25 CEST | 🎯 Mission V112 — Correction build (restauration wrappers backward-compatibles)
+📄 Fichier : `src/lib/pdf-generator.ts`
+
+❌ ERREUR BUILD :
+- 20 imports manquants (generateDevis, generateFactureFinale, generateNoteCommission, generateFactureLogistique, downloadPDF)
+- 1 erreur de type : doc.output('bloburl') retourne URL, pas string
+- 12 fichiers consommateurs impactés
+
+✅ CORRECTION :
+- Type cast : `doc.output('bloburl') as unknown as string`
+- Restauration des 5 wrappers : downloadPDF, generateDevis, generateFactureFinale, generateNoteCommission, generateFactureLogistique
+- formatDateSafe réimplémentée en local (sans dépendance à formatDateCourt) avec support Firestore Timestamp (v?.toDate())
+- mapLignesToItems conservée
+- Aucune modification du nouveau design A4 V3 (arrondis 4.3mm/3.2mm, couleurs, RIB complet)
+---
+----------------------------------------
+🗓️ 06/05/2026 19:30 CEST | 🎯 Mission V112-FIX : Restauration import formatDateCourt + drawPayments + wrappers complets
+📄 src/lib/pdf-generator.ts — Version corrigée garantie sans erreur de build

@@ -1,5 +1,6 @@
 import jsPDF from 'jspdf';
 import autoTable, { CellHookData, UserOptions } from 'jspdf-autotable';
+import { formatDateCourt } from './dateHelpers';
 
 export type PdfDocumentType = 'DV' | 'DV_VIP' | 'DC' | 'FAC' | 'FA' | 'AF' | 'NC' | 'FL' | 'AI' | 'BL';
 
@@ -145,7 +146,7 @@ function getSecondaryLines(data: PdfData): string[] {
 function drawHeader(doc: jsPDF, data: PdfData): void {
   const config = getDocConfig(data.type);
   setFill(doc, config.color);
-  doc.roundedRect(15, 15, 18, 18, 3.2, 3.2, 'F'); // Angles arrondis Logo
+  doc.roundedRect(15, 15, 18, 18, 3.2, 3.2, 'F');
   doc.setFont('helvetica', 'bold'); doc.setFontSize(7.5); setText(doc, COLORS.white);
   doc.text('LUXENT', 24, 25, { align: 'center' });
 
@@ -155,7 +156,7 @@ function drawHeader(doc: jsPDF, data: PdfData): void {
   doc.text(`N° ${data.number}${data.ref ? ` · ${data.ref}` : ''}`, 38, 31);
 
   setFill(doc, config.bg);
-  doc.roundedRect(160, 15, 35, 12, 6, 6, 'F'); // Pill de date arrondi
+  doc.roundedRect(160, 15, 35, 12, 6, 6, 'F');
   doc.setFont('helvetica', 'bold'); doc.setFontSize(6.8); setText(doc, COLORS.mediumGray);
   doc.text('DATE D\'EMISSION', 177.5, 19, { align: 'center' });
   doc.setFontSize(8.8); setText(doc, config.color);
@@ -166,11 +167,11 @@ function drawInfoBox(doc: jsPDF, options: { x: number; y: number; w: number; h: 
   const { x, y, w, h, title, lines, borderColor, bgColor = COLORS.white, titleColor = borderColor, thickLeft = false } = options;
   setFill(doc, bgColor); setDraw(doc, thickLeft ? COLORS.border : borderColor);
   doc.setLineWidth(0.25);
-  doc.roundedRect(x, y, w, h, 4.3, 4.3, 'FD'); // Angles arrondis pour tous les cadres
+  doc.roundedRect(x, y, w, h, 4.3, 4.3, 'FD');
 
   if (thickLeft) {
     setDraw(doc, borderColor); doc.setLineWidth(1.3);
-    doc.line(x, y + 3.5, x, y + h - 3.5); // Ajustement ligne épaisse avec l'arrondi
+    doc.line(x, y + 3.5, x, y + h - 3.5);
   }
 
   doc.setFont('helvetica', 'bold'); doc.setFontSize(7.5); setText(doc, titleColor);
@@ -206,9 +207,9 @@ function drawNote(doc: jsPDF, data: PdfData): number {
   if (data.type === 'AI') text = 'Document interne — Non destiné au client final. Commande fournisseur étranger. Les prix d\'achat sont strictement confidentiels.';
 
   setFill(doc, data.type === 'AI' ? COLORS.orangeBg : COLORS.blueBg);
-  doc.roundedRect(15, 108, 180, 13, 3.2, 3.2, 'F'); // Cadre Note arrondi
+  doc.roundedRect(15, 108, 180, 13, 3.2, 3.2, 'F');
   setDraw(doc, data.type === 'AI' ? COLORS.orange : COLORS.blue); doc.setLineWidth(1.2);
-  doc.line(15, 108 + 2, 15, 121 - 2); // Bordure latérale
+  doc.line(15, 108 + 2, 15, 121 - 2);
 
   doc.setFont('helvetica', 'bold'); doc.setFontSize(8); setText(doc, COLORS.dark);
   doc.text(doc.splitTextToSize(text, 170), 20, 116);
@@ -290,6 +291,22 @@ function drawPaidStamp(doc: jsPDF): void {
   doc.restoreGraphicsState();
 }
 
+function drawPayments(doc: jsPDF, data: PdfData, y: number): number {
+  if (!data.payments || data.payments.length === 0) return y;
+  const sy = Math.min(y + 10, 232);
+  setFill(doc, COLORS.blueBg); doc.roundedRect(15, sy, 180, 10, 2, 2, 'F');
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(8.5); setText(doc, COLORS.blue);
+  doc.text('RECAPITULATIF DES PAIEMENTS', 20, sy + 6.5);
+  autoTable(doc, {
+    startY: sy + 13, head: [['Paiement','Montant','Date']], body: data.payments.map(p => [p.label, euro(p.amount), p.date||'']),
+    theme: 'grid', margin: { left: 15, right: 15 }, tableWidth: 180,
+    styles: { font: 'helvetica', fontSize: 7.5, cellPadding: 2, lineColor: hexToRgb(COLORS.border), lineWidth: 0.15 },
+    headStyles: { fillColor: hexToRgb(COLORS.blue), textColor: hexToRgb(COLORS.white), fontStyle: 'bold' },
+    columnStyles: { 0:{cellWidth:90},1:{cellWidth:45,halign:'right'},2:{cellWidth:45} }
+  });
+  return (doc as any).lastAutoTable.finalY || y;
+}
+
 function drawTotals(doc: jsPDF, data: PdfData, y: number): void {
   if (data.type === 'BL') return;
   const config = getDocConfig(data.type);
@@ -337,7 +354,9 @@ function renderDocument(doc: jsPDF, data: PdfData): void {
   if (['NC', 'AI'].includes(data.type)) drawNote(doc, data);
   drawCommonBlocks(doc, data);
   const tableStartY = ['NC', 'AI'].includes(data.type) ? 130 : drawNote(doc, data);
-  drawTotals(doc, data, drawTable(doc, data, tableStartY));
+  const tableFinalY = drawTable(doc, data, tableStartY);
+  const afterPaymentsY = data.type === 'FA' ? drawPayments(doc, data, tableFinalY) : tableFinalY;
+  drawTotals(doc, data, afterPaymentsY);
   drawFooter(doc, data);
 }
 
@@ -354,7 +373,7 @@ export function downloadDocumentPDF(data: PdfData): void {
 }
 
 // ============ BACKWARD-COMPATIBLE WRAPPERS ============
-// Conservés pour ne pas casser les 12 fichiers importateurs existants.
+// Conservés pour ne pas casser les fichiers importateurs existants
 
 export function downloadPDF(doc: jsPDF, filename: string): void {
   const blob = doc.output('blob');
@@ -369,10 +388,7 @@ export function downloadPDF(doc: jsPDF, filename: string): void {
 }
 
 function formatDateSafe(v: any): string {
-  try {
-    const d = v?.toDate ? v.toDate() : new Date(v);
-    return d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
-  } catch { return String(v || ''); }
+  try { return formatDateCourt(v); } catch { return String(v || ''); }
 }
 
 function mapLignesToItems(lignes: any[], prixNegocies?: Record<string, number>, isVip?: boolean): PdfItem[] {
@@ -398,7 +414,7 @@ export function generateDevis(quote: any, _emetteur?: any): jsPDF {
   const prixNegocies = quote.prix_negocies || {};
   const items = mapLignesToItems(lignes, prixNegocies, isVip);
   const date = formatDateSafe(quote.createdAt);
-  const totalHT = quote.total_ht || items.reduce((s: number, i: PdfItem) => s + (i.total || 0), 0);
+  const totalHT = quote.total_ht || items.reduce((s, i) => s + (i.total || 0), 0);
 
   const data: PdfData = {
     type: isVip ? 'DV_VIP' : 'DV',
@@ -420,7 +436,7 @@ export function generateFactureFinale(quote: any, numero: string, _emetteur?: an
   const lignes = quote.lignes || [];
   const items = mapLignesToItems(lignes);
   const date = formatDateSafe(new Date());
-  const totalHT = quote.total_ht || items.reduce((s: number, i: PdfItem) => s + (i.total || 0), 0);
+  const totalHT = quote.total_ht || items.reduce((s, i) => s + (i.total || 0), 0);
 
   const acomptes = (quote.acomptes || []).filter((a: any) => a.encaisse === true);
   const payments: PdfPayment[] = acomptes.map((a: any) => ({
@@ -513,7 +529,7 @@ export function generateFactureLogistique(container: any, fraisLignes: any[], _e
     amount: l.total || l.montant || 0,
     total: l.total || l.montant || 0,
   }));
-  const totalLog = items.reduce((s: number, i: PdfItem) => s + (i.total || 0), 0);
+  const totalLog = items.reduce((s, i) => s + (i.total || 0), 0);
 
   const data: PdfData = {
     type: 'FL',
