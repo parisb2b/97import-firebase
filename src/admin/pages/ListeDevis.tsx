@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { collection, query, orderBy, getDocs, doc, getDoc } from 'firebase/firestore';
 import { Link } from 'wouter';
 import { adminDb as db } from '../../lib/firebase';
-import { generateDevis, downloadPDF } from '../../lib/pdf-generator';
+import { generateDevis, downloadPDF, formatDateSafe } from '../../lib/pdf-generator';
 import PopupEncaisserAcompte from '../components/PopupEncaisserAcompte';
 import {
   Card,
@@ -252,15 +252,7 @@ export default function ListeDevis() {
                     <strong style={{ cursor: 'pointer' }}>{d.numero}</strong>
                   </Link>
                 </td>
-                <td>
-                  {(() => {
-                    const dateObj = d.createdAt || d.date_creation || d.date;
-                    const parsed = toDate(dateObj);
-                    return parsed
-                      ? parsed.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })
-                      : '—';
-                  })()}
-                </td>
+                <td>{formatDateSafe(d.date || d.createdAt) || '—'}</td>
                 <td>{d.client_nom}</td>
                 <td>
                   {d.partenaire_code ? (

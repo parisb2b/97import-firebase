@@ -24,6 +24,7 @@ interface LigneDevis {
   nom_fr: string;
   qte: number;
   prix_unitaire: number;
+  prix_negocie?: number;
   total: number;
   type?: 'product' | 'custom';
   description?: string;
@@ -511,79 +512,30 @@ export default function DetailDevis() {
                       onChange={(e) => handleLigneChange(index, 'qte', Number(e.target.value))} />
                   </td>
                   <td style={{ textAlign: 'right', verticalAlign: 'middle', paddingRight: 8 }}>
-                    {(() => {
-                      const ref = ligne.ref || '';
-                      const prixPublic = ligne.prix_unitaire || 0;
-                      const prixNegocie = devis.prix_negocies?.[ref] ?? prixPublic;
-                      const estNegocie = devis.is_vip && prixNegocie !== prixPublic;
-                      const estLectureSeule = isDevisReadonly(devis);
-
-                      // Mode lecture seule (devis signé ou en cours de paiement) avec affichage VIP
-                      if (estLectureSeule) {
-                        return (
-                          <div>
-                            {estNegocie && (
-                              <div style={{ textDecoration: 'line-through', color: '#9CA3AF', fontSize: 12 }}>
-                                {prixPublic.toLocaleString('fr-FR')} €
-                              </div>
-                            )}
-                            <div style={{
-                              color: estNegocie ? '#7c3aed' : '#111827',
-                              fontWeight: estNegocie ? 600 : 400
-                            }}>
-                              {prixNegocie.toLocaleString('fr-FR')} €
-                            </div>
-                          </div>
-                        );
-                      }
-
-                      // Mode édition — V123 : affichage VIP si prix négocié détecté
-                      if (devis.is_vip && estNegocie) {
-                        return (
-                          <div>
-                            <div style={{ textDecoration: 'line-through', color: '#9CA3AF', fontSize: 12 }}>
-                              {prixPublic.toLocaleString('fr-FR')} €
-                            </div>
-                            <input className="fi" type="number" value={prixNegocie} min={0}
-                              style={{ textAlign: 'right', color: '#7c3aed', fontWeight: 600 }}
-                              onChange={(e) => {
-                                const newNegocie = Number(e.target.value);
-                                const nouveauxPrix = { ...(devis.prix_negocies || {}), [ref]: newNegocie };
-                                setDevis({ ...devis, prix_negocies: nouveauxPrix });
-                              }} />
-                          </div>
-                        );
-                      }
-                      return (
-                        <input className="fi" type="number" value={ligne.prix_unitaire} min={0}
-                          style={{ textAlign: 'right' }}
-                          onChange={(e) => handleLigneChange(index, 'prix_unitaire', Number(e.target.value))} />
-                      );
-                    })()}
+                    {/* V123 — Affichage VIP : prix public barré + prix négocié en violet */}
+                    {ligne.prix_unitaire > 0 && ligne.prix_negocie && ligne.prix_negocie !== ligne.prix_unitaire ? (
+                      <span>
+                        <span style={{ textDecoration: 'line-through', color: '#CBD5E1', marginRight: 8 }}>
+                          {ligne.prix_unitaire.toLocaleString('fr-FR')} €
+                        </span>
+                        <b style={{ color: '#A78BFA' }}>{ligne.prix_negocie.toLocaleString('fr-FR')} €</b>
+                      </span>
+                    ) : (
+                      <span>{ligne.prix_unitaire?.toLocaleString('fr-FR')} €</span>
+                    )}
                   </td>
                   <td style={{ textAlign: 'right', fontWeight: 600, paddingRight: 8 }}>
-                    {(() => {
-                      const ref = ligne.ref || '';
-                      const prixPublic = ligne.prix_unitaire || 0;
-                      const prixNegocie = devis.prix_negocies?.[ref] ?? prixPublic;
-                      const estNegocie = devis.is_vip && prixNegocie !== prixPublic;
-                      const totalLigne = prixNegocie * (ligne.qte || 1);
-                      const totalPublic = prixPublic * (ligne.qte || 1);
-
-                      if (estNegocie) {
-                        return (
-                          <div>
-                            <div style={{ textDecoration: 'line-through', color: '#9CA3AF', fontSize: 12, fontWeight: 400 }}>
-                              {totalPublic.toLocaleString('fr-FR')} €
-                            </div>
-                            <div style={{ color: '#7c3aed', fontWeight: 600 }}>
-                              {totalLigne.toLocaleString('fr-FR')} €
-                            </div>
-                          </div>
-                        );
-                      }
-                      return <span>{totalLigne.toLocaleString('fr-FR')} €</span>;
-                    })()}
+                    {/* V123 — Total avec VIP si prix négocié */}
+                    {ligne.prix_negocie && ligne.prix_negocie !== ligne.prix_unitaire ? (
+                      <span>
+                        <span style={{ textDecoration: 'line-through', color: '#CBD5E1', marginRight: 8, fontWeight: 400, fontSize: 12 }}>
+                          {(ligne.prix_unitaire * ligne.qte).toLocaleString('fr-FR')} €
+                        </span>
+                        <b style={{ color: '#A78BFA' }}>{(ligne.prix_negocie * ligne.qte).toLocaleString('fr-FR')} €</b>
+                      </span>
+                    ) : (
+                      <span>{(ligne.prix_unitaire * ligne.qte).toLocaleString('fr-FR')} €</span>
+                    )}
                   </td>
                   <td>
                     <button onClick={() => handleRemoveLigne(index)}

@@ -233,7 +233,7 @@ function renderDocument(doc: jsPDF, data: PdfData): void {
 
 // ============ WRAPPERS DE RÉTROCOMPATIBILITÉ (FIX PRIX PARTENAIRE) ============
 
-function formatDateSafe(v: any): string {
+export function formatDateSafe(v: any): string {
   if (!v) return new Date().toLocaleDateString('fr-FR');
   try {
     // 1. Support Firestore Timestamp (.toDate())
@@ -261,17 +261,11 @@ function mapLignesToItems(lignes: any[], prixNegocies?: Record<string, number>, 
   return (lignes || []).map((l: any) => {
     const ref = l.ref || l.reference || '';
     const publicPrice = l.prix_unitaire || 0;
-    // V123 — Priorité prix négocié : 1) ligne.prix_negocie > 0  2) prixNegocies[ref]  3) prix_unitaire
-    const lignePrixNegocie = (l.prix_negocie || l.prix_negocie_vip || 0);
-    const vipPrice = (isVip && lignePrixNegocie > 0)
-      ? lignePrixNegocie
-      : (isVip && prixNegocies && prixNegocies[ref] !== undefined && prixNegocies[ref] > 0)
-        ? prixNegocies[ref]
-        : publicPrice;
-    return {
-      ref, qt: l.qte || 1, desc: l.nom_fr || l.description || ref,
-      publicPrice, vipPrice, total: vipPrice * (l.qte || 1),
-    };
+    // V123 — Priorité : prix_negocie > prixNegocies[ref] > prix_unitaire
+    const vipPrice = isVip
+      ? (l.prix_negocie > 0 ? l.prix_negocie : prixNegocies?.[ref] || publicPrice)
+      : publicPrice;
+    return { ref, qt: l.qte || 1, desc: l.nom_fr || l.description || ref, publicPrice, vipPrice, total: vipPrice * (l.qte || 1) };
   });
 }
 
