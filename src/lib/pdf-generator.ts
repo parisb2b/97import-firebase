@@ -289,7 +289,9 @@ export function mapLignesToItems(lignes: any[], prixNegocies?: Record<string, nu
 
 export function generateDevis(quote: any, _emetteur?: any): jsPDF {
   const isVip = quote.is_vip === true;
+  console.log("🔍 generateDevis — isVip:", isVip, "prix_negocies:", JSON.stringify(quote.prix_negocies), "lignes:", quote.lignes?.length);
   const items = mapLignesToItems(quote.lignes || [], quote.prix_negocies, isVip);
+  console.log("🔍 generateDevis — items[0]:", items[0] ? { ref: items[0].ref, publicPrice: items[0].publicPrice, vipPrice: items[0].vipPrice } : 'no items');
   const data: PdfData = {
     type: isVip ? 'DV_VIP' : 'DV',
     number: (quote.numero || quote.id).replace('DVS-', 'DV-'),

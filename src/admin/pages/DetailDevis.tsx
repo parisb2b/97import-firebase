@@ -206,6 +206,7 @@ export default function DetailDevis() {
     setSaving(true);
     try {
       const total_ht = calculateTotal(devis.lignes);
+      console.log("🔍 handleSave — prix_negocies:", JSON.stringify(devis.prix_negocies), "is_vip:", devis.is_vip);
       const data = {
         ...devis,
         total_ht,
@@ -512,30 +513,62 @@ export default function DetailDevis() {
                       onChange={(e) => handleLigneChange(index, 'qte', Number(e.target.value))} />
                   </td>
                   <td style={{ textAlign: 'right', verticalAlign: 'middle', paddingRight: 8 }}>
-                    {/* V123 — Affichage VIP : prix public barré + prix négocié en violet */}
-                    {ligne.prix_unitaire > 0 && ligne.prix_negocie && ligne.prix_negocie !== ligne.prix_unitaire ? (
-                      <span>
-                        <span style={{ textDecoration: 'line-through', color: '#CBD5E1', marginRight: 8 }}>
-                          {ligne.prix_unitaire.toLocaleString('fr-FR')} €
-                        </span>
-                        <b style={{ color: '#A78BFA' }}>{ligne.prix_negocie.toLocaleString('fr-FR')} €</b>
-                      </span>
-                    ) : (
-                      <span>{ligne.prix_unitaire?.toLocaleString('fr-FR')} €</span>
-                    )}
+                    {/* V123-ULTIMATE — Prix VIP depuis prix_negocies[ref] (source Firestore réelle) */}
+                    {(() => {
+                      const ref = ligne.ref || '';
+                      const prixPublic = ligne.prix_unitaire || 0;
+                      const prixNegocie = devis.prix_negocies?.[ref];
+                      const estNegocie = devis.is_vip && prixNegocie !== undefined && prixNegocie !== prixPublic;
+
+                      if (estNegocie) {
+                        return (
+                          <div>
+                            <div style={{ textDecoration: 'line-through', color: '#CBD5E1', fontSize: 12 }}>
+                              {prixPublic.toLocaleString('fr-FR')} €
+                            </div>
+                            <input className="fi" type="number" value={prixNegocie} min={0}
+                              style={{ textAlign: 'right', color: '#A78BFA', fontWeight: 600, width: 100 }}
+                              onChange={(e) => {
+                                const newPrice = Number(e.target.value);
+                                const updated = { ...(devis.prix_negocies || {}), [ref]: newPrice };
+                                setDevis({ ...devis, prix_negocies: updated });
+                                console.log("🔍 VIP SAVE — ref:", ref, "prixNegocie:", newPrice, "prix_negocies:", updated);
+                              }} />
+                          </div>
+                        );
+                      }
+                      return (
+                        <input className="fi" type="number" value={prixPublic} min={0}
+                          style={{ textAlign: 'right', width: 100 }}
+                          disabled={estLectureSeule}
+                          onChange={(e) => handleLigneChange(index, 'prix_unitaire', Number(e.target.value))} />
+                      );
+                    })()}
                   </td>
                   <td style={{ textAlign: 'right', fontWeight: 600, paddingRight: 8 }}>
-                    {/* V123 — Total avec VIP si prix négocié */}
-                    {ligne.prix_negocie && ligne.prix_negocie !== ligne.prix_unitaire ? (
-                      <span>
-                        <span style={{ textDecoration: 'line-through', color: '#CBD5E1', marginRight: 8, fontWeight: 400, fontSize: 12 }}>
-                          {(ligne.prix_unitaire * ligne.qte).toLocaleString('fr-FR')} €
-                        </span>
-                        <b style={{ color: '#A78BFA' }}>{(ligne.prix_negocie * ligne.qte).toLocaleString('fr-FR')} €</b>
-                      </span>
-                    ) : (
-                      <span>{(ligne.prix_unitaire * ligne.qte).toLocaleString('fr-FR')} €</span>
-                    )}
+                    {/* V123-ULTIMATE — Total avec VIP depuis prix_negocies[ref] */}
+                    {(() => {
+                      const ref = ligne.ref || '';
+                      const prixPublic = ligne.prix_unitaire || 0;
+                      const prixNegocie = devis.prix_negocies?.[ref];
+                      const estNegocie = devis.is_vip && prixNegocie !== undefined && prixNegocie !== prixPublic;
+                      const totalVIP = (prixNegocie ?? prixPublic) * (ligne.qte || 1);
+                      const totalPublic = prixPublic * (ligne.qte || 1);
+
+                      if (estNegocie) {
+                        return (
+                          <div>
+                            <div style={{ textDecoration: 'line-through', color: '#CBD5E1', fontSize: 12, fontWeight: 400 }}>
+                              {totalPublic.toLocaleString('fr-FR')} €
+                            </div>
+                            <div style={{ color: '#A78BFA', fontWeight: 600 }}>
+                              {totalVIP.toLocaleString('fr-FR')} €
+                            </div>
+                          </div>
+                        );
+                      }
+                      return <span>{totalVIP.toLocaleString('fr-FR')} €</span>;
+                    })()}
                   </td>
                   <td>
                     <button onClick={() => handleRemoveLigne(index)}
