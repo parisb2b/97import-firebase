@@ -1699,3 +1699,8 @@ Modifs clés : Logo 17.2mm, Pill 31.5x10.8mm, radius 3.2/4.3/10mm, Émetteur 7 l
 ✅ Encaisser visible dès signe | ✅ Route /espace-client/:tab? | ✅ Auto-transition commande_ferme
 ✅ 4 wrappers rétrocompatibles | ✅ Design V115 sanctuarisé | ✅ Build OK
 V118-ULTIMATE | 06/05 | Injection Force Majeure (Date/Sign/Paiement) | ✅ RÉSOLU
+----------------------------------------
+🗓️ 06/05/2026 22:15 CEST | 🔴 V119 : Correction sentinel serverTimestamp() + _seconds admin SDK
+📄 8 devis corrigés (DVS-2605001 à DVS-2605008) : createdAt/updatedAt remplacés par Timestamps réels
+📄 formatDateSafe : ajout support {_seconds} (admin SDK) en plus de {seconds} (client SDK)
+📄 formatDateAcompte (DetailDevis) : aligné sur les 3 formats (toDate/seconds/_seconds)

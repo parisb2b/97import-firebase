@@ -240,9 +240,13 @@ function formatDateSafe(v: any): string {
     if (v && typeof v.toDate === 'function') {
       return v.toDate().toLocaleDateString('fr-FR');
     }
-    // 2. Support Objet Timestamp {seconds, nanoseconds}
+    // 2. Support Objet Timestamp {seconds, nanoseconds} (client SDK)
     if (v && typeof v.seconds === 'number') {
       return new Date(v.seconds * 1000).toLocaleDateString('fr-FR');
+    }
+    // 2b. Support Objet Timestamp {_seconds, _nanoseconds} (admin SDK)
+    if (v && typeof v._seconds === 'number') {
+      return new Date(v._seconds * 1000).toLocaleDateString('fr-FR');
     }
     // 3. Fallback Date standard ou string
     const d = new Date(v);

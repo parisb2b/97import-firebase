@@ -1,3 +1,4 @@
 V116 | 06/05/2026 | Réparation prix négociés (Espace Partenaire) + Fix lien adresses | ✅ RÉSOLU
 V117 | 06/05/2026 | Restauration Logique V116 + Design 6 Mai Sanctuarisé + Flux Signature/Paiement | ✅ RÉSOLU
 V118 | 06/05/2026 | Consolidation Finale & Correction Force Majeure (vérification conformité V117) | ✅ RÉSOLU
+V119 | 06/05/2026 22:15 | Correction sentinel serverTimestamp() Firestore (8 devis) + support _seconds admin SDK | ✅ RÉSOLU

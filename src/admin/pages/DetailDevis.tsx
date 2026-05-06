@@ -96,7 +96,10 @@ export default function DetailDevis() {
   const formatDateAcompte = (val: any): string => {
     if (!val) return '—';
     try {
-      const d = val?.toDate ? val.toDate() : new Date(val);
+      if (val?.toDate) return val.toDate().toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+      if (typeof val.seconds === 'number') return new Date(val.seconds * 1000).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+      if (typeof val._seconds === 'number') return new Date(val._seconds * 1000).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+      const d = new Date(val);
       if (isNaN(d.getTime())) return '—';
       return d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
     } catch { return '—'; }
