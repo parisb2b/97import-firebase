@@ -190,7 +190,7 @@ export default function Panier() {
     setSubmitting(true);
     logInfo('Panier', 'Début création devis', { items: cart.length, partner: selectedPartner });
     try {
-      const numero = await getNextNumber('DVS');
+      const numero = await getNextNumber('DV');
       logInfo('Panier', 'Numéro devis obtenu', { numero });
       const devisId = numero.replace(/[^a-zA-Z0-9]/g, '-');
       const lignes = cart.map(item => {

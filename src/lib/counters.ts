@@ -19,5 +19,5 @@ export const getNextNumber = async (prefix: string): Promise<string> => {
   return `${prefix}-${aamm}${String(newVal).padStart(3, '0')}`;
 };
 
-// Préfixes : DVS | FA | F | NC | CONT | SAV | LA | STK
-// Exemples : DVS-2604001 | FA-2604001 | NC-2604001
+// Préfixes (V120) : DV- (Devis), DC- (Commandes), FAC- (Facture Acompte), FA- (Facture), NC- (Note Commission), FL- (Logistique), AI- (Achat Import), BL- (Livraison), CTN- (Conteneur), SAV- (SAV), LA- (Liste Achat)
+// Exemples : DV-2605001 | FA-2605001 | NC-2605001 | DC-2605001

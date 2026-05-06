@@ -36,7 +36,7 @@ export default function ModalDupliquerDevis({
     setError(null);
 
     try {
-      const newNumero = await getNextNumber('DVS');
+      const newNumero = await getNextNumber('DV');
 
       const newDevis: any = {
         ...devisSource,
@@ -131,7 +131,7 @@ export default function ModalDupliquerDevis({
             <li>Statut : <strong>nouveau</strong></li>
             <li>Aucun acompte (à recommencer)</li>
             <li>Aucun prix VIP négocié</li>
-            <li>Numéro régénéré (DVS-AAMM-NNN)</li>
+            <li>Numéro régénéré (DV-AAMM-NNN)</li>
           </ul>
         </div>
 

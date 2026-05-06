@@ -1704,3 +1704,9 @@ V118-ULTIMATE | 06/05 | Injection Force Majeure (Date/Sign/Paiement) | ✅ RÉSO
 📄 8 devis corrigés (DVS-2605001 à DVS-2605008) : createdAt/updatedAt remplacés par Timestamps réels
 📄 formatDateSafe : ajout support {_seconds} (admin SDK) en plus de {seconds} (client SDK)
 📄 formatDateAcompte (DetailDevis) : aligné sur les 3 formats (toDate/seconds/_seconds)
+----------------------------------------
+🗓️ 06/05/2026 22:20 CEST | 🔴 Mission V120 : Hard Reset circuit commercial
+🧹 Phase 1 : 143 documents supprimés (8 quotes + 135 logs), compteurs → 0
+📏 Phase 2 : DVS- → DV- dans 3 fichiers (Panier, ModalDupliquer, DetailDevis) + counters.ts
+⚙️ Phase 3 : Correctifs V118 vérifiés (formatDateSafe, boutons Signer/Encaisser)
+🚀 Phase 4 : Build OK, firestore:rules déployé, serveur redémarré

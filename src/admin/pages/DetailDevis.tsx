@@ -121,7 +121,7 @@ export default function DetailDevis() {
     const load = async () => {
       try {
         if (isNew) {
-          const numero = await getNextNumber('DVS');
+          const numero = await getNextNumber('DV');
           setDevis({ ...emptyDevis, numero });
           setLoading(false);
           return;
