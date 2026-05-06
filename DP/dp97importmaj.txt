@@ -1698,3 +1698,4 @@ Modifs clés : Logo 17.2mm, Pill 31.5x10.8mm, radius 3.2/4.3/10mm, Émetteur 7 l
 ✅ formatDateSafe Firestore-proof | ✅ VIP pricing mapLignesToItems | ✅ Bouton Signature (envoye→signe)
 ✅ Encaisser visible dès signe | ✅ Route /espace-client/:tab? | ✅ Auto-transition commande_ferme
 ✅ 4 wrappers rétrocompatibles | ✅ Design V115 sanctuarisé | ✅ Build OK
+V118-ULTIMATE | 06/05 | Injection Force Majeure (Date/Sign/Paiement) | ✅ RÉSOLU

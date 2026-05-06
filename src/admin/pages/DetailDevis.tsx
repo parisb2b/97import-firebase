@@ -11,7 +11,7 @@ import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage
 import { adminDb as db, adminStorage as storage } from '../../lib/firebase';
 import { useI18n } from '../../i18n';
 import { getNextNumber } from '../../lib/counters';
-import { prochainPaiementEstSolde, getSoldeRestant, isDevisReadonly } from '../../lib/quoteStatusHelpers';
+import { isDevisReadonly } from '../../lib/quoteStatusHelpers';
 import { OrangeIndicator } from '../../components/OrangeIndicator';
 import { generateDevis, downloadPDF } from '../../lib/pdf-generator';
 import { Card, Button } from '../components/Icons';
@@ -265,16 +265,6 @@ export default function DetailDevis() {
     });
   };
 
-  const handleEncaisser = async () => {
-    const acomptesDeclares = (devis.acomptes || []).filter((a: any) => a.encaisse === false);
-    if (acomptesDeclares.length === 0) {
-      setErrorMsg('Aucun acompte déclaré en attente'); setTimeout(() => setErrorMsg(''), 5000);
-      return;
-    }
-    setShowEncaisserModal(true);
-  };
-
-
   if (loading) {
     return <div style={{ textAlign: 'center', padding: 32 }}>Chargement...</div>;
   }
@@ -325,32 +315,25 @@ export default function DetailDevis() {
           {isNew ? 'Nouveau devis' : devis.numero}
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
-          {/* V117 — Bouton Signature : visible uniquement quand statut=envoye */}
+          {/* V118 - BOUTON SIGNER : Uniquement si envoyé */}
           {!isNew && devis.statut === 'envoye' && (
             <Button variant="s" onClick={async () => {
-              try {
-                await updateDoc(doc(db, 'quotes', devis.id!), { statut: 'signe', updatedAt: serverTimestamp() });
-                setDevis({ ...devis, statut: 'signe' });
-                setSuccessMsg('Devis signé — prêt pour encaissement');
-                setTimeout(() => setSuccessMsg(''), 3000);
-              } catch (err) { console.error('Signature error:', err); setErrorMsg('Erreur signature'); setTimeout(() => setErrorMsg(''), 5000); }
+              const docRef = doc(db, 'quotes', devis.id!);
+              await updateDoc(docRef, { statut: 'signe', updatedAt: serverTimestamp() });
+              setDevis({ ...devis, statut: 'signe' });
+              setSuccessMsg('Devis marqué comme SIGNÉ — Prêt pour encaissement');
+              setTimeout(() => setSuccessMsg(''), 3000);
             }}>
               ✍️ Signer le devis
             </Button>
           )}
-          {/* V117 — Bouton Encaisser : visible dès que statut=signe (ou phase paiement) */}
-          {!isNew && (devis.statut === 'signe' || devis.statut.startsWith('acompte_') || devis.statut === 'solde_paye') && (devis.acomptes || []).some((a: any) => a.encaisse === false) && (() => {
-            const acomptes = devis.acomptes || [];
-            const soldeRestant = getSoldeRestant(devis.total_ht || 0, acomptes);
-            const estSolde = prochainPaiementEstSolde(acomptes);
-            return (
-              <Button variant="s" onClick={handleEncaisser}>
-                {estSolde
-                  ? `🏁 Encaisser le Solde (${soldeRestant.toFixed(2)}€)`
-                  : t('btn.encaisser')}
-              </Button>
-            );
-          })()}
+
+          {/* V118 - BOUTON ENCAISSER : Dès que signé */}
+          {!isNew && (devis.statut === 'signe' || devis.statut.startsWith('acompte_')) && (
+            <Button variant="s" onClick={() => setShowEncaisserModal(true)}>
+              💰 Encaisser un acompte
+            </Button>
+          )}
           <Button variant="p" onClick={handleSave} disabled={saving || estLectureSeule}>
             {saving ? t('loading') : t('btn.enregistrer')}
           </Button>

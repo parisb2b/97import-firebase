@@ -236,10 +236,21 @@ function renderDocument(doc: jsPDF, data: PdfData): void {
 function formatDateSafe(v: any): string {
   if (!v) return new Date().toLocaleDateString('fr-FR');
   try {
-    if (typeof v.toDate === 'function') return v.toDate().toLocaleDateString('fr-FR');
-    if (v && v.seconds) return new Date(v.seconds * 1000).toLocaleDateString('fr-FR');
-    return new Date(v).toLocaleDateString('fr-FR');
-  } catch { return new Date().toLocaleDateString('fr-FR'); }
+    // 1. Support Firestore Timestamp (.toDate())
+    if (v && typeof v.toDate === 'function') {
+      return v.toDate().toLocaleDateString('fr-FR');
+    }
+    // 2. Support Objet Timestamp {seconds, nanoseconds}
+    if (v && typeof v.seconds === 'number') {
+      return new Date(v.seconds * 1000).toLocaleDateString('fr-FR');
+    }
+    // 3. Fallback Date standard ou string
+    const d = new Date(v);
+    return isNaN(d.getTime()) ? new Date().toLocaleDateString('fr-FR') : d.toLocaleDateString('fr-FR');
+  } catch (e) {
+    console.error("Erreur formatDateSafe:", e);
+    return new Date().toLocaleDateString('fr-FR');
+  }
 }
 
 function mapLignesToItems(lignes: any[], prixNegocies?: Record<string, number>, isVip?: boolean): PdfItem[] {
