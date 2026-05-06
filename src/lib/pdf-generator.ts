@@ -257,15 +257,33 @@ export function formatDateSafe(v: any): string {
   }
 }
 
-function mapLignesToItems(lignes: any[], prixNegocies?: Record<string, number>, isVip?: boolean): PdfItem[] {
+// V123-ULTIMATE — Robuste : !== undefined (évite le piège || avec 0)
+export function mapLignesToItems(lignes: any[], prixNegocies?: Record<string, number>, isVip?: boolean): PdfItem[] {
   return (lignes || []).map((l: any) => {
     const ref = l.ref || l.reference || '';
     const publicPrice = l.prix_unitaire || 0;
-    // V123 — Priorité : prix_negocie > prixNegocies[ref] > prix_unitaire
-    const vipPrice = isVip
-      ? (l.prix_negocie > 0 ? l.prix_negocie : prixNegocies?.[ref] || publicPrice)
-      : publicPrice;
-    return { ref, qt: l.qte || 1, desc: l.nom_fr || l.description || ref, publicPrice, vipPrice, total: vipPrice * (l.qte || 1) };
+
+    // PRIORITÉ ABSOLUE :
+    // 1. La ligne elle-même a un prix_negocie (saisie admin)
+    // 2. L'objet global prixNegocies (négociation partenaire)
+    // 3. Sinon on garde le prix public
+    let finalVipPrice = publicPrice;
+    if (isVip) {
+      if (l.prix_negocie && l.prix_negocie > 0) {
+        finalVipPrice = l.prix_negocie;
+      } else if (prixNegocies && prixNegocies[ref] !== undefined) {
+        finalVipPrice = prixNegocies[ref];
+      }
+    }
+
+    return {
+      ref,
+      qt: l.qte || 1,
+      desc: l.nom_fr || l.description || ref,
+      publicPrice: publicPrice,
+      vipPrice: finalVipPrice,
+      total: finalVipPrice * (l.qte || 1)
+    };
   });
 }
 
