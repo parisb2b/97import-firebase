@@ -1567,3 +1567,56 @@ export const getBuildInfo = () => {
 ### Résultat
 - Base de données propre, prête pour les nouveaux modèles PDF V2
 - Build ✅ OK (456 modules, 17.12s)
+
+---
+
+## MISSION V108.1 — Régénération PDF V3 depuis TOUTVIP.html
+Date : 2026-05-06 09:00 CEST
+
+### Action
+Remplacement intégral de `src/lib/pdf-generator.ts` (ancien : 892 lignes, V2 artisanal → nouveau : 527 lignes, V3 structuré jsPDF + autoTable).
+
+### Fichier modifié
+`src/lib/pdf-generator.ts` — réécrit entièrement.
+
+### Dépendances
+- `jspdf` : déjà présent (^4.2.1)
+- `jspdf-autotable` : installé (ajout package.json)
+
+### Architecture V3
+- Types stricts : `PdfDocumentType`, `PdfData`, `PdfItem`, `PdfPayment`
+- Palette unifiée via objet `COLORS`
+- Fonctions de rendu modulaires : `drawHeader`, `drawInfoBox`, `drawCommonBlocks`, `drawNote`, `drawTable`, `drawTotals`, `drawFooter`, `drawPaidStamp`, `drawPayments`
+- `autoTable` pour les tableaux avec `didParseCell`/`didDrawCell` pour prix barrés
+- Backward-compatible wrappers : `generateDevis`, `generateFactureFinale`, `generateNoteCommission`, `generateFactureLogistique`, `downloadPDF`
+
+### 10 types de documents supportés
+| Code | Titre | Couleur |
+|------|-------|---------|
+| DV | DEVIS | Bleu #1E88E5 |
+| DV_VIP | DEVIS VIP | Bleu #1E88E5 |
+| DC | MES COMMANDES | Orange #F5924A |
+| FAC | FACTURE ACOMPTE | Orange #F5924A |
+| FA | FACTURE | Vert #4ADE80 |
+| AF | AVOIR SUR FACTURE | Rouge #F87171 |
+| NC | NOTE DE COMMISSION | Violet #A78BFA |
+| FL | FACTURE LOGISTIQUE | Marron #7D6608 |
+| AI | ACHAT IMPORT | Orange #F5924A |
+| BL | BON DE LIVRAISON | Bleu foncé #1A5276 |
+
+### Commandes exécutées
+```
+npm install jspdf-autotable
+npm run build → ✅ OK (457 modules, 16.66s)
+npm run lint  → ✅ 0 erreur (31 warnings préexistants, 1 corrigé: prefer-const)
+```
+
+### Résultat
+- Build ✅ OK
+- Lint ✅ 0 erreur
+- 13 fichiers importateurs conservent leur compatibilité
+- Positions A4 mm appliquées (marge 15mm, cadres x=15/107, y=45/108)
+- Prix barrés via `didDrawCell`
+- Tampon PAYÉE sur factures (FA)
+- Récapitulatif paiements sur factures
+- Pied de page adapté par type
