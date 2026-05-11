@@ -86,7 +86,7 @@ export default function Catalogue() {
           const normalizedEmail = u.email?.toLowerCase() || '';
           let snap = await getDoc(doc(db, 'users', normalizedEmail));
           if (!snap.exists()) snap = await getDoc(doc(db, 'users', u.uid));
-          setUserRole(snap.data()?.role || 'user');
+          setUserRole(snap.exists() ? snap.data()?.role || 'user' : 'user');
         } catch { setUserRole('user'); }
       } else {
         setUserRole(null);
