@@ -1781,3 +1781,14 @@ V162-REINJECT | 11/05/2026 23:37 | Réinjection 3 comptes maîtres Auth Emulator
   Partenaire: 97importcom@gmail.com (7uCdrkueMlEZbu7V58mMPW5phxAl) | users/97importcom@gmail.com role=partenaire code=IMP |
   Client: mc@sasfr.com (ZeOhQ9GwRcz0MNth8uocIaFOaYgh) | users/mc@sasfr.com role=client + clients/ZeOhQ9GwRcz0MNth8uocIaFOaYgh |
   Méthode: Auth Emulator REST API + Firestore Emulator REST API (Bearer owner bypass) | Aucune purge |
+M1009 | 11/05/2026 23:50 | v0.43.12 | RECONSTRUCTION SYSTÉMIQUE ET HARMONISATION |
+  §2.1 Vite HMR isolation : server.watch.ignored 12 patterns (firebase_data, exports, logs, DP, docs) |
+  §2.2 Firebase.ts : instance unique + 127.0.0.1 certifié M1009 |
+  §2.3 Firestore.rules : RBAC email token universel + anti-escalation certifié M1009 |
+  §2.4 useAuth.ts : hook central loading gate + .toLowerCase() + dual-path certifié M1009 |
+  §3 Purge + Relance : 16 processus node tués, cache Vite nettoyé, émulateurs + Vite relancés |
+  3 comptes maîtres réinjectés (nouveaux UID post-purge) + 4 documents Firestore |
+  Admin: parisb2b@gmail.com (JHXMK2qZYi0fvtrxQHrzAmlM0lZh) |
+  Partenaire: 97importcom@gmail.com (4aIGO6gokzBVWyfj85TIB9DnyObN) |
+  Client: mc@sasfr.com (HaXUcks2aWFBwklNgTdUowxnTQIG) |
+  Auth:9100✅ FS:8081✅ Storage:9200✅ Vite:5173✅ | Build:10.90s✅ | TS:0✅ | Git push:0✅ |
