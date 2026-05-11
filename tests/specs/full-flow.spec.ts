@@ -102,8 +102,11 @@ test.describe('Full-Flow Client', () => {
     for (const path of pages) {
       await page.goto(path);
       await page.waitForTimeout(500);
-      const footer = page.locator('footer').first();
       await expect(page.locator('body')).toBeVisible();
+      const footer = page.locator('footer').first();
+      if (await footer.isVisible()) {
+        expect(await footer.textContent()).toBeTruthy();
+      }
     }
   });
 });
