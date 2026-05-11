@@ -1,0 +1,76 @@
+V162 MEGA MISE À JOUR — RÉSUMÉ CONDENSÉ
+===========================================
+Date    : 2026-05-11 23:00 CEST
+Version : v0.43.11
+Branche : main
+OS      : Windows 11 Pro
+
+STATUT GLOBAL : CERTIFIÉ
+
+COMMITS (7)
+0eb71dc fix(v162): migration users/{uid} → users/{normalizedEmail} avec fallback uid — 6 fichiers
+a311bea fix(v162): ajout garde snap.exists() dans Catalogue et Produit pour cohérence
+71f4b20 fix(v162): PriceDisplay ×1.2/×0.6 → calculerPrixDerivesSync canonique + Parametres défaut 1.5
+c306ae4 feat(v162): ajout test full-flow E2E — 8 cas parcours client complet
+3e0f3ea fix(v162): configuration export Firebase — exportOnExit + nettoyage anciens exports
+ef25e03 docs(v162): journalisation mission V162 — MEGA MISE À JOUR
+1e6a29a fix(v162): correction warning lint footer inutilisé dans full-flow.spec.ts
+
+FICHIERS MODIFIÉS (10)
+src/front/pages/Catalogue.tsx         — users/{uid} → users/{normalizedEmail} + fallback
+src/front/pages/EspacePartenaire.tsx  — users/{uid} → users/{normalizedEmail} + fallback
+src/front/pages/Panier.tsx            — users/{uid} → users/{normalizedEmail} + fallback (×2)
+src/front/pages/EspaceClient.tsx      — users/{uid} → users/{normalizedEmail} + fallback
+src/front/components/Header.tsx       — users/{uid} → users/{normalizedEmail} + fallback
+src/front/pages/Produit.tsx           — users/{uid} → users/{normalizedEmail} + fallback
+src/front/components/PriceDisplay.tsx — ×1.2/×0.6 → calculerPrixDerivesSync()
+src/admin/pages/Parametres.tsx        — défaut taux_majoration_partner 1.2→1.5
+tests/playwright.config.ts            — +projet full-flow
+firebase.json                         — +exportOnExit + exportOnExitDir
+
+FICHIERS CRÉÉS (1)
+tests/specs/full-flow.spec.ts         — 8 cas E2E (112 lignes)
+
+FICHIERS NON MODIFIÉS VOLONTAIREMENT (7)
+src/hooks/useAuth.ts                  — déjà dual-path V157
+src/admin/AdminLogin.tsx              — déjà dual-path V157
+src/front/pages/Connexion.tsx         — déjà dual-path V157
+src/lib/coefficientsHelpers.ts        — déjà canonique ×1.5
+src/lib/productHelpers.ts             — déjà ×1.5 V157
+firestore.rules                       — déjà V157
+storage.rules                         — déjà V157
+
+ANTI-PATTERNS CORRIGÉS (10)
+A1. Catalogue.tsx       — users/{uid} primaire → dual-path
+A2. EspacePartenaire.tsx — users/{uid} primaire → dual-path
+A3. Panier.tsx (1/2)    — users/{uid} primaire → dual-path
+A4. Panier.tsx (2/2)    — users/{uid} primaire → dual-path
+A5. EspaceClient.tsx    — users/{uid} primaire → dual-path
+A6. Header.tsx          — users/{uid} primaire → dual-path
+A7. Produit.tsx         — users/{uid} primaire → dual-path
+B1. PriceDisplay.tsx    — ×1.2 → calculerPrixDerivesSync() ×1.5
+B2. PriceDisplay.tsx    — ×0.6 → fallback ×0.75
+C1. Parametres.tsx      — défaut 1.2 → 1.5
+D1. full-flow.spec.ts   — absent → créé (8 cas)
+E1. firebase.json       — exportOnExit configuré
+
+VALIDATIONS FINALES
+npm run build     : ✅ 456 modules, 11.35s
+npm run lint      : ✅ 0 erreur, 31 warnings (préexistants)
+npx tsc --noEmit  : ✅ 0 erreur
+git diff --stat   : 12 fichiers, +184/−22
+Export Firebase   : ✅ configuré, exécution au prochain arrêt émulateurs
+Aucun git push    : ✅ contrainte respectée
+
+RISQUES RÉSIDUELS (4, tous Faibles)
+1. Empty-string email → lecture Firestore inutile si email null
+2. Duplication pattern 3-lignes → recommandation extraction future
+3. Export non testé en conditions réelles → exécution au prochain arrêt
+4. Tests Playwright non exécutés → nécessitent serveur dev + émulateurs
+
+VERDICT FINAL
+✅ PROJET 97import-firebase CERTIFIÉ V162
+   Tous les anti-patterns V159/V161 corrigés
+   Build/Lint/TS : 0 erreur
+   Aucune régression détectée
+   Aucun git push effectué

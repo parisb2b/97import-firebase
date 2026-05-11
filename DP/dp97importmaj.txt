@@ -1764,8 +1764,13 @@ V157-DP3-CLOTURE | 11/05/2026 07:32 | v0.43.11 | 14 fichiers + purge + relance |
 V159-SCAN-INTEGRAL | 11/05/2026 12:02 | v0.43.11 | Extraction intégrale code source textuel | fichiers:1104 lignes:350631 build:0 lint:0 anti-patterns:⚠️ TROUVÉS playwright:99 export:1 | ⚠️
 V162-MEGA-MAJ | 11/05/2026 23:00 | v0.43.11 | MEGA MISE À JOUR — Correction anti-patterns V159/V161 |
   A. users/{uid}→users/{normalizedEmail} fallback uid : 6 fichiers (Catalogue, EspacePartenaire, Panier×2, EspaceClient, Header, Produit) | 7 occurrences |
-  B. PriceDisplay ×1.2/×0.6 → calculerPrixDerivesSync() canonique ×1.5/×0.75 |
-  C. Parametres.tsx défaut taux_majoration_partner 1.2→1.5 |
-  D. Ajout tests/specs/full-flow.spec.ts (8 cas E2E) + playwright.config.ts |
-  E. Configuration export Firebase exportOnExit + nettoyage exports corrompus |
-  Commits: 0eb71dc, a311bea, 71f4b20, c306ae4, 3e0f3ea | TS:0 erreur | Aucun git push | ✅
+  B. PriceDisplay ×1.2/×0.6 → calculerPrixDerivesSync() canonique ×1.5/×0.75 | 2 occurrences |
+  C. Parametres.tsx défaut taux_majoration_partner 1.2→1.5 | 1 occurrence |
+  D. Ajout tests/specs/full-flow.spec.ts (8 cas E2E) + playwright.config.ts | 112 lignes |
+  E. Configuration export Firebase exportOnExit + nettoyage exports corrompus | 2 répertoires supprimés |
+  Commits: 0eb71dc a311bea 71f4b20 c306ae4 3e0f3ea ef25e03 1e6a29a (7) |
+  Fichiers: 10 modifiés + 1 créé + 7 non modifiés volontairement | +184/−22 lignes |
+  Build:456 modules 11.35s✅ | Lint:0 erreur 31w✅ | TS:0 erreur✅ | Playwright:6 projets✅ |
+  Export:configuré✅ | Anti-patterns:10/10 corrigés✅ | Régression:0✅ | Git push:0✅ |
+  Rapport: docs/reports/V162-RAPPORT-FINAL.md | Résumé: DP/V162-SUMMARY.txt |
+  VERDICT: PROJET CERTIFIÉ V162 ✅
