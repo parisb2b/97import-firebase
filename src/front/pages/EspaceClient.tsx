@@ -36,7 +36,9 @@ export default function EspaceClient() {
       if (!u) { setLoading(false); setUser(null); return; }
       setUser(u);
       try {
-        const snap = await getDoc(doc(db, 'users', u.uid));
+        const normalizedEmail = u.email?.toLowerCase() || '';
+        let snap = await getDoc(doc(db, 'users', normalizedEmail));
+        if (!snap.exists()) snap = await getDoc(doc(db, 'users', u.uid));
         const p = snap.exists() ? snap.data() : null;
         setProfile(p);
         if (p?.role === 'partner') navigate('/espace-partenaire');

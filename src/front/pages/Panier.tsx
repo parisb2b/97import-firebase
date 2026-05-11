@@ -70,7 +70,11 @@ export default function Panier() {
   useEffect(() => {
     const user = clientAuth.currentUser;
     if (!user) return;
-    getDoc(doc(db, 'users', user.uid)).then(snap => {
+    const normalizedEmail = user.email?.toLowerCase() || '';
+    getDoc(doc(db, 'users', normalizedEmail)).then(snap => {
+      if (!snap.exists()) return getDoc(doc(db, 'users', user.uid));
+      return snap;
+    }).then(snap => {
       if (snap.exists()) setClientProfile(snap.data());
     }).catch(() => {});
   }, []);
@@ -194,7 +198,7 @@ export default function Panier() {
       logInfo('Panier', 'Numéro devis obtenu', { numero });
       const devisId = numero.replace(/[^a-zA-Z0-9]/g, '-');
       const lignes = cart.map(item => {
-        const prix_partenaire = item.prix * 0.7;
+        const prix_partenaire = item.prix * 0.75; // V157 — Prix partenaire canonique
         return {
           id: item.id, // V88 — ID Firestore pour lien admin catalogue
           reference: item.ref,
@@ -220,7 +224,9 @@ export default function Panier() {
       // Charger le profil client pour inclure toutes les infos
       let userProfile: any = {};
       try {
-        const userSnap = await getDoc(doc(db, 'users', user.uid));
+        const normalizedEmail = user.email?.toLowerCase() || '';
+        let userSnap = await getDoc(doc(db, 'users', normalizedEmail));
+        if (!userSnap.exists()) userSnap = await getDoc(doc(db, 'users', user.uid));
         if (userSnap.exists()) userProfile = userSnap.data();
       } catch {
         console.warn('Panier: échec chargement profil client');

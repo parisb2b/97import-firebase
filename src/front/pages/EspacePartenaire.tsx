@@ -37,7 +37,9 @@ export default function EspacePartenaire() {
       setUser(u);
       try {
         // Load profile
-        const snap = await getDoc(doc(db, 'users', u.uid));
+        const normalizedEmail = u.email?.toLowerCase() || '';
+        let snap = await getDoc(doc(db, 'users', normalizedEmail));
+        if (!snap.exists()) snap = await getDoc(doc(db, 'users', u.uid));
         const p = snap.exists() ? snap.data() : null;
         setProfile(p);
 
