@@ -1,9 +1,12 @@
 {
-  "firestore": {
-    "rules": "firestore.rules"
-  },
-  "storage": {
-    "bucket": "importok-6ef77.firebasestorage.app",
-    "rules": "storage.rules"
+  "firestore": { "rules": "firestore.rules" },
+  "storage": { "bucket": "importok-6ef77.firebasestorage.app", "rules": "storage.rules" },
+  "emulators": {
+    "auth": { "port": 9100 },
+    "firestore": { "port": 8081 },
+    "storage": { "port": 9200 },
+    "ui": { "enabled": true, "port": 4001 },
+    "exportOnExit": true,
+    "exportOnExitDir": "./firebase-export"
   }
 }
