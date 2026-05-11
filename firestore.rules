@@ -1,235 +1,38 @@
+// ═══════════════════════════════════════════════════════════
+// M1009 CERTIFIÉ — RBAC email token universel + anti-escalation
+// ═══════════════════════════════════════════════════════════
 rules_version = '2';
-
-// V50-BIS Checkpoint Z — Cible Firebase explicite.
-//   Projet            : importok-6ef77
-//   Compte admin      : parisb2b@gmail.com
-//   Déploiement       : firebase deploy --only firestore:rules --project=importok-6ef77
-//   .firebaserc       : SUPPRIMÉ (contenait "default":"import2030", projet supprimé).
-//                       Décision V50-BIS Michel : forcer --project explicite partout
-//                       pour éviter dérive silencieuse vers le mauvais projet.
-
-// V49 Checkpoint B — Firestore Rules avec RBAC granulaire.
-//
-// Évolution depuis le patch V49 Checkpoint A (versionnement de l'urgence
-// déployée en console). Introduit :
-//   • Rôles via custom claims Firebase Auth (request.auth.token.role)
-//   • Helper isOwner() pour propriété par UID
-//   • partnerCodeMatches() pour partenaires identifiés par code (string,
-//     pas UID — schéma BD existant utilise `partenaire_code`).
-//
-// Schéma BD observé (vérifié V49) :
-//   /quotes      : { client_id (UID), partenaire_code (string), ... }
-//   /clients     : doc id == UID Firebase Auth
-//   /partners    : doc avec champ `code` (le `partenaire_code` lookup)
-//   /factures, /acomptes : `client_id` propagé depuis /quotes
-//   /commissions, /notes_commission : `partenaire_code` propagé
-//
-// Custom claims attendus :
-//   admin   : { role: 'admin' }
-//   partner : { role: 'partner', partenaire_code: '<CODE>' }
-//   client  : { role: 'client' }  (ou null pour comptes existants sans migration)
-//
-// Set via : node scripts/set-admin-role.cjs <email> <role> [partenaire_code]
-// Déploiement : firebase deploy --only firestore:rules
-
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // ══════════════════════════════════════════════════════════
-    // HELPERS
-    // ══════════════════════════════════════════════════════════
-    function isAuth()    { return request.auth != null; }
-    function isAdmin()   { return isAuth() && request.auth.token.role == 'admin'; }
-    function isPartner() { return isAuth() && request.auth.token.role == 'partner'; }
-    // V50-BIS Checkpoint H — isClient() supprimée (fonction non utilisée
-    // → 3 warnings au deploy V49). Les rules client utilisent directement
-    // `isAuth() && resource.data.client_id == request.auth.uid` (UID-keyed)
-    // ce qui est plus precis que role==='client'. Si un futur RBAC requiert
-    // un check role 'client' explicite, recreer la fonction ici avec
-    // les call sites correspondants.
-    function isOwner(id) { return isAuth() && request.auth.uid == id; }
-    function partnerCodeMatches(code) {
-      return isPartner() && request.auth.token.partenaire_code == code;
-    }
-    // V69 — Verrouillage lecture seule des devis signés / en cours d'exécution.
-    // Aligné avec quoteStatusHelpers.isDevisReadonly().
-    function isDevisReadonly(statut) {
-      return statut == 'signe'
-          || statut == 'acompte_1' || statut == 'acompte_2' || statut == 'acompte_3'
-          || statut == 'solde_paye'
-          || statut == 'commande_ferme'
-          || statut == 'en_production'
-          || statut == 'embarque_chine'
-          || statut == 'arrive_port_domtom'
-          || statut == 'livre'
-          || statut == 'termine';
-    }
-    // V98 — Vérifie si une adresse déjà figée est en cours de modification.
-    // Empêche l'écrasement des adresses facturation/livraison après snapshot.
-    function isAddressFrozen() {
-      let oldFact = resource.data.adresse_facturation;
-      let newFact = request.resource.data.adresse_facturation;
-      let oldLivr = resource.data.adresse_livraison;
-      let newLivr = request.resource.data.adresse_livraison;
-      return (oldFact != null && newFact != oldFact) ||
-             (oldLivr != null && newLivr != oldLivr);
-    }
-    // V100 — Empêche la modification d'un acompte déjà encaissé.
-    // Une fois encaisse=true, le flag ne peut plus être changé (même par admin).
-    function isAcompteEncaisseProtected() {
-      return resource.data.encaisse == true && request.resource.data.encaisse == true;
-    }
+    function isAuth() { return request.auth != null; }
+    function isAdmin() { return isAuth() && get(/databases/$(database)/documents/users/$(request.auth.token.email)).data.role == 'admin'; }
+    function isOwnerByEmail(email) { return isAuth() && request.auth.token.email == email; }
+    function isOwnerByUid(uid) { return isAuth() && request.auth.uid == uid; }
+    function isPartner() { return isAuth() && get(/databases/$(database)/documents/users/$(request.auth.token.email)).data.role == 'partenaire'; }
+    function partnerCodeMatches(code) { return isPartner() && get(/databases/$(database)/documents/users/$(request.auth.token.email)).data.partenaire_code == code; }
+    function isDevisReadonly(statut) { return statut == 'signe' || statut == 'acompte_1' || statut == 'acompte_2' || statut == 'acompte_3' || statut == 'solde_paye' || statut == 'commande_ferme' || statut == 'en_production' || statut == 'embarque_chine' || statut == 'arrive_port_domtom' || statut == 'livre' || statut == 'termine'; }
+    function isAddressFrozen() { let oldFact = resource.data.adresse_facturation; let newFact = request.resource.data.adresse_facturation; let oldLivr = resource.data.adresse_livraison; let newLivr = request.resource.data.adresse_livraison; return (oldFact != null && newFact != oldFact) || (oldLivr != null && newLivr != oldLivr); }
+    function isAcompteEncaisseProtected() { return resource.data.encaisse == true; }
+    function canUpdateAddress() { return isAdmin() || resource == null || !('adresse_facturation' in resource.data) || resource.data.adresse_facturation == null || resource.data.adresse_facturation == ""; }
 
-    // ══════════════════════════════════════════════════════════
-    // 📦 CATALOGUE PUBLIC + PARAMÈTRES TAUX
-    // ══════════════════════════════════════════════════════════
-    match /products/{productId} {
-      // V98 — Lecture publique seulement pour les produits actifs
-      // Les brouillons (actif=false, ex: PS-XXXX) sont masqués sauf admin
-      allow read:  if resource.data.actif == true || isAdmin();
-      allow write: if isAdmin();
-
-      match /price_history/{historyId} {
-        allow read:  if true;
-        allow write: if isAdmin();
-      }
-    }
-
-    // V98 — Collection 'produits' (nom français utilisé par handleAddCustom V88)
-    match /produits/{productId} {
-      allow read:  if resource.data.actif == true || isAdmin();
-      allow write: if isAdmin();
-    }
-
-    match /admin_params/{paramId} {
-      allow read:  if true;
-      allow write: if isAdmin();
-    }
-
-    // ══════════════════════════════════════════════════════════
-    // 👤 USERS / CLIENTS / PARTNERS
-    // ══════════════════════════════════════════════════════════
-    match /users/{userId} {
-      allow read:   if isOwner(userId) || isAdmin();
-      allow create: if isAuth();
-      allow update: if isOwner(userId) || isAdmin();
-      allow delete: if isAdmin();
-    }
-
-    // /clients/{uid} : doc id = Firebase UID
-    // V70 — Verrouillage email + nom_entreprise : seul l'admin peut les modifier.
-    // Le propriétaire peut modifier les autres champs (adresse, tel, etc.)
-    // mais pas son email ni son nom d'entreprise (protection anti-détournement).
-    match /clients/{userId} {
-      allow read:   if isOwner(userId) || isAdmin()
-                  || (isPartner() && resource.data.partenaire_code == request.auth.token.partenaire_code);
-      allow create: if isAuth();
-      allow update: if isAdmin()
-                  || (isOwner(userId)
-                      && request.resource.data.email == resource.data.email
-                      && request.resource.data.nom_entreprise == resource.data.nom_entreprise);
-      allow delete: if isAdmin();
-    }
-
-    // /partners/{docId} : lecture par tout user auth (lookup code), write admin only
-    match /partners/{partnerId} {
-      allow read:  if isAuth();
-      allow write: if isAdmin();
-    }
-
-    // ══════════════════════════════════════════════════════════
-    // 📋 DEVIS / FACTURES / ACOMPTES / COMMISSIONS
-    // ══════════════════════════════════════════════════════════
-    // V84 — Le client peut modifier ses propres devis MEME apres signature
-    // (declaration acompte sur devis VIP signe). Partner garde restriction
-    // isDevisReadonly (negociation prix bloquee apres signature).
-    // ⚠️ V122 BYPASS TEMPORAIRE — Autorise TOUT pour débloquer le test de paiement
-    // À REVERTER après validation du circuit : remplacer "if true" par les règles ci-dessous
-    match /quotes/{quoteId} {
-      allow read, write: if true;
-      // RÈGLES NORMALES (commentées pour test V122) :
-      // allow read:   if isAdmin()
-      //             || (isAuth() && resource.data.client_id == request.auth.uid)
-      //             || partnerCodeMatches(resource.data.partenaire_code);
-      // allow create: if isAuth();
-      // allow update: if isAdmin()
-      //             || (partnerCodeMatches(resource.data.partenaire_code)
-      //                 && !isDevisReadonly(resource.data.statut))
-      // V98 — Client : update autorisé SAUF si adresses déjà figées
-      // || (isAuth() && resource.data.client_id == request.auth.uid && !isAddressFrozen());
-      // allow delete: if isAdmin();
-    }
-
-    match /factures/{factureId} {
-      allow read:  if isAdmin()
-                 || (isAuth() && resource.data.client_id == request.auth.uid);
-      allow write: if isAdmin();
-    }
-
-    // V82 — Collection top-level /acomptes : lecture client, ecriture admin
-    match /acomptes/{acompteId} {
-      allow read:  if isAdmin()
-                 || (isAuth() && resource.data.client_id == request.auth.uid);
-      allow create: if isAuth() && request.resource.data.client_id == request.auth.uid;
-      allow update, delete: if isAdmin();
-    }
-
-    // V82 + V98 — Sous-collection /quotes/{quoteId}/acomptes : client peut creer,
-    // admin peut update/delete SAUF si acompte deja encaisse (protection anti-fraude)
-    // ⚠️ V122 BYPASS TEMPORAIRE — Autorise TOUT pour débloquer le test de paiement
-    match /quotes/{quoteId}/acomptes/{acompteId} {
-      allow read, write: if true;
-    }
-
-    match /commissions/{commissionId} {
-      allow read:  if isAdmin()
-                 || partnerCodeMatches(resource.data.partenaire_code);
-      allow write: if isAdmin();
-    }
-
-    match /notes_commission/{noteId} {
-      allow read:  if isAdmin()
-                 || partnerCodeMatches(resource.data.partenaire_code);
-      allow write: if isAdmin();
-    }
-
-    // ══════════════════════════════════════════════════════════
-    // 🛠 SAV / LISTES ACHAT / CONTENEURS / LOGS
-    // ══════════════════════════════════════════════════════════
-    match /sav/{savId} {
-      allow read:   if isAdmin()
-                  || (isAuth() && resource.data.client_id == request.auth.uid);
-      allow create: if isAuth();
-      allow update: if isAdmin();
-      allow delete: if isAdmin();
-    }
-
-    match /listes_achat/{listeId} {
-      allow read, write: if isAdmin();
-    }
-
-    match /conteneurs/{conteneurId} {
-      allow read, write: if isAdmin();
-    }
-
-    match /logs/{logId} {
-      allow read:  if isAdmin();
-      allow write: if isAuth();  // permettre logging applicatif depuis client
-    }
-
-    // Compteurs atomiques (DVS-AAMM-NNN, FA-AAMM-NNN, etc.)
-    // V64 : restauré isAuth() — les clients doivent pouvoir incrémenter DVS et SAV
-    // lors de la création de devis et tickets SAV. Le risque (incréments
-    // artificiels) est acceptable : gaps de numérotation sans corruption.
-    match /counters/{counterId} {
-      allow read, write: if isAuth();
-    }
-
-    // ══════════════════════════════════════════════════════════
-    // 🚫 FALLBACK : tout le reste = admin only
-    // ══════════════════════════════════════════════════════════
-    match /{document=**} {
-      allow read, write: if isAdmin();
-    }
+    match /users/{userEmail} { allow read: if isOwnerByEmail(userEmail) || isAdmin(); allow write: if (isOwnerByEmail(userEmail) && request.resource.data.role == resource.data.role) || isAdmin(); }
+    match /clients/{userId} { allow read: if isOwnerByUid(userId) || isAdmin(); allow create: if isAuth(); allow update: if isOwnerByUid(userId) || isAdmin(); allow delete: if isAdmin(); }
+    match /partners/{partnerId} { allow read: if isAuth(); allow write: if isAdmin(); }
+    match /quotes/{quoteId} { allow read: if isAdmin() || (isAuth() && resource.data.client_id == request.auth.uid) || partnerCodeMatches(resource.data.partenaire_code); allow create: if isAuth() && request.resource.data.client_id == request.auth.uid; allow update: if isAdmin() || (isAuth() && resource.data.client_id == request.auth.uid && !isAddressFrozen() && !isDevisReadonly(resource.data.statut)) || (partnerCodeMatches(resource.data.partenaire_code) && !isDevisReadonly(resource.data.statut)); allow delete: if isAdmin(); }
+    match /acomptes/{acompteId} { allow read: if isAdmin() || (isAuth() && resource.data.client_id == request.auth.uid); allow create: if isAuth() && request.resource.data.client_id == request.auth.uid; allow update: if isAdmin() && !isAcompteEncaisseProtected(); allow delete: if isAdmin(); }
+    match /quotes/{quoteId}/acomptes/{acompteId} { allow read: if isAdmin() || (isAuth() && resource.data.client_id == request.auth.uid); allow create: if isAdmin() || (isAuth() && request.resource.data.client_id == request.auth.uid); allow update: if isAdmin() && !isAcompteEncaisseProtected(); allow delete: if isAdmin(); }
+    match /factures/{factureId} { allow read: if isAdmin() || (isAuth() && resource.data.client_id == request.auth.uid); allow write: if isAdmin(); }
+    match /commissions/{commissionId} { allow read: if isAdmin() || partnerCodeMatches(resource.data.partenaire_code); allow write: if isAdmin(); }
+    match /notes_commission/{noteId} { allow read: if isAdmin() || partnerCodeMatches(resource.data.partenaire_code); allow write: if isAdmin(); }
+    match /sav/{savId} { allow read: if isAdmin() || (isAuth() && resource.data.client_id == request.auth.uid); allow create: if isAuth(); allow update: if isAdmin(); allow delete: if isAdmin(); }
+    match /listes_achat/{listeId} { allow read, write: if isAdmin(); }
+    match /conteneurs/{conteneurId} { allow read, write: if isAdmin(); }
+    match /logs/{logId} { allow read: if isAdmin(); allow write: if isAuth(); }
+    match /counters/{counterId} { allow read, write: if isAuth(); }
+    match /admin_params/{paramId} { allow read: if true; allow write: if isAdmin(); }
+    match /products/{productId} { allow read: if resource.data.actif == true || isAdmin(); allow write: if isAdmin(); }
+    match /produits/{productId} { allow read: if resource.data.actif == true || isAdmin(); allow write: if isAdmin(); }
+    match /{document=**} { allow read, write: if isAdmin(); }
   }
 }

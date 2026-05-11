@@ -3,19 +3,21 @@ import react from '@vitejs/plugin-react'
 import { execSync } from 'node:child_process'
 import { readFileSync } from 'node:fs'
 
-// ── Métadonnées de build injectées dans le bundle (badge version v43-mini) ──
-// On injecte des DONNÉES BRUTES (ISO 8601 UTC) — le formatage en heure de Paris
-// est fait à l'affichage dans src/lib/version.ts (formatBuildDate).
+// ── M1009 — Isolation HMR : ignorer les dossiers de données et logs ──
+// Stopper les rafraîchissements intempestifs causés par les exports
+// Firebase, logs, backups et le cache Vite lui-même.
+
+// ── Métadonnées de build injectées dans le bundle (badge version) ──
 const pkg = JSON.parse(readFileSync('./package.json', 'utf-8'))
 
 let commitHash = 'dev'
 try {
   commitHash = execSync('git rev-parse --short HEAD').toString().trim()
 } catch {
-  // git non disponible (env CI sans .git, etc.) — on garde 'dev'
+  // git non disponible (env CI sans .git, etc.)
 }
 
-const buildIsoUtc = new Date().toISOString()  // ex: "2026-04-25T17:55:30.123Z"
+const buildIsoUtc = new Date().toISOString()
 
 export default defineConfig({
   plugins: [react()],
@@ -24,15 +26,31 @@ export default defineConfig({
       '@': '/src',
     },
   },
+  // ── M1009 §2.1 — Isolation HMR ──
+  server: {
+    watch: {
+      ignored: [
+        '**/firebase_data/**',
+        '**/firebase-export*/**',
+        '**/node_modules/.vite/**',
+        '**/DP/**',
+        '**/docs/**',
+        '**/*.log',
+        '**/firebase-debug.log',
+        '**/firestore-debug.log',
+        '**/auth_export/**',
+        '**/storage_export/**',
+        '**/ui-debug.log',
+        '**/test-results/**',
+        '**/playwright-report/**',
+      ],
+    },
+  },
   define: {
     __APP_VERSION__: JSON.stringify(pkg.version),
     __BUILD_ISO__: JSON.stringify(buildIsoUtc),
     __COMMIT_HASH__: JSON.stringify(commitHash),
   },
-  // V46 Checkpoint B — Code-splitting des grosses dépendances vendor.
-  // Le bundle index principal était à 2.91 MB (gzip 803 kB). On extrait
-  // firebase, pdf, excel, dnd-kit dans des chunks séparés, partagés
-  // entre routes et mieux cachables côté navigateur.
   build: {
     chunkSizeWarningLimit: 800,
     rollupOptions: {
