@@ -1744,3 +1744,28 @@ V133 | 07/05/2026 | Uniformisation nomenclature et préfixes (DV-VIP, DC, FAC, F
 🔄 Compteurs reset : DV, FA, FAC, NC, FL, BL, DC, AI, AF, DVS → 0
 📦 Archive : archive-reset-v135.zip (108 KB) — SHA256 vérifié
 ✅ KEEP intact : users(9) clients(6) partners(2) products(127) categories(5)
+ROLLBACK | 09/05/2026 00:45 | Retour à v135 (3b7b610) | Backup V146: archive-v146-post-crash | Clean + npm install OK
+M-FIX-RESEAU | 09/05/2026 00:56 | Cause racine: firebase.ts V135 sans connectAuthEmulator/connectFirestoreEmulator | Correction: ajout emulators 9100/8081 + guard import.meta.env.DEV | User PARISB2B OK | Connexion API OK
+REBOOT | 09/05/2026 07:46 | Purge totale + Sync 15s | Auth:9100 OK Firestore:8081 OK UI:4001 OK Vite:5173 OK
+V149 | 10/05/2026 18:59 | Autotest intégral (Comptes Sanctuarisés) | ❌ ÉCHEC (code 1)
+V149 | 10/05/2026 19:10 | Autotest intégral (Comptes Sanctuarisés) | ✅ RÉUSSI
+V151 | 10/05/2026 19:24 | Publication locale | v0.43.11 | Auth:9100✅ Firestore:8081✅ Vite:5173✅ | 3 comptes OK | firebase.ts: DEV||localhost
+V152 | 10/05/2026 20:00 | Footer version dynamique | getBuildInfo() remplace VERSION_LABEL + formatBuildInfo() | Sans hash git
+M228 | 10/05/2026 20:43 | Désinstallation Skills | developing-genkit-dart supprimé | karpathy-skills absent | settings.json intact
+M226-FIX | 10/05/2026 21:15 | Restauration rules Firestore (helpers + collections granulaires) | isDevisReadonly + isAddressFrozen + isAcompteEncaisseProtected | ✅
+M999 | 10/05/2026 21:32 | Purge + Relance Synchronisée | firebase.ts hardcodé sans condition | Auth:9100✅ Firestore:8081✅ Vite:5173✅ | DÉBLOQUÉ
+M1000 | 10/05/2026 21:40 | v0.43.12 | localhost + Storage + anti-double-init HMR | Auth:9100✅ FS:8081✅ Vite:5173✅ | DÉBLOQUÉ
+M1001 | 10/05/2026 21:52 | v0.43.13 | Fix Enregistrement Adresses + Rôle Admin | users/{userId} write isOwner | canUpdateAddress() | ✅
+M1002 | 10/05/2026 22:07 | Instance unique + isAdmin via token.email + canUpdateAddress + onAuthStateChanged | adminStorage préservé | ✅
+V155-MAGNUM-OPUS | 10/05/2026 22:19 | AdminApp Firestore role check + firestore.rules protections restaurées | Auth✅ FS✅ Vite✅ | CERTIFIÉ
+V155-SCAN | 10/05/2026 22:28 | Scan 24 fichiers | 20 trouvés + 4 absents (non critiques) | 3006 lignes | firebase.ts✅ rules✅ AdminApp✅ | CERTIFIÉ
+V157-DP3 | 11/05/2026 00:51 | v0.43.11 | Consolidation V2-DP → V3-DP : firebase.ts 127.0.0.1 + useAuth hook + AdminApp anti-flash + productHelpers ×1.5 + Panier ×0.75 + rules V157 + 14 fichiers | TS:0 erreur | ✅
+V157-DP3-CLOTURE | 11/05/2026 07:32 | v0.43.11 | 14 fichiers + purge + relance | Auth✅ FS✅ Vite✅ | CERTIFIÉ
+V159-SCAN-INTEGRAL | 11/05/2026 12:02 | v0.43.11 | Extraction intégrale code source textuel | fichiers:1104 lignes:350631 build:0 lint:0 anti-patterns:⚠️ TROUVÉS playwright:99 export:1 | ⚠️
+V162-MEGA-MAJ | 11/05/2026 23:00 | v0.43.11 | MEGA MISE À JOUR — Correction anti-patterns V159/V161 |
+  A. users/{uid}→users/{normalizedEmail} fallback uid : 6 fichiers (Catalogue, EspacePartenaire, Panier×2, EspaceClient, Header, Produit) | 7 occurrences |
+  B. PriceDisplay ×1.2/×0.6 → calculerPrixDerivesSync() canonique ×1.5/×0.75 |
+  C. Parametres.tsx défaut taux_majoration_partner 1.2→1.5 |
+  D. Ajout tests/specs/full-flow.spec.ts (8 cas E2E) + playwright.config.ts |
+  E. Configuration export Firebase exportOnExit + nettoyage exports corrompus |
+  Commits: 0eb71dc, a311bea, 71f4b20, c306ae4, 3e0f3ea | TS:0 erreur | Aucun git push | ✅
