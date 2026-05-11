@@ -1,5 +1,6 @@
 import { Link } from 'wouter';
 import { useI18n } from '../../i18n';
+import { calculerPrixDerivesSync, COEFFICIENTS_DEFAULT } from '../../lib/coefficientsHelpers';
 
 interface PriceDisplayProps {
   product: any;
@@ -23,7 +24,10 @@ export function getProductPrice(product: any, role: string | null | undefined): 
   const achat = getAchat(product);
   const pub = getPublic(product);
   if (!achat && !pub) return 0;
-  if (role === 'partner') return Math.ceil(achat * 1.2) || Math.ceil(pub * 0.6);
+  if (role === 'partner') {
+    const derived = calculerPrixDerivesSync(achat, COEFFICIENTS_DEFAULT);
+    return derived.prix_partner || Math.ceil(pub * 0.75);
+  }
   return pub || Math.ceil(achat * 2);
 }
 
@@ -32,7 +36,8 @@ export default function PriceDisplay({ product, userRole, size = 'md' }: PriceDi
   const achat = getAchat(product);
   const achatCNY = getAchatCNY(product);
   const pub = getPublic(product);
-  const partner = Math.ceil(achat * 1.2) || Math.ceil(pub * 0.6);
+  const derived = calculerPrixDerivesSync(achat, COEFFICIENTS_DEFAULT);
+  const partner = derived.prix_partner || Math.ceil(pub * 0.75);
 
   // Visitor — locked
   if (!userRole) {

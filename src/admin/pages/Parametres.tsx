@@ -143,7 +143,7 @@ export default function Parametres() {
           </div>
           <div className="fg">
             <div className="fl">Coef. majoration partenaires</div>
-            <input className="fi" type="number" min="0.1" max="10" step="0.1" value={global?.taux_majoration_partner || 1.2}
+            <input className="fi" type="number" min="0.1" max="10" step="0.1" value={global?.taux_majoration_partner || 1.5}
               onChange={(e) => setGlobal(g => g ? { ...g, taux_majoration_partner: Number(e.target.value) } : null)} />
           </div>
         </div>
