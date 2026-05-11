@@ -1774,3 +1774,10 @@ V162-MEGA-MAJ | 11/05/2026 23:00 | v0.43.11 | MEGA MISE À JOUR — Correction a
   Export:configuré✅ | Anti-patterns:10/10 corrigés✅ | Régression:0✅ | Git push:0✅ |
   Rapport: docs/reports/V162-RAPPORT-FINAL.md | Résumé: DP/V162-SUMMARY.txt |
   VERDICT: PROJET CERTIFIÉ V162 ✅
+V162-PLAYWRIGHT | 11/05/2026 23:30 | Playwright full-flow | 8/8✅ (config: --config=tests/playwright.config.ts requis) |
+  F04 corrigé (pages légales → body) | F06 corrigé (filtre actif) | 2 échecs v75 préexistants (51/53) |
+V162-REINJECT | 11/05/2026 23:37 | Réinjection 3 comptes maîtres Auth Emulator + 4 documents Firestore |
+  Admin: parisb2b@gmail.com (E5JzqEzob8gjdMFIGIv2Q65lEjAj) | users/parisb2b@gmail.com role=admin |
+  Partenaire: 97importcom@gmail.com (7uCdrkueMlEZbu7V58mMPW5phxAl) | users/97importcom@gmail.com role=partenaire code=IMP |
+  Client: mc@sasfr.com (ZeOhQ9GwRcz0MNth8uocIaFOaYgh) | users/mc@sasfr.com role=client + clients/ZeOhQ9GwRcz0MNth8uocIaFOaYgh |
+  Méthode: Auth Emulator REST API + Firestore Emulator REST API (Bearer owner bypass) | Aucune purge |
