@@ -5,7 +5,7 @@ export default defineConfig({
   timeout: 30000,
   retries: 1,
   use: {
-    baseURL: process.env.TEST_BASE_URL || 'https://97import-firebase-git-v2-parisb2bs-projects.vercel.app',
+    baseURL: process.env.TEST_BASE_URL || 'http://localhost:5173',
     screenshot: 'only-on-failure',
     trace: 'retain-on-failure',
     video: 'retain-on-failure',
@@ -16,5 +16,6 @@ export default defineConfig({
     { name: 'admin', testMatch: 'parcours-admin.spec.ts' },
     { name: 'v75', testMatch: 'parcours-v75.spec.ts' },
     { name: 'v86', testMatch: 'parcours-commandes.spec.ts' },
+    { name: 'full-flow', testMatch: 'full-flow.spec.ts' },
   ],
 });
