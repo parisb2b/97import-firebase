@@ -3,21 +3,25 @@ import { connectAuthEmulator, getAuth } from 'firebase/auth';
 import { connectFirestoreEmulator, initializeFirestore } from 'firebase/firestore';
 import { connectStorageEmulator, getStorage } from 'firebase/storage';
 
+// Configuration pilotée par les variables d'environnement VITE_FIREBASE_*
+// Fallback local uniquement pour le développement hors Vercel
 const firebaseConfig = {
-  apiKey: "AIzaSyLocalDevEmulatorKey",
-  authDomain: "importok-6ef77.firebaseapp.com",
-  projectId: "importok-6ef77",
-  storageBucket: "importok-6ef77.appspot.com",
-  messagingSenderId: "123456789012",
-  appId: "1:123456789012:web:abcdef123456"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || 'AIzaSyLocalDevEmulatorKey',
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || 'importok-6ef77.firebaseapp.com',
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || 'importok-6ef77',
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || 'importok-6ef77.appspot.com',
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '123456789012',
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || '1:123456789012:web:abcdef123456',
 };
+
+console.log('🔥 Diagnostic : Firebase Project ID =', firebaseConfig.projectId);
 
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 const auth = getAuth(app);
 const db = initializeFirestore(app, { ignoreUndefinedProperties: true });
 const storage = getStorage(app);
 
-// Émulateurs locaux — uniquement en développement
+// Émulateurs locaux — uniquement en développement (import.meta.env.DEV)
 if (import.meta.env.DEV) {
   connectAuthEmulator(auth, 'http://127.0.0.1:9100', { disableWarnings: true });
   connectFirestoreEmulator(db, '127.0.0.1', 8081);
