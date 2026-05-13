@@ -100,3 +100,19 @@ ARCHIVE-INTERENOVATIONS-V56/
 playwright-report/
 test-results/
 tests/fixtures/*.storageState.json
+
+# Firebase emulator data (local only)
+firebase_data/
+firebase_data_master/
+.firebaserc
+
+# DP artifacts volumineux (>100 MB)
+DP/V159-SCAN-INTEGRAL-CODE-SOURCE.md
+DP/V159-SCAN-INTEGRAL-CODE-SOURCE.zip
+DP/V159-MANIFEST-CODE-SOURCE.csv
+DP/backups-*/
+
+# Fichiers de debug/temp locaux
+fix-reseau-bloque.md
+REBOOT-INTEGRAL.ps1
+migrate-acomptes.js
