@@ -1,6 +1,9 @@
+// ═══════════════════════════════════════════════════════════
+// M1012 CERTIFIÉ — users/{email} + email.trim().toLowerCase()
+// ═══════════════════════════════════════════════════════════
 import { useState } from 'react';
 import { Link, useLocation } from 'wouter';
-import { createUserWithEmailAndPassword, updateProfile, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { clientAuth, db } from '../../lib/firebase';
 import { useI18n } from '../../i18n';
@@ -18,6 +21,11 @@ export default function Inscription() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const inputStyle: React.CSSProperties = {
+    width: '100%', padding: '12px 16px', borderRadius: 10, border: '1px solid #E5E7EB',
+    fontSize: 14, outline: 'none', boxSizing: 'border-box',
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -29,25 +37,30 @@ export default function Inscription() {
 
     setLoading(true);
     try {
-      const cred = await createUserWithEmailAndPassword(clientAuth, email, password);
-      await updateProfile(cred.user, { displayName: `${prenom} ${nom}` });
+      const cleanEmail = email.trim().toLowerCase();
+      const cred = await createUserWithEmailAndPassword(clientAuth, cleanEmail, password);
 
+      // M1012 : clé primaire = email normalisé (match users/{userEmail} dans les règles)
       const profileData = {
         uid: cred.user.uid,
-        email,
+        email: cleanEmail,
         firstName: prenom,
         lastName: nom,
-        nom: `${prenom} ${nom}`,
+        nom: `${prenom} ${nom}`.trim(),
         role: 'user',
         createdAt: serverTimestamp(),
       };
-      await setDoc(doc(db, 'users', cred.user.uid), profileData);
+      await setDoc(doc(db, 'users', cleanEmail), profileData);
+      // Double écriture clients/{uid} pour rétrocompatibilité
       await setDoc(doc(db, 'clients', cred.user.uid), profileData);
 
       showToast('Compte créé avec succès !');
       setLocation('/profil');
-    } catch (err) {
-      setError((err as Error).message);
+    } catch (err: any) {
+      const code = err?.code || '';
+      if (code.includes('network-request-failed')) setError('Erreur réseau : vérifiez votre connexion et réessayez.');
+      else if (code.includes('email-already-in-use')) setError('Cet email est déjà utilisé.');
+      else setError(err?.message || 'Erreur lors de la création du compte');
     } finally {
       setLoading(false);
     }
@@ -56,36 +69,45 @@ export default function Inscription() {
   const handleGoogle = async () => {
     setError('');
     setLoading(true);
+    console.log('🔍 [Google Auth Inscription] Tentative de connexion Google...');
     try {
       const provider = new GoogleAuthProvider();
+      provider.setCustomParameters({ prompt: 'select_account' });
       const cred = await signInWithPopup(clientAuth, provider);
+      console.log('✅ [Google Auth Inscription] Connexion réussie:', cred.user.email);
+      const googleEmail = cred.user.email?.toLowerCase() || '';
+      const displayName = cred.user.displayName || '';
 
-      // Create client profile if first time (merge: don't overwrite existing role)
-      await setDoc(doc(db, 'clients', cred.user.uid), {
+      const profileData = {
         uid: cred.user.uid,
-        email: cred.user.email,
-        nom: cred.user.displayName || '',
+        email: googleEmail,
+        nom: displayName,
         createdAt: serverTimestamp(),
-      }, { merge: true });
-      await setDoc(doc(db, 'users', cred.user.uid), {
-        uid: cred.user.uid,
-        email: cred.user.email,
-        nom: cred.user.displayName || '',
-        createdAt: serverTimestamp(),
-      }, { merge: true });
+      };
+      // Écriture dans users/{email} (clé primaire)
+      await setDoc(doc(db, 'users', googleEmail), profileData, { merge: true });
+      // Double écriture clients/{uid} pour rétrocompatibilité
+      await setDoc(doc(db, 'clients', cred.user.uid), profileData, { merge: true });
 
       showToast('Compte créé avec succès !');
       setLocation('/profil');
-    } catch (err) {
-      setError((err as Error).message);
+    } catch (err: any) {
+      const code = err?.code || '';
+      console.error('❌ [Google Auth Inscription] Erreur:', code, err?.message);
+      if (code === 'auth/unauthorized-domain') {
+        setError('Domaine non autorisé pour Google Auth. Ajoutez ce domaine dans Firebase Console > Authentication > Settings > Authorized Domains.');
+      } else if (code === 'auth/popup-closed-by-user') {
+        setError('Inscription Google annulée.');
+      } else if (code === 'auth/cancelled-popup-request') {
+        setError('Inscription Google annulée (conflit de popup).');
+      } else if (code === 'auth/account-exists-with-different-credential') {
+        setError('Un compte existe déjà avec cet email. Connectez-vous plutôt.');
+      } else {
+        setError(err?.message || 'Erreur Google');
+      }
     } finally {
       setLoading(false);
     }
-  };
-
-  const inputStyle: React.CSSProperties = {
-    width: '100%', padding: '12px 16px', borderRadius: 10, border: '1px solid #E5E7EB',
-    fontSize: 14, outline: 'none', boxSizing: 'border-box',
   };
 
   return (
@@ -131,14 +153,12 @@ export default function Inscription() {
           </button>
         </form>
 
-        {/* Separator */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '24px 0' }}>
           <div style={{ flex: 1, height: 1, background: '#E5E7EB' }} />
           <span style={{ fontSize: 12, color: '#9CA3AF' }}>ou</span>
           <div style={{ flex: 1, height: 1, background: '#E5E7EB' }} />
         </div>
 
-        {/* Google */}
         <button onClick={handleGoogle} disabled={loading} style={{
           width: '100%', padding: '12px 0', background: 'white', color: '#374151', border: '1px solid #E5E7EB',
           borderRadius: 12, fontSize: 14, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
