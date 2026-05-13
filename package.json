@@ -1,13 +1,17 @@
 {
   "name": "97import-v2",
   "private": true,
-  "version": "0.43.10",
+  "version": "0.43.11",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "prepare": "husky",
+    "emulators": "firebase emulators:start --import=./firebase_data --export-on-exit=./firebase_data --project importok-6ef77",
+    "emulators:safe": "bash scripts/start-firebase-safe.sh",
+    "seed": "bash scripts/seed-auth-firestore.sh"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -29,6 +33,9 @@
   "devDependencies": {
     "@eslint/js": "^9.17.0",
     "@playwright/test": "^1.59.1",
+    "@secretlint/secretlint-rule-preset-recommend": "^13.0.0",
+    "@sentry/react": "^10.52.0",
+    "@sentry/wizard": "^6.12.0",
     "@tailwindcss/forms": "^0.5.11",
     "@types/react": "^19.0.7",
     "@types/react-dom": "^19.0.3",
@@ -38,11 +45,21 @@
     "eslint-plugin-react-hooks": "^5.1.0",
     "eslint-plugin-react-refresh": "^0.4.16",
     "globals": "^15.14.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.4.0",
     "postcss": "^8.5.9",
+    "prettier": "^3.8.3",
+    "secretlint": "^13.0.0",
+    "snyk": "^1.1304.2",
     "tailwindcss": "^4.2.2",
     "typescript": "~5.6.2",
     "typescript-eslint": "^8.18.2",
     "vite": "^6.0.5",
     "vitest": "^4.1.5"
+  },
+  "lint-staged": {
+    "*.ts": "eslint --fix",
+    "*.tsx": "eslint --fix",
+    "*.json": "prettier --write"
   }
 }
