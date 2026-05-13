@@ -26,15 +26,33 @@ jobs:
       - name: Install Playwright
         run: npx playwright install --with-deps chromium
 
+      - name: Start Vite dev server
+        env:
+          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_PROJECT_ID: importok-6ef77
+          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
+          VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
+        run: |
+          npx vite --host 127.0.0.1 --port 5173 &
+          sleep 5
+          curl --retry 5 --retry-delay 2 http://127.0.0.1:5173
+
       - name: Run tests ${{ matrix.role }}
         env:
           VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
+          VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
           TEST_CLIENT_EMAIL: ${{ secrets.TEST_CLIENT_EMAIL }}
           TEST_CLIENT_PASSWORD: ${{ secrets.TEST_CLIENT_PASSWORD }}
           TEST_PARTNER_EMAIL: ${{ secrets.TEST_PARTNER_EMAIL }}
           TEST_PARTNER_PASSWORD: ${{ secrets.TEST_PARTNER_PASSWORD }}
           TEST_ADMIN_EMAIL: ${{ secrets.TEST_ADMIN_EMAIL }}
           TEST_ADMIN_PASSWORD: ${{ secrets.TEST_ADMIN_PASSWORD }}
+          TEST_BASE_URL: http://127.0.0.1:5173
         run: npx playwright test --config=tests/playwright.config.ts tests/specs/parcours-${{ matrix.role }}.spec.ts
 
       - name: Upload test-results (traces + screenshots)
