@@ -41,7 +41,7 @@ export default function DetailClient() {
       <div className="filters" style={{ justifyContent: 'space-between' }}>
         <div className="ct" style={{ fontSize: 18 }}>{client.nom || client.displayName || client.email}</div>
         <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-          {client.role !== 'partner' ? (
+          {client.role !== 'partenaire' ? (
             <button
               onClick={() => setShowPromouvoirModal(true)}
               style={{
@@ -72,7 +72,7 @@ export default function DetailClient() {
           <InfoRow label="Téléphone" value={client.tel || client.phone || '—'} />
           <InfoRow label="Adresse" value={client.adresse || '—'} />
           <InfoRow label="Pays" value={client.pays || 'France'} />
-          <InfoRow label="Rôle" value={<Pill variant={client.role === 'vip' ? 'pu' : client.role === 'partner' ? 'tl' : 'bl'}>{client.role || 'user'}</Pill>} />
+          <InfoRow label="Rôle" value={<Pill variant={client.role === 'vip' ? 'pu' : client.role === 'partenaire' ? 'tl' : 'bl'}>{client.role || 'user'}</Pill>} />
           <InfoRow label="Inscription" value={client.createdAt?.toDate?.()?.toLocaleDateString('fr-FR') || '—'} />
         </div>
       </Card>

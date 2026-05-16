@@ -41,7 +41,7 @@ export default function Clients() {
   );
 
   const vips = filtered.filter(c => c.role === 'vip').length;
-  const partners = filtered.filter(c => c.role === 'partner').length;
+  const partners = filtered.filter(c => c.role === 'partenaire').length;
 
   if (loading) return <LoadingState message="Chargement des clients…" />;
 
@@ -79,7 +79,7 @@ export default function Clients() {
               <tr key={c.id} className="cl" onClick={() => setLocation(`/admin/clients/${c.id}`)}>
                 <td style={{ fontWeight: 700 }}>{c.nom || '—'}</td>
                 <td>{c.email}</td>
-                <td><Pill variant={c.role === 'vip' ? 'pu' : c.role === 'partner' ? 'tl' : c.role === 'admin' ? 'rd' : 'bl'}>{c.role || 'user'}</Pill></td>
+                <td><Pill variant={c.role === 'vip' ? 'pu' : c.role === 'partenaire' ? 'tl' : c.role === 'admin' ? 'rd' : 'bl'}>{c.role || 'user'}</Pill></td>
                 <td style={{ color: 'var(--tx3)' }}>{c.createdAt?.toDate?.()?.toLocaleDateString('fr-FR') || '—'}</td>
                 <td className="tda">
                   <IconButton icon={<EyeIcon />} tooltip="Voir détail" variant="eye" onClick={(e: any) => { e.stopPropagation(); setLocation(`/admin/clients/${c.id}`); }} />

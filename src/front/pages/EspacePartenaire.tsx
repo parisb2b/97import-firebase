@@ -76,7 +76,7 @@ export default function EspacePartenaire() {
       const cred = await signInWithEmailAndPassword(clientAuth, loginEmail, loginPwd);
       // V81 — Vérifier le rôle via custom claims (getIdTokenResult force le refresh)
       const tokenResult = await cred.user.getIdTokenResult(true);
-      if (tokenResult.claims.role !== 'partner') {
+      if (tokenResult.claims.role !== 'partenaire') {
         setLoginErr('Ce compte n\'est pas un compte partenaire. Veuillez utiliser l\'espace client.');
         await clientAuth.signOut();
         return;

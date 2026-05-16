@@ -134,8 +134,8 @@ service cloud.firestore {
     match /listes_achat/{listeId} { allow read, write: if isAdmin(); }
     match /conteneurs/{conteneurId} { allow read, write: if isAdmin(); }
     match /logs/{logId} { allow read: if isAdmin(); allow write: if isAuth(); }
-    match /counters/{counterId} { allow read, write: if isAuth(); }
-    match /admin_params/{paramId} { allow read: if true; allow write: if isAdmin(); }
+    match /counters/{counterId} { allow read: if isAuth(); allow write: if isAdmin(); }
+    match /admin_params/{paramId} { allow read: if isAuth(); allow write: if isAdmin(); }
     match /products/{productId} { allow read: if resource.data.actif == true || isAdmin(); allow write: if isAdmin(); }
     match /produits/{productId} { allow read: if resource.data.actif == true || isAdmin(); allow write: if isAdmin(); }
     match /{document=**} { allow read, write: if isAdmin(); }

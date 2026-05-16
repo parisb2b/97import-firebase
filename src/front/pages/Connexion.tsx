@@ -26,7 +26,7 @@ export default function Connexion() {
       const role = userData.role || 'user';
       const profilComplet = userData.phone || userData.telephone;
       if (!profilComplet) { setLocation('/profil'); }
-      else if (role === 'partner' || role === 'partenaire') { setLocation('/espace-partenaire'); }
+      else if (role === 'partenaire') { setLocation('/espace-partenaire'); }
       else { setLocation('/espace-client'); }
     } catch { setLocation('/'); }
   };

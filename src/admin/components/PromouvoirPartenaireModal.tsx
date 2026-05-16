@@ -63,7 +63,7 @@ export default function PromouvoirPartenaireModal({ client, onClose, onSuccess }
         return;
       }
 
-      await updateDoc(doc(db, 'users', uid), { role: 'partner' });
+      await updateDoc(doc(db, 'users', uid), { role: 'partenaire' });
 
       await setDoc(
         doc(db, 'partners', uid),

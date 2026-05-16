@@ -4,7 +4,7 @@ import { calculerPrixDerivesSync, COEFFICIENTS_DEFAULT } from '../../lib/coeffic
 
 interface PriceDisplayProps {
   product: any;
-  userRole?: string | null; // null = visitor, 'user', 'partner', 'vip', 'admin'
+  userRole?: string | null; // null = visitor, 'user', 'partenaire', 'vip', 'admin'
   size?: 'sm' | 'md' | 'lg';
 }
 
@@ -24,7 +24,7 @@ export function getProductPrice(product: any, role: string | null | undefined): 
   const achat = getAchat(product);
   const pub = getPublic(product);
   if (!achat && !pub) return 0;
-  if (role === 'partner') {
+  if (role === 'partenaire') {
     const derived = calculerPrixDerivesSync(achat, COEFFICIENTS_DEFAULT);
     return derived.prix_partner || Math.ceil(pub * 0.75);
   }
@@ -110,7 +110,7 @@ export default function PriceDisplay({ product, userRole, size = 'md' }: PriceDi
   }
 
   // Partner — big price + public strikethrough
-  if (userRole === 'partner') {
+  if (userRole === 'partenaire') {
     if (size === 'sm') {
       return (
         <div>

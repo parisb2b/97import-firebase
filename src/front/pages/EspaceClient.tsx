@@ -37,13 +37,26 @@ export default function EspaceClient() {
       setUser(u);
       try {
         const normalizedEmail = u.email?.toLowerCase() || '';
-        let snap = await getDoc(doc(db, 'users', normalizedEmail));
-        if (!snap.exists()) snap = await getDoc(doc(db, 'users', u.uid));
-        const p = snap.exists() ? snap.data() : null;
+        // V172 — Chaîne de fallback robuste : clients/{uid} → users/{email} → profil minimal
+        let p: any = null;
+        let snap = await getDoc(doc(db, 'clients', u.uid));
+        if (snap.exists()) {
+          p = snap.data();
+        } else {
+          snap = await getDoc(doc(db, 'users', normalizedEmail));
+          if (snap.exists()) {
+            p = snap.data();
+          } else {
+            // Profil minimal évitant le blocage "Chargement du profil..."
+            p = { email: normalizedEmail, role: 'user', nom: u.displayName || '' };
+          }
+        }
         setProfile(p);
-        if (p?.role === 'partner') navigate('/espace-partenaire');
+        if (p?.role === 'partenaire') navigate('/espace-partenaire');
       } catch (err) {
-        console.error(err);
+        console.error('[EspaceClient] Erreur chargement profil :', err);
+        // V172 — En cas d'erreur réseau, profil minimal au lieu de blocage
+        setProfile({ email: u.email?.toLowerCase() || '', role: 'user', nom: u.displayName || '' });
       }
       setLoading(false);
     });
