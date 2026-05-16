@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "skills": {
+    "focused-fix": {
+      "source": "alirezarezvani/claude-skills",
+      "sourceType": "github",
+      "skillPath": "engineering/skills/focused-fix/SKILL.md",
+      "computedHash": "5a4d6e024f6091c41157c5d80c1235f39609dc99ef78971008a3a113bb8a5002"
+    },
+    "playwright": {
+      "source": "mindrally/skills",
+      "sourceType": "github",
+      "skillPath": "playwright/SKILL.md",
+      "computedHash": "0c13e411cbd3d887d9a85b9b193f48178ee4ecc2fb729a81f499826b8fbe8a2b"
+    },
+    "systematic-debugging": {
+      "source": "secondsky/claude-skills",
+      "sourceType": "github",
+      "skillPath": "plugins/systematic-debugging/skills/systematic-debugging/SKILL.md",
+      "computedHash": "2a91f7d50f3ae7282918715a91dde9158f33b0e0a3b1da752f919524d8bf5c63"
+    }
+  }
+}
