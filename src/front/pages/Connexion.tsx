@@ -6,6 +6,7 @@ import { Link, useLocation } from 'wouter';
 import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { clientAuth, db } from '../../lib/firebase';
+import { isPartnerRole } from '../../lib/roleUtils';
 import { useI18n } from '../../i18n';
 
 export default function Connexion() {
@@ -26,7 +27,7 @@ export default function Connexion() {
       const role = userData.role || 'user';
       const profilComplet = userData.phone || userData.telephone;
       if (!profilComplet) { setLocation('/profil'); }
-      else if (role === 'partenaire') { setLocation('/espace-partenaire'); }
+      else if (isPartnerRole(role)) { setLocation('/espace-partenaire'); }
       else { setLocation('/espace-client'); }
     } catch { setLocation('/'); }
   };

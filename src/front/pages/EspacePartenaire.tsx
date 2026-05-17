@@ -3,6 +3,7 @@ import { useLocation } from 'wouter';
 import { onAuthStateChanged, signInWithEmailAndPassword } from 'firebase/auth';
 import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
 import { clientAuth, db } from '../../lib/firebase';
+import { isPartnerRole } from '../../lib/roleUtils';
 
 // Réutilisation des onglets client v29
 import MesDevis from './espace-client/MesDevis';
@@ -74,9 +75,12 @@ export default function EspacePartenaire() {
     setLoginErr('');
     try {
       const cred = await signInWithEmailAndPassword(clientAuth, loginEmail, loginPwd);
-      // V81 — Vérifier le rôle via custom claims (getIdTokenResult force le refresh)
-      const tokenResult = await cred.user.getIdTokenResult(true);
-      if (tokenResult.claims.role !== 'partenaire') {
+      // V174 — Vérification Firestore (custom claims non déployés)
+      const normalizedEmail = cred.user.email?.toLowerCase() || '';
+      let roleSnap = await getDoc(doc(db, 'users', normalizedEmail));
+      if (!roleSnap.exists()) roleSnap = await getDoc(doc(db, 'users', cred.user.uid));
+      const role = roleSnap.exists() ? roleSnap.data()?.role : null;
+      if (!isPartnerRole(role)) {
         setLoginErr('Ce compte n\'est pas un compte partenaire. Veuillez utiliser l\'espace client.');
         await clientAuth.signOut();
         return;

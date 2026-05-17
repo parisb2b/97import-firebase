@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useLocation, Redirect } from 'wouter';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { clientAuth, db } from '../../lib/firebase';
+import { isPartnerRole } from '../../lib/roleUtils';
 import { useI18n } from '../../i18n';
 import { useToast } from '../components/Toast';
 
@@ -98,7 +99,7 @@ export default function Profil() {
       showToast('Profil enregistré avec succès !');
       const userSnap = await getDoc(doc(db, 'users', normalizedEmail));
       const role = userSnap.exists() ? userSnap.data()?.role || 'user' : 'user';
-      setTimeout(() => { setLocation(role === 'partenaire' ? '/espace-partenaire' : '/espace-client'); }, 1500);
+      setTimeout(() => { setLocation(isPartnerRole(role) ? '/espace-partenaire' : '/espace-client'); }, 1500);
     } catch (err) { console.error('Error saving profile:', err); showToast('Erreur lors de la sauvegarde', 'error'); }
     finally { setSaving(false); }
   };

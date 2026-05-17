@@ -3,6 +3,7 @@ import { useLocation, Redirect, useRoute } from 'wouter';
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { clientAuth, db } from '../../lib/firebase';
+import { isPartnerRole } from '../../lib/roleUtils';
 
 // Import des onglets
 import MesDevis from './espace-client/MesDevis';
@@ -52,7 +53,7 @@ export default function EspaceClient() {
           }
         }
         setProfile(p);
-        if (p?.role === 'partenaire') navigate('/espace-partenaire');
+        if (isPartnerRole(p?.role)) navigate('/espace-partenaire');
       } catch (err) {
         console.error('[EspaceClient] Erreur chargement profil :', err);
         // V172 — En cas d'erreur réseau, profil minimal au lieu de blocage

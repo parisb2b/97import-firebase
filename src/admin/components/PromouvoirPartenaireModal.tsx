@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { doc, updateDoc, setDoc, collection, query, where, getDocs } from 'firebase/firestore';
+import { doc, setDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { adminDb as db } from '../../lib/firebase';
+import { ROLE_PARTENAIRE } from '../../lib/roleUtils';
 import { sanitizeForFirestore } from '../../lib/firebaseUtils';
 import { logInfo, logError } from '../../lib/logService';
 import { useToast } from '../../front/components/Toast';
@@ -63,7 +64,13 @@ export default function PromouvoirPartenaireModal({ client, onClose, onSuccess }
         return;
       }
 
-      await updateDoc(doc(db, 'users', uid), { role: 'partenaire' });
+      // V174 — setDoc merge remplace updateDoc (immunisé contre document inexistant)
+      const userEmail = (client.email || '').toLowerCase();
+      const rolePayload = { role: ROLE_PARTENAIRE, partenaire_code: codeUpper, updatedAt: new Date() };
+      await setDoc(doc(db, 'users', uid), rolePayload, { merge: true });
+      if (userEmail && userEmail !== uid) {
+        await setDoc(doc(db, 'users', userEmail), rolePayload, { merge: true });
+      }
 
       await setDoc(
         doc(db, 'partners', uid),
