@@ -32,7 +32,8 @@ service cloud.firestore {
 
     function partnerCodeMatches(code) {
       return isPartner() &&
-             get(/databases/$(database)/documents/users/$(request.auth.token.email)).data.partenaire_code == code;
+             (get(/databases/$(database)/documents/users/$(request.auth.token.email)).data.partenaire_code == code ||
+              get(/databases/$(database)/documents/partners/$(request.auth.uid)).data.code == code);
     }
 
     function isDevisReadonly(statut) {

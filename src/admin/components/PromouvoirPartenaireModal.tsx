@@ -63,7 +63,14 @@ export default function PromouvoirPartenaireModal({ client, onClose, onSuccess }
         return;
       }
 
+      // ANO-001 — Écriture dans users/{email} (chemin de lecture du hook central + règles Firestore)
+      const userEmail = (client.email || '').toLowerCase();
       await updateDoc(doc(db, 'users', uid), { role: 'partenaire' });
+      if (userEmail && userEmail !== uid) {
+        await updateDoc(doc(db, 'users', userEmail), { role: 'partenaire', partenaire_code: codeUpper });
+      } else {
+        await updateDoc(doc(db, 'users', uid), { role: 'partenaire', partenaire_code: codeUpper });
+      }
 
       await setDoc(
         doc(db, 'partners', uid),

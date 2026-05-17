@@ -74,9 +74,12 @@ export default function EspacePartenaire() {
     setLoginErr('');
     try {
       const cred = await signInWithEmailAndPassword(clientAuth, loginEmail, loginPwd);
-      // V81 — Vérifier le rôle via custom claims (getIdTokenResult force le refresh)
-      const tokenResult = await cred.user.getIdTokenResult(true);
-      if (tokenResult.claims.role !== 'partenaire') {
+      // ANO-003 — Vérification Firestore (custom claims non déployés)
+      const normalizedEmail = cred.user.email?.toLowerCase() || '';
+      let roleSnap = await getDoc(doc(db, 'users', normalizedEmail));
+      if (!roleSnap.exists()) roleSnap = await getDoc(doc(db, 'users', cred.user.uid));
+      const role = roleSnap.exists() ? roleSnap.data()?.role : null;
+      if (role !== 'partenaire') {
         setLoginErr('Ce compte n\'est pas un compte partenaire. Veuillez utiliser l\'espace client.');
         await clientAuth.signOut();
         return;

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useLocation, Redirect } from 'wouter';
-import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, serverTimestamp, writeBatch } from 'firebase/firestore';
 import { clientAuth, db } from '../../lib/firebase';
 import { useI18n } from '../../i18n';
 import { useToast } from '../components/Toast';
@@ -92,9 +92,12 @@ export default function Profil() {
         adresse_livraison: identiqueFacturation ? { rue: adresse, code_postal: codePostal, ville, pays, identique_facturation: true } : { rue: livraisonRue, code_postal: livraisonCP, ville: livraisonVille, pays: livraisonPays, identique_facturation: false, addressType: 'livraison' as const },
         updatedAt: serverTimestamp(), ...(isNewProfile ? { createdAt: serverTimestamp() } : {}),
       };
-      await setDoc(doc(db, 'clients', user.uid), commonFields, { merge: true });
+      // ANO-006 — Batch atomique pour éviter l'incohérence si une écriture échoue
       const normalizedEmail = user.email?.toLowerCase() || '';
-      await setDoc(doc(db, 'users', normalizedEmail), commonFields, { merge: true });
+      const batch = writeBatch(db);
+      batch.set(doc(db, 'clients', user.uid), commonFields, { merge: true });
+      batch.set(doc(db, 'users', normalizedEmail), commonFields, { merge: true });
+      await batch.commit();
       showToast('Profil enregistré avec succès !');
       const userSnap = await getDoc(doc(db, 'users', normalizedEmail));
       const role = userSnap.exists() ? userSnap.data()?.role || 'user' : 'user';

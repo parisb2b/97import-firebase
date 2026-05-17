@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { collection, query, getDocs } from 'firebase/firestore';
+import { collection, query, getDocs, limit } from 'firebase/firestore';
 import { useLocation } from 'wouter';
 import { adminDb as db } from '../../lib/firebase';
 import { Card, Kpi, Pill, IconButton, EyeIcon } from '../components/Icons';
@@ -23,7 +23,8 @@ export default function Clients() {
   useEffect(() => {
     const load = async () => {
       try {
-        const q = query(collection(db, 'clients'));
+        // ANO-005 — Limite à 500 clients (pagination serveur recommandée au-delà)
+        const q = query(collection(db, 'clients'), limit(500));
         const snap = await getDocs(q);
         setClients(snap.docs.map((d) => ({ id: d.id, ...d.data() } as Client)));
       } catch (err: any) {
