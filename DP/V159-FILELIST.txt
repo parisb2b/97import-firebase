@@ -1,0 +1,1104 @@
+./.claude/launch.json
+./.claude/settings.json
+./.claude/settings.local.json
+./.env
+./.env.local
+./.firebaserc
+./.github/workflows/e2e-tests.yml
+./.gitignore
+./.v53-codexx-backup-tag.txt
+./.v53-production-readiness-backup-tag.txt
+./.v55-backup-tag.txt
+./.v56-admin-quotes-clients-backup-tag.txt
+./.v57-quality-backup-tag.txt
+./.v58-ultra-backup-tag.txt
+./.vercel/README.txt
+./.vercel/project.json
+./1MAJALL/INSTRUCTIONS-AUDIT-IMAGES.md
+./1MAJALL/Les images sont STOCKES-2ENDROITS.txt
+./1MAJALL/RAPPORT-COMPARAISON.md
+./1MAJALL/RAPPORT-NUIT-BACKOFFICE.md
+./1MAJALL/RAPPORT-NUIT.md
+./1MAJALL/prompt-10-etapes-scan-fix.md
+./1MAJALL/prompt-export-catalogue-excel.md
+./1MAJALL/prompt-fix-devis-local.md
+./1MAJALL/prompt-nuit-backoffice.md
+./1MAJALL/prompt-pdf-reproduction-exacte.md
+./1MAJALL/prompt-recuperation-ancien-site.md
+./97import-REFERENCE-FIREBASE.md
+./97import-REFERENCE-FIREBASE_1.md
+./97import.md
+./97import2026_siteweb/RECAP-EXPORTS.txt
+./97import2026_siteweb/assets/html2canvas.esm-B0tyYwQk.js
+./97import2026_siteweb/assets/index-Cq1t86gk.css
+./97import2026_siteweb/assets/index-Dwg-9PEm.js
+./97import2026_siteweb/assets/index.es-DBRrNYGg.js
+./97import2026_siteweb/assets/products-D-pOyOsA.js
+./97import2026_siteweb/assets/purify.es-BgtpMKW3.js
+./97import2026_siteweb/assets/site-content-BILJux3o.js
+./97import2026_siteweb/audit_report.csv
+./97import2026_siteweb/audit_report_selenium.csv
+./97import2026_siteweb/data/add-address-columns.sql
+./97import2026_siteweb/data/analytics.json
+./97import2026_siteweb/data/auto-create-profile-trigger.sql
+./97import2026_siteweb/data/create-error-logs.sql
+./97import2026_siteweb/data/fix-rls-final.sql
+./97import2026_siteweb/data/fix-rls-quotes.sql
+./97import2026_siteweb/data/fix-rls-v2.sql
+./97import2026_siteweb/data/pricing.ts
+./97import2026_siteweb/data/products.json
+./97import2026_siteweb/data/settings.json
+./97import2026_siteweb/data/setup-partners.sql
+./97import2026_siteweb/data/site-content.json
+./97import2026_siteweb/data/sync-profiles.sql
+./97import2026_siteweb/data/translations.json
+./97import2026_siteweb/data/v5-setup.sql
+./97import2026_siteweb/data/v53-fixes.sql
+./97import2026_siteweb/data/v58-fixes.sql
+./97import2026_siteweb/index.html
+./97import2026_siteweb/metadata.json
+./97import2026_siteweb/specs/00-INDEX.txt
+./97import2026_siteweb/specs/01-STYLE-GUIDE.txt
+./97import2026_siteweb/specs/02-DATABASE-SCHEMA.txt
+./97import2026_siteweb/specs/03-PDF-TEMPLATES.txt
+./97import2026_siteweb/specs/04-ROUTES-SEO.txt
+./97import2026_siteweb/specs/05-FORMS-LOGIC.txt
+./97import2026_siteweb/specs/06-MEDIA-INVENTORY.txt
+./97import2026_siteweb/supabase/_manifest.json
+./97import2026_siteweb/supabase/admin_params.json
+./97import2026_siteweb/supabase/commission_notes.json
+./97import2026_siteweb/supabase/contacts.json
+./97import2026_siteweb/supabase/delivery_notes.json
+./97import2026_siteweb/supabase/error_logs.json
+./97import2026_siteweb/supabase/fees.json
+./97import2026_siteweb/supabase/invoices.json
+./97import2026_siteweb/supabase/orders.json
+./97import2026_siteweb/supabase/partners.json
+./97import2026_siteweb/supabase/products.json
+./97import2026_siteweb/supabase/profiles.json
+./97import2026_siteweb/supabase/quotes.json
+./97import2026_siteweb/supabase/site_content.json
+./97import2026_siteweb/vercel/assets/index-B1YsO-WO.js
+./97import2026_siteweb/vercel/assets/index-fcmVpsNi.css
+./97import2026_siteweb/vercel/index.html
+./97import2026_siteweb/vercel/metadata_vercel.json
+./97import2026_siteweb/vercel/pages/accessoires.html
+./97import2026_siteweb/vercel/pages/admin.html
+./97import2026_siteweb/vercel/pages/agricole.html
+./97import2026_siteweb/vercel/pages/cart.html
+./97import2026_siteweb/vercel/pages/confirmation.html
+./97import2026_siteweb/vercel/pages/connexion.html
+./97import2026_siteweb/vercel/pages/contact.html
+./97import2026_siteweb/vercel/pages/delivery.html
+./97import2026_siteweb/vercel/pages/legal.html
+./97import2026_siteweb/vercel/pages/maisons.html
+./97import2026_siteweb/vercel/pages/maisons_camping-car-deluxe.html
+./97import2026_siteweb/vercel/pages/maisons_premium.html
+./97import2026_siteweb/vercel/pages/maisons_standard.html
+./97import2026_siteweb/vercel/pages/minipelles.html
+./97import2026_siteweb/vercel/pages/mon-compte.html
+./97import2026_siteweb/vercel/pages/privacy.html
+./97import2026_siteweb/vercel/pages/services.html
+./97import2026_siteweb/vercel/pages/solaire.html
+./97import2026_siteweb/vercel/pages/terms.html
+./98.md
+./AGENTS.md
+./ARCHIVE-BEFORE-CLEANSTART-V53/commissions.json
+./ARCHIVE-BEFORE-CLEANSTART-V53/contacts.json
+./ARCHIVE-BEFORE-CLEANSTART-V53/containers.json
+./ARCHIVE-BEFORE-CLEANSTART-V53/conteneurs.json
+./ARCHIVE-BEFORE-CLEANSTART-V53/factures.json
+./ARCHIVE-BEFORE-CLEANSTART-V53/invoices.json
+./ARCHIVE-BEFORE-CLEANSTART-V53/listes_achat.json
+./ARCHIVE-BEFORE-CLEANSTART-V53/logistics_invoices.json
+./ARCHIVE-BEFORE-CLEANSTART-V53/logs.json
+./ARCHIVE-BEFORE-CLEANSTART-V53/mail.json
+./ARCHIVE-BEFORE-CLEANSTART-V53/manifest.json
+./ARCHIVE-BEFORE-CLEANSTART-V53/notes_commission.json
+./ARCHIVE-BEFORE-CLEANSTART-V53/price_history.json
+./ARCHIVE-BEFORE-CLEANSTART-V53/profiles.json
+./ARCHIVE-BEFORE-CLEANSTART-V53/quotes.json
+./ARCHIVE-BEFORE-CLEANSTART-V53/sav.json
+./ARCHIVE-BEFORE-CLEANSTART-V53/stock.json
+./ARCHIVE-INTERENOVATIONS-V56/interenovations.json
+./AUDIT-CONFORMITE-V40-20260424.md
+./AUDIT-ENCAISSEMENT-VIP.md
+./AUDIT-FIREBASE-PROJECT-GREP.txt
+./AUDIT-FIREBASE-PROJECT-V53.txt
+./AUDIT-GLOBAL-REPORT.md
+./AUDIT-P2MAQ-20260422-1656.md
+./AUDIT-PARTENAIRES-20260421.md
+./AUDIT-PARTENAIRES-RESUME-EXECUTIF.md
+./AUDIT-PRIX-VIP-DVS-2604024.md
+./AUDIT-RENVOYER-SIGNATURE.md
+./AUDIT-SCRIPTS-DESTRUCTIFS-GREP.txt
+./AUDIT-SCRIPTS-DESTRUCTIFS-V53.txt
+./AUDIT-STORAGE-V60.txt
+./AUDIT-SYSTEME-PARTENAIRES-COMPLET.md
+./AUDIT-V55-CODEX.txt
+./AUDIT-WORKFLOW-20260422-1958.md
+./AUDIT-WORKFLOW-E2E.md
+./AUDIT_TECHNIQUE_V2.md
+./AUDIT_TECHNIQUE_V2_DEEP.md
+./AUDIT_UX_ADMIN.md
+./AUDIT_UX_PARCOURS.md
+./BACKUP-INVENTAIRE.md
+./BUGS-CORRIGES-V65.txt
+./BUILD-REPORT-V53-PRODUCTION-READINESS.txt
+./Basculer Firebase en ModeREEL.txt
+./CD CDATA-MC-203097IMPORT.txt
+./CLAUDE.md
+./CLEANSTART-V53-REPORT.txt
+./Codex97MAJ.txt
+./DEMANDE-MICHEL-CABLAGE1.md
+./DEMANDE-MICHEL.md
+./DIAGNOSTIC-DROPDOWNS-REPORT.md
+./DIAGNOSTIC-MS-20-001.md
+./DP/EXPORT-SESSION-SOIR.md
+./DP/MISSION-V149-AUTOTEST-INTEGRAL.md
+./DP/RAPPORT-DIAGNOSTIC-2222.md
+./DP/V155-SCAN-COMPLET.md
+./DP/V96-FICHIERS-COMPLETS.txt
+./DP/backups-v157/.env
+./DP/backups-v157/AdminApp.tsx
+./DP/backups-v157/AdminLogin.tsx
+./DP/backups-v157/Connexion.tsx
+./DP/backups-v157/MesAdresses.tsx
+./DP/backups-v157/Panier.tsx
+./DP/backups-v157/Profil.tsx
+./DP/backups-v157/firebase.json
+./DP/backups-v157/firebase.ts
+./DP/backups-v157/firestore.rules
+./DP/backups-v157/productHelpers.ts
+./DP/backups-v157/storage.rules
+./DP/dp97importmaj.txt
+./EXTRACT-COMPLET-97IMPORT-20260425-1623.md
+./EXTRACT-COMPLET-97IMPORT-20260425-1624.md
+./FULL_PROJECT_SNAPSHOT_97IMPORT_v37.2.md
+./GUIDE-REMPLISSAGE-EXCEL.md
+./HTML-2030/0001-HTML.html
+./HTML-2030/97IMPORT-设计系统与 HTML 结构完整报告.md
+./HTML-2030/97import_homepage.html
+./HTML-2030/DB--97import_homepage.html
+./HTML-2030/SAVE-97IMPORT/97IMPORT-maison-premium.html
+./HTML-2030/SAVE-97IMPORT/97IMPORT-maison-premium_files/index-fcmVpsNi.css
+./HTML-2030/STITCH/97IMPORT UI Architecture - Design.txt
+./HTML-2030/STITCH/97IMPORT-设计系统与 HTML 结构完整报告.md
+./HTML-2030/texte_site_97import.txt
+./MAJ-V44-BIS.txt
+./MAJ-V44-FIX.txt
+./MAJ-V44-TER.txt
+./MAJ-V45.txt
+./MAJ-V46.txt
+./MAJ-V48-AUDIT.txt
+./MAJ-V49.txt
+./MAJ-V50-BIS.txt
+./MAJ-V52.txt
+./MAJ-V53-CODEXX-PUBLISH.txt
+./MAJ-V53-CODEXX.txt
+./MAJ-V53-PRODUCTION-READINESS.txt
+./MAJ-V56-ADMIN-CLIENTS-DEVIS.txt
+./MAJ-V60.txt
+./MAJ-V64.txt
+./MAJ-V65.txt
+./MAJ-selon le schema.txt
+./MIGRATION_PACKAGE_FINAL/data/add-address-columns.sql
+./MIGRATION_PACKAGE_FINAL/data/auto-create-profile-trigger.sql
+./MIGRATION_PACKAGE_FINAL/data/create-error-logs.sql
+./MIGRATION_PACKAGE_FINAL/data/fix-rls-final.sql
+./MIGRATION_PACKAGE_FINAL/data/fix-rls-quotes.sql
+./MIGRATION_PACKAGE_FINAL/data/fix-rls-v2.sql
+./MIGRATION_PACKAGE_FINAL/data/pricing.ts
+./MIGRATION_PACKAGE_FINAL/data/products.json
+./MIGRATION_PACKAGE_FINAL/data/settings.json
+./MIGRATION_PACKAGE_FINAL/data/setup-partners.sql
+./MIGRATION_PACKAGE_FINAL/data/site-content.json
+./MIGRATION_PACKAGE_FINAL/data/sync-profiles.sql
+./MIGRATION_PACKAGE_FINAL/data/v5-setup.sql
+./MIGRATION_PACKAGE_FINAL/data/v53-fixes.sql
+./MIGRATION_PACKAGE_FINAL/data/v58-fixes.sql
+./MIGRATION_PACKAGE_FINAL/specs/00-INDEX.txt
+./MIGRATION_PACKAGE_FINAL/specs/01-STYLE-GUIDE.txt
+./MIGRATION_PACKAGE_FINAL/specs/02-DATABASE-SCHEMA.txt
+./MIGRATION_PACKAGE_FINAL/specs/03-PDF-TEMPLATES.txt
+./MIGRATION_PACKAGE_FINAL/specs/04-ROUTES-SEO.txt
+./MIGRATION_PACKAGE_FINAL/specs/05-FORMS-LOGIC.txt
+./MIGRATION_PACKAGE_FINAL/specs/06-MEDIA-INVENTORY.txt
+./POINT-DE-DEPART-REFONTE.md
+./PREFLIGHT-PRODUCTION-READINESS.txt
+./PROMPT DE MIGRATION & RECONSTRUCT.txt
+./PROMPT-CODEX-PRODUCTION.md
+./RAPPORT-ALIGNEMENT.md
+./RAPPORT-MEDIAS.md
+./RAPPORT-P3-WF1-C1-SIGNATURE-20260423.md
+./RAPPORT-P3-WF1-STRICT-20260422.md
+./RAPPORT-QA.md
+./RAPPORT-RESET.md
+./RAPPORT-STRUCTURE.md
+./REBOOT-INTEGRAL.ps1
+./RECETTE-FINALE.md
+./REPRISE-PC-WINDOWS.md
+./RESET--FIREBASE.txt
+./SAVE2026/01_Supabase_Database/README_DATABASE.md
+./SAVE2026/01_Supabase_Database/contacts.json
+./SAVE2026/01_Supabase_Database/orders.json
+./SAVE2026/01_Supabase_Database/products.csv
+./SAVE2026/01_Supabase_Database/products.json
+./SAVE2026/01_Supabase_Database/profiles.csv
+./SAVE2026/01_Supabase_Database/profiles.json
+./SAVE2026/01_Supabase_Database/storage_buckets.json
+./SAVE2026/04_Site_Structure/catalogue/vercel_extraction_report.json
+./SAVE2026/04_Site_Structure/catalogue/vercel_files_metadata.csv
+./SAVE2026/06_Reports/vercel_extraction_summary.txt
+./SAVE2026/extract_supabase.js
+./SAVE2026/prompt_detaile_stepfun_97import.md
+./SEED-ANALYSIS-REPORT-V2.md
+./SEED-ANALYSIS-REPORT.md
+./SEED-APPLY-REPORT-V2.md
+./SNAPSHOT_V43.md
+./VERCEL-V2-PRODUCTION-README.md
+./api/README.md
+./api/translate.ts
+./audit-gpt-97import 2/00-PREFLIGHT-REPORT.txt
+./audit-gpt-97import 2/CLAUDE-CODE-AUDIT-EXPORT.txt
+./audit-gpt-97import 2/PROMPT-CLAUDE-IA-VALIDATION.md
+./audit-gpt-97import 2/PROMPT-GPT-AUDIT.md
+./audit-gpt-97import 2/README-MICHEL.md
+./audit-gpt-97import 2/firestore-data/SUMMARY.json
+./audit-gpt-97import 2/firestore-data/col-acomptes.json
+./audit-gpt-97import 2/firestore-data/col-admin_params.json
+./audit-gpt-97import 2/firestore-data/col-categories.json
+./audit-gpt-97import 2/firestore-data/col-clients.json
+./audit-gpt-97import 2/firestore-data/col-commissions.json
+./audit-gpt-97import 2/firestore-data/col-contacts.json
+./audit-gpt-97import 2/firestore-data/col-containers.json
+./audit-gpt-97import 2/firestore-data/col-conteneurs.json
+./audit-gpt-97import 2/firestore-data/col-counters.json
+./audit-gpt-97import 2/firestore-data/col-factures.json
+./audit-gpt-97import 2/firestore-data/col-invoices.json
+./audit-gpt-97import 2/firestore-data/col-listes_achat.json
+./audit-gpt-97import 2/firestore-data/col-logistics_invoices.json
+./audit-gpt-97import 2/firestore-data/col-logs.json
+./audit-gpt-97import 2/firestore-data/col-mail.json
+./audit-gpt-97import 2/firestore-data/col-notes_commission.json
+./audit-gpt-97import 2/firestore-data/col-partners.json
+./audit-gpt-97import 2/firestore-data/col-ports.json
+./audit-gpt-97import 2/firestore-data/col-price_history.json
+./audit-gpt-97import 2/firestore-data/col-products.json
+./audit-gpt-97import 2/firestore-data/col-profiles.json
+./audit-gpt-97import 2/firestore-data/col-quotes.json
+./audit-gpt-97import 2/firestore-data/col-sav.json
+./audit-gpt-97import 2/firestore-data/col-stock.json
+./audit-gpt-97import 2/firestore-data/col-tarifs_logistiques.json
+./audit-gpt-97import 2/firestore-data/col-users.json
+./audit-gpt-97import 2/media-inventory/SUMMARY.txt
+./audit-gpt-97import 2/media-inventory/all-media-sizes.txt
+./audit-gpt-97import 2/media-inventory/all-media.txt
+./audit-gpt-97import 2/media-inventory/critical-media.txt
+./audit-gpt-97import 2/reports/00-secrets-scan.txt
+./audit-gpt-97import 2/reports/01-admin-components-by-size.txt
+./audit-gpt-97import 2/reports/01-front-components-by-size.txt
+./audit-gpt-97import 2/reports/01-tree-public.txt
+./audit-gpt-97import 2/reports/01-tree-root.txt
+./audit-gpt-97import 2/reports/01-tree-scripts.txt
+./audit-gpt-97import 2/reports/01-tree-src.txt
+./audit-gpt-97import 2/reports/02-pricing-conversions.txt
+./audit-gpt-97import 2/reports/02-pricing-grep.txt
+./audit-gpt-97import 2/reports/02-pricing-types.txt
+./audit-gpt-97import 2/reports/03-collections-used.txt
+./audit-gpt-97import 2/reports/03-firestore-indexes.json
+./audit-gpt-97import 2/reports/03-firestore-queries.txt
+./audit-gpt-97import 2/reports/03-subcollections.txt
+./audit-gpt-97import 2/reports/04-devis-grep.txt
+./audit-gpt-97import 2/reports/04-emails.txt
+./audit-gpt-97import 2/reports/04-numbering.txt
+./audit-gpt-97import 2/reports/04-pdf-grep.txt
+./audit-gpt-97import 2/reports/05-dashboard-grep.txt
+./audit-gpt-97import 2/reports/05-loading-grep.txt
+./audit-gpt-97import 2/reports/05-sidebar-grep.txt
+./audit-gpt-97import 2/reports/06-atoms-list.txt
+./audit-gpt-97import 2/reports/06-forms.txt
+./audit-gpt-97import 2/reports/06-modals.txt
+./audit-gpt-97import 2/reports/06-polish-css-stats.txt
+./audit-gpt-97import 2/reports/06-routes.txt
+./audit-gpt-97import 2/reports/07-auth-handlers.txt
+./audit-gpt-97import 2/reports/07-rbac-grep.txt
+./audit-gpt-97import 2/reports/07-rules-stats.txt
+./audit-gpt-97import 2/reports/99-fix-count-by-version.txt
+./audit-gpt-97import 2/reports/99-fix-markers.txt
+./audit-gpt-97import 2/reports/99-fixes-history.txt
+./audit-gpt-97import 2/source-files/_root/firebase.json
+./audit-gpt-97import 2/source-files/_root/firestore.rules
+./audit-gpt-97import 2/source-files/_root/package.json
+./audit-gpt-97import 2/source-files/_root/storage.rules
+./audit-gpt-97import 2/source-files/_root/tsconfig.json
+./audit-gpt-97import 2/source-files/_root/vite.config.ts
+./audit-gpt-97import 2/source-files/firestore.rules.txt
+./audit-gpt-97import 2/source-files/scripts/audit-catalogue.js
+./audit-gpt-97import 2/source-files/scripts/audit-partenaires.js
+./audit-gpt-97import 2/source-files/scripts/backup-quotes.js
+./audit-gpt-97import 2/source-files/scripts/check-firestore.js
+./audit-gpt-97import 2/source-files/scripts/delete-quotes.mjs
+./audit-gpt-97import 2/source-files/scripts/export-catalogue-excel.ts
+./audit-gpt-97import 2/source-files/scripts/export-products-json.ts
+./audit-gpt-97import 2/source-files/scripts/firestore-products.json
+./audit-gpt-97import 2/source-files/scripts/fix-ms-20-001.sh
+./audit-gpt-97import 2/source-files/scripts/images-inventory.json
+./audit-gpt-97import 2/source-files/scripts/import-catalogue-minipelles.js
+./audit-gpt-97import 2/source-files/scripts/import-catalogue-v4.mjs
+./audit-gpt-97import 2/source-files/scripts/init-counters-v50.cjs
+./audit-gpt-97import 2/source-files/scripts/media_sync.mjs
+./audit-gpt-97import 2/source-files/scripts/migrate-acomptes-v43.js
+./audit-gpt-97import 2/source-files/scripts/migrate-admin-params.js
+./audit-gpt-97import 2/source-files/scripts/migrate-product-prices.js
+./audit-gpt-97import 2/source-files/scripts/migrate-users-to-clients.cjs
+./audit-gpt-97import 2/source-files/scripts/nettoyage-catalogue.js
+./audit-gpt-97import 2/source-files/scripts/rename-images.mjs
+./audit-gpt-97import 2/source-files/scripts/repair-97importcom.js
+./audit-gpt-97import 2/source-files/scripts/reset-database.sh
+./audit-gpt-97import 2/source-files/scripts/seed-browser.html
+./audit-gpt-97import 2/source-files/scripts/seed-direct.js
+./audit-gpt-97import 2/source-files/scripts/seed-firestore.js
+./audit-gpt-97import 2/source-files/scripts/seed-options-apply.sh
+./audit-gpt-97import 2/source-files/scripts/seed-products.js
+./audit-gpt-97import 2/source-files/scripts/seed-users.js
+./audit-gpt-97import 2/source-files/scripts/seed-v2-apply.sh
+./audit-gpt-97import 2/source-files/scripts/set-admin-role.cjs
+./audit-gpt-97import 2/source-files/scripts/translate-products.js
+./audit-gpt-97import 2/source-files/scripts/update-firestore-images.mjs
+./audit-gpt-97import 2/source-files/scripts/update-firestore-images.ts
+./audit-gpt-97import 2/source-files/scripts/update-image-urls.mjs
+./audit-gpt-97import 2/source-files/scripts/upload-images-mini-pelles.js
+./audit-gpt-97import 2/source-files/scripts/upload-images.mjs
+./audit-gpt-97import 2/source-files/scripts/upload-to-storage.mjs
+./audit-gpt-97import 2/source-files/src/App.tsx
+./audit-gpt-97import 2/source-files/src/admin/AdminApp.tsx
+./audit-gpt-97import 2/source-files/src/admin/AdminLogin.tsx
+./audit-gpt-97import 2/source-files/src/admin/components/DropdownPorts.tsx
+./audit-gpt-97import 2/source-files/src/admin/components/ForgotPasswordModal.tsx
+./audit-gpt-97import 2/source-files/src/admin/components/Icons.tsx
+./audit-gpt-97import 2/source-files/src/admin/components/ModalDupliquerDevis.tsx
+./audit-gpt-97import 2/source-files/src/admin/components/PopupEncaisserAcompte.tsx
+./audit-gpt-97import 2/source-files/src/admin/components/PopupSelectionClientExcel.tsx
+./audit-gpt-97import 2/source-files/src/admin/components/ProductForm.tsx
+./audit-gpt-97import 2/source-files/src/admin/components/PromouvoirPartenaireModal.tsx
+./audit-gpt-97import 2/source-files/src/admin/components/Toast.tsx
+./audit-gpt-97import 2/source-files/src/admin/components/atoms/LoadingState.tsx
+./audit-gpt-97import 2/source-files/src/admin/components/atoms/SearchInput.tsx
+./audit-gpt-97import 2/source-files/src/admin/components/commission/ModalMarquerPayee.tsx
+./audit-gpt-97import 2/source-files/src/admin/components/commission/ModalNouvelleCommission.tsx
+./audit-gpt-97import 2/source-files/src/admin/components/produit/CaracteristiquesEditor.tsx
+./audit-gpt-97import 2/source-files/src/admin/components/produit/CompositionKitEditor.tsx
+./audit-gpt-97import 2/source-files/src/admin/components/produit/FicheProduitTabs.tsx
+./audit-gpt-97import 2/source-files/src/admin/components/produit/GaleriePhotos.tsx
+./audit-gpt-97import 2/source-files/src/admin/components/produit/GalerieVideos.tsx
+./audit-gpt-97import 2/source-files/src/admin/components/produit/ModalDupliquerProduit.tsx
+./audit-gpt-97import 2/source-files/src/admin/components/produit/OngletDetails.tsx
+./audit-gpt-97import 2/source-files/src/admin/components/produit/OngletEssentiel.tsx
+./audit-gpt-97import 2/source-files/src/admin/components/produit/OngletGestionPrix.tsx
+./audit-gpt-97import 2/source-files/src/admin/components/produit/OngletMedias.tsx
+./audit-gpt-97import 2/source-files/src/admin/components/produit/OngletOptions.tsx
+./audit-gpt-97import 2/source-files/src/admin/hooks/usePricingEngine.ts
+./audit-gpt-97import 2/source-files/src/admin/pages/AcomptesEncaisser.tsx
+./audit-gpt-97import 2/source-files/src/admin/pages/AdminProduits.tsx
+./audit-gpt-97import 2/source-files/src/admin/pages/CatalogueProduits.tsx
+./audit-gpt-97import 2/source-files/src/admin/pages/Clients.tsx
+./audit-gpt-97import 2/source-files/src/admin/pages/Dashboard.tsx
+./audit-gpt-97import 2/source-files/src/admin/pages/DetailAchat.tsx
+./audit-gpt-97import 2/source-files/src/admin/pages/DetailClient.tsx
+./audit-gpt-97import 2/source-files/src/admin/pages/DetailCommission.tsx
+./audit-gpt-97import 2/source-files/src/admin/pages/DetailConteneur.tsx
+./audit-gpt-97import 2/source-files/src/admin/pages/DetailDevis.tsx
+./audit-gpt-97import 2/source-files/src/admin/pages/DetailFacture.tsx
+./audit-gpt-97import 2/source-files/src/admin/pages/DetailFraisLogistique.tsx
+./audit-gpt-97import 2/source-files/src/admin/pages/DetailListeAchat.tsx
+./audit-gpt-97import 2/source-files/src/admin/pages/DetailPartenaire.tsx
+./audit-gpt-97import 2/source-files/src/admin/pages/EditProduit.tsx
+./audit-gpt-97import 2/source-files/src/admin/pages/Factures.tsx
+./audit-gpt-97import 2/source-files/src/admin/pages/FicheProduit.tsx
+./audit-gpt-97import 2/source-files/src/admin/pages/FraisLogistique.tsx
+./audit-gpt-97import 2/source-files/src/admin/pages/GestionSite.tsx
+./audit-gpt-97import 2/source-files/src/admin/pages/ListeConteneurs.tsx
+./audit-gpt-97import 2/source-files/src/admin/pages/ListeDevis.tsx
+./audit-gpt-97import 2/source-files/src/admin/pages/ListeListesAchat.tsx
+./audit-gpt-97import 2/source-files/src/admin/pages/ListesAchat.tsx
+./audit-gpt-97import 2/source-files/src/admin/pages/Logs.tsx
+./audit-gpt-97import 2/source-files/src/admin/pages/LogsDebug.tsx
+./audit-gpt-97import 2/source-files/src/admin/pages/NotesCommission.tsx
+./audit-gpt-97import 2/source-files/src/admin/pages/NouveauConteneur.tsx
+./audit-gpt-97import 2/source-files/src/admin/pages/NouveauProduit.tsx
+./audit-gpt-97import 2/source-files/src/admin/pages/NouvelleListeAchat.tsx
+./audit-gpt-97import 2/source-files/src/admin/pages/Parametres.tsx
+./audit-gpt-97import 2/source-files/src/admin/pages/Partenaires.tsx
+./audit-gpt-97import 2/source-files/src/admin/pages/SAVDetail.tsx
+./audit-gpt-97import 2/source-files/src/admin/pages/SAVListe.tsx
+./audit-gpt-97import 2/source-files/src/admin/pages/Stock.tsx
+./audit-gpt-97import 2/source-files/src/admin/pages/TauxRMB.tsx
+./audit-gpt-97import 2/source-files/src/admin/services/pricingService.ts
+./audit-gpt-97import 2/source-files/src/admin/styles/admin.css
+./audit-gpt-97import 2/source-files/src/admin/styles/polish-v45.css
+./audit-gpt-97import 2/source-files/src/admin/utils/productCompleteness.ts
+./audit-gpt-97import 2/source-files/src/components/DuplicateBtn.tsx
+./audit-gpt-97import 2/source-files/src/components/ErrorBoundary.tsx
+./audit-gpt-97import 2/source-files/src/components/GlobeToggle.tsx
+./audit-gpt-97import 2/source-files/src/components/OrangeIndicator.tsx
+./audit-gpt-97import 2/source-files/src/components/SortControl.tsx
+./audit-gpt-97import 2/source-files/src/front/FrontApp.tsx
+./audit-gpt-97import 2/source-files/src/front/components/Breadcrumb.tsx
+./audit-gpt-97import 2/source-files/src/front/components/Footer.tsx
+./audit-gpt-97import 2/source-files/src/front/components/Header.tsx
+./audit-gpt-97import 2/source-files/src/front/components/PopupSaisieRIB.tsx
+./audit-gpt-97import 2/source-files/src/front/components/PopupVerserAcompte.tsx
+./audit-gpt-97import 2/source-files/src/front/components/PriceDisplay.tsx
+./audit-gpt-97import 2/source-files/src/front/components/ProductCard.tsx
+./audit-gpt-97import 2/source-files/src/front/components/ProductOptionSelector.tsx
+./audit-gpt-97import 2/source-files/src/front/components/SearchBar.tsx
+./audit-gpt-97import 2/source-files/src/front/components/Toast.tsx
+./audit-gpt-97import 2/source-files/src/front/pages/Catalogue.tsx
+./audit-gpt-97import 2/source-files/src/front/pages/Connexion.tsx
+./audit-gpt-97import 2/source-files/src/front/pages/Contact.tsx
+./audit-gpt-97import 2/source-files/src/front/pages/EspaceClient.tsx
+./audit-gpt-97import 2/source-files/src/front/pages/EspacePartenaire.tsx
+./audit-gpt-97import 2/source-files/src/front/pages/Home.tsx
+./audit-gpt-97import 2/source-files/src/front/pages/Inscription.tsx
+./audit-gpt-97import 2/source-files/src/front/pages/MonCompte.tsx
+./audit-gpt-97import 2/source-files/src/front/pages/Panier.tsx
+./audit-gpt-97import 2/source-files/src/front/pages/Produit.tsx
+./audit-gpt-97import 2/source-files/src/front/pages/Profil.tsx
+./audit-gpt-97import 2/source-files/src/front/pages/Services.tsx
+./audit-gpt-97import 2/source-files/src/front/pages/SignatureDevis.tsx
+./audit-gpt-97import 2/source-files/src/front/pages/espace-client/ContinuerAchats.tsx
+./audit-gpt-97import 2/source-files/src/front/pages/espace-client/DevisCard.tsx
+./audit-gpt-97import 2/source-files/src/front/pages/espace-client/MesAdresses.tsx
+./audit-gpt-97import 2/source-files/src/front/pages/espace-client/MesCommandes.tsx
+./audit-gpt-97import 2/source-files/src/front/pages/espace-client/MesDevis.tsx
+./audit-gpt-97import 2/source-files/src/front/pages/espace-client/MesFactures.tsx
+./audit-gpt-97import 2/source-files/src/front/pages/espace-client/MesInfos.tsx
+./audit-gpt-97import 2/source-files/src/front/pages/espace-client/MesVirements.tsx
+./audit-gpt-97import 2/source-files/src/front/pages/espace-client/PopupAcompte.tsx
+./audit-gpt-97import 2/source-files/src/front/pages/espace-client/PopupSAV.tsx
+./audit-gpt-97import 2/source-files/src/front/pages/espace-client/SAV.tsx
+./audit-gpt-97import 2/source-files/src/front/pages/espace-client/SuiviAchats.tsx
+./audit-gpt-97import 2/source-files/src/front/pages/espace-partenaire/GestionDevisPartner.tsx
+./audit-gpt-97import 2/source-files/src/front/pages/espace-partenaire/MesClientsPartner.tsx
+./audit-gpt-97import 2/source-files/src/front/pages/espace-partenaire/MesCommissionsPartner.tsx
+./audit-gpt-97import 2/source-files/src/i18n/en.json
+./audit-gpt-97import 2/source-files/src/i18n/fr.json
+./audit-gpt-97import 2/source-files/src/i18n/index.tsx
+./audit-gpt-97import 2/source-files/src/i18n/zh.json
+./audit-gpt-97import 2/source-files/src/index.css
+./audit-gpt-97import 2/source-files/src/lib/coefficientsHelpers.ts
+./audit-gpt-97import 2/source-files/src/lib/commissionHelpers.ts
+./audit-gpt-97import 2/source-files/src/lib/counters.ts
+./audit-gpt-97import 2/source-files/src/lib/currencyHelpers.ts
+./audit-gpt-97import 2/source-files/src/lib/dateHelpers.ts
+./audit-gpt-97import 2/source-files/src/lib/deepl.ts
+./audit-gpt-97import 2/source-files/src/lib/deeplService.ts
+./audit-gpt-97import 2/source-files/src/lib/devisHelpers.ts
+./audit-gpt-97import 2/source-files/src/lib/emailService.ts
+./audit-gpt-97import 2/source-files/src/lib/excel-generator.ts
+./audit-gpt-97import 2/source-files/src/lib/excel-generators/buildLignesCtn.ts
+./audit-gpt-97import 2/source-files/src/lib/excel-generators/excelStyles.ts
+./audit-gpt-97import 2/source-files/src/lib/excel-generators/excelTypes.ts
+./audit-gpt-97import 2/source-files/src/lib/excel-generators/firestoreHelpers.ts
+./audit-gpt-97import 2/source-files/src/lib/excel-generators/generateBcChine.ts
+./audit-gpt-97import 2/source-files/src/lib/excel-generators/generateBdInvoice.ts
+./audit-gpt-97import 2/source-files/src/lib/excel-generators/generateBdMaritime.ts
+./audit-gpt-97import 2/source-files/src/lib/excel-generators/generateBdPackingList.ts
+./audit-gpt-97import 2/source-files/src/lib/excel-generators/generateBeExport.ts
+./audit-gpt-97import 2/source-files/src/lib/excel-generators/luxentHeader.ts
+./audit-gpt-97import 2/source-files/src/lib/exchange-rate.ts
+./audit-gpt-97import 2/source-files/src/lib/filterPersistence.ts
+./audit-gpt-97import 2/source-files/src/lib/firebase.ts
+./audit-gpt-97import 2/source-files/src/lib/firebaseUtils.ts
+./audit-gpt-97import 2/source-files/src/lib/generateInvoiceAcompte.ts
+./audit-gpt-97import 2/source-files/src/lib/generateInvoiceFinale.ts
+./audit-gpt-97import 2/source-files/src/lib/logService.ts
+./audit-gpt-97import 2/source-files/src/lib/ncNumerotation.ts
+./audit-gpt-97import 2/source-files/src/lib/pdf-generator.ts
+./audit-gpt-97import 2/source-files/src/lib/productGroupHelpers.ts
+./audit-gpt-97import 2/source-files/src/lib/productHelpers.ts
+./audit-gpt-97import 2/source-files/src/lib/productMediaHelpers.ts
+./audit-gpt-97import 2/source-files/src/lib/quoteStatusHelpers.ts
+./audit-gpt-97import 2/source-files/src/lib/storageHelpers.ts
+./audit-gpt-97import 2/source-files/src/lib/version.ts
+./audit-gpt-97import 2/source-files/src/lib/whatsappHelpers.ts
+./audit-gpt-97import 2/source-files/src/main.tsx
+./audit-gpt-97import 2/source-files/src/vite-env.d.ts
+./audit-gpt-97import 2/source-files/storage.rules.txt
+./audit-gpt-97import 2/source-files/superpowers/plans/2026-05-01-bug-a-duplication-devis.md
+./audit-gpt-97import 2/source-files/superpowers/plans/2026-05-01-bug-acomptes-overflow.md
+./audit-gpt-97import 2/source-files/superpowers/plans/2026-05-01-bug1-fiche-produit-stale-state.md
+./audit-gpt-97import 2/source-files/superpowers/plans/2026-05-01-rules-rbac.md
+./audit-gpt-97import 2/source-files/superpowers/plans/2026-05-02-v50-bd-init.md
+./audit-gpt-97import/00-PREFLIGHT-REPORT.txt
+./audit-gpt-97import/CLAUDE-CODE-AUDIT-EXPORT.txt
+./audit-gpt-97import/PROMPT-CLAUDE-IA-VALIDATION.md
+./audit-gpt-97import/PROMPT-GPT-AUDIT.md
+./audit-gpt-97import/README-MICHEL.md
+./audit-gpt-97import/firestore-data/SUMMARY.json
+./audit-gpt-97import/firestore-data/col-acomptes.json
+./audit-gpt-97import/firestore-data/col-admin_params.json
+./audit-gpt-97import/firestore-data/col-categories.json
+./audit-gpt-97import/firestore-data/col-clients.json
+./audit-gpt-97import/firestore-data/col-commissions.json
+./audit-gpt-97import/firestore-data/col-contacts.json
+./audit-gpt-97import/firestore-data/col-containers.json
+./audit-gpt-97import/firestore-data/col-conteneurs.json
+./audit-gpt-97import/firestore-data/col-counters.json
+./audit-gpt-97import/firestore-data/col-factures.json
+./audit-gpt-97import/firestore-data/col-invoices.json
+./audit-gpt-97import/firestore-data/col-listes_achat.json
+./audit-gpt-97import/firestore-data/col-logistics_invoices.json
+./audit-gpt-97import/firestore-data/col-logs.json
+./audit-gpt-97import/firestore-data/col-mail.json
+./audit-gpt-97import/firestore-data/col-notes_commission.json
+./audit-gpt-97import/firestore-data/col-partners.json
+./audit-gpt-97import/firestore-data/col-ports.json
+./audit-gpt-97import/firestore-data/col-price_history.json
+./audit-gpt-97import/firestore-data/col-products.json
+./audit-gpt-97import/firestore-data/col-profiles.json
+./audit-gpt-97import/firestore-data/col-quotes.json
+./audit-gpt-97import/firestore-data/col-sav.json
+./audit-gpt-97import/firestore-data/col-stock.json
+./audit-gpt-97import/firestore-data/col-tarifs_logistiques.json
+./audit-gpt-97import/firestore-data/col-users.json
+./audit-gpt-97import/firestore-data/snapshot-collections.cjs
+./audit-gpt-97import/media-inventory/SUMMARY.txt
+./audit-gpt-97import/media-inventory/all-media-sizes.txt
+./audit-gpt-97import/media-inventory/all-media.txt
+./audit-gpt-97import/media-inventory/critical-media.txt
+./audit-gpt-97import/reports/00-secrets-scan.txt
+./audit-gpt-97import/reports/01-admin-components-by-size.txt
+./audit-gpt-97import/reports/01-front-components-by-size.txt
+./audit-gpt-97import/reports/01-tree-public.txt
+./audit-gpt-97import/reports/01-tree-root.txt
+./audit-gpt-97import/reports/01-tree-scripts.txt
+./audit-gpt-97import/reports/01-tree-src.txt
+./audit-gpt-97import/reports/02-pricing-conversions.txt
+./audit-gpt-97import/reports/02-pricing-grep.txt
+./audit-gpt-97import/reports/02-pricing-types.txt
+./audit-gpt-97import/reports/03-collections-used.txt
+./audit-gpt-97import/reports/03-firestore-indexes.json
+./audit-gpt-97import/reports/03-firestore-queries.txt
+./audit-gpt-97import/reports/03-subcollections.txt
+./audit-gpt-97import/reports/04-devis-grep.txt
+./audit-gpt-97import/reports/04-emails.txt
+./audit-gpt-97import/reports/04-numbering.txt
+./audit-gpt-97import/reports/04-pdf-grep.txt
+./audit-gpt-97import/reports/05-dashboard-grep.txt
+./audit-gpt-97import/reports/05-loading-grep.txt
+./audit-gpt-97import/reports/05-sidebar-grep.txt
+./audit-gpt-97import/reports/06-atoms-list.txt
+./audit-gpt-97import/reports/06-forms.txt
+./audit-gpt-97import/reports/06-modals.txt
+./audit-gpt-97import/reports/06-polish-css-stats.txt
+./audit-gpt-97import/reports/06-routes.txt
+./audit-gpt-97import/reports/07-auth-handlers.txt
+./audit-gpt-97import/reports/07-rbac-grep.txt
+./audit-gpt-97import/reports/07-rules-stats.txt
+./audit-gpt-97import/reports/99-fix-count-by-version.txt
+./audit-gpt-97import/reports/99-fix-markers.txt
+./audit-gpt-97import/reports/99-fixes-history.txt
+./audit-gpt-97import/source-files/_root/firebase.json
+./audit-gpt-97import/source-files/_root/firestore.rules
+./audit-gpt-97import/source-files/_root/package.json
+./audit-gpt-97import/source-files/_root/storage.rules
+./audit-gpt-97import/source-files/_root/tsconfig.json
+./audit-gpt-97import/source-files/_root/vite.config.ts
+./audit-gpt-97import/source-files/firestore.rules.txt
+./audit-gpt-97import/source-files/scripts/audit-catalogue.js
+./audit-gpt-97import/source-files/scripts/audit-partenaires.js
+./audit-gpt-97import/source-files/scripts/backup-quotes.js
+./audit-gpt-97import/source-files/scripts/check-firestore.js
+./audit-gpt-97import/source-files/scripts/delete-quotes.mjs
+./audit-gpt-97import/source-files/scripts/export-catalogue-excel.ts
+./audit-gpt-97import/source-files/scripts/export-products-json.ts
+./audit-gpt-97import/source-files/scripts/firestore-products.json
+./audit-gpt-97import/source-files/scripts/fix-ms-20-001.sh
+./audit-gpt-97import/source-files/scripts/images-inventory.json
+./audit-gpt-97import/source-files/scripts/import-catalogue-minipelles.js
+./audit-gpt-97import/source-files/scripts/import-catalogue-v4.mjs
+./audit-gpt-97import/source-files/scripts/init-counters-v50.cjs
+./audit-gpt-97import/source-files/scripts/media_sync.mjs
+./audit-gpt-97import/source-files/scripts/migrate-acomptes-v43.js
+./audit-gpt-97import/source-files/scripts/migrate-admin-params.js
+./audit-gpt-97import/source-files/scripts/migrate-product-prices.js
+./audit-gpt-97import/source-files/scripts/migrate-users-to-clients.cjs
+./audit-gpt-97import/source-files/scripts/nettoyage-catalogue.js
+./audit-gpt-97import/source-files/scripts/rename-images.mjs
+./audit-gpt-97import/source-files/scripts/repair-97importcom.js
+./audit-gpt-97import/source-files/scripts/reset-database.sh
+./audit-gpt-97import/source-files/scripts/seed-browser.html
+./audit-gpt-97import/source-files/scripts/seed-direct.js
+./audit-gpt-97import/source-files/scripts/seed-firestore.js
+./audit-gpt-97import/source-files/scripts/seed-options-apply.sh
+./audit-gpt-97import/source-files/scripts/seed-products.js
+./audit-gpt-97import/source-files/scripts/seed-users.js
+./audit-gpt-97import/source-files/scripts/seed-v2-apply.sh
+./audit-gpt-97import/source-files/scripts/set-admin-role.cjs
+./audit-gpt-97import/source-files/scripts/translate-products.js
+./audit-gpt-97import/source-files/scripts/update-firestore-images.mjs
+./audit-gpt-97import/source-files/scripts/update-firestore-images.ts
+./audit-gpt-97import/source-files/scripts/update-image-urls.mjs
+./audit-gpt-97import/source-files/scripts/upload-images-mini-pelles.js
+./audit-gpt-97import/source-files/scripts/upload-images.mjs
+./audit-gpt-97import/source-files/scripts/upload-to-storage.mjs
+./audit-gpt-97import/source-files/src/App.tsx
+./audit-gpt-97import/source-files/src/admin/AdminApp.tsx
+./audit-gpt-97import/source-files/src/admin/AdminLogin.tsx
+./audit-gpt-97import/source-files/src/admin/components/DropdownPorts.tsx
+./audit-gpt-97import/source-files/src/admin/components/ForgotPasswordModal.tsx
+./audit-gpt-97import/source-files/src/admin/components/Icons.tsx
+./audit-gpt-97import/source-files/src/admin/components/ModalDupliquerDevis.tsx
+./audit-gpt-97import/source-files/src/admin/components/PopupEncaisserAcompte.tsx
+./audit-gpt-97import/source-files/src/admin/components/PopupSelectionClientExcel.tsx
+./audit-gpt-97import/source-files/src/admin/components/ProductForm.tsx
+./audit-gpt-97import/source-files/src/admin/components/PromouvoirPartenaireModal.tsx
+./audit-gpt-97import/source-files/src/admin/components/Toast.tsx
+./audit-gpt-97import/source-files/src/admin/components/atoms/LoadingState.tsx
+./audit-gpt-97import/source-files/src/admin/components/atoms/SearchInput.tsx
+./audit-gpt-97import/source-files/src/admin/components/commission/ModalMarquerPayee.tsx
+./audit-gpt-97import/source-files/src/admin/components/commission/ModalNouvelleCommission.tsx
+./audit-gpt-97import/source-files/src/admin/components/produit/CaracteristiquesEditor.tsx
+./audit-gpt-97import/source-files/src/admin/components/produit/CompositionKitEditor.tsx
+./audit-gpt-97import/source-files/src/admin/components/produit/FicheProduitTabs.tsx
+./audit-gpt-97import/source-files/src/admin/components/produit/GaleriePhotos.tsx
+./audit-gpt-97import/source-files/src/admin/components/produit/GalerieVideos.tsx
+./audit-gpt-97import/source-files/src/admin/components/produit/ModalDupliquerProduit.tsx
+./audit-gpt-97import/source-files/src/admin/components/produit/OngletDetails.tsx
+./audit-gpt-97import/source-files/src/admin/components/produit/OngletEssentiel.tsx
+./audit-gpt-97import/source-files/src/admin/components/produit/OngletGestionPrix.tsx
+./audit-gpt-97import/source-files/src/admin/components/produit/OngletMedias.tsx
+./audit-gpt-97import/source-files/src/admin/components/produit/OngletOptions.tsx
+./audit-gpt-97import/source-files/src/admin/hooks/usePricingEngine.ts
+./audit-gpt-97import/source-files/src/admin/pages/AcomptesEncaisser.tsx
+./audit-gpt-97import/source-files/src/admin/pages/AdminProduits.tsx
+./audit-gpt-97import/source-files/src/admin/pages/CatalogueProduits.tsx
+./audit-gpt-97import/source-files/src/admin/pages/Clients.tsx
+./audit-gpt-97import/source-files/src/admin/pages/Dashboard.tsx
+./audit-gpt-97import/source-files/src/admin/pages/DetailAchat.tsx
+./audit-gpt-97import/source-files/src/admin/pages/DetailClient.tsx
+./audit-gpt-97import/source-files/src/admin/pages/DetailCommission.tsx
+./audit-gpt-97import/source-files/src/admin/pages/DetailConteneur.tsx
+./audit-gpt-97import/source-files/src/admin/pages/DetailDevis.tsx
+./audit-gpt-97import/source-files/src/admin/pages/DetailFacture.tsx
+./audit-gpt-97import/source-files/src/admin/pages/DetailFraisLogistique.tsx
+./audit-gpt-97import/source-files/src/admin/pages/DetailListeAchat.tsx
+./audit-gpt-97import/source-files/src/admin/pages/DetailPartenaire.tsx
+./audit-gpt-97import/source-files/src/admin/pages/EditProduit.tsx
+./audit-gpt-97import/source-files/src/admin/pages/Factures.tsx
+./audit-gpt-97import/source-files/src/admin/pages/FicheProduit.tsx
+./audit-gpt-97import/source-files/src/admin/pages/FraisLogistique.tsx
+./audit-gpt-97import/source-files/src/admin/pages/GestionSite.tsx
+./audit-gpt-97import/source-files/src/admin/pages/ListeConteneurs.tsx
+./audit-gpt-97import/source-files/src/admin/pages/ListeDevis.tsx
+./audit-gpt-97import/source-files/src/admin/pages/ListeListesAchat.tsx
+./audit-gpt-97import/source-files/src/admin/pages/ListesAchat.tsx
+./audit-gpt-97import/source-files/src/admin/pages/Logs.tsx
+./audit-gpt-97import/source-files/src/admin/pages/LogsDebug.tsx
+./audit-gpt-97import/source-files/src/admin/pages/NotesCommission.tsx
+./audit-gpt-97import/source-files/src/admin/pages/NouveauConteneur.tsx
+./audit-gpt-97import/source-files/src/admin/pages/NouveauProduit.tsx
+./audit-gpt-97import/source-files/src/admin/pages/NouvelleListeAchat.tsx
+./audit-gpt-97import/source-files/src/admin/pages/Parametres.tsx
+./audit-gpt-97import/source-files/src/admin/pages/Partenaires.tsx
+./audit-gpt-97import/source-files/src/admin/pages/SAVDetail.tsx
+./audit-gpt-97import/source-files/src/admin/pages/SAVListe.tsx
+./audit-gpt-97import/source-files/src/admin/pages/Stock.tsx
+./audit-gpt-97import/source-files/src/admin/pages/TauxRMB.tsx
+./audit-gpt-97import/source-files/src/admin/services/pricingService.ts
+./audit-gpt-97import/source-files/src/admin/styles/admin.css
+./audit-gpt-97import/source-files/src/admin/styles/polish-v45.css
+./audit-gpt-97import/source-files/src/admin/utils/productCompleteness.ts
+./audit-gpt-97import/source-files/src/components/DuplicateBtn.tsx
+./audit-gpt-97import/source-files/src/components/ErrorBoundary.tsx
+./audit-gpt-97import/source-files/src/components/GlobeToggle.tsx
+./audit-gpt-97import/source-files/src/components/OrangeIndicator.tsx
+./audit-gpt-97import/source-files/src/components/SortControl.tsx
+./audit-gpt-97import/source-files/src/front/FrontApp.tsx
+./audit-gpt-97import/source-files/src/front/components/Breadcrumb.tsx
+./audit-gpt-97import/source-files/src/front/components/Footer.tsx
+./audit-gpt-97import/source-files/src/front/components/Header.tsx
+./audit-gpt-97import/source-files/src/front/components/PopupSaisieRIB.tsx
+./audit-gpt-97import/source-files/src/front/components/PopupVerserAcompte.tsx
+./audit-gpt-97import/source-files/src/front/components/PriceDisplay.tsx
+./audit-gpt-97import/source-files/src/front/components/ProductCard.tsx
+./audit-gpt-97import/source-files/src/front/components/ProductOptionSelector.tsx
+./audit-gpt-97import/source-files/src/front/components/SearchBar.tsx
+./audit-gpt-97import/source-files/src/front/components/Toast.tsx
+./audit-gpt-97import/source-files/src/front/pages/Catalogue.tsx
+./audit-gpt-97import/source-files/src/front/pages/Connexion.tsx
+./audit-gpt-97import/source-files/src/front/pages/Contact.tsx
+./audit-gpt-97import/source-files/src/front/pages/EspaceClient.tsx
+./audit-gpt-97import/source-files/src/front/pages/EspacePartenaire.tsx
+./audit-gpt-97import/source-files/src/front/pages/Home.tsx
+./audit-gpt-97import/source-files/src/front/pages/Inscription.tsx
+./audit-gpt-97import/source-files/src/front/pages/MonCompte.tsx
+./audit-gpt-97import/source-files/src/front/pages/Panier.tsx
+./audit-gpt-97import/source-files/src/front/pages/Produit.tsx
+./audit-gpt-97import/source-files/src/front/pages/Profil.tsx
+./audit-gpt-97import/source-files/src/front/pages/Services.tsx
+./audit-gpt-97import/source-files/src/front/pages/SignatureDevis.tsx
+./audit-gpt-97import/source-files/src/front/pages/espace-client/ContinuerAchats.tsx
+./audit-gpt-97import/source-files/src/front/pages/espace-client/DevisCard.tsx
+./audit-gpt-97import/source-files/src/front/pages/espace-client/MesAdresses.tsx
+./audit-gpt-97import/source-files/src/front/pages/espace-client/MesCommandes.tsx
+./audit-gpt-97import/source-files/src/front/pages/espace-client/MesDevis.tsx
+./audit-gpt-97import/source-files/src/front/pages/espace-client/MesFactures.tsx
+./audit-gpt-97import/source-files/src/front/pages/espace-client/MesInfos.tsx
+./audit-gpt-97import/source-files/src/front/pages/espace-client/MesVirements.tsx
+./audit-gpt-97import/source-files/src/front/pages/espace-client/PopupAcompte.tsx
+./audit-gpt-97import/source-files/src/front/pages/espace-client/PopupSAV.tsx
+./audit-gpt-97import/source-files/src/front/pages/espace-client/SAV.tsx
+./audit-gpt-97import/source-files/src/front/pages/espace-client/SuiviAchats.tsx
+./audit-gpt-97import/source-files/src/front/pages/espace-partenaire/GestionDevisPartner.tsx
+./audit-gpt-97import/source-files/src/front/pages/espace-partenaire/MesClientsPartner.tsx
+./audit-gpt-97import/source-files/src/front/pages/espace-partenaire/MesCommissionsPartner.tsx
+./audit-gpt-97import/source-files/src/i18n/en.json
+./audit-gpt-97import/source-files/src/i18n/fr.json
+./audit-gpt-97import/source-files/src/i18n/index.tsx
+./audit-gpt-97import/source-files/src/i18n/zh.json
+./audit-gpt-97import/source-files/src/index.css
+./audit-gpt-97import/source-files/src/lib/coefficientsHelpers.ts
+./audit-gpt-97import/source-files/src/lib/commissionHelpers.ts
+./audit-gpt-97import/source-files/src/lib/counters.ts
+./audit-gpt-97import/source-files/src/lib/currencyHelpers.ts
+./audit-gpt-97import/source-files/src/lib/dateHelpers.ts
+./audit-gpt-97import/source-files/src/lib/deepl.ts
+./audit-gpt-97import/source-files/src/lib/deeplService.ts
+./audit-gpt-97import/source-files/src/lib/devisHelpers.ts
+./audit-gpt-97import/source-files/src/lib/emailService.ts
+./audit-gpt-97import/source-files/src/lib/excel-generator.ts
+./audit-gpt-97import/source-files/src/lib/excel-generators/buildLignesCtn.ts
+./audit-gpt-97import/source-files/src/lib/excel-generators/excelStyles.ts
+./audit-gpt-97import/source-files/src/lib/excel-generators/excelTypes.ts
+./audit-gpt-97import/source-files/src/lib/excel-generators/firestoreHelpers.ts
+./audit-gpt-97import/source-files/src/lib/excel-generators/generateBcChine.ts
+./audit-gpt-97import/source-files/src/lib/excel-generators/generateBdInvoice.ts
+./audit-gpt-97import/source-files/src/lib/excel-generators/generateBdMaritime.ts
+./audit-gpt-97import/source-files/src/lib/excel-generators/generateBdPackingList.ts
+./audit-gpt-97import/source-files/src/lib/excel-generators/generateBeExport.ts
+./audit-gpt-97import/source-files/src/lib/excel-generators/luxentHeader.ts
+./audit-gpt-97import/source-files/src/lib/exchange-rate.ts
+./audit-gpt-97import/source-files/src/lib/filterPersistence.ts
+./audit-gpt-97import/source-files/src/lib/firebase.ts
+./audit-gpt-97import/source-files/src/lib/firebaseUtils.ts
+./audit-gpt-97import/source-files/src/lib/generateInvoiceAcompte.ts
+./audit-gpt-97import/source-files/src/lib/generateInvoiceFinale.ts
+./audit-gpt-97import/source-files/src/lib/logService.ts
+./audit-gpt-97import/source-files/src/lib/ncNumerotation.ts
+./audit-gpt-97import/source-files/src/lib/pdf-generator.ts
+./audit-gpt-97import/source-files/src/lib/productGroupHelpers.ts
+./audit-gpt-97import/source-files/src/lib/productHelpers.ts
+./audit-gpt-97import/source-files/src/lib/productMediaHelpers.ts
+./audit-gpt-97import/source-files/src/lib/quoteStatusHelpers.ts
+./audit-gpt-97import/source-files/src/lib/storageHelpers.ts
+./audit-gpt-97import/source-files/src/lib/version.ts
+./audit-gpt-97import/source-files/src/lib/whatsappHelpers.ts
+./audit-gpt-97import/source-files/src/main.tsx
+./audit-gpt-97import/source-files/src/vite-env.d.ts
+./audit-gpt-97import/source-files/storage.rules.txt
+./audit-gpt-97import/source-files/superpowers/plans/2026-05-01-bug-a-duplication-devis.md
+./audit-gpt-97import/source-files/superpowers/plans/2026-05-01-bug-acomptes-overflow.md
+./audit-gpt-97import/source-files/superpowers/plans/2026-05-01-bug1-fiche-produit-stale-state.md
+./audit-gpt-97import/source-files/superpowers/plans/2026-05-01-rules-rbac.md
+./audit-gpt-97import/source-files/superpowers/plans/2026-05-02-v50-bd-init.md
+./audit-v52/AUDIT-COLLECTIONS-DOUBLONS-V52.txt
+./audit-v52/AUDIT-STORAGE-BUCKET-V52.txt
+./audit-v52/buckets-list.txt
+./audit-v52/env-bucket-refs.txt
+./audit-v52/storage-paths.txt
+./audit-v52/storageBucket-refs.txt
+./audit/00_resume-global.md
+./audit/01_architecture-technique.md
+./audit/02_sources-de-verite.md
+./audit/03_cartographie-routes.md
+./audit/04_cartographie-admin.md
+./audit/05_medias-et-assets.md
+./audit/06_risques-et-legacy.md
+./audit/07_plan-refonte-phases.md
+./audit/08_workflow-parcours-client.md
+./backup-products-1776780482656.json
+./backup-products-1776780885840.json
+./backups/images-pre-update-2026-04-27T14-49-10-049Z.json
+./backups/partners-backup-20260424-1651.json
+./backups/products-pre-import-minipelles-2026-04-27T13-26-31-530Z.json
+./backups/products-pre-import-minipelles-2026-04-27T13-45-26-414Z.json
+./backups/quotes-backup-20260424-1651.json
+./backups/quotes-pre-migration-v43-2026-04-25T15-56.json
+./claude-deepseek-v4.sh
+./comparaison_fichiers_report.csv
+./docs/superpowers/plans/2026-05-01-bug-a-duplication-devis.md
+./docs/superpowers/plans/2026-05-01-bug-acomptes-overflow.md
+./docs/superpowers/plans/2026-05-01-bug1-fiche-produit-stale-state.md
+./docs/superpowers/plans/2026-05-01-rules-rbac.md
+./docs/superpowers/plans/2026-05-02-v50-bd-init.md
+./docs/superpowers/plans/2026-05-02-v52-profiles-migration.md
+./eslint.config.js
+./firebase-admin-sdk.json
+./firebase-export-1778403702495oESB9a/firebase-export-metadata.json
+./firebase-export-1778403702495oESB9a/storage_export/buckets.json
+./firebase.json
+./firestore.rules
+./fix-reseau-bloque.md
+./importProducts-v2.mjs
+./index.html
+./liste-vercel.txt
+./majall-97import.md
+./majall/2030--COMPARATIF-site.txt
+./majall/2030-REFONTE-EN-FIREBASE-CLAUDE-PC.txt
+./majall/3--4-2026--debug_report.md
+./majall/3-4---2026--export-techenique.txt
+./majall/97import-2030-openai.md
+./majall/COMPARATIF-FICHIERS.txt
+./majall/LISTE-FICHIERS-97IMPORT-2026.txt
+./majall/PRIX-EURO-RMB.txt
+./majall/confi.txt
+./majall/gemini-2030-97import-MAJ.txt
+./majall/openai-97import-2030.txt
+./medias-inventory.json
+./package-lock.json
+./package.json
+./postcss.config.js
+./prompt_migration.html
+./prompts/v44-bis-fix-create-product.md
+./prompts/v44-fix-admin-taux.md
+./prompts/v47.md
+./public/backoffice_97import_v4.html
+./scripts/audit-acomptes-v52.cjs
+./scripts/audit-admin-clients-quotes-v56.cjs
+./scripts/audit-catalogue.js
+./scripts/audit-partenaires.js
+./scripts/backup-quotes.js
+./scripts/check-firestore.js
+./scripts/clean-start-business-data-v53.cjs
+./scripts/cleanup-interenovations-v56.cjs
+./scripts/cleanup-v106.cjs
+./scripts/cleanup-v64.cjs
+./scripts/delete-quotes.mjs
+./scripts/diagnostic-claims-v81.cjs
+./scripts/diagnostic-post-v53.cjs
+./scripts/export-catalogue-excel.ts
+./scripts/export-products-json.ts
+./scripts/firestore-products.json
+./scripts/fix-ms-20-001.sh
+./scripts/fix-v86-commande-ferme.cjs
+./scripts/images-inventory.json
+./scripts/import-catalogue-minipelles.js
+./scripts/import-catalogue-v4.mjs
+./scripts/init-counters-v50.cjs
+./scripts/media_sync.mjs
+./scripts/migrate-acomptes-v43.js
+./scripts/migrate-admin-params.js
+./scripts/migrate-product-prices.js
+./scripts/migrate-users-to-clients.cjs
+./scripts/nettoyage-catalogue.js
+./scripts/rename-images.mjs
+./scripts/repair-97importcom.js
+./scripts/reset-database.sh
+./scripts/reset-quotes-v135.cjs
+./scripts/seed-browser.html
+./scripts/seed-direct.js
+./scripts/seed-firestore.js
+./scripts/seed-options-apply.sh
+./scripts/seed-products.js
+./scripts/seed-users.js
+./scripts/seed-v2-apply.sh
+./scripts/set-admin-role.cjs
+./scripts/set-all-partner-claims-v81.cjs
+./scripts/set-partner-claims-v81.cjs
+./scripts/test-create-devis-v65.cjs
+./scripts/translate-products.js
+./scripts/update-firestore-images.mjs
+./scripts/update-firestore-images.ts
+./scripts/update-image-urls.mjs
+./scripts/upload-images-mini-pelles.js
+./scripts/upload-images.mjs
+./scripts/upload-to-storage.mjs
+./src/App.tsx
+./src/admin/AdminApp.tsx
+./src/admin/AdminLogin.tsx
+./src/admin/components/DropdownPorts.tsx
+./src/admin/components/ForgotPasswordModal.tsx
+./src/admin/components/Icons.tsx
+./src/admin/components/ModalDupliquerDevis.tsx
+./src/admin/components/PopupEncaisserAcompte.tsx
+./src/admin/components/PopupSelectionClientExcel.tsx
+./src/admin/components/PrixAchatInput.tsx
+./src/admin/components/ProductForm.tsx
+./src/admin/components/PromouvoirPartenaireModal.tsx
+./src/admin/components/Toast.tsx
+./src/admin/components/atoms/EmptyState.tsx
+./src/admin/components/atoms/LoadingState.tsx
+./src/admin/components/atoms/SearchInput.tsx
+./src/admin/components/commission/ModalMarquerPayee.tsx
+./src/admin/components/commission/ModalNouvelleCommission.tsx
+./src/admin/components/produit/CaracteristiquesEditor.tsx
+./src/admin/components/produit/CompositionKitEditor.tsx
+./src/admin/components/produit/FicheProduitTabs.tsx
+./src/admin/components/produit/GaleriePhotos.tsx
+./src/admin/components/produit/GalerieVideos.tsx
+./src/admin/components/produit/ModalDupliquerProduit.tsx
+./src/admin/components/produit/OngletDetails.tsx
+./src/admin/components/produit/OngletEssentiel.tsx
+./src/admin/components/produit/OngletGestionPrix.tsx
+./src/admin/components/produit/OngletMedias.tsx
+./src/admin/components/produit/OngletOptions.tsx
+./src/admin/hooks/usePricingEngine.ts
+./src/admin/pages/AcomptesEncaisser.tsx
+./src/admin/pages/AdminProduits.tsx
+./src/admin/pages/CatalogueProduits.tsx
+./src/admin/pages/Clients.tsx
+./src/admin/pages/Dashboard.tsx
+./src/admin/pages/DetailAchat.tsx
+./src/admin/pages/DetailClient.tsx
+./src/admin/pages/DetailCommission.tsx
+./src/admin/pages/DetailConteneur.tsx
+./src/admin/pages/DetailDevis.tsx
+./src/admin/pages/DetailFacture.tsx
+./src/admin/pages/DetailFraisLogistique.tsx
+./src/admin/pages/DetailListeAchat.tsx
+./src/admin/pages/DetailPartenaire.tsx
+./src/admin/pages/EditProduit.tsx
+./src/admin/pages/Factures.tsx
+./src/admin/pages/FicheProduit.tsx
+./src/admin/pages/FraisLogistique.tsx
+./src/admin/pages/GestionSite.tsx
+./src/admin/pages/ListeConteneurs.tsx
+./src/admin/pages/ListeDevis.tsx
+./src/admin/pages/ListeListesAchat.tsx
+./src/admin/pages/ListesAchat.tsx
+./src/admin/pages/Logs.tsx
+./src/admin/pages/LogsDebug.tsx
+./src/admin/pages/NotesCommission.tsx
+./src/admin/pages/NouveauConteneur.tsx
+./src/admin/pages/NouveauProduit.tsx
+./src/admin/pages/NouvelleListeAchat.tsx
+./src/admin/pages/Parametres.tsx
+./src/admin/pages/Partenaires.tsx
+./src/admin/pages/SAVDetail.tsx
+./src/admin/pages/SAVListe.tsx
+./src/admin/pages/Stock.tsx
+./src/admin/pages/TauxRMB.tsx
+./src/admin/services/pricingService.ts
+./src/admin/styles/admin.css
+./src/admin/styles/polish-v45.css
+./src/admin/styles/sidebar.css
+./src/admin/utils/productCompleteness.ts
+./src/components/DuplicateBtn.tsx
+./src/components/ErrorBoundary.tsx
+./src/components/GlobeToggle.tsx
+./src/components/OrangeIndicator.tsx
+./src/components/SortControl.tsx
+./src/front/FrontApp.tsx
+./src/front/components/Breadcrumb.tsx
+./src/front/components/Footer.tsx
+./src/front/components/Header.tsx
+./src/front/components/PopupSaisieRIB.tsx
+./src/front/components/PopupVerserAcompte.tsx
+./src/front/components/PriceDisplay.tsx
+./src/front/components/ProductCard.tsx
+./src/front/components/ProductOptionSelector.tsx
+./src/front/components/SearchBar.tsx
+./src/front/components/Toast.tsx
+./src/front/pages/Catalogue.tsx
+./src/front/pages/Connexion.tsx
+./src/front/pages/Contact.tsx
+./src/front/pages/EspaceClient.tsx
+./src/front/pages/EspacePartenaire.tsx
+./src/front/pages/Home.tsx
+./src/front/pages/Inscription.tsx
+./src/front/pages/MonCompte.tsx
+./src/front/pages/Panier.tsx
+./src/front/pages/Produit.tsx
+./src/front/pages/Profil.tsx
+./src/front/pages/Services.tsx
+./src/front/pages/SignatureDevis.tsx
+./src/front/pages/espace-client/ContinuerAchats.tsx
+./src/front/pages/espace-client/DevisCard.tsx
+./src/front/pages/espace-client/MesAdresses.tsx
+./src/front/pages/espace-client/MesCommandes.tsx
+./src/front/pages/espace-client/MesDevis.tsx
+./src/front/pages/espace-client/MesFactures.tsx
+./src/front/pages/espace-client/MesInfos.tsx
+./src/front/pages/espace-client/MesVirements.tsx
+./src/front/pages/espace-client/PopupAcompte.tsx
+./src/front/pages/espace-client/PopupSAV.tsx
+./src/front/pages/espace-client/SAV.tsx
+./src/front/pages/espace-client/SuiviAchats.tsx
+./src/front/pages/espace-partenaire/GestionDevisPartner.tsx
+./src/front/pages/espace-partenaire/MesClientsPartner.tsx
+./src/front/pages/espace-partenaire/MesCommissionsPartner.tsx
+./src/hooks/useAuth.ts
+./src/i18n/en.json
+./src/i18n/fr.json
+./src/i18n/index.tsx
+./src/i18n/zh.json
+./src/index.css
+./src/lib/coefficientsHelpers.ts
+./src/lib/commissionHelpers.ts
+./src/lib/counters.ts
+./src/lib/currencyHelpers.ts
+./src/lib/dateHelpers.ts
+./src/lib/deepl.ts
+./src/lib/deeplService.ts
+./src/lib/deeplTranslator.ts
+./src/lib/devisHelpers.ts
+./src/lib/emailService.ts
+./src/lib/excel-generator.ts
+./src/lib/excel-generators/buildLignesCtn.ts
+./src/lib/excel-generators/excelStyles.ts
+./src/lib/excel-generators/excelTypes.ts
+./src/lib/excel-generators/firestoreHelpers.ts
+./src/lib/excel-generators/generateBcChine.ts
+./src/lib/excel-generators/generateBdInvoice.ts
+./src/lib/excel-generators/generateBdMaritime.ts
+./src/lib/excel-generators/generateBdPackingList.ts
+./src/lib/excel-generators/generateBeExport.ts
+./src/lib/excel-generators/luxentHeader.ts
+./src/lib/exchange-rate.ts
+./src/lib/exchangeRateMonitor.ts
+./src/lib/exchangeRateUpdater.ts
+./src/lib/filterPersistence.ts
+./src/lib/firebase.ts
+./src/lib/firebaseUtils.ts
+./src/lib/generateInvoiceAcompte.ts
+./src/lib/generateInvoiceFinale.ts
+./src/lib/logService.ts
+./src/lib/ncNumerotation.ts
+./src/lib/pdf-generator.ts
+./src/lib/pricingEngine.ts
+./src/lib/productGroupHelpers.ts
+./src/lib/productHelpers.ts
+./src/lib/productMediaHelpers.ts
+./src/lib/quoteStatusHelpers.ts
+./src/lib/storageHelpers.ts
+./src/lib/version.ts
+./src/lib/whatsappHelpers.ts
+./src/main.tsx
+./src/styles/global-overrides.css
+./src/types/collections.ts
+./src/vite-env.d.ts
+./storage.rules
+./tests/fixtures/auth.setup.ts
+./tests/helpers/firebase-assertions.ts
+./tests/helpers/test-data.ts
+./tests/playwright.config.ts
+./tests/scripts/cleanup-test-data.cjs
+./tests/scripts/run-tests.sh
+./tests/specs/debug-devis.spec.ts
+./tests/specs/parcours-admin.spec.ts
+./tests/specs/parcours-client.spec.ts
+./tests/specs/parcours-commandes.spec.ts
+./tests/specs/parcours-partenaire.spec.ts
+./tests/specs/parcours-v149.spec.ts
+./tests/specs/parcours-v64.spec.ts
+./tests/specs/parcours-v75.spec.ts
+./tests/specs/test-devis-direct.spec.ts
+./tsconfig.json
+./v20.md
+./v28-prep.md
+./vercel-sans-tocken.txt
+./vercel.json
+./vite.config.ts

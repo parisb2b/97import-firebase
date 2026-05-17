@@ -1,0 +1,414 @@
+# 🔵 CLAUDE CODE — LOGS DE SESSION
+# Période : 10/05/2026 15:00 → 11/05/2026 07:35
+# Généré le : 11/05/2026 07:37
+# Projet    : 97import (C:\DATA-MC-2030\97import-firebase\)
+
+---
+
+## DP97IMPORTMAJ — MISSIONS DU 10-11 MAI 2026
+
+```
+V149 | 10/05/2026 18:59 | Autotest intégral (Comptes Sanctuarisés) | ❌ ÉCHEC (code 1)
+V149 | 10/05/2026 19:10 | Autotest intégral (Comptes Sanctuarisés) | ✅ RÉUSSI
+V151 | 10/05/2026 19:24 | Publication locale | v0.43.11 | Auth:9100✅ Firestore:8081✅ Vite:5173✅ | 3 comptes OK | firebase.ts: DEV||localhost
+V152 | 10/05/2026 20:00 | Footer version dynamique | getBuildInfo() remplace VERSION_LABEL + formatBuildInfo() | Sans hash git
+M228 | 10/05/2026 20:43 | Désinstallation Skills | developing-genkit-dart supprimé | karpathy-skills absent | settings.json intact
+M226-FIX | 10/05/2026 21:15 | Restauration rules Firestore (helpers + collections granulaires) | isDevisReadonly + isAddressFrozen + isAcompteEncaisseProtected | ✅
+M999 | 10/05/2026 21:32 | Purge + Relance Synchronisée | firebase.ts hardcodé sans condition | Auth:9100✅ Firestore:8081✅ Vite:5173✅ | DÉBLOQUÉ
+M1000 | 10/05/2026 21:40 | v0.43.12 | localhost + Storage + anti-double-init HMR | Auth:9100✅ FS:8081✅ Vite:5173✅ | DÉBLOQUÉ
+M1001 | 10/05/2026 21:52 | v0.43.13 | Fix Enregistrement Adresses + Rôle Admin | users/{userId} write isOwner | canUpdateAddress() | ✅
+M1002 | 10/05/2026 22:07 | Instance unique + isAdmin via token.email + canUpdateAddress + onAuthStateChanged | adminStorage préservé | ✅
+V155-MAGNUM-OPUS | 10/05/2026 22:19 | AdminApp Firestore role check + firestore.rules protections restaurées | Auth✅ FS✅ Vite✅ | CERTIFIÉ
+V155-SCAN | 10/05/2026 22:28 | Scan 24 fichiers | 20 trouvés + 4 absents (non critiques) | 3006 lignes | firebase.ts✅ rules✅ AdminApp✅ | CERTIFIÉ
+V157-DP3 | 11/05/2026 00:51 | v0.43.11 | Consolidation V2-DP → V3-DP : firebase.ts 127.0.0.1 + useAuth hook + AdminApp anti-flash + productHelpers ×1.5 + Panier ×0.75 + rules V157 + 14 fichiers | TS:0 erreur | ✅
+V157-DP3-CLOTURE | 11/05/2026 07:32 | v0.43.11 | 14 fichiers + purge + relance | Auth✅ FS✅ Vite✅ | CERTIFIÉ
+```
+
+## SAUVEGARDES V157
+
+```
+total 126
+drwxr-xr-x 1 michel 197609     0 May 11 00:40 .
+drwxr-xr-x 1 michel 197609     0 May 11 00:53 ..
+-rw-r--r-- 1 michel 197609   352 May 11 00:40 .env
+-rw-r--r-- 1 michel 197609 20469 May 11 00:40 AdminApp.tsx
+-rw-r--r-- 1 michel 197609  4510 May 11 00:40 AdminLogin.tsx
+-rw-r--r-- 1 michel 197609  5983 May 11 00:40 Connexion.tsx
+-rw-r--r-- 1 michel 197609 11513 May 11 00:40 MesAdresses.tsx
+-rw-r--r-- 1 michel 197609 24681 May 11 00:40 Panier.tsx
+-rw-r--r-- 1 michel 197609 15163 May 11 00:40 Profil.tsx
+-rw-r--r-- 1 michel 197609   391 May 11 00:40 firebase.json
+-rw-r--r-- 1 michel 197609  1750 May 11 00:40 firebase.ts
+-rw-r--r-- 1 michel 197609  8065 May 11 00:40 firestore.rules
+-rw-r--r-- 1 michel 197609  7810 May 11 00:40 productHelpers.ts
+-rw-r--r-- 1 michel 197609   660 May 11 00:40 storage.rules
+```
+
+## FICHIERS MODIFIÉS (10-11 MAI 2026)
+
+```
+14355223812521880      1 -rw-r--r--   1 michel   197609        334 May 11 00:45 ./.env
+ 4222124650938251    128 -rw-r--r--   1 michel   197609     130806 May 10 22:27 ./DP/V155-SCAN-COMPLET.md
+48976645948165095      1 -rw-r--r--   1 michel   197609        352 May 11 00:40 ./DP/backups-v157/.env
+12666373952361302     20 -rw-r--r--   1 michel   197609      20469 May 11 00:40 ./DP/backups-v157/AdminApp.tsx
+ 8444249301815895      8 -rw-r--r--   1 michel   197609       4510 May 11 00:40 ./DP/backups-v157/AdminLogin.tsx
+ 7881299348397294      8 -rw-r--r--   1 michel   197609       5983 May 11 00:40 ./DP/backups-v157/Connexion.tsx
+19703248370248454     12 -rw-r--r--   1 michel   197609      11513 May 11 00:40 ./DP/backups-v157/MesAdresses.tsx
+25614222881172199     28 -rw-r--r--   1 michel   197609      24681 May 11 00:40 ./DP/backups-v157/Panier.tsx
+53761720552237798     16 -rw-r--r--   1 michel   197609      15163 May 11 00:40 ./DP/backups-v157/Profil.tsx
+22799473114074081      1 -rw-r--r--   1 michel   197609        391 May 11 00:40 ./DP/backups-v157/firebase.json
+10696049115381156      4 -rw-r--r--   1 michel   197609       1750 May 11 00:40 ./DP/backups-v157/firebase.ts
+35184372089341066      8 -rw-r--r--   1 michel   197609       8065 May 11 00:40 ./DP/backups-v157/firestore.rules
+ 5348024558010801      8 -rw-r--r--   1 michel   197609       7810 May 11 00:40 ./DP/backups-v157/productHelpers.ts
+24769797951048665      4 -rw-r--r--   1 michel   197609        660 May 11 00:40 ./DP/backups-v157/storage.rules
+ 4222124652802489      1 -rw-r--r--   1 michel   197609        261 May 10 11:01 ./firebase-export-1778403702495oESB9a/firebase-export-metadata.json
+ 4785074604100995      1 -rw-r--r--   1 michel   197609         83 May 10 11:01 ./firebase-export-1778403702495oESB9a/storage_export/buckets.json
+38562071809870880      1 -rw-r--r--   1 michel   197609        305 May 11 00:44 ./firebase.json
+27021597764231649      8 -rw-r--r--   1 michel   197609       4687 May 11 00:44 ./firestore.rules
+ 34621422135787013      4 -rw-r--r--   1 michel   197609       3620 May 11 07:31 ./node_modules/.vite/deps/_metadata.json
+526921156402404952      1 -rw-r--r--   1 michel   197609         23 May 11 07:31 ./node_modules/.vite/deps/package.json
+ 23362423066995915    300 -rw-r--r--   1 michel   197609     307010 May 10 19:23 ./package-lock.json
+ 21673573206732096      4 -rw-r--r--   1 michel   197609       1299 May 10 19:23 ./package.json
+ 69242844270832719     16 -rw-r--r--   1 michel   197609      14307 May 11 00:48 ./src/admin/AdminApp.tsx
+  8444249301335717      4 -rw-r--r--   1 michel   197609       3526 May 11 00:47 ./src/admin/AdminLogin.tsx
+  5066549581054224      8 -rw-r--r--   1 michel   197609       4800 May 10 11:11 ./src/admin/pages/ListesAchat.tsx
+  6192449487669479      8 -rw-r--r--   1 michel   197609       4165 May 10 19:30 ./src/front/components/Footer.tsx
+ 25332747904470518      8 -rw-r--r--   1 michel   197609       5594 May 11 00:58 ./src/front/pages/Connexion.tsx
+ 20266198323441101     28 -rw-r--r--   1 michel   197609      24720 May 11 00:49 ./src/front/pages/Panier.tsx
+ 34058472182276259     16 -rw-r--r--   1 michel   197609      13216 May 11 01:03 ./src/front/pages/Profil.tsx
+ 19421773393293578     12 -rw-r--r--   1 michel   197609      10021 May 11 01:03 ./src/front/pages/espace-client/MesAdresses.tsx
+ 53480245575077054      4 -rw-r--r--   1 michel   197609       2033 May 11 00:41 ./src/hooks/useAuth.ts
+  5910974511434786      4 -rw-r--r--   1 michel   197609       3088 May 11 00:41 ./src/lib/firebase.ts
+ 37436171903028277      8 -rw-r--r--   1 michel   197609       7838 May 11 00:46 ./src/lib/productHelpers.ts
+  7881299347933487      4 -rw-r--r--   1 michel   197609       2516 May 10 19:30 ./src/lib/version.ts
+ 37154696926317597      4 -rw-r--r--   1 michel   197609        590 May 11 00:44 ./storage.rules
+ 48976645947661874      1 -rw-r--r--   1 michel   197609         45 May 10 18:59 ./test-results/.last-run.json
+ 15481123719984128      4 -rw-r--r--   1 michel   197609        667 May 10 11:15 ./tests/playwright.config.ts
+  9851624185771118      8 -rw-r--r--   1 michel   197609       4803 May 10 18:59 ./tests/specs/parcours-v149.spec.ts
+```
+
+## CONTENU DU DOSSIER DP/
+
+```
+total 744
+drwxr-xr-x 1 michel 197609      0 May 11 00:53 .
+drwxr-xr-x 1 michel 197609      0 May 11 00:45 ..
+-rw-r--r-- 1 michel 197609   7336 May 11 07:37 CLAUDE-LOG.TXT
+-rw-r--r-- 1 michel 197609   8395 May  9 00:44 EXPORT-SESSION-SOIR.md
+-rw-r--r-- 1 michel 197609   1591 May  9 00:44 LISTE-PROMPT.TXT
+-rw-r--r-- 1 michel 197609   3231 May  9 01:02 MISSION-V149-AUTOTEST-INTEGRAL.md
+-rw-r--r-- 1 michel 197609   9263 May  9 00:44 RAPPORT-DIAGNOSTIC-2222.md
+-rw-r--r-- 1 michel 197609 130806 May 10 22:27 V155-SCAN-COMPLET.md
+-rw-r--r-- 1 michel 197609 378149 May  9 00:44 V96-FICHIERS-COMPLETS.txt
+drwxr-xr-x 1 michel 197609      0 May 11 00:40 backups-v157
+-rw-r--r-- 1 michel 197609  98578 May 11 07:32 dp97importmaj.txt
+```
+
+## LOGS FIREBASE (extraits récents)
+
+### firebase-debug.log (dernières 100 lignes)
+
+```
+[debug] [2026-05-11T05:31:13.248Z] [logging] Logging Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2026-05-11T05:31:13.248Z] [auth] Authentication Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2026-05-11T05:31:13.248Z] [firestore] Firestore Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2026-05-11T05:31:13.248Z] [firestore.websocket] websocket server for firestore only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2026-05-11T05:31:13.248Z] [storage] Storage Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2026-05-11T05:31:13.248Z] assigned listening specs for emulators {"user":{"hub":[{"address":"127.0.0.1","family":"IPv4","port":4400},{"address":"::1","family":"IPv6","port":4400}],"ui":[{"address":"127.0.0.1","family":"IPv4","port":4001},{"address":"::1","family":"IPv6","port":4001}],"logging":[{"address":"127.0.0.1","family":"IPv4","port":4500}],"auth":[{"address":"127.0.0.1","family":"IPv4","port":9100}],"firestore":[{"address":"127.0.0.1","family":"IPv4","port":8081}],"firestore.websocket":[{"address":"127.0.0.1","family":"IPv4","port":9150}],"storage":[{"address":"127.0.0.1","family":"IPv4","port":9200}]},"metadata":{"message":"assigned listening specs for emulators"}}
+[debug] [2026-05-11T05:31:13.252Z] Found emulator hub locator: {"version":"15.16.0","origins":["http://127.0.0.1:4400","http://[::1]:4400"],"pid":52644}
+[debug] [2026-05-11T05:31:13.253Z] Write emulator hub locator at C:\Users\miche\AppData\Local\Temp\hub-importok-6ef77.json
+[debug] [2026-05-11T05:31:13.261Z] Ignoring unsupported arg: auto_download {"metadata":{"emulator":{"name":"firestore"},"message":"Ignoring unsupported arg: auto_download"}}
+[debug] [2026-05-11T05:31:13.261Z] Ignoring unsupported arg: single_project_mode_error {"metadata":{"emulator":{"name":"firestore"},"message":"Ignoring unsupported arg: single_project_mode_error"}}
+[debug] [2026-05-11T05:31:13.261Z] Starting Firestore Emulator with command {"binary":"java","args":["-Dgoogle.cloud_firestore.debug_log_level=FINE","-Duser.language=en","-jar","C:\\Users\\miche\\.cache\\firebase\\emulators\\cloud-firestore-emulator-v1.21.0.jar","--host","127.0.0.1","--port",8081,"--websocket_port",9150,"--database-edition","standard","--project_id","importok-6ef77","--rules","C:\\DATA-MC-2030\\97import-firebase\\firestore.rules","--single_project_mode",true],"optionalArgs":["port","webchannel_port","host","rules","websocket_port","database-edition","functions_emulator","seed_from_export","project_id","single_project_mode"],"joinArgs":false,"shell":false,"port":8081} {"metadata":{"emulator":{"name":"firestore"},"message":"Starting Firestore Emulator with command {\"binary\":\"java\",\"args\":[\"-Dgoogle.cloud_firestore.debug_log_level=FINE\",\"-Duser.language=en\",\"-jar\",\"C:\\\\Users\\\\miche\\\\.cache\\\\firebase\\\\emulators\\\\cloud-firestore-emulator-v1.21.0.jar\",\"--host\",\"127.0.0.1\",\"--port\",8081,\"--websocket_port\",9150,\"--database-edition\",\"standard\",\"--project_id\",\"importok-6ef77\",\"--rules\",\"C:\\\\DATA-MC-2030\\\\97import-firebase\\\\firestore.rules\",\"--single_project_mode\",true],\"optionalArgs\":[\"port\",\"webchannel_port\",\"host\",\"rules\",\"websocket_port\",\"database-edition\",\"functions_emulator\",\"seed_from_export\",\"project_id\",\"single_project_mode\"],\"joinArgs\":false,\"shell\":false,\"port\":8081}"}}
+[info] i  firestore: Firestore Emulator logging to firestore-debug.log {"metadata":{"emulator":{"name":"firestore"},"message":"Firestore Emulator logging to \u001b[1mfirestore-debug.log\u001b[22m"}}
+[debug] [2026-05-11T05:31:13.479Z] WARNING: A terminally deprecated method in sun.misc.Unsafe has been called
+WARNING: sun.misc.Unsafe::allocateMemory has been called by io.netty.util.internal.PlatformDependent0$2 (file:/C:/Users/miche/.cache/firebase/emulators/cloud-firestore-emulator-v1.21.0.jar)
+WARNING: Please consider reporting this to the maintainers of class io.netty.util.internal.PlatformDependent0$2
+WARNING: sun.misc.Unsafe::allocateMemory will be removed in a future release
+ {"metadata":{"emulator":{"name":"firestore"},"message":"WARNING: A terminally deprecated method in sun.misc.Unsafe has been called\nWARNING: sun.misc.Unsafe::allocateMemory has been called by io.netty.util.internal.PlatformDependent0$2 (file:/C:/Users/miche/.cache/firebase/emulators/cloud-firestore-emulator-v1.21.0.jar)\nWARNING: Please consider reporting this to the maintainers of class io.netty.util.internal.PlatformDependent0$2\nWARNING: sun.misc.Unsafe::allocateMemory will be removed in a future release\r\n"}}
+[debug] [2026-05-11T05:31:14.092Z] May 11, 2026 7:31:14 AM com.google.cloud.datastore.emulator.firestore.websocket.WebSocketServer start
+INFO: Started WebSocket server on ws://127.0.0.1:9150
+ {"metadata":{"emulator":{"name":"firestore"},"message":"May 11, 2026 7:31:14 AM com.google.cloud.datastore.emulator.firestore.websocket.WebSocketServer start\r\nINFO: Started WebSocket server on ws://127.0.0.1:9150\r\n"}}
+[debug] [2026-05-11T05:31:14.153Z] 
+API endpoint: http://127.0.0.1:8081
+Database Edition: STANDARD
+Database Mode: CLOUD_FIRESTORE
+
+If you are using a library that supports the FIRESTORE_EMULATOR_HOST environment variable, run:
+
+   export FIRESTORE_EMULATOR_HOST=127.0.0.1:8081
+
+If you are running a Firestore in Datastore Mode project, run:
+
+   export DATASTORE_EMULATOR_HOST=127.0.0.1:8081
+
+Note: Support for Datastore Mode is in preview. If you encounter any bugs please file at https://github.com/firebase/firebase-tools/issues.
+ {"metadata":{"emulator":{"name":"firestore"},"message":"\nAPI endpoint: http://127.0.0.1:8081\nDatabase Edition: STANDARD\nDatabase Mode: CLOUD_FIRESTORE\n\nIf you are using a library that supports the FIRESTORE_EMULATOR_HOST environment variable, run:\r\n\n   export FIRESTORE_EMULATOR_HOST=127.0.0.1:8081\n\nIf you are running a Firestore in Datastore Mode project, run:\r\n\n   export DATASTORE_EMULATOR_HOST=127.0.0.1:8081\n\nNote: Support for Datastore Mode is in preview. If you encounter any bugs please file at https://github.com/firebase/firebase-tools/issues.\r\n"}}
+[debug] [2026-05-11T05:31:14.153Z] Dev App Server is now running.
+
+ {"metadata":{"emulator":{"name":"firestore"},"message":"Dev App Server is now running.\n\r\n"}}
+[info] +  firestore: Firestore Emulator was started in standard edition. {"metadata":{"emulator":{"name":"firestore"},"message":"Firestore Emulator was started in standard edition."}}
+[info] +  firestore: Firestore Emulator UI websocket is running on 9150. {"metadata":{"emulator":{"name":"firestore"},"message":"Firestore Emulator UI websocket is running on 9150."}}
+[debug] [2026-05-11T05:31:26.254Z] Ignoring unsupported arg: port {"metadata":{"emulator":{"name":"storage"},"message":"Ignoring unsupported arg: port"}}
+[warn] !  Unexpected rules runtime error: WARNING: A terminally deprecated method in sun.misc.Unsafe has been called
+WARNING: sun.misc.Unsafe::arrayBaseOffset has been called by com.google.protobuf.UnsafeUtil$MemoryAccessor (file:/C:/Users/miche/.cache/firebase/emulators/cloud-storage-rules-runtime-v1.1.3.jar)
+WARNING: Please consider reporting this to the maintainers of class com.google.protobuf.UnsafeUtil$MemoryAccessor
+WARNING: sun.misc.Unsafe::arrayBaseOffset will be removed in a future release
+ {"metadata":{"emulator":{"name":"storage"},"message":"Unexpected rules runtime error: WARNING: A terminally deprecated method in sun.misc.Unsafe has been called\nWARNING: sun.misc.Unsafe::arrayBaseOffset has been called by com.google.protobuf.UnsafeUtil$MemoryAccessor (file:/C:/Users/miche/.cache/firebase/emulators/cloud-storage-rules-runtime-v1.1.3.jar)\nWARNING: Please consider reporting this to the maintainers of class com.google.protobuf.UnsafeUtil$MemoryAccessor\nWARNING: sun.misc.Unsafe::arrayBaseOffset will be removed in a future release\r\n"}}
+[debug] [2026-05-11T05:31:26.767Z] Temp file directory for storage emulator: C:\Users\miche\AppData\Local\Temp/firebase/storage/blobs {"metadata":{"emulator":{"name":"storage"},"message":"Temp file directory for storage emulator: C:\\Users\\miche\\AppData\\Local\\Temp/firebase/storage/blobs"}}
+[debug] [2026-05-11T05:31:26.774Z] May 11, 2026 7:31:26 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+ {"metadata":{"emulator":{"name":"firestore"},"message":"May 11, 2026 7:31:26 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead\r\nINFO: Detected non-HTTP/2 connection.\r\n"}}
+[debug] [2026-05-11T05:31:26.807Z] Could not find VSCode notification endpoint: FetchError: request to http://localhost:40001/vscode/notify failed, reason: . If you are not running the Firebase SQL Connect VSCode extension, this is expected and not an issue.
+[info] 
+┌─────────────────────────────────────────────────────────────┐
+│ ✔  All emulators ready! It is now safe to connect your app. │
+│ i  View Emulator UI at http://127.0.0.1:4001/               │
+└─────────────────────────────────────────────────────────────┘
+
+┌────────────────┬────────────────┬─────────────────────────────────┐
+│ Emulator       │ Host:Port      │ View in Emulator UI             │
+├────────────────┼────────────────┼─────────────────────────────────┤
+│ Authentication │ 127.0.0.1:9100 │ http://127.0.0.1:4001/auth      │
+├────────────────┼────────────────┼─────────────────────────────────┤
+│ Firestore      │ 127.0.0.1:8081 │ http://127.0.0.1:4001/firestore │
+├────────────────┼────────────────┼─────────────────────────────────┤
+│ Storage        │ 127.0.0.1:9200 │ http://127.0.0.1:4001/storage   │
+└────────────────┴────────────────┴─────────────────────────────────┘
+  Emulator Hub host: 127.0.0.1 port: 4400
+  Other reserved ports: 4500, 9150
+
+Issues? Report them at https://github.com/firebase/firebase-tools/issues and attach the *-debug.log files.
+ 
+[debug] [2026-05-11T05:31:27.954Z] May 11, 2026 7:31:27 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected HTTP/2 connection.
+ {"metadata":{"emulator":{"name":"firestore"},"message":"May 11, 2026 7:31:27 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead\r\nINFO: Detected HTTP/2 connection.\r\n"}}
+[debug] [2026-05-11T05:31:28.002Z] May 11, 2026 7:31:28 AM io.grpc.netty.TcpMetrics loadEpollInfo
+INFO: Epoll available during static init of TcpMetrics:false
+ {"metadata":{"emulator":{"name":"firestore"},"message":"May 11, 2026 7:31:28 AM io.grpc.netty.TcpMetrics loadEpollInfo\r\nINFO: Epoll available during static init of TcpMetrics:false\r\n"}}
+[debug] [2026-05-11T05:31:30.023Z] May 11, 2026 7:31:30 AM io.netty.channel.DefaultChannelPipeline onUnhandledInboundException
+WARNING: An exceptionCaught() event was fired, and it reached at the tail of the pipeline. It usually means the last handler in the pipeline did not handle the exception.
+java.net.SocketException: Connection reset
+	at java.base/sun.nio.ch.SocketChannelImpl.throwConnectionReset(SocketChannelImpl.java:399)
+	at java.base/sun.nio.ch.SocketChannelImpl.implRead(SocketChannelImpl.java:431)
+	at java.base/sun.nio.ch.SocketChannelImpl.read(SocketChannelImpl.java:489)
+	at io.netty.buffer.PooledByteBuf.setBytes(PooledByteBuf.java:255)
+	at io.netty.buffer.AbstractByteBuf.writeBytes(AbstractByteBuf.java:1132)
+	at io.netty.channel.socket.nio.NioSocketChannel.doReadBytes(NioSocketChannel.java:356)
+	at io.netty.channel.nio.AbstractNioByteChannel$NioByteUnsafe.read(AbstractNioByteChannel.java:156)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:796)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:732)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:658)
+	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:562)
+	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:998)
+	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
+	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
+	at java.base/java.lang.Thread.run(Thread.java:1474)
+
+ {"metadata":{"emulator":{"name":"firestore"},"message":"May 11, 2026 7:31:30 AM io.netty.channel.DefaultChannelPipeline onUnhandledInboundException\r\nWARNING: An exceptionCaught() event was fired, and it reached at the tail of the pipeline. It usually means the last handler in the pipeline did not handle the exception.\r\njava.net.SocketException: Connection reset\r\n\tat java.base/sun.nio.ch.SocketChannelImpl.throwConnectionReset(SocketChannelImpl.java:399)\r\n\tat java.base/sun.nio.ch.SocketChannelImpl.implRead(SocketChannelImpl.java:431)\r\n\tat java.base/sun.nio.ch.SocketChannelImpl.read(SocketChannelImpl.java:489)\r\n\tat io.netty.buffer.PooledByteBuf.setBytes(PooledByteBuf.java:255)\r\n\tat io.netty.buffer.AbstractByteBuf.writeBytes(AbstractByteBuf.java:1132)\r\n\tat io.netty.channel.socket.nio.NioSocketChannel.doReadBytes(NioSocketChannel.java:356)\r\n\tat io.netty.channel.nio.AbstractNioByteChannel$NioByteUnsafe.read(AbstractNioByteChannel.java:156)\r\n\tat io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:796)\r\n\tat io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:732)\r\n\tat io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:658)\r\n\tat io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:562)\r\n\tat io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:998)\r\n\tat io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)\r\n\tat io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)\r\n\tat java.base/java.lang.Thread.run(Thread.java:1474)\r\n\r\n"}}
+[debug] [2026-05-11T05:32:00.600Z] May 11, 2026 7:32:00 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+ {"metadata":{"emulator":{"name":"firestore"},"message":"May 11, 2026 7:32:00 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead\r\nINFO: Detected non-HTTP/2 connection.\r\n"}}
+```
+
+### firestore-debug.log (dernières 100 lignes)
+
+```
+WARNING: A terminally deprecated method in sun.misc.Unsafe has been called
+WARNING: sun.misc.Unsafe::allocateMemory has been called by io.netty.util.internal.PlatformDependent0$2 (file:/C:/Users/miche/.cache/firebase/emulators/cloud-firestore-emulator-v1.21.0.jar)
+WARNING: Please consider reporting this to the maintainers of class io.netty.util.internal.PlatformDependent0$2
+WARNING: sun.misc.Unsafe::allocateMemory will be removed in a future release
+May 11, 2026 7:31:14 AM com.google.cloud.datastore.emulator.firestore.websocket.WebSocketServer start
+INFO: Started WebSocket server on ws://127.0.0.1:9150
+
+API endpoint: http://127.0.0.1:8081
+Database Edition: STANDARD
+Database Mode: CLOUD_FIRESTORE
+
+If you are using a library that supports the FIRESTORE_EMULATOR_HOST environment variable, run:
+
+   export FIRESTORE_EMULATOR_HOST=127.0.0.1:8081
+
+If you are running a Firestore in Datastore Mode project, run:
+
+   export DATASTORE_EMULATOR_HOST=127.0.0.1:8081
+
+Note: Support for Datastore Mode is in preview. If you encounter any bugs please file at https://github.com/firebase/firebase-tools/issues.
+Dev App Server is now running.
+
+May 11, 2026 7:31:26 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+May 11, 2026 7:31:27 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected HTTP/2 connection.
+May 11, 2026 7:31:28 AM io.grpc.netty.TcpMetrics loadEpollInfo
+INFO: Epoll available during static init of TcpMetrics:false
+May 11, 2026 7:31:30 AM io.netty.channel.DefaultChannelPipeline onUnhandledInboundException
+WARNING: An exceptionCaught() event was fired, and it reached at the tail of the pipeline. It usually means the last handler in the pipeline did not handle the exception.
+java.net.SocketException: Connection reset
+	at java.base/sun.nio.ch.SocketChannelImpl.throwConnectionReset(SocketChannelImpl.java:399)
+	at java.base/sun.nio.ch.SocketChannelImpl.implRead(SocketChannelImpl.java:431)
+	at java.base/sun.nio.ch.SocketChannelImpl.read(SocketChannelImpl.java:489)
+	at io.netty.buffer.PooledByteBuf.setBytes(PooledByteBuf.java:255)
+	at io.netty.buffer.AbstractByteBuf.writeBytes(AbstractByteBuf.java:1132)
+	at io.netty.channel.socket.nio.NioSocketChannel.doReadBytes(NioSocketChannel.java:356)
+	at io.netty.channel.nio.AbstractNioByteChannel$NioByteUnsafe.read(AbstractNioByteChannel.java:156)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:796)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:732)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:658)
+	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:562)
+	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:998)
+	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
+	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
+	at java.base/java.lang.Thread.run(Thread.java:1474)
+
+May 11, 2026 7:32:00 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+```
+
+### firebase.log (dernières 100 lignes)
+
+```
+[36m[1mi  emulators:[22m[39m Starting emulators: auth, firestore, storage
+[33m[1m!  ui:[22m[39m Port 4001 is not open on localhost (127.0.0.1,::1), could not start Emulator UI.
+[33m[1m!  ui:[22m[39m To select a different host/port, specify that host/port in a firebase.json config file:
+      {
+        // ...
+        "emulators": {
+          "ui": {
+            "host": "[33mHOST[39m",
+            "port": "[33mPORT[39m"
+          }
+        }
+      }
+[33m[1m!  auth:[22m[39m Port 9100 is not open on localhost (127.0.0.1), could not start Authentication Emulator.
+[33m[1m!  auth:[22m[39m To select a different host/port, specify that host/port in a firebase.json config file:
+      {
+        // ...
+        "emulators": {
+          "auth": {
+            "host": "[33mHOST[39m",
+            "port": "[33mPORT[39m"
+          }
+        }
+      }
+[33m[1m!  firestore:[22m[39m Port 8081 is not open on localhost (127.0.0.1), could not start Firestore Emulator.
+[33m[1m!  firestore:[22m[39m To select a different host/port, specify that host/port in a firebase.json config file:
+      {
+        // ...
+        "emulators": {
+          "firestore": {
+            "host": "[33mHOST[39m",
+            "port": "[33mPORT[39m"
+          }
+        }
+      }
+[33m[1m!  storage:[22m[39m Port 9200 is not open on localhost (127.0.0.1), could not start Storage Emulator.
+[33m[1m!  storage:[22m[39m To select a different host/port, specify that host/port in a firebase.json config file:
+      {
+        // ...
+        "emulators": {
+          "storage": {
+            "host": "[33mHOST[39m",
+            "port": "[33mPORT[39m"
+          }
+        }
+      }
+[33m[1m!  hub:[22m[39m emulator hub unable to start on port 4400, starting on 4402 instead.
+[33m[1m!  logging:[22m[39m Logging Emulator unable to start on port 4500, starting on 4502 instead.
+[36m[1mi  emulators:[22m[39m Shutting down emulators.
+
+[1m[31mError:[39m[22m Could not start Emulator UI, port taken.
+```
+
+### firebase-m999.log (dernières 100 lignes)
+
+```
+[36m[1mi  emulators:[22m[39m Starting emulators: auth, firestore, storage
+[33m[1m!  ui:[22m[39m Port 4001 is not open on localhost (127.0.0.1,::1), could not start Emulator UI.
+[33m[1m!  ui:[22m[39m To select a different host/port, specify that host/port in a firebase.json config file:
+      {
+        // ...
+        "emulators": {
+          "ui": {
+            "host": "[33mHOST[39m",
+            "port": "[33mPORT[39m"
+          }
+        }
+      }
+[33m[1m!  auth:[22m[39m Port 9100 is not open on localhost (127.0.0.1), could not start Authentication Emulator.
+[33m[1m!  auth:[22m[39m To select a different host/port, specify that host/port in a firebase.json config file:
+      {
+        // ...
+        "emulators": {
+          "auth": {
+            "host": "[33mHOST[39m",
+            "port": "[33mPORT[39m"
+          }
+        }
+      }
+[33m[1m!  firestore:[22m[39m Port 8081 is not open on localhost (127.0.0.1), could not start Firestore Emulator.
+[33m[1m!  firestore:[22m[39m To select a different host/port, specify that host/port in a firebase.json config file:
+      {
+        // ...
+        "emulators": {
+          "firestore": {
+            "host": "[33mHOST[39m",
+            "port": "[33mPORT[39m"
+          }
+        }
+      }
+[33m[1m!  storage:[22m[39m Port 9200 is not open on localhost (127.0.0.1), could not start Storage Emulator.
+[33m[1m!  storage:[22m[39m To select a different host/port, specify that host/port in a firebase.json config file:
+      {
+        // ...
+        "emulators": {
+          "storage": {
+            "host": "[33mHOST[39m",
+            "port": "[33mPORT[39m"
+          }
+        }
+      }
+[33m[1m!  hub:[22m[39m emulator hub unable to start on port 4400, starting on 4402 instead.
+[33m[1m!  logging:[22m[39m Logging Emulator unable to start on port 4500, starting on 4502 instead.
+[36m[1mi  emulators:[22m[39m Shutting down emulators.
+
+[1m[31mError:[39m[22m Could not start Emulator UI, port taken.
+```
+
+### firebase-boot.log (dernières 100 lignes)
+
+```
+[36m[1mi  emulators:[22m[39m Starting emulators: auth, firestore, storage
+[36m[1mi  firestore:[22m[39m Firestore Emulator logging to [1mfirestore-debug.log[22m
+[32m[1m+  firestore:[22m[39m Firestore Emulator was started in standard edition.
+[32m[1m+  firestore:[22m[39m Firestore Emulator UI websocket is running on 9150.
+[33m[1m! [22m[39m Unexpected rules runtime error: WARNING: A terminally deprecated method in sun.misc.Unsafe has been called
+WARNING: sun.misc.Unsafe::arrayBaseOffset has been called by com.google.protobuf.UnsafeUtil$MemoryAccessor (file:/C:/Users/miche/.cache/firebase/emulators/cloud-storage-rules-runtime-v1.1.3.jar)
+WARNING: Please consider reporting this to the maintainers of class com.google.protobuf.UnsafeUtil$MemoryAccessor
+WARNING: sun.misc.Unsafe::arrayBaseOffset will be removed in a future release
+
+
+[90m┌─────────────────────────────────────────────────────────────┐[39m
+[90m│[39m [32m✔[39m  [1mAll emulators ready! It is now safe to connect your app.[22m [90m│[39m
+[90m│[39m [36mi[39m  View Emulator UI at [4m[1mhttp://127.0.0.1:4001/[22m[24m               [90m│[39m
+[90m└─────────────────────────────────────────────────────────────┘[39m
+
+[90m┌────────────────[39m[90m┬────────────────[39m[90m┬─────────────────────────────────┐[39m
+[90m│[39m[33m Emulator       [39m[90m│[39m[33m Host:Port      [39m[90m│[39m[33m View in Emulator UI             [39m[90m│[39m
+[90m├────────────────[39m[90m┼────────────────[39m[90m┼─────────────────────────────────┤[39m
+[90m│[39m Authentication [90m│[39m 127.0.0.1:9100 [90m│[39m [4m[1mhttp://127.0.0.1:4001/auth[22m[24m      [90m│[39m
+[90m├────────────────[39m[90m┼────────────────[39m[90m┼─────────────────────────────────┤[39m
+[90m│[39m Firestore      [90m│[39m 127.0.0.1:8081 [90m│[39m [4m[1mhttp://127.0.0.1:4001/firestore[22m[24m [90m│[39m
+[90m├────────────────[39m[90m┼────────────────[39m[90m┼─────────────────────────────────┤[39m
+[90m│[39m Storage        [90m│[39m 127.0.0.1:9200 [90m│[39m [4m[1mhttp://127.0.0.1:4001/storage[22m[24m   [90m│[39m
+[90m└────────────────[39m[90m┴────────────────[39m[90m┴─────────────────────────────────┘[39m
+[90m  Emulator Hub host: 127.0.0.1 port: 4400[39m
+[90m  Other reserved ports:[39m 4500, 9150
+
+Issues? Report them at [4m[1mhttps://github.com/firebase/firebase-tools/issues[22m[24m and attach the *-debug.log files.
+ 
+```
+
+
+---
+✅ Extraction terminée le 11/05/2026 07:37

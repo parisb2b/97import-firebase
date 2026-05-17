@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react';
 import { useRoute, useLocation } from 'wouter';
 import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { adminDb as db } from '../../lib/firebase';
-import { isPartnerRole } from '../../lib/roleUtils';
+import { isUserPartenaire } from '../../lib/roleUtils';
 import { Card, Button, Pill, InfoRow } from '../components/Icons';
-import PromouvoirPartenaireModal from '../components/PromouvoirPartenaireModal';
+import { PromouvoirPartenaireModal } from '../components/PromouvoirPartenaireModal';
 
 export default function DetailClient() {
   const [, params] = useRoute('/admin/clients/:id');
@@ -42,7 +42,7 @@ export default function DetailClient() {
       <div className="filters" style={{ justifyContent: 'space-between' }}>
         <div className="ct" style={{ fontSize: 18 }}>{client.nom || client.displayName || client.email}</div>
         <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-          {!isPartnerRole(client.role) ? (
+          {!isUserPartenaire(client.role) ? (
             <button
               onClick={() => setShowPromouvoirModal(true)}
               style={{
@@ -73,21 +73,20 @@ export default function DetailClient() {
           <InfoRow label="Téléphone" value={client.tel || client.phone || '—'} />
           <InfoRow label="Adresse" value={client.adresse || '—'} />
           <InfoRow label="Pays" value={client.pays || 'France'} />
-          <InfoRow label="Rôle" value={<Pill variant={client.role === 'vip' ? 'pu' : isPartnerRole(client.role) ? 'tl' : 'bl'}>{client.role || 'user'}</Pill>} />
+          <InfoRow label="Rôle" value={<Pill variant={client.role === 'vip' ? 'pu' : isUserPartenaire(client.role) ? 'tl' : 'bl'}>{client.role || 'user'}</Pill>} />
           <InfoRow label="Inscription" value={client.createdAt?.toDate?.()?.toLocaleDateString('fr-FR') || '—'} />
         </div>
       </Card>
 
-      {showPromouvoirModal && (
-        <PromouvoirPartenaireModal
-          client={client}
-          onClose={() => setShowPromouvoirModal(false)}
-          onSuccess={() => {
-            setShowPromouvoirModal(false);
-            window.location.reload();
-          }}
-        />
-      )}
+      <PromouvoirPartenaireModal
+        isOpen={showPromouvoirModal}
+        client={{ ...client, telephone: client.tel || client.phone || '' }}
+        onClose={() => setShowPromouvoirModal(false)}
+        onSuccess={() => {
+          setShowPromouvoirModal(false);
+          window.location.reload();
+        }}
+      />
 
       {devis.length > 0 && (
         <Card title={`Devis du client (${devis.length})`}>

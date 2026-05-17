@@ -3,7 +3,7 @@ import { Link, useLocation } from 'wouter';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { clientAuth, db } from '../../lib/firebase';
-import { isPartnerRole } from '../../lib/roleUtils';
+import { isUserPartenaire } from '../../lib/roleUtils';
 import { useI18n } from '../../i18n';
 
 const B = '#1565C0'; // bleu hero
@@ -238,7 +238,7 @@ export default function Header() {
 
           {/* Connexion */}
           {user ? (
-            <Link href={isPartnerRole(userRole) ? '/espace-partenaire' : '/espace-client'}>
+            <Link href={isUserPartenaire(userRole) ? '/espace-partenaire' : '/espace-client'}>
               <div style={{
                 display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer',
                 border: '1px solid #E5E7EB', borderRadius: 12, padding: '6px 14px',

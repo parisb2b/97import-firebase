@@ -1,0 +1,208 @@
+Le lien sandbox n'est pas accessible. Voici le contenu complet du méga-prompt, que tu peux copier et sauvegarder en `.md` :
+
+```markdown
+# 🚀 97IMPORT — MÉGA-PROMPT AUDIT, CORRECTIONS & DÉPLOIEMENT V173
+
+**Date :** 17/05/2026
+**Projet :** `C:\DATA-MC-2030\97import-firebase`
+**Branche :** `v2`
+**Mode :** local exclusif (émulateurs) + audit Vercel (lecture seule)
+**Git push :** INTERDIT
+**Git commit :** INTERDIT sauf ordre explicite
+
+---
+
+## 🛡️ RÈGLES D'OR
+
+1. **Compte admin sacré :** `parisb2b@gmail.com` / `20262026` — jamais supprimé ni écrasé
+2. **Branche `main` :** sanctuarisée — site Supabase 97import.com — ne jamais toucher
+3. **Branche `v2` :** notre branche de travail — déploiement Vercel uniquement
+4. **Méthode :** Remplacement Intégral obligatoire pour toute modification
+5. **Journalisation :** toute action dans `DP/dp97importmaj.txt`
+
+---
+
+## ÉTAPE 1 — CRÉATION COMPTES DE TEST LOCAUX
+
+### 1.1 Vérifier que l'admin sacré existe
+
+```bash
+curl -s "http://127.0.0.1:9100/emulator/v1/projects/importok-6ef77/accounts" | grep -o '"email":"parisb2b@gmail.com"'
+```
+
+### 1.2 Créer les 4 comptes @97import.com
+
+| Email | Rôle | DisplayName | MDP |
+|-------|------|-------------|-----|
+| client@97import.com | user | Jean Dupont | 20262026 |
+| vip@97import.com | vip | Marie Martin | 20262026 |
+| partenaire@97import.com | partner | Pierre Bernard | 20262026 |
+| client2@97import.com | user | Sophie Leblanc | 20262026 |
+
+Pour chaque compte :
+1. Si existe → `DELETE /emulator/v1/projects/importok-6ef77/accounts` avec `{"email":"..."}`
+2. `signUp` via `POST /identitytoolkit.googleapis.com/v1/accounts:signUp?key=local`
+3. Récupérer l'UID
+4. Créer `profiles/{uid}` dans Firestore via SDK Admin (`127.0.0.1:8081`)
+
+### 1.3 Tableau récapitulatif
+
+```bash
+echo "| Email | UID | Rôle | Nom |" 
+echo "|-------|-----|------|-----|"
+# pour chaque compte...
+```
+
+---
+
+## ÉTAPE 2 — AUDIT LOCAL
+
+### 2.1 Test de connexion API Auth
+
+```bash
+for email in "parisb2b@gmail.com" "client@97import.com" "vip@97import.com" "partenaire@97import.com" "client2@97import.com"; do
+  echo "=== $email ==="
+  curl -s -X POST "http://127.0.0.1:9100/identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=local" \
+    -H "Content-Type: application/json" \
+    -d "{\"email\":\"$email\",\"password\":\"20262026\",\"returnSecureToken\":true}" | head -c 300
+  echo ""
+done
+```
+
+### 2.2 Vérification TypeScript + Build
+
+```bash
+npx tsc --noEmit 2>&1 | tee DP/audit-local-tsc.log
+npm run build 2>&1 | tee DP/audit-local-build.log
+```
+
+### 2.3 Tests Playwright (tous les profils)
+
+```bash
+npx playwright test --config=tests/playwright.config.ts --reporter=list 2>&1 | tee DP/audit-local-playwright.log
+```
+
+### 2.4 Rapport local
+
+→ `DP/audit-local-20260517.log`
+
+---
+
+## ÉTAPE 3 — AUDIT VERCEL (lecture seule)
+
+### 3.1 Test d'accessibilité
+
+```bash
+curl -s -o /dev/null -w "%{http_code}" https://97import-firebase-git-v2-parisb2bs-projects.vercel.app
+curl -s -o /dev/null -w "%{http_code}" https://97import-firebase-git-v2-parisb2bs-projects.vercel.app/admin
+```
+
+### 3.2 Test connexion admin
+
+Avec Playwright (config `baseURL: 'https://97import-firebase-git-v2-parisb2bs-projects.vercel.app'`) :
+- Se connecter avec `parisb2b@gmail.com` / `20262026`
+- Vérifier que le dashboard admin s'affiche
+
+### 3.3 Vérification bug dubourg.thierryraphael@gmail.com
+
+- Se connecter avec `dubourg.thierryraphael@gmail.com` / `20262026` sur `/connexion`
+- Vérifier quel rôle est attribué
+- Capturer l'interface affichée
+
+### 3.4 Rapport Vercel
+
+→ `DP/audit-vercel-20260517.log`
+
+---
+
+## ÉTAPE 4 — SYNTHÈSE COMPARATIVE
+
+Produire un tableau :
+
+| Point | Local | Vercel | Écart ? |
+|-------|-------|--------|---------|
+| Version | X.Y.Z | ? | |
+| Connexion admin | ✅/❌ | ✅/❌ | |
+| Connexion client | ✅/❌ | ✅/❌ | |
+| Connexion VIP | ✅/❌ | ✅/❌ | |
+| Connexion partenaire | ✅/❌ | ✅/❌ | |
+| Nombre comptes Auth | 5 | ? | |
+| Bug dubourg | N/A | ✅/❌ | |
+| Tests Playwright | XX pass | N/A | |
+
+→ `DP/synthese-audit-local-vs-vercel.md`
+
+---
+
+## ÉTAPE 5 — CORRECTION BUG DUBOURG
+
+### 5.1 Diagnostic
+
+1. Dans l'émulateur local, créer `dubourg.thierryraphael@gmail.com` avec `role: 'partenaire'` dans `users/{email}`
+2. Se connecter avec ce compte → reproduire le bug
+3. Lire `src/hooks/useAuth.ts` → identifier la chaîne de fallback
+
+### 5.2 Si la cause est dans Firestore production
+
+```js
+// Exécuter via console Firebase ou script admin
+db.doc('users/dubourg.thierryraphael@gmail.com').update({ role: 'client' });
+```
+
+### 5.3 Si la cause est dans useAuth.ts
+
+Modifier le fallback pour que le rôle par défaut soit `'client'`, pas `'partenaire'`.
+
+---
+
+## ÉTAPE 6 — CORRECTIONS PRIORITAIRES (V173)
+
+### 6.1 Anomalies à corriger (si pas déjà fait)
+
+| ID | Fichier | Correction |
+|----|---------|------------|
+| ANO-001 | `PromouvoirPartenaireModal.tsx:66` | Écriture `users/{email}` en plus de `users/{uid}` |
+| ANO-002 | `firestore.rules:33-36` | `partnerCodeMatches` avec fallback `partners/{uid}` |
+| ANO-003 | `EspacePartenaire.tsx:77-82` | Remplacer `getIdTokenResult` par `getDoc(doc(db, 'users', email))` |
+| ANO-004 | `storage.rules:13` | Écriture admin uniquement via `firestore.get()` |
+| ANO-005 | `Clients.tsx:26-27` | Ajouter `limit(500)` (ou pagination) |
+| ANO-006 | `Profil.tsx:95-97` | `writeBatch` atomique |
+| ANO-007 | `EspacePartenaire.tsx:34-70` | Unifier avec `useAuth()` |
+
+### 6.2 Validation post-correction
+
+```bash
+npx tsc --noEmit && npm run build
+npx playwright test tests/specs/regression-ano.spec.ts --reporter=list
+```
+
+---
+
+## ÉTAPE 7 — RAPPORT FINAL
+
+Créer `DP/V173-RAPPORT-FINAL.md` contenant :
+1. Résumé des actions menées
+2. Tableau des anomalies et leur statut
+3. Résultat audit local
+4. Résultat audit Vercel
+5. Résultat correction bug dubourg
+6. Verdict final : `CERTIFIE` / `CERTIFIE_TECHNIQUE` / `A_CONTROLER`
+
+### Journalisation
+
+```bash
+echo "V173-COMPLET | $(date '+%d/%m/%Y %H:%M') | Audit local+Vercel + correctifs ANO + bug dubourg | Voir DP/V173-RAPPORT-FINAL.md" >> DP/dp97importmaj.txt
+```
+
+---
+
+## ⚠️ POINTS D'ATTENTION
+
+- **Ne jamais déployer** avant validation humaine explicite
+- **Ne pas modifier** `parisb2b@gmail.com`
+- **Ne pas exécuter** de création de comptes @97import.com sur Firebase production
+- **Toute modification** de code = Remplacement Intégral
+- **Rapports** dans `DP/`, jamais commités
+```
+
+ 

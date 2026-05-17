@@ -1,5 +1,5 @@
 import { Link } from 'wouter';
-import { isPartnerRole } from '../../lib/roleUtils';
+import { isUserPartenaire } from '../../lib/roleUtils';
 import { useI18n } from '../../i18n';
 import { calculerPrixDerivesSync, COEFFICIENTS_DEFAULT } from '../../lib/coefficientsHelpers';
 
@@ -25,7 +25,7 @@ export function getProductPrice(product: any, role: string | null | undefined): 
   const achat = getAchat(product);
   const pub = getPublic(product);
   if (!achat && !pub) return 0;
-  if (isPartnerRole(role)) {
+  if (isUserPartenaire(role)) {
     const derived = calculerPrixDerivesSync(achat, COEFFICIENTS_DEFAULT);
     return derived.prix_partner || Math.ceil(pub * 0.75);
   }
@@ -111,7 +111,7 @@ export default function PriceDisplay({ product, userRole, size = 'md' }: PriceDi
   }
 
   // Partner — big price + public strikethrough
-  if (isPartnerRole(userRole)) {
+  if (isUserPartenaire(userRole)) {
     if (size === 'sm') {
       return (
         <div>

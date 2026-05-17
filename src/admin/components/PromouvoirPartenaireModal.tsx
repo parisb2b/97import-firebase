@@ -1,228 +1,143 @@
-import { useState } from 'react';
-import { doc, setDoc, collection, query, where, getDocs } from 'firebase/firestore';
-import { adminDb as db } from '../../lib/firebase';
+import React, { useState } from 'react';
+import { doc, writeBatch, collection, query, where, getDocs } from 'firebase/firestore';
+import { db } from '../../lib/firebase';
 import { ROLE_PARTENAIRE } from '../../lib/roleUtils';
-import { sanitizeForFirestore } from '../../lib/firebaseUtils';
-import { logInfo, logError } from '../../lib/logService';
-import { useToast } from '../../front/components/Toast';
 
-interface ClientLite {
-  uid?: string;
-  id?: string;
-  email?: string;
-  nom?: string;
-  displayName?: string;
-  firstName?: string;
-  lastName?: string;
-  prenom?: string;
-}
-
-interface Props {
-  client: ClientLite;
+interface PromouvoirPartenaireModalProps {
+  isOpen: boolean;
   onClose: () => void;
+  client: {
+    uid: string;
+    email: string;
+    nom?: string;
+    telephone?: string;
+  };
   onSuccess: () => void;
 }
 
-export default function PromouvoirPartenaireModal({ client, onClose, onSuccess }: Props) {
-  const { showToast } = useToast();
-  const [code, setCode] = useState('');
-  const [commissionTaux, setCommissionTaux] = useState('0');
-  const [ribIban, setRibIban] = useState('');
-  const [ribBic, setRibBic] = useState('');
-  const [ribBanque, setRibBanque] = useState('');
-  const [ribBeneficiaire, setRibBeneficiaire] = useState('');
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState('');
+export const PromouvoirPartenaireModal: React.FC<PromouvoirPartenaireModalProps> = ({
+  isOpen,
+  onClose,
+  client,
+  onSuccess,
+}) => {
+  const [codePartenaire, setCodePartenaire] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const uid = client.uid || client.id || '';
-  const nom = client.nom
-    || client.displayName
-    || `${client.firstName || client.prenom || ''} ${client.lastName || ''}`.trim()
-    || client.email
-    || 'Partenaire';
+  if (!isOpen) return null;
 
-  const handleConfirm = async () => {
-    setError('');
-    const codeUpper = code.trim().toUpperCase();
-
-    if (!uid) {
-      setError("UID client introuvable.");
-      return;
-    }
-    if (!/^[A-Z]{2,3}$/.test(codeUpper)) {
-      setError('Le code doit contenir 2 ou 3 lettres en majuscules.');
+  const handlePromotionCalculated = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!codePartenaire.trim()) {
+      setError('Le code trigramme du partenaire est obligatoire.');
       return;
     }
 
-    setSubmitting(true);
+    setLoading(true);
+    setError(null);
+    const codeUpper = codePartenaire.trim().toUpperCase();
+
     try {
-      const existingQ = query(collection(db, 'partners'), where('code', '==', codeUpper));
-      const existingSnap = await getDocs(existingQ);
-      if (!existingSnap.empty) {
-        setError(`Le code "${codeUpper}" est déjà utilisé.`);
-        setSubmitting(false);
-        return;
+      const usersRef = collection(db, 'users');
+      const q = query(usersRef, where('partenaire_code', '==', codeUpper));
+      const querySnapshot = await getDocs(q);
+
+      if (!querySnapshot.empty) {
+        throw new Error(`Le code partenaire [${codeUpper}] est déjà attribué à un autre compte.`);
       }
 
-      // V174 — setDoc merge remplace updateDoc (immunisé contre document inexistant)
-      const userEmail = (client.email || '').toLowerCase();
-      const rolePayload = { role: ROLE_PARTENAIRE, partenaire_code: codeUpper, updatedAt: new Date() };
-      await setDoc(doc(db, 'users', uid), rolePayload, { merge: true });
-      if (userEmail && userEmail !== uid) {
-        await setDoc(doc(db, 'users', userEmail), rolePayload, { merge: true });
+      const batch = writeBatch(db);
+      const uid = client.uid;
+      const cleanEmail = client.email.trim().toLowerCase();
+
+      const profilePayload = {
+        role: ROLE_PARTENAIRE,
+        partenaire_code: codeUpper,
+        updatedAt: new Date(),
+      };
+
+      // Écriture atomique et instantanée sur l'ensemble des chemins d'accès du RBAC
+      batch.set(doc(db, 'users', uid), profilePayload, { merge: true });
+      batch.set(doc(db, 'clients', uid), profilePayload, { merge: true });
+
+      if (cleanEmail && cleanEmail !== uid) {
+        batch.set(doc(db, 'users', cleanEmail), profilePayload, { merge: true });
       }
 
-      await setDoc(
-        doc(db, 'partners', uid),
-        sanitizeForFirestore({
-          uid,
-          userId: uid,
-          nom,
-          email: client.email || '',
-          code: codeUpper,
-          commission_taux: parseFloat(commissionTaux) || 0,
-          rib: {
-            iban: ribIban.trim(),
-            bic: ribBic.trim(),
-            banque: ribBanque.trim(),
-            beneficiaire: ribBeneficiaire.trim() || nom,
-          },
-          actif: true,
-          createdAt: new Date(),
-        }),
-      );
+      // Génération de la fiche d'administration partenaire
+      batch.set(doc(db, 'partners', uid), {
+        userId: uid,
+        email: cleanEmail,
+        code: codeUpper,
+        active: true,
+        nom_entreprise: client.nom || 'Entreprise Individuelle',
+        telephone: client.telephone || '',
+        createdAt: new Date(),
+      }, { merge: true });
 
-      logInfo('partner-promoted', 'Client promu en partenaire', { uid, code: codeUpper });
-      showToast(`Partenaire ${codeUpper} créé avec succès`, 'success');
+      await batch.commit();
       onSuccess();
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err);
-      logError('partner-promoted', 'Échec promotion partenaire', { uid, code: codeUpper }, err);
-      setError(`Erreur : ${msg}`);
-      setSubmitting(false);
+      onClose();
+    } catch (err: any) {
+      console.error('[V174] Échec de la transaction groupée partenaire:', err);
+      setError(err?.message || 'Erreur d\'accès réseau.');
+    } finally {
+      setLoading(false);
     }
-  };
-
-  const inputStyle: React.CSSProperties = {
-    width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #E5E7EB',
-    fontSize: 13, outline: 'none', boxSizing: 'border-box',
-  };
-  const labelStyle: React.CSSProperties = {
-    display: 'block', fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 4,
   };
 
   return (
-    <div
-      style={{
-        position: 'fixed', inset: 0, background: 'rgba(11,37,69,.6)',
-        backdropFilter: 'blur(4px)', zIndex: 9000,
-        display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20,
-      }}
-      onClick={onClose}
-    >
-      <div
-        onClick={(e) => e.stopPropagation()}
-        style={{
-          background: '#fff', borderRadius: 20, padding: 28,
-          width: '100%', maxWidth: 520, boxShadow: '0 24px 64px rgba(0,0,0,.28)',
-          maxHeight: '90vh', overflowY: 'auto',
-        }}
-      >
-        <div style={{ fontSize: 26, marginBottom: 8 }}>⭐</div>
-        <h2 style={{ fontSize: 20, fontWeight: 700, color: '#1565C0', marginBottom: 4 }}>
-          Promouvoir en partenaire
-        </h2>
-        <p style={{ color: '#6B7280', fontSize: 13, marginBottom: 18 }}>
-          {nom} ({client.email || '—'})
-          <br />
-          <span style={{ fontSize: 11, color: '#9CA3AF' }}>UID : {uid}</span>
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6 border border-gray-100 animate-in fade-in zoom-in-95 duration-200">
+        <h3 className="text-xl font-bold text-gray-900 mb-2">🤝 Attribution Statut Partenaire</h3>
+        <p className="text-sm text-gray-500 mb-4 leading-relaxed">
+          Le compte <span className="font-semibold text-blue-600 font-mono">{client.email}</span> va recevoir ses accès pour le calcul des grilles tarifaires de gros.
         </p>
 
-        <div style={{ display: 'grid', gap: 12 }}>
-          <div>
-            <label style={labelStyle}>Code partenaire (2-3 lettres MAJ)</label>
-            <input
-              style={inputStyle}
-              placeholder="Ex : IMP, ALC, JD"
-              value={code}
-              onChange={(e) => setCode(e.target.value.toUpperCase().slice(0, 3))}
-              maxLength={3}
-            />
-          </div>
-
-          <div>
-            <label style={labelStyle}>Taux de commission (%)</label>
-            <input
-              type="number"
-              step="0.1"
-              style={inputStyle}
-              value={commissionTaux}
-              onChange={(e) => setCommissionTaux(e.target.value)}
-            />
-          </div>
-
-          <div style={{ borderTop: '1px solid #E8ECF4', paddingTop: 12, marginTop: 4 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: '#1565C0', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '.5px' }}>
-              RIB partenaire (versement commissions)
-            </div>
-
-            <div style={{ display: 'grid', gap: 10 }}>
-              <div>
-                <label style={labelStyle}>IBAN</label>
-                <input style={inputStyle} placeholder="FR76..." value={ribIban} onChange={(e) => setRibIban(e.target.value)} />
-              </div>
-              <div>
-                <label style={labelStyle}>BIC / SWIFT</label>
-                <input style={inputStyle} value={ribBic} onChange={(e) => setRibBic(e.target.value)} />
-              </div>
-              <div>
-                <label style={labelStyle}>Banque</label>
-                <input style={inputStyle} value={ribBanque} onChange={(e) => setRibBanque(e.target.value)} />
-              </div>
-              <div>
-                <label style={labelStyle}>Bénéficiaire (laisser vide = nom du partenaire)</label>
-                <input style={inputStyle} value={ribBeneficiaire} onChange={(e) => setRibBeneficiaire(e.target.value)} />
-              </div>
-            </div>
-          </div>
-        </div>
-
         {error && (
-          <div style={{
-            marginTop: 14, padding: 10, background: '#FEE2E2', border: '1px solid #FCA5A5',
-            borderRadius: 8, color: '#991B1B', fontSize: 13,
-          }}>
-            {error}
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg font-medium">
+            ❌ {error}
           </div>
         )}
 
-        <div style={{ display: 'flex', gap: 10, marginTop: 22 }}>
-          <button
-            onClick={onClose}
-            disabled={submitting}
-            style={{
-              flex: 1, padding: 12, background: 'transparent', color: '#6B7280',
-              border: '1.5px solid #CBD5E1', borderRadius: 10, fontSize: 14, cursor: 'pointer',
-            }}
-          >
-            Annuler
-          </button>
-          <button
-            onClick={handleConfirm}
-            disabled={submitting || !code}
-            style={{
-              flex: 2, padding: 12,
-              background: 'linear-gradient(135deg, #7C3AED, #A855F7)',
-              color: '#fff', border: 'none', borderRadius: 10,
-              fontSize: 14, fontWeight: 700,
-              cursor: submitting ? 'wait' : 'pointer',
-              opacity: submitting || !code ? 0.6 : 1,
-            }}
-          >
-            {submitting ? 'Promotion en cours…' : '⭐ Promouvoir partenaire'}
-          </button>
-        </div>
+        <form onSubmit={handlePromotionCalculated} className="space-y-4">
+          <div>
+            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
+              Code Trigramme Partenaire Exclusif
+            </label>
+            <input
+              type="text"
+              maxLength={3}
+              minLength={3}
+              value={codePartenaire}
+              onChange={(e) => setCodePartenaire(e.target.value)}
+              placeholder="Ex: PAR, LIO, CHN"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base font-mono uppercase focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+              disabled={loading}
+              required
+            />
+          </div>
+
+          <div className="flex gap-3 justify-end pt-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors cursor-pointer"
+              disabled={loading}
+            >
+              Annuler
+            </button>
+            <button
+              type="submit"
+              className="px-5 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 shadow-md shadow-blue-500/20 disabled:opacity-50 transition-all cursor-pointer"
+              disabled={loading}
+            >
+              {loading ? 'Traitement atomique...' : '✓ Confirmer l\'attribution'}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );
-}
+};

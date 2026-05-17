@@ -1,0 +1,9 @@
+{
+  "kind": "identitytoolkit#VerifyPasswordResponse",
+  "registered": true,
+  "localId": "JHXMK2qZYi0fvtrxQHrzAmlM0lZh",
+  "email": "parisb2b@gmail.com",
+  "idToken": "eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJlbWFpbCI6InBhcmlzYjJiQGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwiYXV0aF90aW1lIjoxNzc4NTYxNTEzLCJ1c2VyX2lkIjoiSkhYTUsycVpZaTBmdnRyeFFIcnpBbWxNMGxaaCIsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZW1haWwiOlsicGFyaXNiMmJAZ21haWwuY29tIl19LCJzaWduX2luX3Byb3ZpZGVyIjoicGFzc3dvcmQifSwiaWF0IjoxNzc4NTYxNTEzLCJleHAiOjE3Nzg1NjUxMTMsImF1ZCI6ImltcG9ydG9rLTZlZjc3IiwiaXNzIjoiaHR0cHM6Ly9zZWN1cmV0b2tlbi5nb29nbGUuY29tL2ltcG9ydG9rLTZlZjc3Iiwic3ViIjoiSkhYTUsycVpZaTBmdnRyeFFIcnpBbWxNMGxaaCJ9.",
+  "refreshToken": "eyJfQXV0aEVtdWxhdG9yUmVmcmVzaFRva2VuIjoiRE8gTk9UIE1PRElGWSIsImxvY2FsSWQiOiJKSFhNSzJxWllpMGZ2dHJ4UUhyekFtbE0wbFpoIiwicHJvdmlkZXIiOiJwYXNzd29yZCIsImV4dHJhQ2xhaW1zIjp7fSwicHJvamVjdElkIjoiaW1wb3J0b2stNmVmNzcifQ==",
+  "expiresIn": "3600"
+}

@@ -1,0 +1,15 @@
+# MISSION : SYNCHRONISATION AUTH ET FIRESTORE
+
+Agis en tant qu'Expert Firebase. J'ai un décalage : des utilisateurs peuvent se connecter car ils sont dans 'Authentication', mais ils n'apparaissent pas dans mon Back-Office car ils sont absents de 'Firestore'.
+
+## 1. AFFICHAGE DE SÉCURITÉ (`admin.html`)
+- Ajoute une vérification au chargement de la liste des utilisateurs.
+- Si un utilisateur est connecté mais que son adresse n'est pas dans la liste Firestore, affiche un message d'alerte à l'administrateur.
+
+## 2. NETTOYAGE DU "VIGILE" (`app.html`)
+- Dans le script de vérification de session de `app.html`, ajoute cette règle :
+  "Si l'utilisateur est authentifié (Auth) mais que son document n'existe PAS dans la collection 'users' de Firestore, alors force la déconnexion (`auth.signOut()`) et renvoie-le à la page login."
+- Cela garantit que si je supprime quelqu'un du Back-Office, il perd son accès instantanément même s'il est encore dans la liste Firebase Auth.
+
+## 3. DÉPLOIEMENT
+C:\DATA-MC-2030\python\python.exe -c "import os; os.system('git add -A && git commit -m \"Security: Force logout if user not in Firestore list\" && git push && vercel --prod')"

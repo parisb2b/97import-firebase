@@ -1,0 +1,9 @@
+## 🔒 Mode d'exécution
+Applique avec `--dangerously-skip-permissions`
+
+## 📄 Étape 1 — Lecture des instructions
+Utilise la commande `/config set subagents true` pour accélérer le traitement et valide chaque étape par un `npx tsc --noEmit` avant de passer à la suite
+
+Lis le fichier ET applique de manière séquentielle l'intégralité du protocole maître décrit dans le fichier : `C:\DATA-MC-2030\TOTAL\V103.md`
+
+Utilise la commande `/config set subagents true` pour accélérer le traitement et valide chaque étape par un `npx tsc --noEmit` avant de passer à la suite

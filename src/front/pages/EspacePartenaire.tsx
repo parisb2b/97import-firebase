@@ -3,7 +3,7 @@ import { useLocation } from 'wouter';
 import { onAuthStateChanged, signInWithEmailAndPassword } from 'firebase/auth';
 import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
 import { clientAuth, db } from '../../lib/firebase';
-import { isPartnerRole } from '../../lib/roleUtils';
+import { isUserPartenaire } from '../../lib/roleUtils';
 
 // Réutilisation des onglets client v29
 import MesDevis from './espace-client/MesDevis';
@@ -80,7 +80,7 @@ export default function EspacePartenaire() {
       let roleSnap = await getDoc(doc(db, 'users', normalizedEmail));
       if (!roleSnap.exists()) roleSnap = await getDoc(doc(db, 'users', cred.user.uid));
       const role = roleSnap.exists() ? roleSnap.data()?.role : null;
-      if (!isPartnerRole(role)) {
+      if (!isUserPartenaire(role)) {
         setLoginErr('Ce compte n\'est pas un compte partenaire. Veuillez utiliser l\'espace client.');
         await clientAuth.signOut();
         return;

@@ -11,7 +11,7 @@ import './styles/sidebar.css';
 import '../styles/global-overrides.css';
 
 // Pages
-import Dashboard from './pages/Dashboard';
+import { Dashboard } from './pages/Dashboard';
 import ListeDevis from './pages/ListeDevis';
 import DetailDevis from './pages/DetailDevis';
 import Factures from './pages/Factures';

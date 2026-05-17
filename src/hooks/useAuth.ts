@@ -5,7 +5,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { auth, db } from '../lib/firebase';
-import { isPartnerRole } from '../lib/roleUtils';
+import { isUserPartenaire } from '../lib/roleUtils';
 
 export interface AuthState {
   user: User | null;
@@ -56,7 +56,7 @@ export function useAuth(): AuthState {
   }, []);
 
   const isAdmin = useMemo(() => role === 'admin', [role]);
-  const isPartner = useMemo(() => isPartnerRole(role), [role]);
+  const isPartner = useMemo(() => isUserPartenaire(role), [role]);
   const normalizedEmail = useMemo(() => user?.email?.toLowerCase() || null, [user]);
 
   return { user, role, loading, isAdmin, isPartner, normalizedEmail };

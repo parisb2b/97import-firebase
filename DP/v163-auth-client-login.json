@@ -1,0 +1,9 @@
+{
+  "kind": "identitytoolkit#VerifyPasswordResponse",
+  "registered": true,
+  "localId": "HaXUcks2aWFBwklNgTdUowxnTQIG",
+  "email": "mc@sasfr.com",
+  "idToken": "eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJlbWFpbCI6Im1jQHNhc2ZyLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwiYXV0aF90aW1lIjoxNzc4NTYxNTEzLCJ1c2VyX2lkIjoiSGFYVWNrczJhV0ZCd2tsTmdUZFVvd3huVFFJRyIsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZW1haWwiOlsibWNAc2FzZnIuY29tIl19LCJzaWduX2luX3Byb3ZpZGVyIjoicGFzc3dvcmQifSwiaWF0IjoxNzc4NTYxNTEzLCJleHAiOjE3Nzg1NjUxMTMsImF1ZCI6ImltcG9ydG9rLTZlZjc3IiwiaXNzIjoiaHR0cHM6Ly9zZWN1cmV0b2tlbi5nb29nbGUuY29tL2ltcG9ydG9rLTZlZjc3Iiwic3ViIjoiSGFYVWNrczJhV0ZCd2tsTmdUZFVvd3huVFFJRyJ9.",
+  "refreshToken": "eyJfQXV0aEVtdWxhdG9yUmVmcmVzaFRva2VuIjoiRE8gTk9UIE1PRElGWSIsImxvY2FsSWQiOiJIYVhVY2tzMmFXRkJ3a2xOZ1RkVW93eG5UUUlHIiwicHJvdmlkZXIiOiJwYXNzd29yZCIsImV4dHJhQ2xhaW1zIjp7fSwicHJvamVjdElkIjoiaW1wb3J0b2stNmVmNzcifQ==",
+  "expiresIn": "3600"
+}

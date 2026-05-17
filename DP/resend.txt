@@ -1,0 +1,12 @@
+Configuration de l'extension (Champs à remplir)
+SMTP Connection URI :
+smtps://resend:re_VOTRE_CLE_API@smtp.resend.com:465
+Remplacez re_VOTRE_CLE_API par votre véritable clé API Resend.
+
+smtps://resend:re_YEgQ47SP_KFxhYa9msL2743R1ovuxhwJc@smtp.resend.com:465
+Type,Nom (Host),Valeur (Content/Data),TTL
+TXT,resend._domainkey.total,p=MIGfMA... (Copiez la valeur complète),Auto / 14400
+MX,send.total,feedback-smtp.us-east-1.amazonses.com,Auto (Priorité 10)
+TXT,send.total,v=spf1 include:amazonses.com ~all,Auto / 14400
+
+3. Ajoutez les 3 enregistrements un par unPour chaque ligne fournie par Resend, créez un nouvel enregistrement dans votre zone DNS :TypeNom (Host)Valeur (Content/Data)TTLTXTresend._domainkey.totalp=MIGfMA... (Copiez la valeur complète)Auto / 14400MXsend.totalfeedback-smtp.us-east-1.amazonses.comAuto (Priorité 10)TXTsend.totalv=spf1 include:amazonses.com ~allAuto / 14400Note importante : Si votre interface d'hébergeur ajoute déjà automatiquement .sasfr.com à la fin du nom, ne tapez que la première partie (ex: resend._domainkey.total).4. Vérifiez la validation sur ResendUne fois les lignes ajoutées, retournez sur Resend.Cliquez sur le bouton Verify.Le statut "Domain" doit passer de gris à Vert (Verified).Attention : La propagation DNS peut prendre de 1 heure à 24 heures selon votre hébergeur.5. Demandez à Claude de rétablir les vrais destinatairesDès que vous voyez le cercle vert sur Resend, donnez cet ordre final à Claude Code :

@@ -1,0 +1,43 @@
+================================================================================
+🚀 97IMPORT — MATRICE DE DIAGNOSTIC ET BASELINE ARCHITECTURALE (97importGEMINI)
+================================================================================
+
+[1. PARAMÈTRES DE CONFORMITÉ INITIALE]
+--------------------------------------------------------------------------------
+- Version de Référence : v0.43.10
+- Statut Base de Données : Connecté (importok-6ef77)
+- Statut Serveur d'Hébergement : Vercel Production Connecté
+- Encodage Global Vérifié : UTF-8 Forcé
+
+[2. CARTOGRAPHIE DU CONTRÔLE D'ACCÈS RBAC ACCESSIBLE]
+--------------------------------------------------------------------------------
+- Admin Principal : parisb2b@gmail.com (UID: UYI68ThdrTZwkuA2TutwK2KUpU92) -> Rôle : admin
+- Collection de Vérification Interface : /users/{id_document}
+- Collection de Profil Applicatif : /clients/{id_document}
+- Statut Système Custom Claims : Opérationnel via Firebase Auth SDK tokens
+
+[3. SCHÉMA INITIAL DES COLLECTIONS FIRESTORE STRUCTURÉES]
+--------------------------------------------------------------------------------
+* Collections Principales :
+  ├── users             : Contient les profils d'accès et les chaînes de rôles normalisées.
+  ├── clients           : Données métiers, adresses de livraison et de facturation.
+  ├── partners          : Codes partenaires uniques (trigrammes) et suivi des commissions.
+  ├── produits          : Catalogue d'importation (champs ref, nom_fr, image, actif).
+  ├── quotes            : Devis figés contenant les snapshots d'adresses et d'acomptes.
+  └── admin_params      : Configuration système des coefficients de prix et des taux de change.
+
+[4. VÉRIFICATION DES SÉCURITÉS FIRESTORE & STORAGE]
+--------------------------------------------------------------------------------
+- Sécurité /counters  : restriction stricte d'accès aux profils habilités (isAdmin).
+- Sécurité /admin_params : accès en lecture réservé exclusivement aux comptes identifiés.
+- Sécurité /storage    : isolation des dossiers d'uploads de photos par identifiant client.
+
+[5. ÉTAT DES TESTS DE RÉGRESSION APPLICATIFS]
+--------------------------------------------------------------------------------
+- Connexions Auth Validées : 5/5 profils (Admin, Client, Client2, VIP, Partenaire)
+- Génération des Documents PDF : Palette COLORS V3, RIB complet intégré, support chinois actif.
+- Algorithme de Calcul : Normalisation arithmétique forcée à deux décimales (anti-flottant).
+
+================================================================================
+Rapport Initial Établi avec Succès. Prêt pour l'exécution de la Méga Mise à Jour.
+================================================================================
